@@ -12,7 +12,7 @@ public class BlockAllocationManager implements IBlockAllocationManager
 {
     private final FragmentedRange allocation = new FragmentedRange();
     private final FragmentedRange unallocatedBlocks = new FragmentedRange();
-    private int highestKnownBlockId = 0;
+    private int highestKnownBlockId = -1;
 
     public BlockAllocationManager(IArchiveInfoContext context, FileInventoryItem target) throws IOException
     {

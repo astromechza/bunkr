@@ -10,6 +10,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 
 import static org.junit.Assert.assertEquals;
@@ -52,6 +53,9 @@ public class TestWriteScenarios
             }
         }
         MetadataWriter.write(context);
+
+        System.out.println(tempfile);
+        Files.copy(tempfile.toPath(), new File("./scenario_one.bunkr").toPath());
     }
 
 

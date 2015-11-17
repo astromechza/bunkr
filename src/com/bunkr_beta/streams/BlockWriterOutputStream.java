@@ -45,6 +45,7 @@ public class BlockWriterOutputStream extends OutputStream
     {
         if (this.cursor == this.blockSize) this.flush();
         this.buffer[this.cursor++] = (byte) b;
+        bytesWritten += 1;
     }
 
     @Override
@@ -65,6 +66,7 @@ public class BlockWriterOutputStream extends OutputStream
             System.arraycopy(b, off + srcCursor, this.buffer, this.cursor, readAmnt);
             this.cursor += readAmnt;
             srcCursor += readAmnt;
+            bytesWritten += readAmnt;
         }
     }
 
@@ -82,6 +84,7 @@ public class BlockWriterOutputStream extends OutputStream
                 byte[] remaining = new byte[this.blockSize - this.cursor];
                 r.nextBytes(remaining);
                 this.write(remaining);
+                this.bytesWritten -= remaining.length;
                 partiallyFlushed = true;
             }
 
@@ -96,7 +99,6 @@ public class BlockWriterOutputStream extends OutputStream
                     buf.put(this.buffer, 0, cursor);
                 }
             }
-            bytesWritten += this.cursor;
             this.cursor = 0;
         }
     }
