@@ -1,9 +1,7 @@
 package com.bunkr_beta.streams;
 
-import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
-import com.bunkr_beta.inventory.FileInventoryItem;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -16,23 +14,25 @@ import java.util.EmptyStackException;
  */
 public class BlockReaderInputStream extends InputStream
 {
-    private final ArchiveInfoContext context;
-    private final FileInventoryItem target;
+    private final File filePath;
+    private final int blockSize;
+    private final long dataLength;
     private final byte[] buffer;
     private final FragmentedRange blocks;
     private long bytesRead;
     private int cursor;
 
-    public BlockReaderInputStream(ArchiveInfoContext context, FileInventoryItem target)
+    public BlockReaderInputStream(File path, int blockSize, FragmentedRange blocks, long length)
     {
         super();
-        this.context = context;
-        this.target = target;
+        this.filePath = path;
+        this.blockSize = blockSize;
+        this.dataLength = length;
 
-        this.buffer = new byte[this.context.getBlockSize()];
+        this.buffer = new byte[blockSize];
         this.cursor = 0;
 
-        this.blocks = target.blocks.copy();
+        this.blocks = blocks.copy();
         this.bytesRead = 0;
     }
 
@@ -40,8 +40,8 @@ public class BlockReaderInputStream extends InputStream
     @Override
     public int read() throws IOException
     {
-        if (bytesRead >= target.size) return -1;
-        if (cursor == this.context.getBlockSize())
+        if (bytesRead >= dataLength) return -1;
+        if (cursor == blockSize)
         {
             loadNextBlock();
         }
@@ -61,14 +61,14 @@ public class BlockReaderInputStream extends InputStream
     @Override
     public int read(byte[] b, int off, int len) throws IOException
     {
-        if (bytesRead >= target.size) return -1;
+        if (bytesRead >= dataLength) return -1;
         int remainingBytesToRead = len;
         int destCursor = 0;
         try
         {
             while (remainingBytesToRead > 0)
             {
-                int bytesThatCanBeReadFromBuffer = Math.min(remainingBytesToRead, context.getBlockSize() - cursor);
+                int bytesThatCanBeReadFromBuffer = Math.min(remainingBytesToRead, blockSize - cursor);
                 if (bytesThatCanBeReadFromBuffer > 0)
                 {
                     System.arraycopy(this.buffer, cursor, b, off + destCursor, bytesThatCanBeReadFromBuffer);
@@ -77,7 +77,7 @@ public class BlockReaderInputStream extends InputStream
                     remainingBytesToRead -= bytesThatCanBeReadFromBuffer;
                     destCursor += bytesThatCanBeReadFromBuffer;
                 }
-                if (cursor == this.context.getBlockSize())
+                if (cursor == blockSize)
                 {
                     loadNextBlock();
                 }
@@ -91,20 +91,20 @@ public class BlockReaderInputStream extends InputStream
     @Override
     public long skip(long n) throws IOException
     {
-        if (bytesRead >= target.size) return -1;
+        if (bytesRead >= dataLength) return -1;
         long remainingBytesToSkip = n;
         try
         {
             while (remainingBytesToSkip > 0)
             {
-                long bytesThatCanBeSkippedFromBuffer = Math.min(remainingBytesToSkip, context.getBlockSize() - cursor);
+                long bytesThatCanBeSkippedFromBuffer = Math.min(remainingBytesToSkip, blockSize - cursor);
                 if (bytesThatCanBeSkippedFromBuffer > 0)
                 {
                     cursor += bytesThatCanBeSkippedFromBuffer;
                     bytesRead += bytesThatCanBeSkippedFromBuffer;
                     remainingBytesToSkip -= bytesThatCanBeSkippedFromBuffer;
                 }
-                if (cursor == this.context.getBlockSize())
+                if (cursor == blockSize)
                 {
                     loadNextBlock();
                 }
@@ -118,7 +118,7 @@ public class BlockReaderInputStream extends InputStream
     @Override
     public int available() throws IOException
     {
-        long v = target.size - bytesRead;
+        long v = dataLength - bytesRead;
         if (v > Integer.MAX_VALUE) return Integer.MAX_VALUE;
         return (int) v;
     }
@@ -133,15 +133,15 @@ public class BlockReaderInputStream extends InputStream
     {
         if (this.blocks.isEmpty()) throw new EmptyStackException();
         int blockId = this.blocks.popMin();
-        long filePosition = MetadataWriter.DBL_DATA_POS + Long.BYTES + blockId * this.context.getBlockSize();
+        long filePosition = MetadataWriter.DBL_DATA_POS + Long.BYTES + blockId * blockSize;
 
-        try(RandomAccessFile raf = new RandomAccessFile(context.filePath, "r"))
+        try(RandomAccessFile raf = new RandomAccessFile(filePath, "r"))
         {
             try(FileChannel fc = raf.getChannel())
             {
-                ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, filePosition, context.getBlockSize());
+                ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, filePosition, blockSize);
                 buf.get(this.buffer);
-                this.bytesRead += (context.getBlockSize() - this.cursor);
+                this.bytesRead += (blockSize - this.cursor);
                 this.cursor = 0;
             }
         }

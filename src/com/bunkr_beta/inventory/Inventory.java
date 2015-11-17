@@ -48,7 +48,7 @@ public class Inventory
         {
             while (queuedFiles.isEmpty() && ! queuedFolders.isEmpty())
             {
-                queuedFiles.addAll(queuedFolders.poll().files);
+                queuedFiles.addAll(queuedFolders.poll().getFiles());
             }
         }
 

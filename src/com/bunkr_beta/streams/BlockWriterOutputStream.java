@@ -1,10 +1,10 @@
 package com.bunkr_beta.streams;
 
-import com.bunkr_beta.ArchiveInfoContext;
-import com.bunkr_beta.BlockAllocationManager;
 import com.bunkr_beta.MetadataWriter;
+import com.bunkr_beta.interfaces.IBlockAllocationManager;
 import com.bunkr_beta.inventory.FileInventoryItem;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
@@ -14,33 +14,36 @@ import java.security.SecureRandom;
 
 public class BlockWriterOutputStream extends OutputStream
 {
-
-    private final ArchiveInfoContext context;
+    private final File filePath;
+    private final int blockSize;
     private final FileInventoryItem target;
-    private final BlockAllocationManager blockAllocMan;
+    private final IBlockAllocationManager blockAllocMan;
 
     private byte[] buffer;
     private int cursor;
     private long bytesWritten;
     private boolean partiallyFlushed;
 
-    public BlockWriterOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws IOException
+    public BlockWriterOutputStream(File path, int blockSize, FileInventoryItem target, IBlockAllocationManager blockAllocMan) throws IOException
     {
         super();
-        this.context = context;
+        this.filePath = path;
+        this.blockSize = blockSize;
         this.target = target;
-        this.blockAllocMan = new BlockAllocationManager(context, target);
+        this.blockAllocMan = blockAllocMan;
 
-        this.buffer = new byte[this.context.getBlockSize()];
+        this.buffer = new byte[this.blockSize];
         this.cursor = 0;
         this.bytesWritten = 0;
         this.partiallyFlushed = false;
+
+        this.blockAllocMan.clearAllocation();
     }
 
     @Override
     public void write(int b) throws IOException
     {
-        if (this.cursor == this.context.getBlockSize()) this.flush();
+        if (this.cursor == this.blockSize) this.flush();
         this.buffer[this.cursor++] = (byte) b;
     }
 
@@ -56,9 +59,9 @@ public class BlockWriterOutputStream extends OutputStream
         int srcCursor = 0;
         while(srcCursor < len)
         {
-            if (this.cursor == this.context.getBlockSize()) this.flush();
-            int readAmnt = (len - srcCursor) % this.context.getBlockSize();
-            readAmnt = Math.min(readAmnt, this.context.getBlockSize() - this.cursor);
+            if (this.cursor == this.blockSize) this.flush();
+            int readAmnt = (len - srcCursor) % this.blockSize;
+            readAmnt = Math.min(readAmnt, this.blockSize - this.cursor);
             System.arraycopy(b, off + srcCursor, this.buffer, this.cursor, readAmnt);
             this.cursor += readAmnt;
             srcCursor += readAmnt;
@@ -73,23 +76,23 @@ public class BlockWriterOutputStream extends OutputStream
             if (partiallyFlushed) throw new RuntimeException(
                     "Block stream has already been partially flushed on a partial block. Flushing again would cause " +
                     "stream damage.");
-            if (this.cursor < this.context.getBlockSize())
+            if (this.cursor < this.blockSize)
             {
                 SecureRandom r = new SecureRandom();
-                byte[] remaining = new byte[context.getBlockSize() - this.cursor];
+                byte[] remaining = new byte[this.blockSize - this.cursor];
                 r.nextBytes(remaining);
                 this.write(remaining);
                 partiallyFlushed = true;
             }
 
-            int blockId = this.blockAllocMan.consumeBlock();
+            int blockId = this.blockAllocMan.allocateNextBlock();
 
-            long writePosition = blockId * context.getBlockSize() + MetadataWriter.DBL_DATA_POS + Long.BYTES;
-            try(RandomAccessFile raf = new RandomAccessFile(context.filePath, "rw"))
+            long writePosition = blockId * this.blockSize + MetadataWriter.DBL_DATA_POS + Long.BYTES;
+            try(RandomAccessFile raf = new RandomAccessFile(this.filePath, "rw"))
             {
                 try(FileChannel fc = raf.getChannel())
                 {
-                    ByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, writePosition, context.getBlockSize());
+                    ByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, writePosition, this.blockSize);
                     buf.put(this.buffer, 0, cursor);
                 }
             }
@@ -103,12 +106,9 @@ public class BlockWriterOutputStream extends OutputStream
     {
         this.flush();
 
-        long newDataBlocksLength = Math.max(
-                context.getBlockDataLength(),
-                (this.blockAllocMan.getNewAllocatedBlocks().getMax() + 1) * context.getBlockSize()
-        );
+        long newDataBlocksLength = this.blockAllocMan.getTotalBlocks() * this.blockSize;
 
-        try(RandomAccessFile raf = new RandomAccessFile(context.filePath, "rw"))
+        try(RandomAccessFile raf = new RandomAccessFile(this.filePath, "rw"))
         {
             try (FileChannel fc = raf.getChannel())
             {
@@ -117,9 +117,8 @@ public class BlockWriterOutputStream extends OutputStream
             }
         }
 
-        context.invalidate();
-        target.blocks = this.blockAllocMan.getNewAllocatedBlocks();
-        target.size = this.bytesWritten;
+        target.setBlocks(this.blockAllocMan.getAllocation());
+        target.setSize(this.bytesWritten);
     }
 
 }

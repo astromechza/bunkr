@@ -13,11 +13,11 @@ import java.util.UUID;
  */
 public class FileInventoryItem extends InventoryItem
 {
-    public long size;
-    public long modifiedAt;
-    public byte[] encryptionKey;
-    public byte[] encryptionIV;
-    public FragmentedRange blocks;
+    private long size;
+    private long modifiedAt;
+    private byte[] encryptionKey;
+    private byte[] encryptionIV;
+    private FragmentedRange blocks;
 
     @JsonCreator
     public FileInventoryItem(
@@ -50,5 +50,55 @@ public class FileInventoryItem extends InventoryItem
         r.nextBytes(encryptionKey);
         this.encryptionIV = new byte[keysize];
         r.nextBytes(encryptionIV);
+    }
+
+    public FragmentedRange getBlocks()
+    {
+        return blocks;
+    }
+
+    public void setBlocks(FragmentedRange blocks)
+    {
+        this.blocks = blocks;
+    }
+
+    public byte[] getEncryptionIV()
+    {
+        return encryptionIV;
+    }
+
+    public void setEncryptionIV(byte[] encryptionIV)
+    {
+        this.encryptionIV = encryptionIV;
+    }
+
+    public byte[] getEncryptionKey()
+    {
+        return encryptionKey;
+    }
+
+    public void setEncryptionKey(byte[] encryptionKey)
+    {
+        this.encryptionKey = encryptionKey;
+    }
+
+    public long getModifiedAt()
+    {
+        return modifiedAt;
+    }
+
+    public void setModifiedAt(long modifiedAt)
+    {
+        this.modifiedAt = modifiedAt;
+    }
+
+    public long getSize()
+    {
+        return size;
+    }
+
+    public void setSize(long size)
+    {
+        this.size = size;
     }
 }

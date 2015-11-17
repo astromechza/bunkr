@@ -1,7 +1,7 @@
 package com.bunkr_beta_tests.scenarios;
 
 import com.bunkr_beta.*;
-import com.bunkr_beta.fragmented_range.FragmentedRange;
+import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.streams.MultilayeredOutputStream;
 import org.junit.Rule;
@@ -10,9 +10,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,7 +28,7 @@ public class TestWriteScenarios
     public void TestScenarioOne() throws IOException, NoSuchAlgorithmException
     {
         File tempfile = folder.newFile("scenario_one.bunkr");
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
+        IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
         assertTrue(context.getArchiveInventory().files.isEmpty());
         assertTrue(context.getArchiveInventory().folders.isEmpty());
         assertTrue(context.isFresh());

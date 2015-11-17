@@ -2,6 +2,7 @@ package com.bunkr_beta.demos;
 
 import com.bunkr_beta.*;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
+import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
 import com.bunkr_beta.streams.CustomCipherOutputStream;
@@ -79,7 +80,7 @@ public class BuildExampleArchive2
         }
 
 
-        ArchiveInfoContext aic = new ArchiveInfoContext(new File("example.bnkr"));
+        IArchiveInfoContext aic = new ArchiveInfoContext(new File("example.bnkr"));
 
     }
 }

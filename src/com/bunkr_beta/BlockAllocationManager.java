@@ -1,65 +1,76 @@
 package com.bunkr_beta;
 
 import com.bunkr_beta.fragmented_range.FragmentedRange;
+import com.bunkr_beta.interfaces.IArchiveInfoContext;
+import com.bunkr_beta.interfaces.IBlockAllocationManager;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
 
 import java.io.IOException;
-import java.util.UUID;
 
-public class BlockAllocationManager
+public class BlockAllocationManager implements IBlockAllocationManager
 {
-    public ArchiveInfoContext context;
-    public FileInventoryItem target;
-    public FragmentedRange oldAllocatedBlocks;
-    public FragmentedRange newAllocatedBlocks;
-    public FragmentedRange nonAllocatedBlocks;
-    public int nextAllocatableBlock;
+    private final FragmentedRange allocation = new FragmentedRange();
+    private final FragmentedRange unallocatedBlocks = new FragmentedRange();
+    private int highestKnownBlockId = 0;
 
-    public BlockAllocationManager(ArchiveInfoContext context, FileInventoryItem target) throws IOException
+    public BlockAllocationManager(IArchiveInfoContext context, FileInventoryItem target) throws IOException
     {
-        this.context = context;
-        this.target = target;
-
-        context.assertFresh();
-
-        FileInventoryItem foundItem = null;
-        this.newAllocatedBlocks = new FragmentedRange();
-        this.nextAllocatableBlock = (int)context.getNumBlocks();
-        this.nonAllocatedBlocks = new FragmentedRange(0, this.nextAllocatableBlock);
+        allocation.union(target.getBlocks());
+        unallocatedBlocks.add(0, (int)context.getNumBlocks());
         Inventory.InventoryIterator fileIterator = context.getArchiveInventory().getIterator();
         while (fileIterator.hasNext())
         {
             FileInventoryItem item = fileIterator.next();
-            this.nonAllocatedBlocks.subtract(item.blocks);
+            unallocatedBlocks.subtract(item.getBlocks());
+            highestKnownBlockId = Math.max(highestKnownBlockId, item.getBlocks().getMax());
         }
-        this.oldAllocatedBlocks = target.blocks.copy();
     }
 
-    public int consumeBlock()
+    @Override
+    public FragmentedRange getAllocation()
     {
-        int blockId;
-        if(this.oldAllocatedBlocks.isEmpty())
+        return this.allocation;
+    }
+
+    @Override
+    public int getTotalBlocks()
+    {
+        return highestKnownBlockId + 1;
+    }
+
+    @Override
+    public int getNextAllocatableBlockId()
+    {
+        if (this.unallocatedBlocks.isEmpty())
         {
-            if(this.nonAllocatedBlocks.isEmpty())
-            {
-                blockId = nextAllocatableBlock++;
-            }
-            else
-            {
-                blockId = nonAllocatedBlocks.popMin();
-            }
+            // this will give you the id of the logical 'next' block that will extend the data section
+            return this.getTotalBlocks();
         }
         else
         {
-            blockId = oldAllocatedBlocks.popMin();
+            return this.unallocatedBlocks.getMin();
         }
-        this.newAllocatedBlocks.add(blockId);
+    }
+
+    @Override
+    public int allocateBlock(int blockId)
+    {
+        if (!this.unallocatedBlocks.isEmpty() && !this.unallocatedBlocks.contains(blockId))
+            throw new IllegalArgumentException("There are unallocated blocks that have not been allocated yet");
+        if (this.unallocatedBlocks.isEmpty() && blockId != this.getNextAllocatableBlockId())
+            throw new IllegalArgumentException("The next block you're allowed to allocate is " + this.getNextAllocatableBlockId());
+
+        this.unallocatedBlocks.remove(blockId);
+        this.allocation.add(blockId);
+        this.highestKnownBlockId = Math.max(this.highestKnownBlockId, blockId);
         return blockId;
     }
 
-    public FragmentedRange getNewAllocatedBlocks()
+    @Override
+    public void clearAllocation()
     {
-        return newAllocatedBlocks;
+        this.unallocatedBlocks.union(this.allocation);
+        this.allocation.clear();
     }
 }

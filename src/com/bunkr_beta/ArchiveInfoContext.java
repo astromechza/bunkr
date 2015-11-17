@@ -1,12 +1,13 @@
 package com.bunkr_beta;
 
+import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.Inventory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 
-public class ArchiveInfoContext
+public class ArchiveInfoContext implements IArchiveInfoContext
 {
     public final File filePath;
     private Inventory archiveInventory;
@@ -22,6 +23,7 @@ public class ArchiveInfoContext
         this.refresh();
     }
 
+    @Override
     public void refresh() throws IOException, NoSuchAlgorithmException
     {
         try(FileInputStream fis = new FileInputStream(this.filePath))
@@ -34,7 +36,7 @@ public class ArchiveInfoContext
                 dis.readByte();
                 dis.readByte();
                 this.blockSize = dis.readInt();
-                this.blockDataOffset = 5 + 3 + 4;
+                this.blockDataOffset = 5 + 3 + Integer.BYTES;
                 this.blockDataLength = dis.readLong();
                 IO.reliableSkip(dis, this.blockDataLength);
                 String invjson = IO.readString(dis);
@@ -46,16 +48,19 @@ public class ArchiveInfoContext
         this.fresh = true;
     }
 
+    @Override
     public boolean isFresh()
     {
         return this.fresh;
     }
 
+    @Override
     public void invalidate()
     {
         this.fresh = false;
     }
 
+    @Override
     public void assertFresh()
     {
         if (! isFresh())
@@ -65,26 +70,31 @@ public class ArchiveInfoContext
     }
 
 
+    @Override
     public int getBlockSize()
     {
         return blockSize;
     }
 
+    @Override
     public Descriptor getArchiveDescriptor()
     {
         return archiveDescriptor;
     }
 
+    @Override
     public Inventory getArchiveInventory()
     {
         return archiveInventory;
     }
 
+    @Override
     public long getNumBlocks()
     {
         return this.blockDataLength / this.blockSize;
     }
 
+    @Override
     public long getBlockDataLength()
     {
         return blockDataLength;

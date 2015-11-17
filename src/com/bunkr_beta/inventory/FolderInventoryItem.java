@@ -11,8 +11,8 @@ import java.util.UUID;
  */
 public class FolderInventoryItem extends InventoryItem
 {
-    public final ArrayList<FolderInventoryItem> folders;
-    public final ArrayList<FileInventoryItem> files;
+    private final ArrayList<FolderInventoryItem> folders;
+    private final ArrayList<FileInventoryItem> files;
 
     public FolderInventoryItem(
             @JsonProperty("name") String name,
@@ -24,5 +24,15 @@ public class FolderInventoryItem extends InventoryItem
         super(name, uuid);
         this.files = files;
         this.folders = folders;
+    }
+
+    public ArrayList<FileInventoryItem> getFiles()
+    {
+        return files;
+    }
+
+    public ArrayList<FolderInventoryItem> getFolders()
+    {
+        return folders;
     }
 }

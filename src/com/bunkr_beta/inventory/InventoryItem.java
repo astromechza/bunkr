@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 public class InventoryItem
 {
-    public final UUID uuid;
+    private final UUID uuid;
     private String name;
 
     @JsonCreator
@@ -32,5 +32,10 @@ public class InventoryItem
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public UUID getUuid()
+    {
+        return uuid;
     }
 }
