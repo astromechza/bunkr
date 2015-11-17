@@ -103,7 +103,7 @@ public class TestWriteScenarios
             assertEquals(inventory.files.get(0).getName(), "some file.txt");
             assertEquals(inventory.files.get(0).getBlocks().toString(), "FragmentedRange{0,1,2,3,}");
             assertEquals(inventory.files.get(0).getUuid(), newFile.getUuid());
-            assertEquals(inventory.files.get(0).getSize(), newFile.getSize());
+            assertEquals(inventory.files.get(0).getSizeOnDisk(), newFile.getSizeOnDisk());
             assertEquals(inventory.files.get(0).getModifiedAt(), newFile.getModifiedAt());
             assertArrayEquals(inventory.files.get(0).getEncryptionIV(), newFile.getEncryptionIV());
             assertArrayEquals(inventory.files.get(0).getEncryptionKey(), newFile.getEncryptionKey());
@@ -178,7 +178,7 @@ public class TestWriteScenarios
             assertEquals(inventory.files.get(0).getName(), fileOne.getName());
             assertEquals(inventory.files.get(0).getBlocks().toString(), fileOne.getBlocks().toString());
             assertEquals(inventory.files.get(0).getUuid(), fileOne.getUuid());
-            assertEquals(inventory.files.get(0).getSize(), fileOne.getSize());
+            assertEquals(inventory.files.get(0).getSizeOnDisk(), fileOne.getSizeOnDisk());
             assertEquals(inventory.files.get(0).getModifiedAt(), fileOne.getModifiedAt());
             assertArrayEquals(inventory.files.get(0).getEncryptionIV(), fileOne.getEncryptionIV());
             assertArrayEquals(inventory.files.get(0).getEncryptionKey(), fileOne.getEncryptionKey());
@@ -186,7 +186,7 @@ public class TestWriteScenarios
             assertEquals(inventory.files.get(1).getName(), fileTwo.getName());
             assertEquals(inventory.files.get(1).getBlocks().toString(), fileTwo.getBlocks().toString());
             assertEquals(inventory.files.get(1).getUuid(), fileTwo.getUuid());
-            assertEquals(inventory.files.get(1).getSize(), fileTwo.getSize());
+            assertEquals(inventory.files.get(1).getSizeOnDisk(), fileTwo.getSizeOnDisk());
             assertEquals(inventory.files.get(1).getModifiedAt(), fileTwo.getModifiedAt());
             assertArrayEquals(inventory.files.get(1).getEncryptionIV(), fileTwo.getEncryptionIV());
             assertArrayEquals(inventory.files.get(1).getEncryptionKey(), fileTwo.getEncryptionKey());
@@ -236,7 +236,7 @@ public class TestWriteScenarios
             assertEquals(holder.getName(), "some file.txt");
             assertEquals(holder.getBlocks().toString(), "FragmentedRange{}");
             assertEquals(holder.getUuid(), newFile.getUuid());
-            assertEquals(holder.getSize(), newFile.getSize());
+            assertEquals(holder.getSizeOnDisk(), newFile.getSizeOnDisk());
             assertEquals(holder.getModifiedAt(), newFile.getModifiedAt());
             assertArrayEquals(holder.getEncryptionIV(), newFile.getEncryptionIV());
             assertArrayEquals(holder.getEncryptionKey(), newFile.getEncryptionKey());

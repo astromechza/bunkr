@@ -13,18 +13,20 @@ import java.util.UUID;
  */
 public class FileInventoryItem extends InventoryItem
 {
-    private long size;
+    private long sizeOnDisk;
     private long modifiedAt;
     private byte[] encryptionKey;
     private byte[] encryptionIV;
     private FragmentedRange blocks;
+    private long actualSize;
 
     @JsonCreator
     public FileInventoryItem(
             @JsonProperty("name") String name,
             @JsonProperty("uuid") UUID uuid,
             @JsonProperty("blocks") FragmentedRange blocks,
-            @JsonProperty("size") long size,
+            @JsonProperty("sizeOnDisk") long sizeOnDisk,
+            @JsonProperty("actualSize") long actualSize,
             @JsonProperty("modifiedAt") long modifiedAt,
             @JsonProperty("encryptionKey") byte[] encryptionKey,
             @JsonProperty("encryptionIV") byte[] encryptionIV
@@ -33,7 +35,8 @@ public class FileInventoryItem extends InventoryItem
         super(name, uuid);
         this.encryptionKey = encryptionKey;
         this.encryptionIV = encryptionIV;
-        this.size = size;
+        this.sizeOnDisk = sizeOnDisk;
+        this.actualSize = actualSize;
         this.modifiedAt = modifiedAt;
         this.blocks = blocks;
     }
@@ -41,7 +44,7 @@ public class FileInventoryItem extends InventoryItem
     public FileInventoryItem(String name)
     {
         super(name, UUID.randomUUID());
-        this.size = 0;
+        this.sizeOnDisk = 0;
         this.blocks = new FragmentedRange();
         this.modifiedAt = System.currentTimeMillis();
         SecureRandom r = new SecureRandom();
@@ -92,13 +95,23 @@ public class FileInventoryItem extends InventoryItem
         this.modifiedAt = modifiedAt;
     }
 
-    public long getSize()
+    public long getSizeOnDisk()
     {
-        return size;
+        return sizeOnDisk;
     }
 
-    public void setSize(long size)
+    public void setSizeOnDisk(long sizeOnDisk)
     {
-        this.size = size;
+        this.sizeOnDisk = sizeOnDisk;
+    }
+
+    public void setActualSize(long actualSize)
+    {
+        this.actualSize = actualSize;
+    }
+
+    public long getActualSize()
+    {
+        return this.actualSize;
     }
 }

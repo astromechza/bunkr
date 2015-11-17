@@ -20,12 +20,17 @@ import java.util.zip.DeflaterOutputStream;
  */
 public class MultilayeredOutputStream extends OutputStream
 {
+    private final FileInventoryItem target;
+
     private StreamStack<OutputStream> streams = new StreamStack<>();
 
     private OutputStream topStream;
 
+    private long writtenBytes = 0;
+
     public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws IOException
     {
+        this.target = target;
         this.streams.push(
                 new BlockWriterOutputStream(
                         context.filePath,
@@ -43,15 +48,16 @@ public class MultilayeredOutputStream extends OutputStream
             );
             this.streams.push(
                     new CustomCipherOutputStream(
-                            new NonClosableOutputStream(this.streams.get(0)),
+                            new NonClosableOutputStream(this.streams.peek()),
                             new BufferedBlockCipher(fileCipher)
                     )
             );
         }
         if (context.getArchiveDescriptor().compression != null)
         {
-            this.streams.push(new DeflaterOutputStream(this.streams.get(0)));
+            this.streams.push(new DeflaterOutputStream(this.streams.peek()));
         }
+
         this.topStream = this.streams.peek();
     }
 
@@ -59,18 +65,21 @@ public class MultilayeredOutputStream extends OutputStream
     public void write(int b) throws IOException
     {
         this.topStream.write(b);
+        writtenBytes += 1;
     }
 
     @Override
     public void write(byte[] b) throws IOException
     {
         this.topStream.write(b);
+        writtenBytes += b.length;
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException
     {
         this.topStream.write(b, off, len);
+        writtenBytes += len;
     }
 
     @Override
@@ -89,6 +98,7 @@ public class MultilayeredOutputStream extends OutputStream
         {
             stream.close();
         }
+        target.setActualSize(this.writtenBytes);
     }
 
     public class StreamStack<T> extends ArrayList<T>
