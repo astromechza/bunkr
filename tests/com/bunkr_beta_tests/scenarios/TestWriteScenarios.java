@@ -31,7 +31,7 @@ public class TestWriteScenarios
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void TestScenarioOne() throws IOException, NoSuchAlgorithmException
+    public void testEmptyArchive() throws IOException, NoSuchAlgorithmException
     {
         File tempfile = folder.newFile();
         IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
@@ -65,7 +65,7 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void TestScenarioTwo() throws IOException, NoSuchAlgorithmException
+    public void testSingleFile() throws IOException, NoSuchAlgorithmException
     {
         File tempfile = folder.newFile();
 
@@ -119,7 +119,7 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void TestScenarioThree() throws IOException, NoSuchAlgorithmException
+    public void testMultipleFiles() throws IOException, NoSuchAlgorithmException
     {
         File tempfile = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
@@ -202,7 +202,7 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void TestScenarioFour() throws IOException, NoSuchAlgorithmException
+    public void testFoldersAndFile() throws IOException, NoSuchAlgorithmException
     {
         File tempfile = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
@@ -249,7 +249,5 @@ public class TestWriteScenarios
 
             assertEquals(dis.available(), 0);
         }
-
     }
-
 }
