@@ -3,6 +3,7 @@ package com.bunkr_beta_tests.scenarios;
 import com.bunkr_beta.*;
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.FileInventoryItem;
+import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
 import com.bunkr_beta.streams.MultilayeredOutputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +15,6 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -33,7 +33,7 @@ public class TestWriteScenarios
     @Test
     public void TestScenarioOne() throws IOException, NoSuchAlgorithmException
     {
-        File tempfile = folder.newFile("scenario_one.bunkr");
+        File tempfile = folder.newFile();
         IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
         assertTrue(context.getArchiveInventory().files.isEmpty());
         assertTrue(context.getArchiveInventory().folders.isEmpty());
@@ -67,7 +67,7 @@ public class TestWriteScenarios
     @Test
     public void TestScenarioTwo() throws IOException, NoSuchAlgorithmException
     {
-        File tempfile = folder.newFile("scenario_two.bunkr");
+        File tempfile = folder.newFile();
 
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
 
@@ -121,7 +121,7 @@ public class TestWriteScenarios
     @Test
     public void TestScenarioThree() throws IOException, NoSuchAlgorithmException
     {
-        File tempfile = folder.newFile("scenario_three.bunkr");
+        File tempfile = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
@@ -200,4 +200,56 @@ public class TestWriteScenarios
             assertEquals(dis.available(), 0);
         }
     }
+
+    @Test
+    public void TestScenarioFour() throws IOException, NoSuchAlgorithmException
+    {
+        File tempfile = folder.newFile();
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
+
+        FolderInventoryItem folder1 = new FolderInventoryItem("some folder");
+        FolderInventoryItem folder2 = new FolderInventoryItem("another folder");
+        FolderInventoryItem folder3 = new FolderInventoryItem("another folder");
+        folder1.getFolders().add(folder2);
+        context.getArchiveInventory().folders.add(folder1);
+        context.getArchiveInventory().folders.add(folder3);
+
+        FileInventoryItem newFile = new FileInventoryItem("some file.txt");
+        folder1.getFiles().add(newFile);
+        MetadataWriter.write(context);
+
+        try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
+        {
+            assertEquals(IO.readNByteString(dis, 5), "BUNKR");
+            assertEquals(dis.read(), 0);
+            assertEquals(dis.read(), 0);
+            assertEquals(dis.read(), 1);
+            assertEquals(dis.readInt(), 1024);
+            assertEquals(dis.readLong(), 0);
+            String invJSON = IO.readNByteString(dis, dis.readInt());
+            Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
+
+            assertEquals(inventory.files.size(), 0);
+            assertEquals(inventory.folders.size(), 2);
+
+            FileInventoryItem holder = inventory.folders.get(0).getFiles().get(0);
+            assertEquals(holder.getName(), "some file.txt");
+            assertEquals(holder.getBlocks().toString(), "FragmentedRange{}");
+            assertEquals(holder.getUuid(), newFile.getUuid());
+            assertEquals(holder.getSize(), newFile.getSize());
+            assertEquals(holder.getModifiedAt(), newFile.getModifiedAt());
+            assertArrayEquals(holder.getEncryptionIV(), newFile.getEncryptionIV());
+            assertArrayEquals(holder.getEncryptionKey(), newFile.getEncryptionKey());
+
+            String desJSON = IO.readNByteString(dis, dis.readInt());
+            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
+
+            assertEquals(descriptor.compression, null);
+            assertEquals(descriptor.encryption, null);
+
+            assertEquals(dis.available(), 0);
+        }
+
+    }
+
 }

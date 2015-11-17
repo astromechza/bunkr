@@ -26,6 +26,13 @@ public class FolderInventoryItem extends InventoryItem
         this.folders = folders;
     }
 
+    public FolderInventoryItem(String name)
+    {
+        super(name, UUID.randomUUID());
+        this.files = new ArrayList<>();
+        this.folders = new ArrayList<>();
+    }
+
     public ArrayList<FileInventoryItem> getFiles()
     {
         return files;
