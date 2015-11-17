@@ -39,12 +39,35 @@ public class TestWriteScenarios
         assertTrue(context.getArchiveInventory().folders.isEmpty());
         assertTrue(context.isFresh());
         assertEquals(context.getBlockSize(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
+
+        try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
+        {
+            assertEquals(IO.readNByteString(dis, 5), "BUNKR");
+            assertEquals(dis.read(), 0);
+            assertEquals(dis.read(), 0);
+            assertEquals(dis.read(), 1);
+            assertEquals(dis.readInt(), 1024);
+            assertEquals(dis.readLong(), 0);
+
+            String invJSON = IO.readNByteString(dis, dis.readInt());
+            Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
+            assertEquals(inventory.files.size(), 0);
+            assertEquals(inventory.folders.size(), 0);
+
+            String desJSON = IO.readNByteString(dis, dis.readInt());
+            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
+
+            assertEquals(descriptor.compression, null);
+            assertEquals(descriptor.encryption, null);
+
+            assertEquals(dis.available(), 0);
+        }
     }
 
     @Test
     public void TestScenarioTwo() throws IOException, NoSuchAlgorithmException
     {
-        File tempfile = folder.newFile("scenario_one.bunkr");
+        File tempfile = folder.newFile("scenario_two.bunkr");
 
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
 
@@ -68,7 +91,7 @@ public class TestWriteScenarios
             assertEquals(dis.readInt(), 1024);
             assertEquals(dis.readLong(), 4096);
             byte[] data = new byte[4096];
-            dis.read(data);
+            assertEquals(dis.read(data), 4096);
             for (int i = 0; i < 3333; i++)
             {
                 assertEquals(data[i], (65 + i % 26));
@@ -90,10 +113,91 @@ public class TestWriteScenarios
 
             assertEquals(descriptor.compression, null);
             assertEquals(descriptor.encryption, null);
-            
+
             assertEquals(dis.available(), 0);
         }
     }
 
+    @Test
+    public void TestScenarioThree() throws IOException, NoSuchAlgorithmException
+    {
+        File tempfile = folder.newFile("scenario_three.bunkr");
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
 
+        FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
+        {
+            context.getArchiveInventory().files.add(fileOne);
+            try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
+            {
+                for (int i = 0; i < 3333; i++)
+                {
+                    bwos.write(65 + i % 26);
+                }
+            }
+            MetadataWriter.write(context);
+        }
+
+        FileInventoryItem fileTwo = new FileInventoryItem("another file.txt");
+        {
+            context.getArchiveInventory().files.add(fileTwo);
+            try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileTwo))
+            {
+                for (int i = 0; i < 50; i++)
+                {
+                    bwos.write(65 + i % 26);
+                }
+            }
+            MetadataWriter.write(context);
+        }
+
+        try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
+        {
+            assertEquals(IO.readNByteString(dis, 5), "BUNKR");
+            assertEquals(dis.read(), 0);
+            assertEquals(dis.read(), 0);
+            assertEquals(dis.read(), 1);
+            assertEquals(dis.readInt(), 1024);
+            assertEquals(dis.readLong(), 5120);
+            byte[] data = new byte[4096];
+            assertEquals(dis.read(data), 4096);
+            for (int i = 0; i < 3333; i++)
+            {
+                assertEquals(data[i], (65 + i % 26));
+            }
+            data = new byte[1024];
+            assertEquals(dis.read(data), 1024);
+            for (int i = 0; i < 50; i++)
+            {
+                assertEquals(data[i], (65 + i % 26));
+            }
+            String invJSON = IO.readNByteString(dis, dis.readInt());
+            Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
+            assertEquals(inventory.files.size(), 2);
+            assertEquals(inventory.folders.size(), 0);
+
+            assertEquals(inventory.files.get(0).getName(), fileOne.getName());
+            assertEquals(inventory.files.get(0).getBlocks().toString(), fileOne.getBlocks().toString());
+            assertEquals(inventory.files.get(0).getUuid(), fileOne.getUuid());
+            assertEquals(inventory.files.get(0).getSize(), fileOne.getSize());
+            assertEquals(inventory.files.get(0).getModifiedAt(), fileOne.getModifiedAt());
+            assertArrayEquals(inventory.files.get(0).getEncryptionIV(), fileOne.getEncryptionIV());
+            assertArrayEquals(inventory.files.get(0).getEncryptionKey(), fileOne.getEncryptionKey());
+
+            assertEquals(inventory.files.get(1).getName(), fileTwo.getName());
+            assertEquals(inventory.files.get(1).getBlocks().toString(), fileTwo.getBlocks().toString());
+            assertEquals(inventory.files.get(1).getUuid(), fileTwo.getUuid());
+            assertEquals(inventory.files.get(1).getSize(), fileTwo.getSize());
+            assertEquals(inventory.files.get(1).getModifiedAt(), fileTwo.getModifiedAt());
+            assertArrayEquals(inventory.files.get(1).getEncryptionIV(), fileTwo.getEncryptionIV());
+            assertArrayEquals(inventory.files.get(1).getEncryptionKey(), fileTwo.getEncryptionKey());
+
+            String desJSON = IO.readNByteString(dis, dis.readInt());
+            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
+
+            assertEquals(descriptor.compression, null);
+            assertEquals(descriptor.encryption, null);
+
+            assertEquals(dis.available(), 0);
+        }
+    }
 }

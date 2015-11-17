@@ -42,6 +42,7 @@ public class Inventory
         public InventoryIterator(Inventory inv)
         {
             queuedFolders.addAll(inv.folders);
+            queuedFiles.addAll(inv.files);
         }
 
         private void fillFileQueue()

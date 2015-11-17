@@ -23,7 +23,10 @@ public class BlockAllocationManager implements IBlockAllocationManager
         {
             FileInventoryItem item = fileIterator.next();
             unallocatedBlocks.subtract(item.getBlocks());
-            highestKnownBlockId = Math.max(highestKnownBlockId, item.getBlocks().getMax());
+            if (!item.getBlocks().isEmpty())
+            {
+                highestKnownBlockId = Math.max(highestKnownBlockId, item.getBlocks().getMax());
+            }
         }
     }
 
