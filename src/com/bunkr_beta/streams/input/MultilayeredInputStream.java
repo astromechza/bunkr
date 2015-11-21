@@ -3,6 +3,11 @@ package com.bunkr_beta.streams.input;
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.ArrayStack;
 import com.bunkr_beta.inventory.FileInventoryItem;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.modes.SICBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +34,18 @@ public class MultilayeredInputStream extends InputStream
         );
         if (context.getArchiveDescriptor().encryption != null)
         {
-            throw new RuntimeException("Not implemented");
+            SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
+            fileCipher.init(
+                    false,
+                    new ParametersWithIV(new KeyParameter(target.getEncryptionKey()), target.getEncryptionIV())
+            );
+
+            this.streams.push(
+                new CustomCipherInputStream(
+                    new NonClosableInputStream(this.streams.peek()),
+                    new BufferedBlockCipher(fileCipher)
+                )
+            );
         }
         if (context.getArchiveDescriptor().compression != null)
         {

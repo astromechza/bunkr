@@ -10,6 +10,7 @@ import java.io.OutputStream;
  * Created by benmeier on 15/10/26.
  *
  * borrowed heavily from spongy castle
+ * Borrowed from org/spongycastle/crypto/io/CipherOutputStream.java
  */
 public class CustomCipherOutputStream extends FilterOutputStream
 {

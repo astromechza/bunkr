@@ -7,14 +7,12 @@ import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.streams.input.MultilayeredInputStream;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 
 import static org.hamcrest.CoreMatchers.is;
