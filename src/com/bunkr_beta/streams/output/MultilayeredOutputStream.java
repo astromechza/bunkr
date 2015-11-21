@@ -1,7 +1,8 @@
-package com.bunkr_beta.streams;
+package com.bunkr_beta.streams.output;
 
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.BlockAllocationManager;
+import com.bunkr_beta.ArrayStack;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -11,7 +12,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.zip.DeflaterOutputStream;
 
 /**
@@ -22,9 +23,7 @@ public class MultilayeredOutputStream extends OutputStream
 {
     private final FileInventoryItem target;
 
-    private StreamStack<OutputStream> streams = new StreamStack<>();
-
-    private OutputStream topStream;
+    private ArrayStack<OutputStream> streams = new ArrayStack<>();
 
     private long writtenBytes = 0;
 
@@ -32,12 +31,12 @@ public class MultilayeredOutputStream extends OutputStream
     {
         this.target = target;
         this.streams.push(
-                new BlockWriterOutputStream(
-                        context.filePath,
-                        context.getBlockSize(),
-                        target,
-                        new BlockAllocationManager(context, target)
-                )
+            new BlockWriterOutputStream(
+                    context.filePath,
+                    context.getBlockSize(),
+                    target,
+                    new BlockAllocationManager(context, target)
+            )
         );
         if (context.getArchiveDescriptor().encryption != null)
         {
@@ -47,70 +46,57 @@ public class MultilayeredOutputStream extends OutputStream
                     new ParametersWithIV(new KeyParameter(target.getEncryptionKey()), target.getEncryptionIV())
             );
             this.streams.push(
-                    new CustomCipherOutputStream(
-                            new NonClosableOutputStream(this.streams.peek()),
-                            new BufferedBlockCipher(fileCipher)
-                    )
+                new CustomCipherOutputStream(
+                        new NonClosableOutputStream(this.streams.peek()),
+                        new BufferedBlockCipher(fileCipher)
+                )
             );
         }
         if (context.getArchiveDescriptor().compression != null)
         {
             this.streams.push(new DeflaterOutputStream(this.streams.peek()));
         }
-
-        this.topStream = this.streams.peek();
     }
 
     @Override
     public void write(int b) throws IOException
     {
-        this.topStream.write(b);
+        this.streams.peek().write(b);
         writtenBytes += 1;
     }
 
     @Override
     public void write(byte[] b) throws IOException
     {
-        this.topStream.write(b);
+        this.streams.peek().write(b);
         writtenBytes += b.length;
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException
     {
-        this.topStream.write(b, off, len);
+        this.streams.peek().write(b, off, len);
         writtenBytes += len;
     }
 
     @Override
     public void flush() throws IOException
     {
-        for (OutputStream stream : streams)
+        Iterator<OutputStream> i = this.streams.topToBottom();
+        while(i.hasNext())
         {
-            stream.flush();
+            i.next().flush();
         }
     }
 
     @Override
     public void close() throws IOException
     {
-        for (OutputStream stream : streams)
+        Iterator<OutputStream> i = this.streams.topToBottom();
+        while(i.hasNext())
         {
-            stream.close();
+            i.next().close();
         }
         target.setActualSize(this.writtenBytes);
-    }
-
-    public class StreamStack<T> extends ArrayList<T>
-    {
-        public void push(T t)
-        {
-            this.add(0, t);
-        }
-
-        public T peek()
-        {
-            return this.get(0);
-        }
     }
 }

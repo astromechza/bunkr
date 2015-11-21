@@ -5,7 +5,7 @@ import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
-import com.bunkr_beta.streams.MultilayeredOutputStream;
+import com.bunkr_beta.streams.output.MultilayeredOutputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Rule;
 import org.junit.Test;

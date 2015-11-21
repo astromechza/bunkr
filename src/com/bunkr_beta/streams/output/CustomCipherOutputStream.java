@@ -1,4 +1,4 @@
-package com.bunkr_beta.streams;
+package com.bunkr_beta.streams.output;
 
 import org.bouncycastle.crypto.BufferedBlockCipher;
 

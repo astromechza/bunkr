@@ -1,4 +1,4 @@
-package com.bunkr_beta.streams;
+package com.bunkr_beta.streams.input;
 
 import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
@@ -30,7 +30,7 @@ public class BlockReaderInputStream extends InputStream
         this.dataLength = length;
 
         this.buffer = new byte[blockSize];
-        this.cursor = 0;
+        this.cursor = this.blockSize;
 
         this.blocks = blocks.copy();
         this.bytesRead = 0;
