@@ -1,9 +1,6 @@
 package com.bunkr_beta_tests.scenarios;
 
-import com.bunkr_beta.ArchiveBuilder;
-import com.bunkr_beta.ArchiveInfoContext;
-import com.bunkr_beta.Descriptor;
-import com.bunkr_beta.MetadataWriter;
+import com.bunkr_beta.*;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.streams.input.MultilayeredInputStream;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
@@ -62,12 +59,10 @@ public class TestReadScenarios
             MetadataWriter.write(context);
         }
 
-        Files.copy(context.filePath.toPath(), new File(context.filePath.getName()).toPath());
-
         try(MultilayeredInputStream ms = new MultilayeredInputStream(context, fileOne))
         {
             byte[] buffer = new byte[1500];
-            assertThat(ms.read(buffer), is(equalTo(1500)));
+            assertThat(IO.reliableRead(ms, buffer), is(equalTo(1500)));
             for (int i = 0; i < 1500; i++)
             {
                 assertThat((int)buffer[i], is(equalTo(65 + i % 10)));
@@ -77,7 +72,7 @@ public class TestReadScenarios
         try(MultilayeredInputStream ms = new MultilayeredInputStream(context, fileTwo))
         {
             byte[] buffer = new byte[50];
-            assertThat(ms.read(buffer), is(equalTo(50)));
+            assertThat(IO.reliableRead(ms, buffer), is(equalTo(50)));
             for (int i = 0; i < 50; i++)
             {
                 assertThat((int)buffer[i], is(equalTo(75 + i % 10)));
@@ -120,6 +115,18 @@ public class TestReadScenarios
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
                 .EncryptionDescriptor("", "", "".getBytes()), null));
+
+        runThreeFileTestOnContext(context);
+    }
+
+    @Test
+    public void testReadingWithCompressionAndEncryption() throws IOException, NoSuchAlgorithmException
+    {
+        File tempfile = folder.newPrefixedFile("withboth");
+
+        // first create the demo file
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
+                .EncryptionDescriptor("", "", "".getBytes()), new Descriptor.CompressionDescriptor("")));
 
         runThreeFileTestOnContext(context);
     }

@@ -32,6 +32,25 @@ public class IO
         }
     }
 
+    public static int reliableRead(InputStream is, byte[] dst) throws IOException
+    {
+        return reliableRead(is, dst, 0, dst.length);
+    }
+
+    public static int reliableRead(InputStream is, byte[] dst, int off, int n) throws IOException
+    {
+        int stillToRead = n;
+        int successfullyRead = 0;
+        while (stillToRead > 0)
+        {
+            int read = is.read(dst, off + successfullyRead, stillToRead);
+            if (read == -1) break;
+            stillToRead -= read;
+            successfullyRead += read;
+        }
+        return successfullyRead;
+    }
+
     public static String convertToJson(Object object) throws IOException
     {
         ObjectMapper om = new ObjectMapper();
