@@ -22,8 +22,12 @@ public class MultilayeredInputStream extends InputStream
 {
     private ArrayStack<InputStream> streams = new ArrayStack<>();
 
+    private final boolean emptyFile;
+
     public MultilayeredInputStream(ArchiveInfoContext context, FileInventoryItem target)
     {
+        this.emptyFile = target.getActualSize() == 0;
+
         this.streams.push(
             new BlockReaderInputStream(
                     context.filePath,
@@ -68,18 +72,21 @@ public class MultilayeredInputStream extends InputStream
     @Override
     public int read() throws IOException
     {
+        if(this.emptyFile) return -1;
         return this.streams.peek().read();
     }
 
     @Override
     public int read(byte[] b) throws IOException
     {
+        if(this.emptyFile) return -1;
         return this.streams.peek().read(b);
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException
     {
+        if(this.emptyFile) return -1;
         return this.streams.peek().read(b, off, len);
     }
 

@@ -7,12 +7,14 @@ import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.streams.input.MultilayeredInputStream;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
+import com.bunkr_beta_tests.XTemporaryFolder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -26,15 +28,10 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class TestReadScenarios
 {
     @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    public XTemporaryFolder folder = new XTemporaryFolder();
 
-    @Test
-    public void testBasicReading() throws IOException, NoSuchAlgorithmException
+    private void runThreeFileTestOnContext(ArchiveInfoContext context) throws IOException
     {
-        File tempfile = folder.newFile();
-
-        // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         {
             context.getArchiveInventory().files.add(fileOne);
@@ -65,9 +62,10 @@ public class TestReadScenarios
             MetadataWriter.write(context);
         }
 
+        Files.copy(context.filePath.toPath(), new File(context.filePath.getName()).toPath());
+
         try(MultilayeredInputStream ms = new MultilayeredInputStream(context, fileOne))
         {
-            assertThat(ms.available(), is(equalTo(1500)));
             byte[] buffer = new byte[1500];
             assertThat(ms.read(buffer), is(equalTo(1500)));
             for (int i = 0; i < 1500; i++)
@@ -78,7 +76,6 @@ public class TestReadScenarios
 
         try(MultilayeredInputStream ms = new MultilayeredInputStream(context, fileTwo))
         {
-            assertThat(ms.available(), is(equalTo(50)));
             byte[] buffer = new byte[50];
             assertThat(ms.read(buffer), is(equalTo(50)));
             for (int i = 0; i < 50; i++)
@@ -89,7 +86,41 @@ public class TestReadScenarios
 
         try(MultilayeredInputStream ms = new MultilayeredInputStream(context, fileThree))
         {
-            assertThat(ms.available(), is(equalTo(0)));
+            assertThat(ms.read(), is(equalTo(-1)));
         }
+    }
+
+    @Test
+    public void testReadingPlain() throws IOException, NoSuchAlgorithmException
+    {
+        File tempfile = folder.newPrefixedFile("plain");
+
+        // first create the demo file
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
+
+        runThreeFileTestOnContext(context);
+    }
+
+    @Test
+    public void testReadingWithCompression() throws IOException, NoSuchAlgorithmException
+    {
+        File tempfile = folder.newPrefixedFile("withcompres");
+
+        // first create the demo file
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new Descriptor.CompressionDescriptor("")));
+
+        runThreeFileTestOnContext(context);
+    }
+
+    @Test
+    public void testReadingWithEncryption() throws IOException, NoSuchAlgorithmException
+    {
+        File tempfile = folder.newPrefixedFile("withencrypt");
+
+        // first create the demo file
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
+                .EncryptionDescriptor("", "", "".getBytes()), null));
+
+        runThreeFileTestOnContext(context);
     }
 }
