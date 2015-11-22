@@ -1,5 +1,7 @@
-package com.bunkr_beta.inventory;
+package com.bunkr_beta.interfaces;
 
+import com.bunkr_beta.inventory.FileInventoryItem;
+import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayDeque;

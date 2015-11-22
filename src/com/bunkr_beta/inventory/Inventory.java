@@ -1,13 +1,10 @@
 package com.bunkr_beta.inventory;
 
+import com.bunkr_beta.interfaces.IFFContainer;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Queue;
 
 /**
  * Creator: benmeier
@@ -26,7 +23,6 @@ public class Inventory implements IFFContainer
         this.ffcontainer = new FFContainer(files, folders);
     }
 
-
     @Override
     public ArrayList<FolderInventoryItem> getFolders()
     {
@@ -38,4 +34,7 @@ public class Inventory implements IFFContainer
     {
         return this.ffcontainer.files;
     }
+
+
+
 }

@@ -1,5 +1,6 @@
 package com.bunkr_beta.inventory;
 
+import com.bunkr_beta.interfaces.IFFContainer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
