@@ -35,6 +35,4 @@ public class Inventory implements IFFContainer
         return this.ffcontainer.files;
     }
 
-
-
 }

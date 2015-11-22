@@ -35,6 +35,9 @@ public class Descriptor
                 @JsonProperty("asymmetricAlgorithm") String asymmetricAlgorithm,
                 @JsonProperty("encryptedInventoryKey") byte[] encryptedInventoryKey)
         {
+            if (!symmetricAlgorithm.toUpperCase().equals("AES"))
+                throw new IllegalArgumentException("'AES' is the only allowed symmetric encryption algorithm");
+
             this.symmetricAlgorithm = symmetricAlgorithm;
             this.asymmetricAlgorithm = asymmetricAlgorithm;
             this.encryptedInventoryKey = encryptedInventoryKey;
@@ -47,10 +50,10 @@ public class Descriptor
 
         @JsonCreator
         public CompressionDescriptor(
-                @JsonProperty("symmetricAlgorithm") String algorithm)
+                @JsonProperty("algorithm") String algorithm)
         {
-            if (!algorithm.toLowerCase().equals("zlib"))
-                throw new IllegalArgumentException("'zlib' is the only allowed compression algorithm");
+            if (!algorithm.toUpperCase().equals("ZLIB"))
+                throw new IllegalArgumentException("'ZLIB' is the only allowed compression algorithm");
             this.algorithm = algorithm;
         }
     }
