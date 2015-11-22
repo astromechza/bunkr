@@ -39,8 +39,20 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                 IO.reliableSkip(dis, this.blockDataLength);
                 String descjson = IO.readString(dis);
                 this.descriptor = new ObjectMapper().readValue(descjson, Descriptor.class);
-                String invjson = IO.readString(dis);
-                this.inventory = new ObjectMapper().readValue(invjson, Inventory.class);
+
+                if (this.descriptor.encryption == null)
+                {
+                    this.inventory = new ObjectMapper().readValue(IO.readString(dis), Inventory.class);
+                }
+                else
+                {
+                    int l = dis.readInt();
+                    byte[] encryptedInventory = new byte[l];
+                    assert l == dis.read(encryptedInventory);
+
+                    // TODO add assymetrics key decryption here
+                    throw new RuntimeException("Not implemented");
+                }
             }
         }
         this.fresh = true;
