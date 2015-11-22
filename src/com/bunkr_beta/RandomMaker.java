@@ -6,7 +6,7 @@ import java.security.SecureRandom;
  * Creator: benmeier
  * Created At: 2015-11-22
  */
-public class KeyMaker
+public class RandomMaker
 {
     private static SecureRandom randomSource = null;
 
@@ -19,7 +19,7 @@ public class KeyMaker
     public static byte[] get(int bits)
     {
         byte[] data = new byte[bits / 8];
-        KeyMaker.getRandomSource().nextBytes(data);
+        RandomMaker.getRandomSource().nextBytes(data);
         return data;
     }
 }

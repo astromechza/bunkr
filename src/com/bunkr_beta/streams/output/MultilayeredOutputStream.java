@@ -3,7 +3,7 @@ package com.bunkr_beta.streams.output;
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.BlockAllocationManager;
 import com.bunkr_beta.ArrayStack;
-import com.bunkr_beta.KeyMaker;
+import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -43,8 +43,8 @@ public class MultilayeredOutputStream extends OutputStream
         {
             if (refreshKeys)
             {
-                target.setEncryptionKey(KeyMaker.get(256));
-                target.setEncryptionIV(KeyMaker.get(256));
+                target.setEncryptionKey(RandomMaker.get(256));
+                target.setEncryptionIV(RandomMaker.get(256));
             }
 
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());

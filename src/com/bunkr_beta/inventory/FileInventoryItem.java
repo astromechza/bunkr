@@ -1,6 +1,6 @@
 package com.bunkr_beta.inventory;
 
-import com.bunkr_beta.KeyMaker;
+import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -47,8 +47,8 @@ public class FileInventoryItem extends InventoryItem
         this.sizeOnDisk = 0;
         this.blocks = new FragmentedRange();
         this.modifiedAt = System.currentTimeMillis();
-        this.encryptionKey = KeyMaker.get(256);
-        this.encryptionIV = KeyMaker.get(256);
+        this.encryptionKey = RandomMaker.get(256);
+        this.encryptionIV = RandomMaker.get(256);
     }
 
     public FragmentedRange getBlocks()
