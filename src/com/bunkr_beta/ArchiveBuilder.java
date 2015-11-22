@@ -32,10 +32,10 @@ public class ArchiveBuilder
                 dos.write(VERSION_BYTES);
                 dos.writeInt(DEFAULT_BLOCK_SIZE);
                 dos.writeLong(0);
-                dos.writeInt(inventoryJson.length());
-                dos.writeBytes(inventoryJson);
                 dos.writeInt(descriptorJson.length());
                 dos.writeBytes(descriptorJson);
+                dos.writeInt(inventoryJson.length());
+                dos.writeBytes(inventoryJson);
             }
         }
         return new ArchiveInfoContext(path);

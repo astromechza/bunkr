@@ -37,10 +37,10 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                 this.blockSize = dis.readInt();
                 this.blockDataLength = dis.readLong();
                 IO.reliableSkip(dis, this.blockDataLength);
-                String invjson = IO.readString(dis);
                 String descjson = IO.readString(dis);
-                this.inventory = new ObjectMapper().readValue(invjson, Inventory.class);
                 this.descriptor = new ObjectMapper().readValue(descjson, Descriptor.class);
+                String invjson = IO.readString(dis);
+                this.inventory = new ObjectMapper().readValue(invjson, Inventory.class);
             }
         }
         this.fresh = true;

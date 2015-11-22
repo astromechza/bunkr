@@ -33,10 +33,10 @@ public class MetadataWriter
 
 
                 buf = fc.map(FileChannel.MapMode.READ_WRITE, DBL_DATA_POS + Long.BYTES + dataBlocksLength, metaLength);
-                buf.putInt(inventoryJson.length());
-                buf.put(inventoryJson.getBytes());
                 buf.putInt(descriptorJson.length());
                 buf.put(descriptorJson.getBytes());
+                buf.putInt(inventoryJson.length());
+                buf.put(inventoryJson.getBytes());
             }
         }
     }

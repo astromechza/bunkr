@@ -46,16 +46,16 @@ public class TestWriteScenarios
             assertEquals(dis.readInt(), 1024);
             assertEquals(dis.readLong(), 0);
 
-            String invJSON = IO.readNByteString(dis, dis.readInt());
-            Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
-            assertEquals(inventory.getFiles().size(), 0);
-            assertEquals(inventory.getFolders().size(), 0);
-
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
 
             assertEquals(descriptor.compression, null);
             assertEquals(descriptor.encryption, null);
+
+            String invJSON = IO.readNByteString(dis, dis.readInt());
+            Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
+            assertEquals(inventory.getFiles().size(), 0);
+            assertEquals(inventory.getFolders().size(), 0);
 
             assertEquals(dis.available(), 0);
         }
@@ -93,6 +93,13 @@ public class TestWriteScenarios
             {
                 assertEquals(data[i], (65 + i % 26));
             }
+
+            String desJSON = IO.readNByteString(dis, dis.readInt());
+            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
+
+            assertEquals(descriptor.compression, null);
+            assertEquals(descriptor.encryption, null);
+
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
             assertEquals(inventory.getFiles().size(), 1);
@@ -104,12 +111,6 @@ public class TestWriteScenarios
             assertEquals(inventory.getFiles().get(0).getModifiedAt(), newFile.getModifiedAt());
             assertArrayEquals(inventory.getFiles().get(0).getEncryptionIV(), newFile.getEncryptionIV());
             assertArrayEquals(inventory.getFiles().get(0).getEncryptionKey(), newFile.getEncryptionKey());
-
-            String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
-
-            assertEquals(descriptor.compression, null);
-            assertEquals(descriptor.encryption, null);
 
             assertEquals(dis.available(), 0);
         }
@@ -167,6 +168,13 @@ public class TestWriteScenarios
             {
                 assertEquals(data[i], (65 + i % 26));
             }
+
+            String desJSON = IO.readNByteString(dis, dis.readInt());
+            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
+
+            assertEquals(descriptor.compression, null);
+            assertEquals(descriptor.encryption, null);
+
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
             assertEquals(inventory.getFiles().size(), 2);
@@ -187,12 +195,6 @@ public class TestWriteScenarios
             assertEquals(inventory.getFiles().get(1).getModifiedAt(), fileTwo.getModifiedAt());
             assertArrayEquals(inventory.getFiles().get(1).getEncryptionIV(), fileTwo.getEncryptionIV());
             assertArrayEquals(inventory.getFiles().get(1).getEncryptionKey(), fileTwo.getEncryptionKey());
-
-            String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
-
-            assertEquals(descriptor.compression, null);
-            assertEquals(descriptor.encryption, null);
 
             assertEquals(dis.available(), 0);
         }
@@ -223,6 +225,13 @@ public class TestWriteScenarios
             assertEquals(dis.read(), 1);
             assertEquals(dis.readInt(), 1024);
             assertEquals(dis.readLong(), 0);
+
+            String desJSON = IO.readNByteString(dis, dis.readInt());
+            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
+
+            assertEquals(descriptor.compression, null);
+            assertEquals(descriptor.encryption, null);
+
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
 
@@ -237,12 +246,6 @@ public class TestWriteScenarios
             assertEquals(holder.getModifiedAt(), newFile.getModifiedAt());
             assertArrayEquals(holder.getEncryptionIV(), newFile.getEncryptionIV());
             assertArrayEquals(holder.getEncryptionKey(), newFile.getEncryptionKey());
-
-            String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
-
-            assertEquals(descriptor.compression, null);
-            assertEquals(descriptor.encryption, null);
 
             assertEquals(dis.available(), 0);
         }
