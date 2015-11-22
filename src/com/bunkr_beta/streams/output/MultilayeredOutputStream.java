@@ -3,6 +3,7 @@ package com.bunkr_beta.streams.output;
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.BlockAllocationManager;
 import com.bunkr_beta.ArrayStack;
+import com.bunkr_beta.KeyMaker;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -27,7 +28,7 @@ public class MultilayeredOutputStream extends OutputStream
 
     private long writtenBytes = 0;
 
-    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws IOException
+    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target, boolean refreshKeys) throws IOException
     {
         this.target = target;
         this.streams.push(
@@ -40,6 +41,12 @@ public class MultilayeredOutputStream extends OutputStream
         );
         if (context.getArchiveDescriptor().encryption != null)
         {
+            if (refreshKeys)
+            {
+                target.setEncryptionKey(KeyMaker.get(256));
+                target.setEncryptionIV(KeyMaker.get(256));
+            }
+
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
             fileCipher.init(
                     true,
@@ -56,6 +63,11 @@ public class MultilayeredOutputStream extends OutputStream
         {
             this.streams.push(new DeflaterOutputStream(this.streams.peek()));
         }
+    }
+
+    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws IOException
+    {
+        this(context, target, true);
     }
 
     @Override
