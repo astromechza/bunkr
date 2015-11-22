@@ -13,14 +13,29 @@ import java.util.Queue;
  * Creator: benmeier
  * Created At: 2015-11-08
  */
-public class Inventory extends FFContainer
+public class Inventory implements IFFContainer
 {
+    private final FFContainer ffcontainer;
+
     @JsonCreator
     public Inventory(
             @JsonProperty("files") ArrayList<FileInventoryItem> files,
             @JsonProperty("folders") ArrayList<FolderInventoryItem> folders
     )
     {
-        super(files, folders);
+        this.ffcontainer = new FFContainer(files, folders);
+    }
+
+
+    @Override
+    public ArrayList<FolderInventoryItem> getFolders()
+    {
+        return this.ffcontainer.folders;
+    }
+
+    @Override
+    public ArrayList<FileInventoryItem> getFiles()
+    {
+        return this.ffcontainer.files;
     }
 }

@@ -29,7 +29,7 @@ public class TestReadScenarios
     {
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         {
-            context.getInventory().files.add(fileOne);
+            context.getInventory().getFiles().add(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
             {
                 for (int i = 0; i < 1500; i++)
@@ -41,7 +41,7 @@ public class TestReadScenarios
         }
         FileInventoryItem fileTwo = new FileInventoryItem("b.txt");
         {
-            context.getInventory().files.add(fileTwo);
+            context.getInventory().getFiles().add(fileTwo);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileTwo))
             {
                 for (int i = 0; i < 50; i++)
@@ -53,7 +53,7 @@ public class TestReadScenarios
         }
         FileInventoryItem fileThree = new FileInventoryItem("c.txt");
         {
-            context.getInventory().files.add(fileThree);
+            context.getInventory().getFiles().add(fileThree);
             MetadataWriter.write(context);
         }
 

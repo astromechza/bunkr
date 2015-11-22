@@ -32,8 +32,8 @@ public class TestWriteScenarios
     {
         File tempfile = folder.newFile();
         IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
-        assertTrue(context.getInventory().files.isEmpty());
-        assertTrue(context.getInventory().folders.isEmpty());
+        assertTrue(context.getInventory().getFiles().isEmpty());
+        assertTrue(context.getInventory().getFolders().isEmpty());
         assertTrue(context.isFresh());
         assertEquals(context.getBlockSize(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
 
@@ -48,8 +48,8 @@ public class TestWriteScenarios
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
-            assertEquals(inventory.files.size(), 0);
-            assertEquals(inventory.folders.size(), 0);
+            assertEquals(inventory.getFiles().size(), 0);
+            assertEquals(inventory.getFolders().size(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
@@ -69,7 +69,7 @@ public class TestWriteScenarios
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
-        context.getInventory().files.add(newFile);
+        context.getInventory().getFiles().add(newFile);
         try(MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, newFile))
         {
             for (int i = 0; i < 3333; i++)
@@ -95,15 +95,15 @@ public class TestWriteScenarios
             }
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
-            assertEquals(inventory.files.size(), 1);
-            assertEquals(inventory.folders.size(), 0);
-            assertEquals(inventory.files.get(0).getName(), "some file.txt");
-            assertEquals(inventory.files.get(0).getBlocks().toString(), "FragmentedRange{0,1,2,3,}");
-            assertEquals(inventory.files.get(0).getUuid(), newFile.getUuid());
-            assertEquals(inventory.files.get(0).getSizeOnDisk(), newFile.getSizeOnDisk());
-            assertEquals(inventory.files.get(0).getModifiedAt(), newFile.getModifiedAt());
-            assertArrayEquals(inventory.files.get(0).getEncryptionIV(), newFile.getEncryptionIV());
-            assertArrayEquals(inventory.files.get(0).getEncryptionKey(), newFile.getEncryptionKey());
+            assertEquals(inventory.getFiles().size(), 1);
+            assertEquals(inventory.getFolders().size(), 0);
+            assertEquals(inventory.getFiles().get(0).getName(), "some file.txt");
+            assertEquals(inventory.getFiles().get(0).getBlocks().toString(), "FragmentedRange{0,1,2,3,}");
+            assertEquals(inventory.getFiles().get(0).getUuid(), newFile.getUuid());
+            assertEquals(inventory.getFiles().get(0).getSizeOnDisk(), newFile.getSizeOnDisk());
+            assertEquals(inventory.getFiles().get(0).getModifiedAt(), newFile.getModifiedAt());
+            assertArrayEquals(inventory.getFiles().get(0).getEncryptionIV(), newFile.getEncryptionIV());
+            assertArrayEquals(inventory.getFiles().get(0).getEncryptionKey(), newFile.getEncryptionKey());
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
@@ -123,7 +123,7 @@ public class TestWriteScenarios
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
         {
-            context.getInventory().files.add(fileOne);
+            context.getInventory().getFiles().add(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
             {
                 for (int i = 0; i < 3333; i++)
@@ -136,7 +136,7 @@ public class TestWriteScenarios
 
         FileInventoryItem fileTwo = new FileInventoryItem("another file.txt");
         {
-            context.getInventory().files.add(fileTwo);
+            context.getInventory().getFiles().add(fileTwo);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileTwo))
             {
                 for (int i = 0; i < 50; i++)
@@ -169,24 +169,24 @@ public class TestWriteScenarios
             }
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
-            assertEquals(inventory.files.size(), 2);
-            assertEquals(inventory.folders.size(), 0);
+            assertEquals(inventory.getFiles().size(), 2);
+            assertEquals(inventory.getFolders().size(), 0);
 
-            assertEquals(inventory.files.get(0).getName(), fileOne.getName());
-            assertEquals(inventory.files.get(0).getBlocks().toString(), fileOne.getBlocks().toString());
-            assertEquals(inventory.files.get(0).getUuid(), fileOne.getUuid());
-            assertEquals(inventory.files.get(0).getSizeOnDisk(), fileOne.getSizeOnDisk());
-            assertEquals(inventory.files.get(0).getModifiedAt(), fileOne.getModifiedAt());
-            assertArrayEquals(inventory.files.get(0).getEncryptionIV(), fileOne.getEncryptionIV());
-            assertArrayEquals(inventory.files.get(0).getEncryptionKey(), fileOne.getEncryptionKey());
+            assertEquals(inventory.getFiles().get(0).getName(), fileOne.getName());
+            assertEquals(inventory.getFiles().get(0).getBlocks().toString(), fileOne.getBlocks().toString());
+            assertEquals(inventory.getFiles().get(0).getUuid(), fileOne.getUuid());
+            assertEquals(inventory.getFiles().get(0).getSizeOnDisk(), fileOne.getSizeOnDisk());
+            assertEquals(inventory.getFiles().get(0).getModifiedAt(), fileOne.getModifiedAt());
+            assertArrayEquals(inventory.getFiles().get(0).getEncryptionIV(), fileOne.getEncryptionIV());
+            assertArrayEquals(inventory.getFiles().get(0).getEncryptionKey(), fileOne.getEncryptionKey());
 
-            assertEquals(inventory.files.get(1).getName(), fileTwo.getName());
-            assertEquals(inventory.files.get(1).getBlocks().toString(), fileTwo.getBlocks().toString());
-            assertEquals(inventory.files.get(1).getUuid(), fileTwo.getUuid());
-            assertEquals(inventory.files.get(1).getSizeOnDisk(), fileTwo.getSizeOnDisk());
-            assertEquals(inventory.files.get(1).getModifiedAt(), fileTwo.getModifiedAt());
-            assertArrayEquals(inventory.files.get(1).getEncryptionIV(), fileTwo.getEncryptionIV());
-            assertArrayEquals(inventory.files.get(1).getEncryptionKey(), fileTwo.getEncryptionKey());
+            assertEquals(inventory.getFiles().get(1).getName(), fileTwo.getName());
+            assertEquals(inventory.getFiles().get(1).getBlocks().toString(), fileTwo.getBlocks().toString());
+            assertEquals(inventory.getFiles().get(1).getUuid(), fileTwo.getUuid());
+            assertEquals(inventory.getFiles().get(1).getSizeOnDisk(), fileTwo.getSizeOnDisk());
+            assertEquals(inventory.getFiles().get(1).getModifiedAt(), fileTwo.getModifiedAt());
+            assertArrayEquals(inventory.getFiles().get(1).getEncryptionIV(), fileTwo.getEncryptionIV());
+            assertArrayEquals(inventory.getFiles().get(1).getEncryptionKey(), fileTwo.getEncryptionKey());
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = new ObjectMapper().readValue(desJSON, Descriptor.class);
@@ -208,8 +208,8 @@ public class TestWriteScenarios
         FolderInventoryItem folder2 = new FolderInventoryItem("another folder");
         FolderInventoryItem folder3 = new FolderInventoryItem("another folder");
         folder1.getFolders().add(folder2);
-        context.getInventory().folders.add(folder1);
-        context.getInventory().folders.add(folder3);
+        context.getInventory().getFolders().add(folder1);
+        context.getInventory().getFolders().add(folder3);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         folder1.getFiles().add(newFile);
@@ -226,10 +226,10 @@ public class TestWriteScenarios
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = new ObjectMapper().readValue(invJSON, Inventory.class);
 
-            assertEquals(inventory.files.size(), 0);
-            assertEquals(inventory.folders.size(), 2);
+            assertEquals(inventory.getFiles().size(), 0);
+            assertEquals(inventory.getFolders().size(), 2);
 
-            FileInventoryItem holder = inventory.folders.get(0).getFiles().get(0);
+            FileInventoryItem holder = inventory.getFolders().get(0).getFiles().get(0);
             assertEquals(holder.getName(), "some file.txt");
             assertEquals(holder.getBlocks().toString(), "FragmentedRange{}");
             assertEquals(holder.getUuid(), newFile.getUuid());

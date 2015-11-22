@@ -9,10 +9,9 @@ import java.util.UUID;
  * Creator: benmeier
  * Created At: 2015-11-08
  */
-public class FolderInventoryItem extends InventoryItem
+public class FolderInventoryItem extends InventoryItem implements IFFContainer
 {
-    private final ArrayList<FolderInventoryItem> folders;
-    private final ArrayList<FileInventoryItem> files;
+    private final FFContainer ffcontainer;
 
     public FolderInventoryItem(
             @JsonProperty("name") String name,
@@ -22,24 +21,24 @@ public class FolderInventoryItem extends InventoryItem
     )
     {
         super(name, uuid);
-        this.files = files;
-        this.folders = folders;
+        this.ffcontainer = new FFContainer(files, folders);
     }
 
     public FolderInventoryItem(String name)
     {
         super(name, UUID.randomUUID());
-        this.files = new ArrayList<>();
-        this.folders = new ArrayList<>();
+        this.ffcontainer = new FFContainer(new ArrayList<>(), new ArrayList<>());
     }
 
-    public ArrayList<FileInventoryItem> getFiles()
-    {
-        return files;
-    }
-
+    @Override
     public ArrayList<FolderInventoryItem> getFolders()
     {
-        return folders;
+        return this.ffcontainer.folders;
+    }
+
+    @Override
+    public ArrayList<FileInventoryItem> getFiles()
+    {
+        return this.ffcontainer.files;
     }
 }
