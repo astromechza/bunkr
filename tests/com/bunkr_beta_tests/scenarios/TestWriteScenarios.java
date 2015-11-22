@@ -32,8 +32,8 @@ public class TestWriteScenarios
     {
         File tempfile = folder.newFile();
         IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
-        assertTrue(context.getArchiveInventory().files.isEmpty());
-        assertTrue(context.getArchiveInventory().folders.isEmpty());
+        assertTrue(context.getInventory().files.isEmpty());
+        assertTrue(context.getInventory().folders.isEmpty());
         assertTrue(context.isFresh());
         assertEquals(context.getBlockSize(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
 
@@ -69,7 +69,7 @@ public class TestWriteScenarios
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
-        context.getArchiveInventory().files.add(newFile);
+        context.getInventory().files.add(newFile);
         try(MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, newFile))
         {
             for (int i = 0; i < 3333; i++)
@@ -123,7 +123,7 @@ public class TestWriteScenarios
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
         {
-            context.getArchiveInventory().files.add(fileOne);
+            context.getInventory().files.add(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
             {
                 for (int i = 0; i < 3333; i++)
@@ -136,7 +136,7 @@ public class TestWriteScenarios
 
         FileInventoryItem fileTwo = new FileInventoryItem("another file.txt");
         {
-            context.getArchiveInventory().files.add(fileTwo);
+            context.getInventory().files.add(fileTwo);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileTwo))
             {
                 for (int i = 0; i < 50; i++)
@@ -208,8 +208,8 @@ public class TestWriteScenarios
         FolderInventoryItem folder2 = new FolderInventoryItem("another folder");
         FolderInventoryItem folder3 = new FolderInventoryItem("another folder");
         folder1.getFolders().add(folder2);
-        context.getArchiveInventory().folders.add(folder1);
-        context.getArchiveInventory().folders.add(folder3);
+        context.getInventory().folders.add(folder1);
+        context.getInventory().folders.add(folder3);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         folder1.getFiles().add(newFile);

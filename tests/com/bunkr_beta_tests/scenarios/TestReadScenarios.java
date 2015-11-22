@@ -7,11 +7,9 @@ import com.bunkr_beta.streams.output.MultilayeredOutputStream;
 import com.bunkr_beta_tests.XTemporaryFolder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -31,7 +29,7 @@ public class TestReadScenarios
     {
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         {
-            context.getArchiveInventory().files.add(fileOne);
+            context.getInventory().files.add(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
             {
                 for (int i = 0; i < 1500; i++)
@@ -43,7 +41,7 @@ public class TestReadScenarios
         }
         FileInventoryItem fileTwo = new FileInventoryItem("b.txt");
         {
-            context.getArchiveInventory().files.add(fileTwo);
+            context.getInventory().files.add(fileTwo);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileTwo))
             {
                 for (int i = 0; i < 50; i++)
@@ -55,7 +53,7 @@ public class TestReadScenarios
         }
         FileInventoryItem fileThree = new FileInventoryItem("c.txt");
         {
-            context.getArchiveInventory().files.add(fileThree);
+            context.getInventory().files.add(fileThree);
             MetadataWriter.write(context);
         }
 

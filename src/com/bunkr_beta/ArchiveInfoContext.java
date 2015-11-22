@@ -10,10 +10,9 @@ import java.security.NoSuchAlgorithmException;
 public class ArchiveInfoContext implements IArchiveInfoContext
 {
     public final File filePath;
-    private Inventory archiveInventory;
-    private Descriptor archiveDescriptor;
+    private Inventory inventory;
+    private Descriptor descriptor;
     private int blockSize;
-    private long blockDataOffset;
     private long blockDataLength;
     private boolean fresh = false;
 
@@ -36,13 +35,12 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                 dis.readByte();
                 dis.readByte();
                 this.blockSize = dis.readInt();
-                this.blockDataOffset = 5 + 3 + Integer.BYTES;
                 this.blockDataLength = dis.readLong();
                 IO.reliableSkip(dis, this.blockDataLength);
                 String invjson = IO.readString(dis);
                 String descjson = IO.readString(dis);
-                this.archiveInventory = new ObjectMapper().readValue(invjson, Inventory.class);
-                this.archiveDescriptor = new ObjectMapper().readValue(descjson, Descriptor.class);
+                this.inventory = new ObjectMapper().readValue(invjson, Inventory.class);
+                this.descriptor = new ObjectMapper().readValue(descjson, Descriptor.class);
             }
         }
         this.fresh = true;
@@ -77,15 +75,15 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     }
 
     @Override
-    public Descriptor getArchiveDescriptor()
+    public Descriptor getDescriptor()
     {
-        return archiveDescriptor;
+        return descriptor;
     }
 
     @Override
-    public Inventory getArchiveInventory()
+    public Inventory getInventory()
     {
-        return archiveInventory;
+        return inventory;
     }
 
     @Override

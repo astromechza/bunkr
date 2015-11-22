@@ -22,9 +22,9 @@ public interface IArchiveInfoContext
 
     int getBlockSize();
 
-    Descriptor getArchiveDescriptor();
+    Descriptor getDescriptor();
 
-    Inventory getArchiveInventory();
+    Inventory getInventory();
 
     long getNumBlocks();
 

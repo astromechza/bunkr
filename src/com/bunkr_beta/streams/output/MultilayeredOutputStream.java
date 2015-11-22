@@ -39,7 +39,7 @@ public class MultilayeredOutputStream extends OutputStream
                     new BlockAllocationManager(context, target)
             )
         );
-        if (context.getArchiveDescriptor().encryption != null)
+        if (context.getDescriptor().encryption != null)
         {
             if (refreshKeys)
             {
@@ -59,7 +59,7 @@ public class MultilayeredOutputStream extends OutputStream
                 )
             );
         }
-        if (context.getArchiveDescriptor().compression != null)
+        if (context.getDescriptor().compression != null)
         {
             this.streams.push(new DeflaterOutputStream(this.streams.peek()));
         }

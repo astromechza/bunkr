@@ -26,8 +26,8 @@ public class MetadataWriter
                 ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, DBL_DATA_POS, Long.BYTES);
                 dataBlocksLength = buf.getLong();
 
-                String inventoryJson = IO.convertToJson(context.getArchiveInventory());
-                String descriptorJson = IO.convertToJson(context.getArchiveDescriptor());
+                String inventoryJson = IO.convertToJson(context.getInventory());
+                String descriptorJson = IO.convertToJson(context.getDescriptor());
 
                 long metaLength = Integer.BYTES + inventoryJson.length() + Integer.BYTES + descriptorJson.length();
 

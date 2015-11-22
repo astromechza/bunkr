@@ -18,7 +18,7 @@ public class BlockAllocationManager implements IBlockAllocationManager
     {
         allocation.union(target.getBlocks());
         unallocatedBlocks.add(0, (int)context.getNumBlocks());
-        Inventory.InventoryIterator fileIterator = context.getArchiveInventory().getIterator();
+        Inventory.InventoryIterator fileIterator = context.getInventory().getIterator();
         while (fileIterator.hasNext())
         {
             FileInventoryItem item = fileIterator.next();

@@ -36,7 +36,7 @@ public class MultilayeredInputStream extends InputStream
                     target.getSizeOnDisk()
             )
         );
-        if (context.getArchiveDescriptor().encryption != null)
+        if (context.getDescriptor().encryption != null)
         {
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
             fileCipher.init(
@@ -51,7 +51,7 @@ public class MultilayeredInputStream extends InputStream
                 )
             );
         }
-        if (context.getArchiveDescriptor().compression != null)
+        if (context.getDescriptor().compression != null)
         {
             this.streams.push(new InflaterInputStream(this.streams.peek()));
         }
