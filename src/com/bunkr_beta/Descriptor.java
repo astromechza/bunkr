@@ -49,6 +49,8 @@ public class Descriptor
         public CompressionDescriptor(
                 @JsonProperty("symmetricAlgorithm") String algorithm)
         {
+            if (!algorithm.toLowerCase().equals("zlib"))
+                throw new IllegalArgumentException("'zlib' is the only allowed compression algorithm");
             this.algorithm = algorithm;
         }
     }

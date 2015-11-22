@@ -100,7 +100,7 @@ public class TestReadScenarios
         File tempfile = folder.newPrefixedFile("withcompres");
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new Descriptor.CompressionDescriptor("")));
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new Descriptor.CompressionDescriptor("zlib")));
 
         runThreeFileTestOnContext(context);
     }
@@ -124,7 +124,7 @@ public class TestReadScenarios
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
-                .EncryptionDescriptor("", "", "".getBytes()), new Descriptor.CompressionDescriptor("")));
+                .EncryptionDescriptor("", "", "".getBytes()), new Descriptor.CompressionDescriptor("zlib")));
 
         runThreeFileTestOnContext(context);
     }
