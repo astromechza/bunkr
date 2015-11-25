@@ -112,7 +112,7 @@ public class TestReadScenarios
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
-                .EncryptionDescriptor("AES", "", "".getBytes()), null));
+                .EncryptionDescriptor(4096, 256), null));
 
         runThreeFileTestOnContext(context);
     }
@@ -124,7 +124,7 @@ public class TestReadScenarios
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
-                .EncryptionDescriptor("AES", "", "".getBytes()), new Descriptor.CompressionDescriptor("ZLIB")));
+                .EncryptionDescriptor(4096, 256), new Descriptor.CompressionDescriptor("ZLIB")));
 
         runThreeFileTestOnContext(context);
     }

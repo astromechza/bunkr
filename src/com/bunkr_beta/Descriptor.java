@@ -25,22 +25,23 @@ public class Descriptor
 
     public static class EncryptionDescriptor
     {
-        public final String symmetricAlgorithm;
-        public final String asymmetricAlgorithm;
-        public final byte[] encryptedInventoryKey;
+        public final int pbkdf2Iterations;
+        public final int aesKeyLength;
 
         @JsonCreator
         public EncryptionDescriptor(
-                @JsonProperty("symmetricAlgorithm") String symmetricAlgorithm,
-                @JsonProperty("asymmetricAlgorithm") String asymmetricAlgorithm,
-                @JsonProperty("encryptedInventoryKey") byte[] encryptedInventoryKey)
+                @JsonProperty("pbkdf2Iterations") int pbkdf2Iterations,
+                @JsonProperty("aesKeyLength") int aesKeyLength
+        )
         {
-            if (!symmetricAlgorithm.toUpperCase().equals("AES"))
-                throw new IllegalArgumentException("'AES' is the only allowed symmetric encryption algorithm");
+            if (pbkdf2Iterations < 4096)
+                throw new IllegalArgumentException("pbkdf2Iterations must be at least 4096");
 
-            this.symmetricAlgorithm = symmetricAlgorithm;
-            this.asymmetricAlgorithm = asymmetricAlgorithm;
-            this.encryptedInventoryKey = encryptedInventoryKey;
+            if (aesKeyLength != 256)
+                throw new IllegalArgumentException("aesKeyLength must be 256");
+
+            this.pbkdf2Iterations = pbkdf2Iterations;
+            this.aesKeyLength = aesKeyLength;
         }
     }
 

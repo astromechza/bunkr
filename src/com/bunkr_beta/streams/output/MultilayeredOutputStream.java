@@ -43,8 +43,8 @@ public class MultilayeredOutputStream extends OutputStream
         {
             if (refreshKeys)
             {
-                target.setEncryptionKey(RandomMaker.get(256));
-                target.setEncryptionIV(RandomMaker.get(256));
+                target.setEncryptionKey(RandomMaker.get(context.getDescriptor().encryption.aesKeyLength));
+                target.setEncryptionIV(RandomMaker.get(context.getDescriptor().encryption.aesKeyLength));
             }
 
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());

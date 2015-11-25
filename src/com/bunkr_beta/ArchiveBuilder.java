@@ -1,10 +1,15 @@
 package com.bunkr_beta;
 
 import com.bunkr_beta.inventory.Inventory;
+import org.bouncycastle.crypto.engines.HC256Engine;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 
 /**
  * Creator: benmeier
@@ -21,8 +26,8 @@ public class ArchiveBuilder
     {
         Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>());
 
-        String inventoryJson = IO.convertToJson(blankInventory);
-        String descriptorJson = IO.convertToJson(descriptor);
+        byte[] inventoryJsonBytes = IO.convertToJson(blankInventory).getBytes();
+        byte[] descriptorJsonBytes = IO.convertToJson(descriptor).getBytes();
 
         try(FileOutputStream fos = new FileOutputStream(path))
         {
@@ -32,10 +37,31 @@ public class ArchiveBuilder
                 dos.write(VERSION_BYTES);
                 dos.writeInt(DEFAULT_BLOCK_SIZE);
                 dos.writeLong(0);
-                dos.writeInt(descriptorJson.length());
-                dos.writeBytes(descriptorJson);
-                dos.writeInt(inventoryJson.length());
-                dos.writeBytes(inventoryJson);
+                dos.writeInt(descriptorJsonBytes.length);
+                dos.write(descriptorJsonBytes);
+
+                dos.writeInt(inventoryJsonBytes.length);
+                if (descriptor.encryption == null)
+                {
+                    dos.write(inventoryJsonBytes);
+                }
+                else
+                {
+                    PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
+                    g.init("password".getBytes(), "SALTYBUNKR".getBytes(),
+                           descriptor.encryption.pbkdf2Iterations);
+                    ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
+                            descriptor.encryption.aesKeyLength,
+                            descriptor.encryption.aesKeyLength)
+                    );
+
+                    HC256Engine cipher = new HC256Engine();
+                    cipher.init(true, kp);
+                    byte[] encryptedInv = new byte[inventoryJsonBytes.length];
+                    cipher.processBytes(inventoryJsonBytes, 0, inventoryJsonBytes.length, encryptedInv, 0);
+                    dos.write(encryptedInv);
+                }
+
             }
         }
         return new ArchiveInfoContext(path);
