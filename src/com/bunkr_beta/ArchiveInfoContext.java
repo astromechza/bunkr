@@ -3,22 +3,12 @@ package com.bunkr_beta;
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.Inventory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.bouncycastle.crypto.AsymmetricBlockCipher;
-import org.bouncycastle.crypto.StreamBlockCipher;
-import org.bouncycastle.crypto.StreamCipher;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.engines.HC256Engine;
-import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.modes.SICBlockCipher;
-import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-import org.bouncycastle.crypto.util.PrivateKeyFactory;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
 public class ArchiveInfoContext implements IArchiveInfoContext
 {
@@ -64,7 +54,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                     if (dis.read(encryptedInventory) != l) throw new IOException("Did not read enough bytes");
 
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init("password".getBytes(), "SALTYBUNKR".getBytes(),
+                    g.init("password".getBytes(), this.descriptor.encryption.pbkdf2Salt,
                            this.descriptor.encryption.pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
                             this.descriptor.encryption.aesKeyLength,

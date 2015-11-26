@@ -27,11 +27,13 @@ public class Descriptor
     {
         public final int pbkdf2Iterations;
         public final int aesKeyLength;
+        public final byte[] pbkdf2Salt;
 
         @JsonCreator
         public EncryptionDescriptor(
                 @JsonProperty("pbkdf2Iterations") int pbkdf2Iterations,
-                @JsonProperty("aesKeyLength") int aesKeyLength
+                @JsonProperty("aesKeyLength") int aesKeyLength,
+                @JsonProperty("pbkdf2Salt") byte[] pbkdf2Salt
         )
         {
             if (pbkdf2Iterations < 4096)
@@ -42,6 +44,7 @@ public class Descriptor
 
             this.pbkdf2Iterations = pbkdf2Iterations;
             this.aesKeyLength = aesKeyLength;
+            this.pbkdf2Salt = pbkdf2Salt;
         }
     }
 

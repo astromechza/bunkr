@@ -48,7 +48,7 @@ public class ArchiveBuilder
                 else
                 {
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init("password".getBytes(), "SALTYBUNKR".getBytes(),
+                    g.init("password".getBytes(), descriptor.encryption.pbkdf2Salt,
                            descriptor.encryption.pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
                             descriptor.encryption.aesKeyLength,

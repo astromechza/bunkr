@@ -23,6 +23,7 @@ JAR_JSON_DB = "com.fasterxml.jackson.core:jackson-databind:jar:2.6.3"
 # entry point
 MAIN_CLASS = "#{PROJECT_GROUP}.Main"
 
+
 # define main project
 define PROJECT_NAME, layout: layout do
     project.version = PROJECT_VERSION
@@ -34,7 +35,14 @@ define PROJECT_NAME, layout: layout do
     package(:jar).with(manifest: {'Main-Class' => MAIN_CLASS})
     run.using main: MAIN_CLASS
 
-    build do
+    clean do
+        if Dir.exists? project.path_to('lib')
+            puts "Deleting 'lib' directory"
+            FileUtils.rm_r project.path_to('lib')
+        end
+    end
+
+    task :pulllibs do
         unless Dir.exists? project.path_to('lib')
             puts "Creating 'lib' directory"
             Dir.mkdir project.path_to('lib')
@@ -56,12 +64,4 @@ define PROJECT_NAME, layout: layout do
             end
         end
     end
-
-    clean do
-        if Dir.exists? project.path_to('lib')
-            puts "Deleting 'lib' directory"
-            FileUtils.rm_r project.path_to('lib')
-        end
-    end
-
 end

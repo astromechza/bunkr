@@ -51,7 +51,7 @@ public class MetadataWriter
                 else
                 {
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init("password".getBytes(), "SALTYBUNKR".getBytes(),
+                    g.init("password".getBytes(), context.getDescriptor().encryption.pbkdf2Salt,
                            context.getDescriptor().encryption.pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
                             context.getDescriptor().encryption.aesKeyLength,
