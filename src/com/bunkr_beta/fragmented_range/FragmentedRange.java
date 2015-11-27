@@ -323,7 +323,7 @@ public class FragmentedRange
     {
         if (requiredCapacity > data.length)
         {
-            int newCapacity = (data.length * 3)/2 + 2;
+            int newCapacity = (data.length * 3) / 2 + 2;
             if (newCapacity < requiredCapacity) newCapacity = requiredCapacity;
             data = Arrays.copyOf(data, newCapacity);
         }

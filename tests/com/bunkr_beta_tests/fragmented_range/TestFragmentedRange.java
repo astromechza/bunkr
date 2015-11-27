@@ -261,4 +261,21 @@ public class TestFragmentedRange
         frB.clear();
         assertEquals(frA.size(), 6);
     }
+
+    @Test
+    public void testManyRanges()
+    {
+        FragmentedRange fr = new FragmentedRange();
+        for (int i = 0; i < 20; i++)
+        {
+            fr.add(i * 2, 1);
+        }
+
+        for (int i = 0; i < 20; i++)
+        {
+            assertTrue(fr.contains(i * 2));
+            assertFalse(fr.contains(i * 2 + 1));
+        }
+    }
+
 }
