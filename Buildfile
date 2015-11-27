@@ -6,6 +6,7 @@ PROJECT_VERSION = '0.1'
 
 # where to pull maven dependencies from
 repositories.remote << 'https://repo.maven.apache.org/maven2'
+repositories.remote << 'https://repo1.maven.org/maven2'
 
 # directory structure
 layout = Layout.new
@@ -14,8 +15,7 @@ layout[:source, :test, :java] = 'tests'
 
 # dependencies
 JAR_JUNIT = "junit:junit:jar:4.12"
-# JAR_JMOCK = "org.jmock:jmock-junit4:jar:2.5.1"
-JAR_BC = "bouncycastle:bcprov-jdk16:jar:140"
+JAR_BC = "org.bouncycastle:bcprov-jdk15on:jar:1.53"
 JAR_JSON_CORE = "com.fasterxml.jackson.core:jackson-core:jar:2.6.3"
 JAR_JSON_ANNOT = "com.fasterxml.jackson.core:jackson-annotations:jar:2.6.3"
 JAR_JSON_DB = "com.fasterxml.jackson.core:jackson-databind:jar:2.6.3"
