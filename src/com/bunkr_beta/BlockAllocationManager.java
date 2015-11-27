@@ -6,15 +6,13 @@ import com.bunkr_beta.interfaces.IBlockAllocationManager;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
 
-import java.io.IOException;
-
 public class BlockAllocationManager implements IBlockAllocationManager
 {
     private final FragmentedRange allocation = new FragmentedRange();
     private final FragmentedRange unallocatedBlocks = new FragmentedRange();
     private int highestKnownBlockId = -1;
 
-    public BlockAllocationManager(IArchiveInfoContext context, FileInventoryItem target) throws IOException
+    public BlockAllocationManager(IArchiveInfoContext context, FileInventoryItem target)
     {
         allocation.union(target.getBlocks());
         unallocatedBlocks.add(0, (int)context.getNumBlocks());

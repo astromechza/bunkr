@@ -30,8 +30,8 @@ public class FFContainer
 
     public static class InventoryIterator implements Iterator<FileInventoryItem>
     {
-        Queue<FileInventoryItem> queuedFiles = new ArrayDeque<>();
-        Queue<FolderInventoryItem> queuedFolders = new ArrayDeque<>();
+        final Queue<FileInventoryItem> queuedFiles = new ArrayDeque<>();
+        final Queue<FolderInventoryItem> queuedFolders = new ArrayDeque<>();
 
         public InventoryIterator(FFContainer inv)
         {

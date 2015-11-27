@@ -14,10 +14,10 @@ import java.io.OutputStream;
  */
 public class CustomCipherOutputStream extends FilterOutputStream
 {
-    private BufferedBlockCipher bufferedBlockCipher;
+    private final BufferedBlockCipher bufferedBlockCipher;
 
-    private byte[] oneByte = new byte[1];
-    private byte[] buf;
+    private final byte[] oneByte = new byte[1];
+    private final byte[] buf;
 
     /**
      * Constructs a CipherOutputStream from an OutputStream and a
@@ -93,26 +93,6 @@ public class CustomCipherOutputStream extends FilterOutputStream
         {
             out.write(buf, 0, outLen);
         }
-    }
-
-    /**
-     * Flushes this output stream by forcing any buffered output bytes
-     * that have already been processed by the encapsulated cipher object
-     * to be written out.
-     *
-     * <p>
-     * Any bytes buffered by the encapsulated cipher
-     * and waiting to be processed by it will not be written out. For example,
-     * if the encapsulated cipher is a block cipher, and the total number of
-     * bytes written using one of the <code>write</code> methods is less than
-     * the cipher's block size, no bytes will be written out.
-     *
-     * @exception java.io.IOException if an I/O error occurs.
-     */
-    public void flush()
-            throws IOException
-    {
-        super.flush();
     }
 
     /**

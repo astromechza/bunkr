@@ -4,7 +4,6 @@ import com.bunkr_beta.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
 
 import java.io.*;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 /**
@@ -18,7 +17,7 @@ public class ArchiveBuilder
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
     public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor)
-            throws IOException, NoSuchAlgorithmException, CryptoException
+            throws IOException, CryptoException
     {
         Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>());
 

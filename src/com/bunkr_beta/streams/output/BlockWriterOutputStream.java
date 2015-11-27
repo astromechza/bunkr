@@ -18,13 +18,13 @@ public class BlockWriterOutputStream extends OutputStream
     private final int blockSize;
     private final FileInventoryItem target;
     private final IBlockAllocationManager blockAllocMan;
+    private final byte[] buffer;
 
-    private byte[] buffer;
     private int cursor;
     private long bytesWritten;
     private boolean partiallyFlushed;
 
-    public BlockWriterOutputStream(File path, int blockSize, FileInventoryItem target, IBlockAllocationManager blockAllocMan) throws IOException
+    public BlockWriterOutputStream(File path, int blockSize, FileInventoryItem target, IBlockAllocationManager blockAllocMan)
     {
         super();
         this.filePath = path;

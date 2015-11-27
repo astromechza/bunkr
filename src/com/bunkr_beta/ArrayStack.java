@@ -12,7 +12,7 @@ import java.util.Iterator;
  */
 public class ArrayStack<T>
 {
-    private ArrayList<T> items = new ArrayList<>();
+    private final ArrayList<T> items = new ArrayList<>();
 
     public void push(T t)
     {

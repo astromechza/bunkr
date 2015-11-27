@@ -20,7 +20,7 @@ import java.util.zip.InflaterInputStream;
  */
 public class MultilayeredInputStream extends InputStream
 {
-    private ArrayStack<InputStream> streams = new ArrayStack<>();
+    private final ArrayStack<InputStream> streams = new ArrayStack<>();
 
     private final boolean emptyFile;
 

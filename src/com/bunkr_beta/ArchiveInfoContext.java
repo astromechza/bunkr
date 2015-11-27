@@ -9,7 +9,6 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.*;
-import java.security.NoSuchAlgorithmException;
 
 public class ArchiveInfoContext implements IArchiveInfoContext
 {
@@ -20,14 +19,14 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     private long blockDataLength;
     private boolean fresh = false;
 
-    public ArchiveInfoContext(File filePath) throws IOException, NoSuchAlgorithmException, CryptoException
+    public ArchiveInfoContext(File filePath) throws IOException, CryptoException
     {
         this.filePath = filePath;
         this.refresh();
     }
 
     @Override
-    public void refresh() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void refresh() throws IOException, CryptoException
     {
         try(FileInputStream fis = new FileInputStream(this.filePath))
         {

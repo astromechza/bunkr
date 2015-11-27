@@ -18,8 +18,8 @@ public class CustomCipherInputStream extends FilterInputStream
     private BufferedBlockCipher bufferedBlockCipher;
     private StreamCipher streamCipher;
 
-    private byte[] buf;
-    private byte[] inBuf;
+    private final byte[] buf;
+    private final byte[] inBuf;
 
     private int bufOff;
     private int maxBuf;
@@ -223,12 +223,6 @@ public class CustomCipherInputStream extends FilterInputStream
             throws IOException
     {
         return maxBuf - bufOff;
-    }
-
-    public void close()
-            throws IOException
-    {
-        super.close();
     }
 
     public boolean markSupported()

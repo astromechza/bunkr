@@ -5,7 +5,6 @@ import com.bunkr_beta.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Creator: benmeier
@@ -13,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public interface IArchiveInfoContext
 {
-    void refresh() throws IOException, NoSuchAlgorithmException, CryptoException;
+    void refresh() throws IOException, CryptoException;
 
     boolean isFresh();
 

@@ -24,11 +24,11 @@ public class MultilayeredOutputStream extends OutputStream
 {
     private final FileInventoryItem target;
 
-    private ArrayStack<OutputStream> streams = new ArrayStack<>();
+    private final ArrayStack<OutputStream> streams = new ArrayStack<>();
 
     private long writtenBytes = 0;
 
-    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target, boolean refreshKeys) throws IOException
+    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target, boolean refreshKeys)
     {
         this.target = target;
         this.streams.push(
@@ -65,7 +65,7 @@ public class MultilayeredOutputStream extends OutputStream
         }
     }
 
-    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws IOException
+    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target)
     {
         this(context, target, true);
     }
