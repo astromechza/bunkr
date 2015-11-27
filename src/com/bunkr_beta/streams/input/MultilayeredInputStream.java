@@ -5,6 +5,7 @@ import com.bunkr_beta.ArrayStack;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.io.CipherInputStream;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
@@ -45,7 +46,7 @@ public class MultilayeredInputStream extends InputStream
             );
 
             this.streams.push(
-                new CustomCipherInputStream(
+                new CipherInputStream(
                     new NonClosableInputStream(this.streams.peek()),
                     new BufferedBlockCipher(fileCipher)
                 )

@@ -7,6 +7,7 @@ import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.io.CipherOutputStream;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
@@ -53,7 +54,7 @@ public class MultilayeredOutputStream extends OutputStream
                     new ParametersWithIV(new KeyParameter(target.getEncryptionKey()), target.getEncryptionIV())
             );
             this.streams.push(
-                new CustomCipherOutputStream(
+                new CipherOutputStream(
                         new NonClosableOutputStream(this.streams.peek()),
                         new BufferedBlockCipher(fileCipher)
                 )
