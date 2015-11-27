@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'buildr/jacoco'
 
 PROJECT_NAME = 'bunkr_beta'
 PROJECT_GROUP = "com.#{PROJECT_NAME}"
