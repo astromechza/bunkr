@@ -2,15 +2,10 @@ package com.bunkr_beta;
 
 import com.bunkr_beta.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.engines.HC256Engine;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Base64;
 
 /**
  * Creator: benmeier
@@ -27,9 +22,6 @@ public class ArchiveBuilder
     {
         Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>());
 
-        byte[] inventoryJsonBytes = IO.convertToJson(blankInventory).getBytes();
-        byte[] descriptorJsonBytes = IO.convertToJson(descriptor).getBytes();
-
         try(FileOutputStream fos = new FileOutputStream(path))
         {
             try(DataOutputStream dos = new DataOutputStream(fos))
@@ -38,35 +30,9 @@ public class ArchiveBuilder
                 dos.write(VERSION_BYTES);
                 dos.writeInt(DEFAULT_BLOCK_SIZE);
                 dos.writeLong(0);
-                dos.writeInt(descriptorJsonBytes.length);
-                dos.write(descriptorJsonBytes);
-
-                if (descriptor.encryption == null)
-                {
-                    dos.writeInt(inventoryJsonBytes.length);
-                    dos.write(inventoryJsonBytes);
-                }
-                else
-                {
-                    PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init("password".getBytes(), descriptor.encryption.pbkdf2Salt,
-                           descriptor.encryption.pbkdf2Iterations);
-                    ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
-                            descriptor.encryption.aesKeyLength,
-                            descriptor.encryption.aesKeyLength)
-                    );
-
-                    byte[] encryptedInv = SimpleAES.encrypt(
-                            inventoryJsonBytes,
-                            ((KeyParameter) kp.getParameters()).getKey(),
-                            kp.getIV()
-                    );
-                    dos.writeInt(encryptedInv.length);
-                    dos.write(encryptedInv);
-                }
-
             }
         }
+        MetadataWriter.write(path, blankInventory, descriptor);
         return new ArchiveInfoContext(path);
     }
 }

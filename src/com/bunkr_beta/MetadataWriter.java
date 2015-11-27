@@ -1,12 +1,8 @@
 package com.bunkr_beta;
 
+import com.bunkr_beta.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.StreamBlockCipher;
-import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.engines.HC256Engine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.modes.SICBlockCipher;
-import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
@@ -28,7 +24,13 @@ public class MetadataWriter
 
     public static void write(ArchiveInfoContext context) throws IOException, CryptoException
     {
-        try(RandomAccessFile raf = new RandomAccessFile(context.filePath, "rw"))
+        write(context.filePath, context.getInventory(), context.getDescriptor());
+    }
+
+    public static void write(File filePath, Inventory inventory, Descriptor descriptor)
+            throws IOException, CryptoException
+    {
+        try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"))
         {
             try(FileChannel fc = raf.getChannel())
             {
@@ -36,13 +38,13 @@ public class MetadataWriter
                 ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, DBL_DATA_POS, Long.BYTES);
                 dataBlocksLength = buf.getLong();
 
-                byte[] inventoryJsonBytes = IO.convertToJson(context.getInventory()).getBytes();
-                byte[] descriptorJsonBytes = IO.convertToJson(context.getDescriptor()).getBytes();
+                byte[] inventoryJsonBytes = IO.convertToJson(inventory).getBytes();
+                byte[] descriptorJsonBytes = IO.convertToJson(descriptor).getBytes();
 
                 long metaLength = Integer.BYTES + inventoryJsonBytes.length + Integer.BYTES + descriptorJsonBytes.length;
-                if (context.getDescriptor().encryption != null)
+                if (descriptor.encryption != null)
                 {
-                    int b = context.getDescriptor().encryption.aesKeyLength;
+                    int b = descriptor.encryption.aesKeyLength;
                     metaLength += b - (inventoryJsonBytes.length % b);
                 }
 
@@ -50,7 +52,7 @@ public class MetadataWriter
                 buf.putInt(descriptorJsonBytes.length);
                 buf.put(descriptorJsonBytes);
 
-                if (context.getDescriptor().encryption == null)
+                if (descriptor.encryption == null)
                 {
                     buf.putInt(inventoryJsonBytes.length);
                     buf.put(inventoryJsonBytes);
@@ -58,11 +60,11 @@ public class MetadataWriter
                 else
                 {
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init("password".getBytes(), context.getDescriptor().encryption.pbkdf2Salt,
-                           context.getDescriptor().encryption.pbkdf2Iterations);
+                    g.init("password".getBytes(), descriptor.encryption.pbkdf2Salt,
+                           descriptor.encryption.pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
-                            context.getDescriptor().encryption.aesKeyLength,
-                            context.getDescriptor().encryption.aesKeyLength)
+                            descriptor.encryption.aesKeyLength,
+                            descriptor.encryption.aesKeyLength)
                     );
 
                     byte[] encryptedInv = SimpleAES.encrypt(
