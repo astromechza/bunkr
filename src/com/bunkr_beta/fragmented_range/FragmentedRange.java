@@ -309,29 +309,28 @@ public class FragmentedRange
 
     // ======= PRIVATE PARTS ========
 
-    private void rangeCheck(int index)
-    {
-        if (index >= usedDataLength) throw new IndexOutOfBoundsException("Index " + index + " out of range.");
-    }
-
-    private void rangeCheckForAdd(int index)
-    {
-        if (index > usedDataLength || index < 0) throw new IndexOutOfBoundsException("Index " + index + " out of range for insert.");
-    }
+    //    private void rangeCheck(int index)
+    //    {
+    //        if (index >= usedDataLength) throw new IndexOutOfBoundsException("Index " + index + " out of range.");
+    //    }
+    //
+    //    private void rangeCheckForAdd(int index)
+    //    {
+    //        if (index > usedDataLength || index < 0) throw new IndexOutOfBoundsException("Index " + index + " out of range for insert.");
+    //    }
 
     private void ensureCapacity(int requiredCapacity)
     {
         if (requiredCapacity > data.length)
         {
-            int newCapacity = (data.length * 3) / 2 + 2;
-            if (newCapacity < requiredCapacity) newCapacity = requiredCapacity;
+            int newCapacity = Math.max(requiredCapacity, (data.length * 3) / 2 + 2);
             data = Arrays.copyOf(data, newCapacity);
         }
     }
 
     private void removeElementPair(int index)
     {
-        rangeCheck(index);
+        // DisableCheck: rangeCheck(index);
         int numMoved = usedDataLength - index - 2;
         if (numMoved > 0) System.arraycopy(data, index + 2, data, index, numMoved);
         usedDataLength -= 2;
@@ -346,7 +345,7 @@ public class FragmentedRange
 
     private void addElementPair(int index, int a, int b)
     {
-        rangeCheckForAdd(index);
+        // DisableCheck: rangeCheckForAdd(index);
         ensureCapacity(usedDataLength + 2);
         System.arraycopy(data, index, data, index + 2, usedDataLength - index);
         data[index] = a;
