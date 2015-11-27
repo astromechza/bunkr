@@ -1,10 +1,12 @@
 package com.bunkr_beta;
 
+import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.StreamBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.engines.HC256Engine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
@@ -24,7 +26,7 @@ public class MetadataWriter
             Integer.BYTES
     );
 
-    public static void write(ArchiveInfoContext context) throws IOException
+    public static void write(ArchiveInfoContext context) throws IOException, CryptoException
     {
         try(RandomAccessFile raf = new RandomAccessFile(context.filePath, "rw"))
         {
@@ -38,14 +40,19 @@ public class MetadataWriter
                 byte[] descriptorJsonBytes = IO.convertToJson(context.getDescriptor()).getBytes();
 
                 long metaLength = Integer.BYTES + inventoryJsonBytes.length + Integer.BYTES + descriptorJsonBytes.length;
+                if (context.getDescriptor().encryption != null)
+                {
+                    int b = context.getDescriptor().encryption.aesKeyLength;
+                    metaLength += b - (inventoryJsonBytes.length % b);
+                }
 
                 buf = fc.map(FileChannel.MapMode.READ_WRITE, DBL_DATA_POS + Long.BYTES + dataBlocksLength, metaLength);
                 buf.putInt(descriptorJsonBytes.length);
                 buf.put(descriptorJsonBytes);
 
-                buf.putInt(inventoryJsonBytes.length);
                 if (context.getDescriptor().encryption == null)
                 {
+                    buf.putInt(inventoryJsonBytes.length);
                     buf.put(inventoryJsonBytes);
                 }
                 else
@@ -58,10 +65,13 @@ public class MetadataWriter
                             context.getDescriptor().encryption.aesKeyLength)
                     );
 
-                    HC256Engine cipher = new HC256Engine();
-                    cipher.init(true, kp);
-                    byte[] encryptedInv = new byte[inventoryJsonBytes.length];
-                    cipher.processBytes(inventoryJsonBytes, 0, inventoryJsonBytes.length, encryptedInv, 0);
+                    byte[] encryptedInv = SimpleAES.encrypt(
+                            inventoryJsonBytes,
+                            ((KeyParameter) kp.getParameters()).getKey(),
+                            kp.getIV()
+                    );
+
+                    buf.putInt(encryptedInv.length);
                     buf.put(encryptedInv);
                 }
             }

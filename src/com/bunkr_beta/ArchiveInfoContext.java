@@ -3,8 +3,9 @@ package com.bunkr_beta;
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.Inventory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.bouncycastle.crypto.engines.HC256Engine;
+import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.*;
@@ -19,14 +20,14 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     private long blockDataLength;
     private boolean fresh = false;
 
-    public ArchiveInfoContext(File filePath) throws IOException, NoSuchAlgorithmException
+    public ArchiveInfoContext(File filePath) throws IOException, NoSuchAlgorithmException, CryptoException
     {
         this.filePath = filePath;
         this.refresh();
     }
 
     @Override
-    public void refresh() throws IOException, NoSuchAlgorithmException
+    public void refresh() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         try(FileInputStream fis = new FileInputStream(this.filePath))
         {
@@ -61,10 +62,11 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                             this.descriptor.encryption.aesKeyLength)
                     );
 
-                    HC256Engine cipher = new HC256Engine();
-                    cipher.init(false, kp);
-                    byte[] decryptedInv = new byte[l];
-                    cipher.processBytes(encryptedInventory, 0, l, decryptedInv, 0);
+                    byte[] decryptedInv = SimpleAES.decrypt(
+                            encryptedInventory,
+                            ((KeyParameter) kp.getParameters()).getKey(),
+                            kp.getIV()
+                    );
 
                     this.inventory = new ObjectMapper().readValue(new String(decryptedInv), Inventory.class);
                 }

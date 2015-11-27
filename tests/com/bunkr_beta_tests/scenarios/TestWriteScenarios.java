@@ -7,6 +7,7 @@ import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -28,7 +29,7 @@ public class TestWriteScenarios
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void testEmptyArchive() throws IOException, NoSuchAlgorithmException
+    public void testEmptyArchive() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
         IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
@@ -62,7 +63,7 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void testSingleFile() throws IOException, NoSuchAlgorithmException
+    public void testSingleFile() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
 
@@ -117,7 +118,7 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void testMultipleFiles() throws IOException, NoSuchAlgorithmException
+    public void testMultipleFiles() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
@@ -201,7 +202,7 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void testFoldersAndFile() throws IOException, NoSuchAlgorithmException
+    public void testFoldersAndFile() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));

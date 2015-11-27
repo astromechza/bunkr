@@ -2,6 +2,7 @@ package com.bunkr_beta.interfaces;
 
 import com.bunkr_beta.Descriptor;
 import com.bunkr_beta.inventory.Inventory;
+import org.bouncycastle.crypto.CryptoException;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -12,7 +13,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public interface IArchiveInfoContext
 {
-    void refresh() throws IOException, NoSuchAlgorithmException;
+    void refresh() throws IOException, NoSuchAlgorithmException, CryptoException;
 
     boolean isFresh();
 

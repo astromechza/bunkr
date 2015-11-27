@@ -1,6 +1,7 @@
 package com.bunkr_beta;
 
 import com.bunkr_beta.inventory.Inventory;
+import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.engines.HC256Engine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -22,7 +23,7 @@ public class ArchiveBuilder
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
     public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor)
-            throws IOException, NoSuchAlgorithmException
+            throws IOException, NoSuchAlgorithmException, CryptoException
     {
         Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>());
 
@@ -40,9 +41,9 @@ public class ArchiveBuilder
                 dos.writeInt(descriptorJsonBytes.length);
                 dos.write(descriptorJsonBytes);
 
-                dos.writeInt(inventoryJsonBytes.length);
                 if (descriptor.encryption == null)
                 {
+                    dos.writeInt(inventoryJsonBytes.length);
                     dos.write(inventoryJsonBytes);
                 }
                 else
@@ -55,10 +56,12 @@ public class ArchiveBuilder
                             descriptor.encryption.aesKeyLength)
                     );
 
-                    HC256Engine cipher = new HC256Engine();
-                    cipher.init(true, kp);
-                    byte[] encryptedInv = new byte[inventoryJsonBytes.length];
-                    cipher.processBytes(inventoryJsonBytes, 0, inventoryJsonBytes.length, encryptedInv, 0);
+                    byte[] encryptedInv = SimpleAES.encrypt(
+                            inventoryJsonBytes,
+                            ((KeyParameter) kp.getParameters()).getKey(),
+                            kp.getIV()
+                    );
+                    dos.writeInt(encryptedInv.length);
                     dos.write(encryptedInv);
                 }
 

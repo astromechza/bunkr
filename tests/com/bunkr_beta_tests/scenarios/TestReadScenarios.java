@@ -5,6 +5,7 @@ import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.streams.input.MultilayeredInputStream;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
 import com.bunkr_beta_tests.XTemporaryFolder;
+import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class TestReadScenarios
     @Rule
     public XTemporaryFolder folder = new XTemporaryFolder();
 
-    private void runThreeFileTestOnContext(ArchiveInfoContext context) throws IOException
+    private void runThreeFileTestOnContext(ArchiveInfoContext context) throws IOException, CryptoException
     {
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         {
@@ -84,7 +85,7 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingPlain() throws IOException, NoSuchAlgorithmException
+    public void testReadingPlain() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("plain");
 
@@ -95,7 +96,7 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingWithCompression() throws IOException, NoSuchAlgorithmException
+    public void testReadingWithCompression() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withcompres");
 
@@ -106,7 +107,7 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingWithEncryption() throws IOException, NoSuchAlgorithmException
+    public void testReadingWithEncryption() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withencrypt");
 
@@ -118,7 +119,7 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingWithCompressionAndEncryption() throws IOException, NoSuchAlgorithmException
+    public void testReadingWithCompressionAndEncryption() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withboth");
 
