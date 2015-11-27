@@ -1,5 +1,6 @@
 package com.bunkr_beta.inventory;
 
+import com.bunkr_beta.interfaces.IFFContainer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayDeque;
@@ -11,7 +12,7 @@ import java.util.Queue;
  * Creator: benmeier
  * Created At: 2015-11-22
  */
-public class FFContainer
+public class FFContainer implements IFFContainer
 {
     public final ArrayList<FolderInventoryItem> folders;
     public final ArrayList<FileInventoryItem> files;
@@ -22,42 +23,15 @@ public class FFContainer
         this.files = files;
     }
 
-    @JsonIgnore
-    public InventoryIterator getIterator()
+    @Override
+    public ArrayList<FolderInventoryItem> getFolders()
     {
-        return new InventoryIterator(this);
+        return this.folders;
     }
 
-    public static class InventoryIterator implements Iterator<FileInventoryItem>
+    @Override
+    public ArrayList<FileInventoryItem> getFiles()
     {
-        final Queue<FileInventoryItem> queuedFiles = new ArrayDeque<>();
-        final Queue<FolderInventoryItem> queuedFolders = new ArrayDeque<>();
-
-        public InventoryIterator(FFContainer inv)
-        {
-            queuedFolders.addAll(inv.folders);
-            queuedFiles.addAll(inv.files);
-        }
-
-        private void fillFileQueue()
-        {
-            while (queuedFiles.isEmpty() && ! queuedFolders.isEmpty())
-            {
-                queuedFiles.addAll(queuedFolders.poll().getFiles());
-            }
-        }
-
-        @Override
-        public boolean hasNext()
-        {
-            this.fillFileQueue();
-            return !queuedFiles.isEmpty();
-        }
-
-        @Override
-        public FileInventoryItem next()
-        {
-            return queuedFiles.poll();
-        }
+        return this.files;
     }
 }
