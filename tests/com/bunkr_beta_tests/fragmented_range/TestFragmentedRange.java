@@ -97,6 +97,17 @@ public class TestFragmentedRange
         }
         catch (IllegalArgumentException ignored)
         {}
+
+        fr.add(7, 24);
+        assertEquals(fr.toList(), Arrays.asList(
+                7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+                29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+        ));
+        fr.add(9, 10);
+        assertEquals(fr.toList(), Arrays.asList(
+                7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+                29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+        ));
     }
 
     @Test
@@ -266,12 +277,12 @@ public class TestFragmentedRange
     public void testManyRanges()
     {
         FragmentedRange fr = new FragmentedRange();
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 200; i++)
         {
             fr.add(i * 2, 1);
         }
 
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 200; i++)
         {
             assertTrue(fr.contains(i * 2));
             assertFalse(fr.contains(i * 2 + 1));
