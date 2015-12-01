@@ -5,6 +5,7 @@ import com.bunkr_beta.fragmented_range.FragmentedRange;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -19,6 +20,7 @@ public class FileInventoryItem extends InventoryItem
     private byte[] encryptionIV;
     private FragmentedRange blocks;
     private long actualSize;
+    private HashSet<String> tags;
 
     @JsonCreator
     public FileInventoryItem(
@@ -29,7 +31,8 @@ public class FileInventoryItem extends InventoryItem
             @JsonProperty("actualSize") long actualSize,
             @JsonProperty("modifiedAt") long modifiedAt,
             @JsonProperty("encryptionKey") byte[] encryptionKey,
-            @JsonProperty("encryptionIV") byte[] encryptionIV
+            @JsonProperty("encryptionIV") byte[] encryptionIV,
+            @JsonProperty("tags") HashSet<String> tags
     )
     {
         super(name, uuid);
@@ -39,6 +42,7 @@ public class FileInventoryItem extends InventoryItem
         this.actualSize = actualSize;
         this.modifiedAt = modifiedAt;
         this.blocks = blocks;
+        this.tags = tags;
     }
 
     public FileInventoryItem(String name)
@@ -49,6 +53,7 @@ public class FileInventoryItem extends InventoryItem
         this.modifiedAt = System.currentTimeMillis();
         this.encryptionKey = RandomMaker.get(256);
         this.encryptionIV = RandomMaker.get(256);
+        this.tags = new HashSet<>();
     }
 
     public FragmentedRange getBlocks()
@@ -109,5 +114,15 @@ public class FileInventoryItem extends InventoryItem
     public long getActualSize()
     {
         return this.actualSize;
+    }
+
+    public HashSet<String> getTags()
+    {
+        return tags;
+    }
+
+    public void setTags(HashSet<String> tags)
+    {
+        this.tags = tags;
     }
 }
