@@ -94,7 +94,6 @@ public class ArchiveInfoContext implements IArchiveInfoContext
         }
     }
 
-
     @Override
     public int getBlockSize()
     {
@@ -111,12 +110,6 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     public Inventory getInventory()
     {
         return inventory;
-    }
-
-    @Override
-    public long getNumBlocks()
-    {
-        return this.blockDataLength / this.blockSize;
     }
 
     @Override

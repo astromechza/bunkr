@@ -307,6 +307,11 @@ public class FragmentedRange
         return o;
     }
 
+    public boolean equals(FragmentedRange other)
+    {
+        return Arrays.equals(this.data, other.data);
+    }
+
     // ======= PRIVATE PARTS ========
 
     //    private void rangeCheck(int index)

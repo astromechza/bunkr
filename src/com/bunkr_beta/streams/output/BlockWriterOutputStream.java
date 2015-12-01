@@ -119,7 +119,7 @@ public class BlockWriterOutputStream extends OutputStream
             }
         }
 
-        target.setBlocks(this.blockAllocMan.getAllocation());
+        target.setBlocks(this.blockAllocMan.getCurrentAllocation());
         target.setSizeOnDisk(this.bytesWritten);
     }
 

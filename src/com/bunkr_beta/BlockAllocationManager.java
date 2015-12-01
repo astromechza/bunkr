@@ -8,30 +8,34 @@ import com.bunkr_beta.inventory.Inventory;
 
 public class BlockAllocationManager implements IBlockAllocationManager
 {
-    private final FragmentedRange allocation = new FragmentedRange();
+    private final FragmentedRange currentAllocation = new FragmentedRange();
     private final FragmentedRange unallocatedBlocks = new FragmentedRange();
     private int highestKnownBlockId = -1;
 
-    public BlockAllocationManager(IArchiveInfoContext context, FileInventoryItem target)
+    public BlockAllocationManager(IArchiveInfoContext context, FragmentedRange startingAllocation)
     {
-        allocation.union(target.getBlocks());
-        unallocatedBlocks.add(0, (int)context.getNumBlocks());
+        currentAllocation.union(startingAllocation);
+        FragmentedRange usedBlocks = new FragmentedRange();
+
         Inventory.InventoryIterator fileIterator = context.getInventory().getIterator();
         while (fileIterator.hasNext())
         {
             FileInventoryItem item = fileIterator.next();
-            unallocatedBlocks.subtract(item.getBlocks());
+            usedBlocks.union(item.getBlocks());
             if (!item.getBlocks().isEmpty())
             {
                 highestKnownBlockId = Math.max(highestKnownBlockId, item.getBlocks().getMax());
             }
         }
+
+        unallocatedBlocks.add(0, highestKnownBlockId + 1);
+        unallocatedBlocks.subtract(usedBlocks);
     }
 
     @Override
-    public FragmentedRange getAllocation()
+    public FragmentedRange getCurrentAllocation()
     {
-        return this.allocation;
+        return this.currentAllocation;
     }
 
     @Override
@@ -63,7 +67,7 @@ public class BlockAllocationManager implements IBlockAllocationManager
             throw new IllegalArgumentException("The next block you're allowed to allocate is " + this.getNextAllocatableBlockId());
 
         this.unallocatedBlocks.remove(blockId);
-        this.allocation.add(blockId);
+        this.currentAllocation.add(blockId);
         this.highestKnownBlockId = Math.max(this.highestKnownBlockId, blockId);
         return blockId;
     }
@@ -71,7 +75,7 @@ public class BlockAllocationManager implements IBlockAllocationManager
     @Override
     public void clearAllocation()
     {
-        this.unallocatedBlocks.union(this.allocation);
-        this.allocation.clear();
+        this.unallocatedBlocks.union(this.currentAllocation);
+        this.currentAllocation.clear();
     }
 }

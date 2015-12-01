@@ -21,13 +21,16 @@ public interface IArchiveInfoContext
 
     void assertFresh();
 
+    long getBlockDataLength();
+
     int getBlockSize();
 
     Descriptor getDescriptor();
 
     Inventory getInventory();
 
-    long getNumBlocks();
-
-    long getBlockDataLength();
+    default long getNumBlocks()
+    {
+        return this.getBlockDataLength() / this.getBlockSize();
+    }
 }

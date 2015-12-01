@@ -15,7 +15,7 @@ public interface IBlockAllocationManager
     /**
      * @return the blocks currently allocated to this file
      */
-    FragmentedRange getAllocation();
+    FragmentedRange getCurrentAllocation();
 
     /**
      * Clear the allocations for the given file
