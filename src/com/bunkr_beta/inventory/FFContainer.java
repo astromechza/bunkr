@@ -14,8 +14,8 @@ import java.util.Queue;
  */
 public class FFContainer implements IFFContainer
 {
-    public final ArrayList<FolderInventoryItem> folders;
-    public final ArrayList<FileInventoryItem> files;
+    private final ArrayList<FolderInventoryItem> folders;
+    private final ArrayList<FileInventoryItem> files;
 
     public FFContainer(ArrayList<FileInventoryItem> files, ArrayList<FolderInventoryItem> folders)
     {

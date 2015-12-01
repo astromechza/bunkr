@@ -34,12 +34,12 @@ public class FolderInventoryItem extends InventoryItem implements IFFContainer
     @Override
     public ArrayList<FolderInventoryItem> getFolders()
     {
-        return this.ffcontainer.folders;
+        return this.ffcontainer.getFolders();
     }
 
     @Override
     public ArrayList<FileInventoryItem> getFiles()
     {
-        return this.ffcontainer.files;
+        return this.ffcontainer.getFiles();
     }
 }
