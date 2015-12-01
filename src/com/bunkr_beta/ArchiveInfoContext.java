@@ -2,7 +2,6 @@ package com.bunkr_beta;
 
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.Inventory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -41,11 +40,11 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                 this.blockDataLength = dis.readLong();
                 IO.reliableSkip(dis, this.blockDataLength);
                 String descjson = IO.readString(dis);
-                this.descriptor = new ObjectMapper().readValue(descjson, Descriptor.class);
+                this.descriptor = JSONHelper.unstringify(descjson, Descriptor.class);
 
                 if (this.descriptor.encryption == null)
                 {
-                    this.inventory = new ObjectMapper().readValue(IO.readString(dis), Inventory.class);
+                    this.inventory = JSONHelper.unstringify(IO.readString(dis), Inventory.class);
                 }
                 else
                 {
@@ -67,7 +66,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                             kp.getIV()
                     );
 
-                    this.inventory = new ObjectMapper().readValue(new String(decryptedInv), Inventory.class);
+                    this.inventory = JSONHelper.unstringify(new String(decryptedInv), Inventory.class);
                 }
             }
         }

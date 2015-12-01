@@ -1,11 +1,8 @@
 package com.bunkr_beta;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 
 public class IO
 {
@@ -49,13 +46,4 @@ public class IO
         }
         return successfullyRead;
     }
-
-    public static String convertToJson(Object object) throws IOException
-    {
-        ObjectMapper om = new ObjectMapper();
-        StringWriter sw = new StringWriter();
-        om.writeValue(sw, object);
-        return sw.toString();
-    }
-
 }
