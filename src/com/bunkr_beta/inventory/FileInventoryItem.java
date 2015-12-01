@@ -4,8 +4,10 @@ import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
 import com.bunkr_beta.interfaces.ITaggable;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -95,7 +97,14 @@ public class FileInventoryItem extends InventoryItem implements ITaggable
 
     public void setModifiedAt(long modifiedAt)
     {
+        if (modifiedAt < 0) throw new IllegalArgumentException("Cannot set modifiedAt < 0");
         this.modifiedAt = modifiedAt;
+    }
+
+    @JsonIgnore
+    public Date getModifiedAtDate()
+    {
+        return new Date(this.getModifiedAt());
     }
 
     public long getSizeOnDisk()
@@ -105,11 +114,13 @@ public class FileInventoryItem extends InventoryItem implements ITaggable
 
     public void setSizeOnDisk(long sizeOnDisk)
     {
+        if (sizeOnDisk < 0) throw new IllegalArgumentException("Cannot set sizeOnDisk < 0");
         this.sizeOnDisk = sizeOnDisk;
     }
 
     public void setActualSize(long actualSize)
     {
+        if (actualSize < 0) throw new IllegalArgumentException("Cannot set actualSize < 0");
         this.actualSize = actualSize;
     }
 

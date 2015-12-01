@@ -20,14 +20,14 @@ public class TestInventoryItem
     @Test
     public void testBasic() throws IOException
     {
-        UUID u = UUID.fromString("fc36a1a7-630c-4a1a-8387-fb8a8f6157e9");
+        UUID u = UUID.fromString("01234567-89ab-cdef-0123-456789abcdef");
         InventoryItem i = new InventoryItem("some name", u);
 
         assertThat(i.getName(), is(equalTo("some name")));
         assertThat(i.getUuid(), is(equalTo(u)));
 
         String asJson = JSONHelper.stringify(i);
-        assertThat(asJson, is(equalTo("{\"name\":\"some name\",\"uuid\":\"fc36a1a7-630c-4a1a-8387-fb8a8f6157e9\"}")));
+        assertThat(asJson, is(equalTo("{\"name\":\"some name\",\"uuid\":\"01234567-89ab-cdef-0123-456789abcdef\"}")));
 
         InventoryItem ia = JSONHelper.unstringify(asJson, InventoryItem.class);
 
@@ -39,6 +39,6 @@ public class TestInventoryItem
         assertThat(ia.getName(), is(equalTo("new name")));
         assertThat(i.getName(), is(equalTo("some name")));
 
-        assertThat(JSONHelper.stringify(ia), is(equalTo("{\"name\":\"new name\",\"uuid\":\"fc36a1a7-630c-4a1a-8387-fb8a8f6157e9\"}")));
+        assertThat(JSONHelper.stringify(ia), is(equalTo("{\"name\":\"new name\",\"uuid\":\"01234567-89ab-cdef-0123-456789abcdef\"}")));
     }
 }
