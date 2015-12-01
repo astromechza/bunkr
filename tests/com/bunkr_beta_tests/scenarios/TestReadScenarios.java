@@ -29,6 +29,8 @@ public class TestReadScenarios
     private void runThreeFileTestOnContext(ArchiveInfoContext context, UserInfoContext uic) throws IOException, CryptoException
     {
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
+        fileOne.addTag("something");
+        fileOne.addTag("another_thing");
         {
             context.getInventory().getFiles().add(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
@@ -53,6 +55,8 @@ public class TestReadScenarios
             MetadataWriter.write(context, uic);
         }
         FileInventoryItem fileThree = new FileInventoryItem("c.txt");
+        fileThree.addTag("bob");
+        fileThree.addTag("charles");
         {
             context.getInventory().getFiles().add(fileThree);
             MetadataWriter.write(context, uic);

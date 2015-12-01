@@ -2,17 +2,19 @@ package com.bunkr_beta.inventory;
 
 import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
+import com.bunkr_beta.interfaces.ITaggable;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * Creator: benmeier
  * Created At: 2015-11-08
  */
-public class FileInventoryItem extends InventoryItem
+public class FileInventoryItem extends InventoryItem implements ITaggable
 {
     private long sizeOnDisk;
     private long modifiedAt;
@@ -20,7 +22,7 @@ public class FileInventoryItem extends InventoryItem
     private byte[] encryptionIV;
     private FragmentedRange blocks;
     private long actualSize;
-    private HashSet<String> tags;
+    private Set<String> tags;
 
     @JsonCreator
     public FileInventoryItem(
@@ -116,13 +118,15 @@ public class FileInventoryItem extends InventoryItem
         return this.actualSize;
     }
 
-    public HashSet<String> getTags()
-    {
-        return tags;
-    }
-
-    public void setTags(HashSet<String> tags)
+    @Override
+    public void setTags(Set<String> tags)
     {
         this.tags = tags;
+    }
+
+    @Override
+    public Set<String> getTags()
+    {
+        return this.tags;
     }
 }
