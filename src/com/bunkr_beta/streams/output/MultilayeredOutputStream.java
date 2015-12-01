@@ -40,12 +40,12 @@ public class MultilayeredOutputStream extends OutputStream
                     new BlockAllocationManager(context, target)
             )
         );
-        if (context.getDescriptor().encryption != null)
+        if (context.getDescriptor().getEncryption() != null)
         {
             if (refreshKeys)
             {
-                target.setEncryptionKey(RandomMaker.get(context.getDescriptor().encryption.aesKeyLength));
-                target.setEncryptionIV(RandomMaker.get(context.getDescriptor().encryption.aesKeyLength));
+                target.setEncryptionKey(RandomMaker.get(context.getDescriptor().getEncryption().aesKeyLength));
+                target.setEncryptionIV(RandomMaker.get(context.getDescriptor().getEncryption().aesKeyLength));
             }
 
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
@@ -60,7 +60,7 @@ public class MultilayeredOutputStream extends OutputStream
                 )
             );
         }
-        if (context.getDescriptor().compression != null)
+        if (context.getDescriptor().getCompression() != null)
         {
             this.streams.push(new DeflaterOutputStream(this.streams.peek()));
         }

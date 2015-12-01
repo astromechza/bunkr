@@ -24,7 +24,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class TestReadScenarios
 {
     @Rule
-    public XTemporaryFolder folder = new XTemporaryFolder();
+    public final XTemporaryFolder folder = new XTemporaryFolder();
 
     private void runThreeFileTestOnContext(ArchiveInfoContext context, UserInfoContext uic) throws IOException, CryptoException
     {

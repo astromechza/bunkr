@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class TestWriteScenarios
 {
     @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    public final TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testEmptyArchive() throws IOException, NoSuchAlgorithmException, CryptoException
@@ -48,8 +48,8 @@ public class TestWriteScenarios
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = JSONHelper.unstringify(desJSON, Descriptor.class);
 
-            assertEquals(descriptor.compression, null);
-            assertEquals(descriptor.encryption, null);
+            assertEquals(descriptor.getCompression(), null);
+            assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = JSONHelper.unstringify(invJSON, Inventory.class);
@@ -97,8 +97,8 @@ public class TestWriteScenarios
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = JSONHelper.unstringify(desJSON, Descriptor.class);
 
-            assertEquals(descriptor.compression, null);
-            assertEquals(descriptor.encryption, null);
+            assertEquals(descriptor.getCompression(), null);
+            assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = JSONHelper.unstringify(invJSON, Inventory.class);
@@ -176,8 +176,8 @@ public class TestWriteScenarios
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = JSONHelper.unstringify(desJSON, Descriptor.class);
 
-            assertEquals(descriptor.compression, null);
-            assertEquals(descriptor.encryption, null);
+            assertEquals(descriptor.getCompression(), null);
+            assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = JSONHelper.unstringify(invJSON, Inventory.class);
@@ -239,8 +239,8 @@ public class TestWriteScenarios
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = JSONHelper.unstringify(desJSON, Descriptor.class);
 
-            assertEquals(descriptor.compression, null);
-            assertEquals(descriptor.encryption, null);
+            assertEquals(descriptor.getCompression(), null);
+            assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = JSONHelper.unstringify(invJSON, Inventory.class);

@@ -42,7 +42,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                 String descjson = IO.readString(dis);
                 this.descriptor = JSONHelper.unstringify(descjson, Descriptor.class);
 
-                if (this.descriptor.encryption == null)
+                if (this.descriptor.getEncryption() == null)
                 {
                     this.inventory = JSONHelper.unstringify(IO.readString(dis), Inventory.class);
                 }
@@ -53,11 +53,11 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                     if (dis.read(encryptedInventory) != l) throw new IOException("Did not read enough bytes");
 
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init(uic.getArchivePassword(), this.descriptor.encryption.pbkdf2Salt,
-                           this.descriptor.encryption.pbkdf2Iterations);
+                    g.init(uic.getArchivePassword(), this.descriptor.getEncryption().pbkdf2Salt,
+                           this.descriptor.getEncryption().pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
-                            this.descriptor.encryption.aesKeyLength,
-                            this.descriptor.encryption.aesKeyLength)
+                            this.descriptor.getEncryption().aesKeyLength,
+                            this.descriptor.getEncryption().aesKeyLength)
                     );
 
                     byte[] decryptedInv = SimpleAES.decrypt(

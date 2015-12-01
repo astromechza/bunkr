@@ -42,9 +42,9 @@ public class MetadataWriter
                 byte[] descriptorJsonBytes = JSONHelper.stringify(descriptor).getBytes();
 
                 long metaLength = Integer.BYTES + inventoryJsonBytes.length + Integer.BYTES + descriptorJsonBytes.length;
-                if (descriptor.encryption != null)
+                if (descriptor.getEncryption() != null)
                 {
-                    int b = descriptor.encryption.aesKeyLength;
+                    int b = descriptor.getEncryption().aesKeyLength;
                     metaLength += b - (inventoryJsonBytes.length % b);
                 }
 
@@ -52,7 +52,7 @@ public class MetadataWriter
                 buf.putInt(descriptorJsonBytes.length);
                 buf.put(descriptorJsonBytes);
 
-                if (descriptor.encryption == null)
+                if (descriptor.getEncryption() == null)
                 {
                     buf.putInt(inventoryJsonBytes.length);
                     buf.put(inventoryJsonBytes);
@@ -60,11 +60,11 @@ public class MetadataWriter
                 else
                 {
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init(uic.getArchivePassword(), descriptor.encryption.pbkdf2Salt,
-                           descriptor.encryption.pbkdf2Iterations);
+                    g.init(uic.getArchivePassword(), descriptor.getEncryption().pbkdf2Salt,
+                           descriptor.getEncryption().pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
-                            descriptor.encryption.aesKeyLength,
-                            descriptor.encryption.aesKeyLength)
+                            descriptor.getEncryption().aesKeyLength,
+                            descriptor.getEncryption().aesKeyLength)
                     );
 
                     byte[] encryptedInv = SimpleAES.encrypt(

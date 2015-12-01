@@ -1,12 +1,8 @@
 package com.bunkr_beta.inventory;
 
 import com.bunkr_beta.interfaces.IFFContainer;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Queue;
 
 /**
  * Creator: benmeier

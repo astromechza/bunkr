@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Descriptor
 {
-    public final EncryptionDescriptor encryption;
-    public final CompressionDescriptor compression;
+    private final EncryptionDescriptor encryption;
+    private final CompressionDescriptor compression;
 
     @JsonCreator
     public Descriptor(
@@ -60,5 +60,15 @@ public class Descriptor
                 throw new IllegalArgumentException("'ZLIB' is the only allowed compression algorithm");
             this.algorithm = algorithm;
         }
+    }
+
+    public CompressionDescriptor getCompression()
+    {
+        return compression;
+    }
+
+    public EncryptionDescriptor getEncryption()
+    {
+        return encryption;
     }
 }
