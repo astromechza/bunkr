@@ -22,12 +22,12 @@ public class MetadataWriter
             Integer.BYTES
     );
 
-    public static void write(ArchiveInfoContext context) throws IOException, CryptoException
+    public static void write(ArchiveInfoContext context, UserInfoContext uic) throws IOException, CryptoException
     {
-        write(context.filePath, context.getInventory(), context.getDescriptor());
+        write(context.filePath, context.getInventory(), context.getDescriptor(), uic);
     }
 
-    public static void write(File filePath, Inventory inventory, Descriptor descriptor)
+    public static void write(File filePath, Inventory inventory, Descriptor descriptor, UserInfoContext uic)
             throws IOException, CryptoException
     {
         try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"))
@@ -60,7 +60,7 @@ public class MetadataWriter
                 else
                 {
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init("password".getBytes(), descriptor.encryption.pbkdf2Salt,
+                    g.init(uic.getArchivePassword(), descriptor.encryption.pbkdf2Salt,
                            descriptor.encryption.pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
                             descriptor.encryption.aesKeyLength,

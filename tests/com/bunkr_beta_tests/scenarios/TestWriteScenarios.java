@@ -32,7 +32,8 @@ public class TestWriteScenarios
     public void testEmptyArchive() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
+        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
         assertTrue(context.getInventory().getFiles().isEmpty());
         assertTrue(context.getInventory().getFolders().isEmpty());
         assertTrue(context.isFresh());
@@ -67,7 +68,8 @@ public class TestWriteScenarios
     {
         File tempfile = folder.newFile();
 
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
+        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         context.getInventory().getFiles().add(newFile);
@@ -78,7 +80,7 @@ public class TestWriteScenarios
                 bwos.write(65 + i % 26);
             }
         }
-        MetadataWriter.write(context);
+        MetadataWriter.write(context, uic);
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {
@@ -121,7 +123,8 @@ public class TestWriteScenarios
     public void testMultipleFiles() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
+        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
         {
@@ -133,7 +136,7 @@ public class TestWriteScenarios
                     bwos.write(65 + i % 26);
                 }
             }
-            MetadataWriter.write(context);
+            MetadataWriter.write(context, uic);
         }
 
         FileInventoryItem fileTwo = new FileInventoryItem("another file.txt");
@@ -146,7 +149,7 @@ public class TestWriteScenarios
                     bwos.write(65 + i % 26);
                 }
             }
-            MetadataWriter.write(context);
+            MetadataWriter.write(context, uic);
         }
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
@@ -205,7 +208,8 @@ public class TestWriteScenarios
     public void testFoldersAndFile() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
+        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
 
         FolderInventoryItem folder1 = new FolderInventoryItem("some folder");
         FolderInventoryItem folder2 = new FolderInventoryItem("another folder");
@@ -216,7 +220,7 @@ public class TestWriteScenarios
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         folder1.getFiles().add(newFile);
-        MetadataWriter.write(context);
+        MetadataWriter.write(context, uic);
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {

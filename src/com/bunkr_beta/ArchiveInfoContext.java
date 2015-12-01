@@ -19,14 +19,14 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     private long blockDataLength;
     private boolean fresh = false;
 
-    public ArchiveInfoContext(File filePath) throws IOException, CryptoException
+    public ArchiveInfoContext(File filePath, UserInfoContext uic) throws IOException, CryptoException
     {
         this.filePath = filePath;
-        this.refresh();
+        this.refresh(uic);
     }
 
     @Override
-    public void refresh() throws IOException, CryptoException
+    public void refresh(UserInfoContext uic) throws IOException, CryptoException
     {
         try(FileInputStream fis = new FileInputStream(this.filePath))
         {
@@ -54,7 +54,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                     if (dis.read(encryptedInventory) != l) throw new IOException("Did not read enough bytes");
 
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init("password".getBytes(), this.descriptor.encryption.pbkdf2Salt,
+                    g.init(uic.getArchivePassword(), this.descriptor.encryption.pbkdf2Salt,
                            this.descriptor.encryption.pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
                             this.descriptor.encryption.aesKeyLength,

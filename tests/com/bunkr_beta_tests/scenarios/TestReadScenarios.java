@@ -26,7 +26,7 @@ public class TestReadScenarios
     @Rule
     public XTemporaryFolder folder = new XTemporaryFolder();
 
-    private void runThreeFileTestOnContext(ArchiveInfoContext context) throws IOException, CryptoException
+    private void runThreeFileTestOnContext(ArchiveInfoContext context, UserInfoContext uic) throws IOException, CryptoException
     {
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         {
@@ -38,7 +38,7 @@ public class TestReadScenarios
                     bwos.write(65 + i % 10);
                 }
             }
-            MetadataWriter.write(context);
+            MetadataWriter.write(context, uic);
         }
         FileInventoryItem fileTwo = new FileInventoryItem("b.txt");
         {
@@ -50,12 +50,12 @@ public class TestReadScenarios
                     bwos.write(75 + i % 10);
                 }
             }
-            MetadataWriter.write(context);
+            MetadataWriter.write(context, uic);
         }
         FileInventoryItem fileThree = new FileInventoryItem("c.txt");
         {
             context.getInventory().getFiles().add(fileThree);
-            MetadataWriter.write(context);
+            MetadataWriter.write(context, uic);
         }
 
         try(MultilayeredInputStream ms = new MultilayeredInputStream(context, fileOne))
@@ -88,45 +88,49 @@ public class TestReadScenarios
     public void testReadingPlain() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("plain");
+        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null));
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
 
-        runThreeFileTestOnContext(context);
+        runThreeFileTestOnContext(context, uic);
     }
 
     @Test
     public void testReadingWithCompression() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withcompres");
+        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new Descriptor.CompressionDescriptor("ZLIB")));
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new Descriptor.CompressionDescriptor("ZLIB")), uic);
 
-        runThreeFileTestOnContext(context);
+        runThreeFileTestOnContext(context, uic);
     }
 
     @Test
     public void testReadingWithEncryption() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withencrypt");
+        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
-                .EncryptionDescriptor(4096, 256, RandomMaker.get(64)), null));
+                .EncryptionDescriptor(4096, 256, RandomMaker.get(64)), null), uic);
 
-        runThreeFileTestOnContext(context);
+        runThreeFileTestOnContext(context, uic);
     }
 
     @Test
     public void testReadingWithCompressionAndEncryption() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withboth");
+        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
-                .EncryptionDescriptor(4096, 256, RandomMaker.get(64)), new Descriptor.CompressionDescriptor("ZLIB")));
+                .EncryptionDescriptor(4096, 256, RandomMaker.get(64)), new Descriptor.CompressionDescriptor("ZLIB")), uic);
 
-        runThreeFileTestOnContext(context);
+        runThreeFileTestOnContext(context, uic);
     }
 }

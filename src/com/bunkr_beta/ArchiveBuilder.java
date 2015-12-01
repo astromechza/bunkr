@@ -16,7 +16,7 @@ public class ArchiveBuilder
     public static final byte[] VERSION_BYTES = new byte[] {0, 0, 1};
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
-    public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor)
+    public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor, UserInfoContext uic)
             throws IOException, CryptoException
     {
         Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>());
@@ -31,7 +31,7 @@ public class ArchiveBuilder
                 dos.writeLong(0);
             }
         }
-        MetadataWriter.write(path, blankInventory, descriptor);
-        return new ArchiveInfoContext(path);
+        MetadataWriter.write(path, blankInventory, descriptor, uic);
+        return new ArchiveInfoContext(path, uic);
     }
 }
