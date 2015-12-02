@@ -1,7 +1,9 @@
 package com.bunkr_beta.cli;
 
+import com.bunkr_beta.cli.commands.AuthCommand;
 import com.bunkr_beta.interfaces.ICLICommand;
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -20,7 +22,7 @@ public class CLI
     public static Map<String, ICLICommand> commands = new HashMap<>();
     static
     {
-
+        commands.put("auth", new AuthCommand());
     }
 
     public static void main(String[] args) throws IOException
@@ -29,7 +31,12 @@ public class CLI
         ArgumentParser parser = ArgumentParsers.newArgumentParser("bunkr");
 
         parser.addArgument("archive")
-                .help("path to the Bunkr archive");
+                .help("path to the archive file");
+
+        parser.addArgument("-p", "--password-file")
+                .type(String.class)
+                .action(Arguments.store())
+                .help("read the archive password from the given file");
 
         Subparsers subparsers = parser.addSubparsers().dest("subcommand");
         commands.entrySet().stream()
@@ -44,6 +51,7 @@ public class CLI
             // perform sub command and pass in args
             commands.get(namespace.getString("subcommand")).handle(namespace);
         }
+
         // if an exception occurs from parsing the command line inputs
         // then handle it and print help/error
         catch (ArgumentParserException e)
