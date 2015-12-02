@@ -6,7 +6,6 @@ import com.bunkr_beta.fragmented_range.FragmentedRange;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.EmptyStackException;
 
 /**
  * Creator: benmeier
@@ -21,7 +20,7 @@ public class BlockReaderInputStream extends InputStream
     private final long dataLength;
     private final byte[] buffer;
     private final FragmentedRange blocks;
-    private long bytesRead;
+    private long bytesConsumed;
     private int cursor;
 
     public BlockReaderInputStream(File path, int blockSize, FragmentedRange blocks, long dataLength)
@@ -38,21 +37,21 @@ public class BlockReaderInputStream extends InputStream
         this.cursor = this.blockSize;
 
         this.blocks = blocks.copy();
-        this.bytesRead = 0;
+        this.bytesConsumed = 0;
     }
 
 
     @Override
     public int read() throws IOException
     {
-        if (bytesRead >= dataLength) return -1;
+        if (bytesConsumed >= dataLength) return -1;
         if (cursor == blockSize)
         {
             loadNextBlock();
         }
         int v = (int) this.buffer[cursor];
         cursor += 1;
-        bytesRead += 1;
+        bytesConsumed += 1;
         return v;
     }
 
@@ -66,68 +65,48 @@ public class BlockReaderInputStream extends InputStream
     @Override
     public int read(byte[] b, int off, int len) throws IOException
     {
-        if (bytesRead >= dataLength) return -1;
+        if (bytesConsumed >= dataLength) return -1;
         int remainingBytesToRead = len;
-        int destCursor = 0;
+        int read = 0;
         while (remainingBytesToRead > 0)
         {
-            int bytesThatCanBeReadFromBuffer = (int) Math.min(remainingBytesToRead, Math.min(blockSize - cursor, dataLength - bytesRead));
-            if (bytesThatCanBeReadFromBuffer > 0)
-            {
-                System.arraycopy(this.buffer, cursor, b, off + destCursor, bytesThatCanBeReadFromBuffer);
-                cursor += bytesThatCanBeReadFromBuffer;
-                bytesRead += bytesThatCanBeReadFromBuffer;
-                remainingBytesToRead -= bytesThatCanBeReadFromBuffer;
-                destCursor += bytesThatCanBeReadFromBuffer;
-            }
-            else if (dataLength - bytesRead <= 0)
-            {
-                break;
-            }
-            if (cursor == blockSize)
-            {
-                loadNextBlock();
-            }
+            if (dataLength <= bytesConsumed) break;
+            if (cursor == blockSize) loadNextBlock();
+            int readable = (int) Math.min(remainingBytesToRead, Math.min(blockSize - cursor, dataLength - bytesConsumed));
+            System.arraycopy(this.buffer, cursor, b, off + read, readable);
+            cursor += readable;
+            bytesConsumed += readable;
+            remainingBytesToRead -= readable;
+            read += readable;
         }
 
-        return destCursor;
+        return read;
     }
 
     @Override
-    public long skip(long n) throws IOException
+    public long skip(long len) throws IOException
     {
-        if (bytesRead >= dataLength) return -1;
-        long remainingBytesToSkip = n;
-        try
+        if (bytesConsumed >= dataLength) return -1;
+        long remainingBytesToSkip = len;
+        long skipped = 0;
+        while (remainingBytesToSkip > 0)
         {
-            while (remainingBytesToSkip > 0)
-            {
-                long bytesThatCanBeSkippedFromBuffer = Math.min(remainingBytesToSkip, Math.min(blockSize - cursor, dataLength - bytesRead));
-                if (bytesThatCanBeSkippedFromBuffer > 0)
-                {
-                    cursor += bytesThatCanBeSkippedFromBuffer;
-                    bytesRead += bytesThatCanBeSkippedFromBuffer;
-                    remainingBytesToSkip -= bytesThatCanBeSkippedFromBuffer;
-                }
-                else if (dataLength - bytesRead <= 0)
-                {
-                    break;
-                }
-                if (cursor == blockSize)
-                {
-                    loadNextBlock();
-                }
-            }
+            if (dataLength <= bytesConsumed) break;
+            if (cursor == blockSize) loadNextBlock();
+            long skippable = Math.min(remainingBytesToSkip, Math.min(blockSize - cursor, dataLength - bytesConsumed));
+            cursor += skippable;
+            bytesConsumed += skippable;
+            remainingBytesToSkip -= skippable;
+            skipped += skippable;
         }
-        catch (EmptyStackException ignored) {}
 
-        return n - remainingBytesToSkip;
+        return skipped;
     }
 
     @Override
     public int available() throws IOException
     {
-        long v = dataLength - bytesRead;
+        long v = dataLength - bytesConsumed;
         if (v > Integer.MAX_VALUE) return Integer.MAX_VALUE;
         return (int) v;
     }
@@ -149,7 +128,7 @@ public class BlockReaderInputStream extends InputStream
             {
                 ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, DATABLOCKS_START + blockId * blockSize, blockSize);
                 buf.get(this.buffer);
-                this.bytesRead += (blockSize - this.cursor);
+                this.bytesConsumed += (blockSize - this.cursor);
                 this.cursor = 0;
             }
         }

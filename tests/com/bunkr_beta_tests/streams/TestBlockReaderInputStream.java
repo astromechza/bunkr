@@ -17,6 +17,7 @@ import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Creator: benmeier
@@ -62,11 +63,28 @@ public class TestBlockReaderInputStream
         BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 4 + 17);
         assertThat(bis.read(), is(equalTo(97)));
         assertThat(bis.read(), is(equalTo(98)));
-        bis.skip(72);
+        assertThat(bis.skip(72), is(equalTo(72L)));
         assertThat(bis.read(), is(equalTo(69)));
         assertThat(bis.available(), is(equalTo(70)));
         assertThat(bis.skip(10000000), is(equalTo(70L)));
         assertThat(bis.skip(1), is(equalTo(-1L)));
+        bis.close();
+    }
+
+    @Test
+    public void testRead() throws IOException
+    {
+        File f = buildFake();
+        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 4 + 17);
+        assertThat(bis.read(), is(equalTo(97)));
+        assertThat(bis.read(), is(equalTo(98)));
+        byte[] buffer = new byte[200];
+        assertThat(bis.read(buffer, 0, 72), is(equalTo(72)));
+        assertThat(bis.read(), is(equalTo(69)));
+        assertThat(bis.available(), is(equalTo(70)));
+        assertThat(bis.read(buffer, 0, 100000), is(equalTo(70)));
+        assertThat(bis.read(), is(equalTo(-1)));
+        bis.close();
     }
 
     @Test
@@ -75,10 +93,13 @@ public class TestBlockReaderInputStream
         File f = buildFake();
         try
         {
-            BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 10);
+            new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 10);
             fail("bad datalength");
         }
         catch (IllegalArgumentException ignored) {}
+
+        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 4 + 17);
+        assertFalse(bis.markSupported());
     }
 
 }
