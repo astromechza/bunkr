@@ -21,8 +21,8 @@ public class TestIFFContainer
 {
     class FakeFFContainer implements IFFContainer
     {
-        List<FolderInventoryItem> folders = new ArrayList<>();
-        List<FileInventoryItem> files = new ArrayList<>();
+        final List<FolderInventoryItem> folders = new ArrayList<>();
+        final List<FileInventoryItem> files = new ArrayList<>();
 
         @Override
         public List<FolderInventoryItem> getFolders()

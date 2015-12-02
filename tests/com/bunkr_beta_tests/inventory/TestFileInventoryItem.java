@@ -5,16 +5,12 @@ import com.bunkr_beta.inventory.FileInventoryItem;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Creator: benmeier
@@ -78,10 +74,12 @@ public class TestFileInventoryItem
     public void testDateMod()
     {
         FileInventoryItem fii = new FileInventoryItem("some file");
-        Date d = new Date(2000, 10, 20, 0, 0, 0);
+
+        Calendar c = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+        Date d = c.getTime();
         fii.setModifiedAt(d.getTime());
 
-        assertThat(fii.getModifiedAt(), is(equalTo(60932815200000L)));
+        assertThat(fii.getModifiedAt(), is(equalTo(d.getTime())));
         assertThat(fii.getModifiedAtDate(), is(equalTo(d)));
 
         try

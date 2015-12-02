@@ -4,7 +4,6 @@ import com.bunkr_beta.fragmented_range.FragmentedRange;
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.interfaces.IBlockAllocationManager;
 import com.bunkr_beta.inventory.FileInventoryItem;
-import com.bunkr_beta.inventory.Inventory;
 
 import java.util.Iterator;
 
