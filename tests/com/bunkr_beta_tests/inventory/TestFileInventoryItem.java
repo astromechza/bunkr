@@ -50,36 +50,6 @@ public class TestFileInventoryItem
     }
 
     @Test
-    public void testTags()
-    {
-        FileInventoryItem fii = new FileInventoryItem("some file");
-
-        assertThat(fii.getTags().size(), is(equalTo(0)));
-        assertFalse(fii.hasTag("x"));
-        assertFalse(fii.hasTag(""));
-
-        assertTrue(fii.addTag("thing"));
-        assertFalse(fii.addTag("thing"));
-        assertTrue(fii.hasTag("thing"));
-        assertThat(fii.getTags().size(), is(equalTo(1)));
-        assertTrue(fii.removeTag("thing"));
-        assertFalse(fii.removeTag("thing"));
-        assertFalse(fii.hasTag("thing"));
-
-        fii.addTag("bob");
-        fii.addTag("charles");
-
-        assertThat(fii.getTags().size(), is(equalTo(2)));
-
-        HashSet<String> tags2 = new HashSet<>();
-        tags2.add("fish");
-        tags2.add("dog");
-        fii.setTags(tags2);
-
-        assertThat(fii.getTags().size(), is(equalTo(2)));
-    }
-
-    @Test
     public void testAllowedSizes()
     {
         FileInventoryItem fii = new FileInventoryItem("some file");

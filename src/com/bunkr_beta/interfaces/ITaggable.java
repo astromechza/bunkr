@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  */
 public interface ITaggable
 {
-    Pattern VALID_CHARS_PATTERN = Pattern.compile("^[a-z][a-z0-9_\\-\\.]*[a-z0-9]$");
+    Pattern VALID_CHARS_PATTERN = Pattern.compile("^[a-z][a-z0-9_\\-\\.]+[a-z0-9]$");
 
     // bulk methods
     void setTags(Set<String> tags);

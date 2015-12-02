@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creator: benmeier
@@ -24,13 +25,13 @@ public class Inventory implements IFFContainer
     }
 
     @Override
-    public ArrayList<FolderInventoryItem> getFolders()
+    public List<FolderInventoryItem> getFolders()
     {
         return this.ffcontainer.getFolders();
     }
 
     @Override
-    public ArrayList<FileInventoryItem> getFiles()
+    public List<FileInventoryItem> getFiles()
     {
         return this.ffcontainer.getFiles();
     }

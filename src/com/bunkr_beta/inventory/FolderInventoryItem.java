@@ -4,6 +4,7 @@ import com.bunkr_beta.interfaces.IFFContainer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,13 +33,13 @@ public class FolderInventoryItem extends InventoryItem implements IFFContainer
     }
 
     @Override
-    public ArrayList<FolderInventoryItem> getFolders()
+    public List<FolderInventoryItem> getFolders()
     {
         return this.ffcontainer.getFolders();
     }
 
     @Override
-    public ArrayList<FileInventoryItem> getFiles()
+    public List<FileInventoryItem> getFiles()
     {
         return this.ffcontainer.getFiles();
     }

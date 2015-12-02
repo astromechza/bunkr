@@ -4,10 +4,7 @@ import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Creator: benmeier
@@ -15,9 +12,9 @@ import java.util.Queue;
  */
 public interface IFFContainer
 {
-    ArrayList<FolderInventoryItem> getFolders();
+    List<FolderInventoryItem> getFolders();
 
-    ArrayList<FileInventoryItem> getFiles();
+    List<FileInventoryItem> getFiles();
 
     @JsonIgnore
     default InventoryIterator getIterator()
@@ -40,7 +37,9 @@ public interface IFFContainer
         {
             while (queuedFiles.isEmpty() && ! queuedFolders.isEmpty())
             {
-                queuedFiles.addAll(queuedFolders.poll().getFiles());
+                FolderInventoryItem f = queuedFolders.poll();
+                queuedFiles.addAll(f.getFiles());
+                queuedFolders.addAll(f.getFolders());
             }
         }
 
@@ -54,6 +53,7 @@ public interface IFFContainer
         @Override
         public FileInventoryItem next()
         {
+            this.fillFileQueue();
             return queuedFiles.poll();
         }
     }

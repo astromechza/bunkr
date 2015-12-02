@@ -3,6 +3,7 @@ package com.bunkr_beta.inventory;
 import com.bunkr_beta.interfaces.IFFContainer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creator: benmeier
@@ -20,13 +21,13 @@ public class FFContainer implements IFFContainer
     }
 
     @Override
-    public ArrayList<FolderInventoryItem> getFolders()
+    public List<FolderInventoryItem> getFolders()
     {
         return this.folders;
     }
 
     @Override
-    public ArrayList<FileInventoryItem> getFiles()
+    public List<FileInventoryItem> getFiles()
     {
         return this.files;
     }
