@@ -13,11 +13,10 @@ import java.util.*;
 public interface IFFContainer
 {
     List<FolderInventoryItem> getFolders();
-
     List<FileInventoryItem> getFiles();
 
     @JsonIgnore
-    default InventoryIterator getIterator()
+    default Iterator<FileInventoryItem> getIterator()
     {
         return new InventoryIterator(this);
     }
