@@ -40,21 +40,14 @@ public class BlockReaderInputStream extends InputStream
         this.bytesConsumed = 0;
     }
 
-
     @Override
     public int read() throws IOException
     {
         if (bytesConsumed >= dataLength) return -1;
-        if (cursor == blockSize)
-        {
-            loadNextBlock();
-        }
-        int v = (int) this.buffer[cursor];
-        cursor += 1;
-        bytesConsumed += 1;
-        return v;
+        if (cursor == blockSize) loadNextBlock();
+        bytesConsumed++;
+        return (int) this.buffer[cursor++];
     }
-
 
     @Override
     public int read(byte[] b) throws IOException
@@ -70,7 +63,7 @@ public class BlockReaderInputStream extends InputStream
         int read = 0;
         while (remainingBytesToRead > 0)
         {
-            if (dataLength <= bytesConsumed) break;
+            if (bytesConsumed >= dataLength) break;
             if (cursor == blockSize) loadNextBlock();
             int readable = (int) Math.min(remainingBytesToRead, Math.min(blockSize - cursor, dataLength - bytesConsumed));
             System.arraycopy(this.buffer, cursor, b, off + read, readable);
@@ -91,7 +84,7 @@ public class BlockReaderInputStream extends InputStream
         long skipped = 0;
         while (remainingBytesToSkip > 0)
         {
-            if (dataLength <= bytesConsumed) break;
+            if (bytesConsumed >= dataLength) break;
             if (cursor == blockSize) loadNextBlock();
             long skippable = Math.min(remainingBytesToSkip, Math.min(blockSize - cursor, dataLength - bytesConsumed));
             cursor += skippable;

@@ -96,20 +96,14 @@ public class MultilayeredOutputStream extends OutputStream
     public void flush() throws IOException
     {
         Iterator<OutputStream> i = this.streams.topToBottom();
-        while(i.hasNext())
-        {
-            i.next().flush();
-        }
+        while(i.hasNext()) i.next().flush();
     }
 
     @Override
     public void close() throws IOException
     {
         Iterator<OutputStream> i = this.streams.topToBottom();
-        while(i.hasNext())
-        {
-            i.next().close();
-        }
+        while(i.hasNext()) i.next().close();
         target.setActualSize(this.writtenBytes);
     }
 }

@@ -95,10 +95,7 @@ public class MultilayeredInputStream extends InputStream
     public void close() throws IOException
     {
         Iterator<InputStream> i = this.streams.topToBottom();
-        while(i.hasNext())
-        {
-            i.next().close();
-        }
+        while(i.hasNext())  i.next().close();
     }
 
     @Override
