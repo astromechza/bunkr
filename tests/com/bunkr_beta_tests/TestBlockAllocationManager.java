@@ -2,7 +2,7 @@ package com.bunkr_beta_tests;
 
 import com.bunkr_beta.BlockAllocationManager;
 import com.bunkr_beta.Descriptor;
-import com.bunkr_beta.UserInfoContext;
+import com.bunkr_beta.PasswordProvider;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.FileInventoryItem;
@@ -58,7 +58,7 @@ public class TestBlockAllocationManager
         }
 
         @Override
-        public void refresh(UserInfoContext uic) throws IOException, CryptoException
+        public void refresh(PasswordProvider uic) throws IOException, CryptoException
         {
             throw new RuntimeException("Not implemented");
         }

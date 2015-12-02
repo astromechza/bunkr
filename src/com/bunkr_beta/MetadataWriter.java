@@ -22,12 +22,12 @@ public class MetadataWriter
             Integer.BYTES
     );
 
-    public static void write(ArchiveInfoContext context, UserInfoContext uic) throws IOException, CryptoException
+    public static void write(ArchiveInfoContext context, PasswordProvider uic) throws IOException, CryptoException
     {
         write(context.filePath, context.getInventory(), context.getDescriptor(), uic);
     }
 
-    public static void write(File filePath, Inventory inventory, Descriptor descriptor, UserInfoContext uic)
+    public static void write(File filePath, Inventory inventory, Descriptor descriptor, PasswordProvider uic)
             throws IOException, CryptoException
     {
         try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"))

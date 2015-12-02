@@ -6,24 +6,24 @@ import com.bunkr_beta.interfaces.IPasswordPrompter;
  * Creator: benmeier
  * Created At: 2015-12-01
  */
-public class UserInfoContext
+public class PasswordProvider
 {
     private byte[] archivePassword;
     private IPasswordPrompter prompter;
 
-    public UserInfoContext()
+    public PasswordProvider()
     {
         this.archivePassword = null;
         this.prompter = null;
     }
 
-    public UserInfoContext(IPasswordPrompter prompter)
+    public PasswordProvider(IPasswordPrompter prompter)
     {
         this.archivePassword = null;
         this.prompter = prompter;
     }
 
-    public UserInfoContext(byte[] password)
+    public PasswordProvider(byte[] password)
     {
         this.archivePassword = password;
         this.prompter = null;

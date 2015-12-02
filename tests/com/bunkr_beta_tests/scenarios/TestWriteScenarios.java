@@ -29,7 +29,7 @@ public class TestWriteScenarios
     public void testEmptyArchive() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
         IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
         assertTrue(context.getInventory().getFiles().isEmpty());
         assertTrue(context.getInventory().getFolders().isEmpty());
@@ -65,7 +65,7 @@ public class TestWriteScenarios
     {
         File tempfile = folder.newFile();
 
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
@@ -120,7 +120,7 @@ public class TestWriteScenarios
     public void testMultipleFiles() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
@@ -213,7 +213,7 @@ public class TestWriteScenarios
     public void testFoldersAndFile() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
 
         FolderInventoryItem folder1 = new FolderInventoryItem("some folder");

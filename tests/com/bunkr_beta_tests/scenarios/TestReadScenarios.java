@@ -26,7 +26,7 @@ public class TestReadScenarios
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
 
-    private void runThreeFileTestOnContext(ArchiveInfoContext context, UserInfoContext uic) throws IOException, CryptoException
+    private void runThreeFileTestOnContext(ArchiveInfoContext context, PasswordProvider uic) throws IOException, CryptoException
     {
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         fileOne.addTag("something");
@@ -92,7 +92,7 @@ public class TestReadScenarios
     public void testReadingPlain() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("plain");
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
@@ -104,7 +104,7 @@ public class TestReadScenarios
     public void testReadingWithCompression() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withcompres");
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new Descriptor.CompressionDescriptor("ZLIB")), uic);
@@ -116,7 +116,7 @@ public class TestReadScenarios
     public void testReadingWithEncryption() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withencrypt");
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
@@ -129,7 +129,7 @@ public class TestReadScenarios
     public void testReadingWithCompressionAndEncryption() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newPrefixedFile("withboth");
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor

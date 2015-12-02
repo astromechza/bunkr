@@ -1,7 +1,7 @@
 package com.bunkr_beta.interfaces;
 
 import com.bunkr_beta.Descriptor;
-import com.bunkr_beta.UserInfoContext;
+import com.bunkr_beta.PasswordProvider;
 import com.bunkr_beta.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
 
@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public interface IArchiveInfoContext
 {
-    void refresh(UserInfoContext uic) throws IOException, CryptoException;
+    void refresh(PasswordProvider uic) throws IOException, CryptoException;
 
     boolean isFresh();
 

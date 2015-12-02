@@ -1,6 +1,6 @@
 package com.bunkr_beta_tests;
 
-import com.bunkr_beta.UserInfoContext;
+import com.bunkr_beta.PasswordProvider;
 import com.bunkr_beta.interfaces.IPasswordPrompter;
 import org.junit.Test;
 
@@ -13,12 +13,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Creator: benmeier
  * Created At: 2015-12-02
  */
-public class TestUserInfoContext
+public class TestPasswordProvider
 {
     @Test
     public void testNoPasswordOrPrompt()
     {
-        UserInfoContext uic = new UserInfoContext();
+        PasswordProvider uic = new PasswordProvider();
         assertThat(uic.getPrompter(), is(equalTo(null)));
         uic.setArchivePassword(null);
         try
@@ -32,7 +32,7 @@ public class TestUserInfoContext
     @Test
     public void testNoPrompt()
     {
-        UserInfoContext uic = new UserInfoContext("Hunter2".getBytes());
+        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
         assertThat(uic.getArchivePassword(), is(equalTo("Hunter2".getBytes())));
         assertThat(uic.getPrompter(), is(equalTo(null)));
 
@@ -48,7 +48,7 @@ public class TestUserInfoContext
     @Test
     public void testWithPrompt()
     {
-        UserInfoContext uic = new UserInfoContext(new IPasswordPrompter() {
+        PasswordProvider uic = new PasswordProvider(new IPasswordPrompter() {
             @Override
             public byte[] getPassword()
             {

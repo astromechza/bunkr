@@ -18,14 +18,14 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     private long blockDataLength;
     private boolean fresh = false;
 
-    public ArchiveInfoContext(File filePath, UserInfoContext uic) throws IOException, CryptoException
+    public ArchiveInfoContext(File filePath, PasswordProvider uic) throws IOException, CryptoException
     {
         this.filePath = filePath;
         this.refresh(uic);
     }
 
     @Override
-    public void refresh(UserInfoContext uic) throws IOException, CryptoException
+    public void refresh(PasswordProvider uic) throws IOException, CryptoException
     {
         try(FileInputStream fis = new FileInputStream(this.filePath))
         {

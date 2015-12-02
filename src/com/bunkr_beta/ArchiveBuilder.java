@@ -16,7 +16,7 @@ public class ArchiveBuilder
     public static final byte[] VERSION_BYTES = new byte[] {0, 0, 1};
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
-    public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor, UserInfoContext uic)
+    public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor, PasswordProvider uic)
             throws IOException, CryptoException
     {
         Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>());
