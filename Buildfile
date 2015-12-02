@@ -20,10 +20,10 @@ JAR_BC = "org.bouncycastle:bcprov-jdk15on:jar:1.53"
 JAR_JSON_CORE = "com.fasterxml.jackson.core:jackson-core:jar:2.6.3"
 JAR_JSON_ANNOT = "com.fasterxml.jackson.core:jackson-annotations:jar:2.6.3"
 JAR_JSON_DB = "com.fasterxml.jackson.core:jackson-databind:jar:2.6.3"
+JAR_ARGPARSE = "net.sourceforge.argparse4j:argparse4j:jar:0.6.0"
 
 # entry point
-MAIN_CLASS = "#{PROJECT_GROUP}.Main"
-
+MAIN_CLASS = "#{PROJECT_GROUP}.cli.CLI"
 
 # define main project
 define PROJECT_NAME, layout: layout do
@@ -31,7 +31,7 @@ define PROJECT_NAME, layout: layout do
     project.group = PROJECT_GROUP
 
     test.with JAR_JUNIT
-    compile.with JAR_BC, JAR_JSON_CORE, JAR_JSON_ANNOT, JAR_JSON_DB
+    compile.with JAR_BC, JAR_JSON_CORE, JAR_JSON_ANNOT, JAR_JSON_DB, JAR_ARGPARSE
     package(:jar).merge(compile.dependencies).exclude('META-INF/BCKEY.*')
     package(:jar).with(manifest: {'Main-Class' => MAIN_CLASS})
     run.using main: MAIN_CLASS
