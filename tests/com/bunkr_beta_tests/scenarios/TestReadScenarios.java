@@ -110,7 +110,7 @@ public class TestReadScenarios
         PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new CompressionDescriptor("ZLIB")), uic);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, CompressionDescriptor.makeDefaults()), uic);
 
         runThreeFileTestOnContext(context, uic);
     }
@@ -122,7 +122,7 @@ public class TestReadScenarios
         PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new EncryptionDescriptor(4096, 256, RandomMaker.get(64)), null), uic);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults(), null), uic);
 
         runThreeFileTestOnContext(context, uic);
     }
@@ -134,7 +134,7 @@ public class TestReadScenarios
         PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new EncryptionDescriptor(4096, 256, RandomMaker.get(64)), new CompressionDescriptor("ZLIB")), uic);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults(), CompressionDescriptor.makeDefaults()), uic);
 
         runThreeFileTestOnContext(context, uic);
     }
