@@ -1,6 +1,7 @@
 package com.bunkr_beta.cli;
 
 import com.bunkr_beta.cli.commands.AuthCommand;
+import com.bunkr_beta.cli.commands.NewArchiveCommand;
 import com.bunkr_beta.interfaces.ICLICommand;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -23,6 +24,7 @@ public class CLI
     static
     {
         commands.put("auth", new AuthCommand());
+        commands.put("create", new NewArchiveCommand());
     }
 
     public static void main(String[] args) throws IOException
