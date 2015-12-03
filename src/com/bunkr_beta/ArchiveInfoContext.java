@@ -1,5 +1,6 @@
 package com.bunkr_beta;
 
+import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;

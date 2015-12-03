@@ -2,6 +2,7 @@ package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.*;
 import com.bunkr_beta.cli.CLIPasswordPrompt;
+import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.interfaces.ICLICommand;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -48,13 +49,7 @@ public class NewArchiveCommand implements ICLICommand
 
         try
         {
-            ArchiveBuilder.createNewEmptyArchive(
-                    archiveFile,
-                    new Descriptor(
-                            new Descriptor.EncryptionDescriptor(4096, 256, RandomMaker.get(64)),
-                            new Descriptor.CompressionDescriptor("ZLIB")),
-                    passProv
-            );
+            ArchiveBuilder.createNewEmptyArchive(archiveFile, Descriptor.makeDefaults(), passProv);
         }
         catch (CryptoException e)
         {

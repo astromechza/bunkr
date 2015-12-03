@@ -1,6 +1,9 @@
 package com.bunkr_beta_tests.scenarios;
 
 import com.bunkr_beta.*;
+import com.bunkr_beta.descriptor.CompressionDescriptor;
+import com.bunkr_beta.descriptor.Descriptor;
+import com.bunkr_beta.descriptor.EncryptionDescriptor;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.streams.input.MultilayeredInputStream;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
@@ -107,7 +110,7 @@ public class TestReadScenarios
         PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new Descriptor.CompressionDescriptor("ZLIB")), uic);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, new CompressionDescriptor("ZLIB")), uic);
 
         runThreeFileTestOnContext(context, uic);
     }
@@ -119,8 +122,7 @@ public class TestReadScenarios
         PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
-                .EncryptionDescriptor(4096, 256, RandomMaker.get(64)), null), uic);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new EncryptionDescriptor(4096, 256, RandomMaker.get(64)), null), uic);
 
         runThreeFileTestOnContext(context, uic);
     }
@@ -132,8 +134,7 @@ public class TestReadScenarios
         PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new Descriptor
-                .EncryptionDescriptor(4096, 256, RandomMaker.get(64)), new Descriptor.CompressionDescriptor("ZLIB")), uic);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(new EncryptionDescriptor(4096, 256, RandomMaker.get(64)), new CompressionDescriptor("ZLIB")), uic);
 
         runThreeFileTestOnContext(context, uic);
     }

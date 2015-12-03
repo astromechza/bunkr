@@ -1,6 +1,7 @@
 package com.bunkr_beta_tests.scenarios;
 
 import com.bunkr_beta.*;
+import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;

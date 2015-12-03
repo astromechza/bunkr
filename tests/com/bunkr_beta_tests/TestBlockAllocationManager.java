@@ -1,7 +1,7 @@
 package com.bunkr_beta_tests;
 
 import com.bunkr_beta.BlockAllocationManager;
-import com.bunkr_beta.Descriptor;
+import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.PasswordProvider;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
 import com.bunkr_beta.interfaces.IArchiveInfoContext;
