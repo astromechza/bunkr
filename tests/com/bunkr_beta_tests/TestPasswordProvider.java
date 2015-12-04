@@ -20,7 +20,7 @@ public class TestPasswordProvider
     {
         PasswordProvider uic = new PasswordProvider();
         assertThat(uic.getPrompter(), is(equalTo(null)));
-        uic.setArchivePassword(null);
+        uic.clearArchivePassword();
         try
         {
             uic.getArchivePassword();
@@ -36,7 +36,7 @@ public class TestPasswordProvider
         assertThat(uic.getArchivePassword(), is(equalTo("Hunter2".getBytes())));
         assertThat(uic.getPrompter(), is(equalTo(null)));
 
-        uic.setArchivePassword(null);
+        uic.clearArchivePassword();
         try
         {
             uic.getArchivePassword();
@@ -56,10 +56,10 @@ public class TestPasswordProvider
             }
         });
 
-        uic.setArchivePassword(null);
+        uic.clearArchivePassword();
         assertThat(uic.getArchivePassword(), is(equalTo("AdventureTime".getBytes())));
 
-        uic.setArchivePassword(null);
+        uic.clearArchivePassword();
         uic.setPrompter(null);
         try
         {

@@ -2,6 +2,11 @@ package com.bunkr_beta;
 
 import com.bunkr_beta.interfaces.IPasswordPrompter;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Set;
+
 /**
  * Creator: benmeier
  * Created At: 2015-12-01
@@ -50,6 +55,24 @@ public class PasswordProvider
         this.archivePassword = archivePassword;
     }
 
+    public void setArchivePassword(File passwordFile) throws IOException
+    {
+        Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(passwordFile.toPath());
+        if (permissions.contains(PosixFilePermission.OTHERS_READ))
+            throw new IOException("For security reasons, the password file may not be world-readable.");
+        if (permissions.contains(PosixFilePermission.OTHERS_WRITE))
+            throw new IOException("For security reasons, the password file may not be world-writeable.");
+        try(BufferedReader br = new BufferedReader(new FileReader(passwordFile)))
+        {
+            this.setArchivePassword(br.readLine().getBytes());
+        }
+    }
+
+    public void clearArchivePassword()
+    {
+        this.archivePassword = null;
+    }
+
     public IPasswordPrompter getPrompter()
     {
         return prompter;
@@ -59,4 +82,5 @@ public class PasswordProvider
     {
         this.prompter = prompter;
     }
+
 }

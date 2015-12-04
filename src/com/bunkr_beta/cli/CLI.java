@@ -59,7 +59,18 @@ public class CLI
         catch (ArgumentParserException e)
         {
             parser.handleError(e);
+            System.exit(3);
+        }
+        catch (CLIException e)
+        {
+            System.err.println(e.getMessage());
             System.exit(1);
+        }
+        catch (Exception e)
+        {
+            System.err.println(String.format("Unexpected Exception %s: %s", e.getClass(), e.getMessage()));
+            e.printStackTrace();
+            System.exit(2);
         }
     }
 }

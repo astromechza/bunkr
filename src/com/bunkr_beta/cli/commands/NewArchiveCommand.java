@@ -1,6 +1,7 @@
 package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.*;
+import com.bunkr_beta.cli.CLIException;
 import com.bunkr_beta.cli.CLIPasswordPrompt;
 import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.interfaces.ICLICommand;
@@ -32,19 +33,16 @@ public class NewArchiveCommand implements ICLICommand
     }
 
     @Override
-    public void handle(Namespace args) throws IOException
+    public void handle(Namespace args) throws Exception
     {
         File archiveFile = new File(args.getString("archive"));
         if (archiveFile.exists() && !args.getBoolean("overwrite"))
-            throw new IOException(String.format("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath()));
+            throw new CLIException("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath());
 
         PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
         if (args.getString("password-file") != null)
         {
-            try(BufferedReader br = new BufferedReader(new FileReader(args.getString("password-file"))))
-            {
-                passProv.setArchivePassword(br.readLine().getBytes());
-            }
+            passProv.setArchivePassword(new File(args.getString("password-file")));
         }
 
         try
