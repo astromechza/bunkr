@@ -1,6 +1,6 @@
 package com.bunkr_beta_tests.interfaces;
 
-import com.bunkr_beta.interfaces.ITaggable;
+import com.bunkr_beta.inventory.ITaggable;
 import org.junit.Test;
 
 import java.util.HashSet;

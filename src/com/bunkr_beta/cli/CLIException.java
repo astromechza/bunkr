@@ -13,4 +13,9 @@ public class CLIException extends Exception
     {
         super(String.format(message, args));
     }
+
+    public CLIException(Throwable e)
+    {
+        super(e);
+    }
 }

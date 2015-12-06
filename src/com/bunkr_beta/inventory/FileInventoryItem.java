@@ -2,7 +2,6 @@ package com.bunkr_beta.inventory;
 
 import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
-import com.bunkr_beta.interfaces.ITaggable;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +15,7 @@ import java.util.UUID;
  * Creator: benmeier
  * Created At: 2015-11-08
  */
-public class FileInventoryItem extends InventoryItem implements ITaggable
+public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTraversalTarget
 {
     private long sizeOnDisk;
     private long modifiedAt;
@@ -139,5 +138,12 @@ public class FileInventoryItem extends InventoryItem implements ITaggable
     public Set<String> getTags()
     {
         return this.tags;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAFile()
+    {
+        return true;
     }
 }

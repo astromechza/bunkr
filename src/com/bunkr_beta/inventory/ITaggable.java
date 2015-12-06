@@ -1,4 +1,4 @@
-package com.bunkr_beta.interfaces;
+package com.bunkr_beta.inventory;
 
 import java.util.Set;
 import java.util.regex.Pattern;

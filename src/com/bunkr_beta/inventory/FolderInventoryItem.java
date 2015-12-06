@@ -1,6 +1,6 @@
 package com.bunkr_beta.inventory;
 
-import com.bunkr_beta.interfaces.IFFContainer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.UUID;
  * Creator: benmeier
  * Created At: 2015-11-08
  */
-public class FolderInventoryItem extends InventoryItem implements IFFContainer
+public class FolderInventoryItem extends InventoryItem implements IFFContainer, IFFTraversalTarget
 {
     private final FFContainer ffcontainer;
 
@@ -42,5 +42,12 @@ public class FolderInventoryItem extends InventoryItem implements IFFContainer
     public List<FileInventoryItem> getFiles()
     {
         return this.ffcontainer.getFiles();
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAFolder()
+    {
+        return true;
     }
 }

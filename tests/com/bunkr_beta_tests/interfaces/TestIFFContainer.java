@@ -1,6 +1,6 @@
 package com.bunkr_beta_tests.interfaces;
 
-import com.bunkr_beta.interfaces.IFFContainer;
+import com.bunkr_beta.inventory.IFFContainer;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import org.junit.Test;

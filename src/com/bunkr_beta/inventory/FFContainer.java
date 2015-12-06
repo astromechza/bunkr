@@ -1,7 +1,5 @@
 package com.bunkr_beta.inventory;
 
-import com.bunkr_beta.interfaces.IFFContainer;
-
 import java.util.ArrayList;
 import java.util.List;
 
