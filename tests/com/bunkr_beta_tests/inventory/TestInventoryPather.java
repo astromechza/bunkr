@@ -1,5 +1,6 @@
 package com.bunkr_beta_tests.inventory;
 
+import com.bunkr_beta.exceptions.TraversalException;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
@@ -81,6 +82,14 @@ public class TestInventoryPather
         assertThat(InventoryPather.baseName("/delta"), is(equalTo("delta")));
     }
 
+    @Test
+    public void testJoin()
+    {
+        assertThat(InventoryPather.simpleJoin("/", "bob"), is(equalTo("/bob")));
+        assertThat(InventoryPather.simpleJoin("/a", "bob"), is(equalTo("/a/bob")));
+        assertThat(InventoryPather.simpleJoin("/a/b", "bob"), is(equalTo("/a/b/bob")));
+    }
+
     private static Inventory buildFakeInventory()
     {
         Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>());
@@ -148,7 +157,7 @@ public class TestInventoryPather
         {
             InventoryPather.traverse(i, "/f4");
         }
-        catch (Exception ignored) {}
+        catch (TraversalException ignored) {}
     }
 
     @Test
@@ -159,7 +168,7 @@ public class TestInventoryPather
         {
             InventoryPather.traverse(i, "/d4");
         }
-        catch (Exception ignored) {}
+        catch (TraversalException ignored) {}
     }
 
     @Test
@@ -170,7 +179,7 @@ public class TestInventoryPather
         {
             InventoryPather.traverse(i, "/d1/f4");
         }
-        catch (Exception ignored) {}
+        catch (TraversalException ignored) {}
     }
 
     @Test
@@ -181,7 +190,7 @@ public class TestInventoryPather
         {
             InventoryPather.traverse(i, "/d1/d4");
         }
-        catch (Exception ignored) {}
+        catch (TraversalException ignored) {}
     }
 
 
@@ -193,7 +202,7 @@ public class TestInventoryPather
         {
             InventoryPather.traverse(i, "/d5/d4");
         }
-        catch (Exception ignored) {}
+        catch (TraversalException ignored) {}
     }
 
 }

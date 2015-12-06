@@ -54,4 +54,53 @@ public interface IFFContainer
             return queuedFiles.poll();
         }
     }
+
+    default IFFTraversalTarget findFileOrFolder(String name)
+    {
+        for (FolderInventoryItem item : this.getFolders())
+        {
+            if (item.getName().equals(name))
+            {
+                return item;
+            }
+        }
+        for (FileInventoryItem item : this.getFiles())
+        {
+            if (item.getName().equals(name))
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    default IFFContainer findFolder(String name)
+    {
+        for (FolderInventoryItem item : this.getFolders())
+        {
+            if (item.getName().equals(name))
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    default boolean hasFile(String name)
+    {
+        for (FileInventoryItem item : this.getFiles())
+        {
+            if (item.getName().equals(name)) return true;
+        }
+        return false;
+    }
+
+    default boolean hasFolder(String name)
+    {
+        for (FolderInventoryItem item : this.getFolders())
+        {
+            if (item.getName().equals(name)) return true;
+        }
+        return false;
+    }
 }

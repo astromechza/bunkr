@@ -1,5 +1,8 @@
 package com.bunkr_beta.inventory;
 
+import com.bunkr_beta.exceptions.IllegalPathException;
+import com.bunkr_beta.exceptions.TraversalException;
+
 import java.util.regex.Pattern;
 
 /**
@@ -19,7 +22,7 @@ public class InventoryPather
     public static void assertValid(String path)
     {
         if (! isValid(path))
-            throw new IllegalArgumentException(String.format("Error: '%s' is not a valid path.", path));
+            throw new IllegalPathException(String.format("Error: '%s' is not a valid path.", path));
     }
 
     public static String[] getParts(String path)
@@ -45,41 +48,16 @@ public class InventoryPather
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
-    private static IFFTraversalTarget findFileOrFolder(IFFContainer container, String name) throws Exception
+    public static String simpleJoin(String path, String n)
     {
-        for (FolderInventoryItem item : container.getFolders())
-        {
-            if (item.getName().equals(name))
-            {
-                return item;
-            }
-        }
-        for (FileInventoryItem item : container.getFiles())
-        {
-            if (item.getName().equals(name))
-            {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    private static IFFContainer findFolder(IFFContainer container, String name) throws Exception
-    {
-        for (FolderInventoryItem item : container.getFolders())
-        {
-            if (item.getName().equals(name))
-            {
-                return item;
-            }
-        }
-        return null;
+        if (path.equals("/")) return "/" + n;
+        return path + "/" + n;
     }
 
     /**
      * Traverse the inventory for a path
      */
-    public static IFFTraversalTarget traverse(Inventory inventory, String path) throws Exception
+    public static IFFTraversalTarget traverse(Inventory inventory, String path) throws TraversalException
     {
         // this will also do a validity check
         String[] pathParts = getParts(path);
@@ -92,16 +70,16 @@ public class InventoryPather
         IFFContainer current = inventory;
         for (int i = 0; i < pathParts.length - 1; i++)
         {
-            IFFContainer c = findFolder(current, pathParts[i]);
+            IFFContainer c = current.findFolder(pathParts[i]);
             if (c == null)
-                throw new Exception(String.format("No such folder '%s' in '%s'", pathParts[i], pathSoFar));
+                throw new TraversalException(String.format("No such folder '%s' in '%s'", pathParts[i], pathSoFar));
             current = c;
             pathSoFar += pathParts[i] + "/";
         }
 
-        IFFTraversalTarget t = findFileOrFolder(current, pathParts[pathParts.length - 1]);
+        IFFTraversalTarget t = current.findFileOrFolder(pathParts[pathParts.length - 1]);
         if (t == null)
-            throw new Exception(String.format("No such file or folder '%s' in '%s'", pathParts[pathParts.length - 1], pathSoFar));
+            throw new TraversalException(String.format("No such file or folder '%s' in '%s'", pathParts[pathParts.length - 1], pathSoFar));
         return t;
     }
 }

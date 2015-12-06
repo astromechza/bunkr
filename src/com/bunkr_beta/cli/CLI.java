@@ -3,6 +3,7 @@ package com.bunkr_beta.cli;
 import com.bunkr_beta.cli.commands.AuthCommand;
 import com.bunkr_beta.cli.commands.NewArchiveCommand;
 import com.bunkr_beta.cli.commands.ICLICommand;
+import com.bunkr_beta.exceptions.CLIException;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;

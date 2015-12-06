@@ -1,18 +1,15 @@
 package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.*;
-import com.bunkr_beta.cli.CLIException;
+import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta.cli.CLIPasswordPrompt;
 import com.bunkr_beta.descriptor.Descriptor;
-import com.bunkr_beta.interfaces.ICLICommand;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import org.bouncycastle.crypto.CryptoException;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
 /**
