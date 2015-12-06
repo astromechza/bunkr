@@ -35,6 +35,7 @@ public class MetadataWriter
         {
             try(FileChannel fc = raf.getChannel())
             {
+                // TODO!! this should be changed to allow removing of files and their data blocks!
                 long dataBlocksLength;
                 ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, DBL_DATA_POS, Long.BYTES);
                 dataBlocksLength = buf.getLong();

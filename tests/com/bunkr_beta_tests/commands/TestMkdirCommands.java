@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static junit.framework.TestCase.fail;
+
 /**
  * Creator: benmeier
  * Created At: 2015-12-06
@@ -83,11 +85,13 @@ public class TestMkdirCommands
         try
         {
             new MkdirCommand().mkdirs(inv, "/d2/d2.f3/d5", false);
+            fail("did not through traversal exception");
         }
         catch (TraversalException ignored) {}
         try
         {
             new MkdirCommand().mkdirs(inv, "/d2/d2.f3/d5", true);
+            fail("did not through traversal exception");
         }
         catch (TraversalException ignored) {}
     }
@@ -99,6 +103,7 @@ public class TestMkdirCommands
         try
         {
             new MkdirCommand().mkdirs(inv, "/d2/d4/d5", false);
+            fail("did not through traversal exception");
         }
         catch (TraversalException ignored) {}
     }
