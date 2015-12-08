@@ -38,11 +38,12 @@ public class CLI
         ArgumentParser parser = ArgumentParsers.newArgumentParser("bunkr");
 
         parser.addArgument("archive")
+                .type(Arguments.fileType())
                 .help("path to the archive file");
 
         parser.addArgument("-p", "--password-file")
-                .type(String.class)
-                .action(Arguments.store())
+                .type(Arguments.fileType().verifyExists().verifyCanRead())
+                .setDefault("-")
                 .help("read the archive password from the given file");
 
         Subparsers subparsers = parser.addSubparsers().dest("subcommand");

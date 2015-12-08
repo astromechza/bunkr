@@ -1,14 +1,10 @@
 package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.ArchiveInfoContext;
-import com.bunkr_beta.PasswordProvider;
 import com.bunkr_beta.exceptions.CLIException;
-import com.bunkr_beta.cli.CLIPasswordPrompt;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import org.bouncycastle.crypto.CryptoException;
-
-import java.io.File;
 
 /**
  * Creator: benmeier
@@ -25,16 +21,9 @@ public class AuthCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        File archiveFile = new File(args.getString("archive"));
-        PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
-        if (args.getString("password-file") != null)
-        {
-            passProv.setArchivePassword(new File(args.getString("password-file")));
-        }
-
         try
         {
-            new ArchiveInfoContext(archiveFile, passProv);
+            new ArchiveInfoContext(args.get("archive"), makePasswordProvider(args));
             System.out.println("Decryption Succeeded");
         }
         catch (CryptoException e)

@@ -36,16 +36,10 @@ public class RmdirCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        File archiveFile = new File(args.getString("archive"));
-        PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
-        if (args.getString("password-file") != null)
-        {
-            passProv.setArchivePassword(new File(args.getString("password-file")));
-        }
-
         try
         {
-            ArchiveInfoContext aic = new ArchiveInfoContext(archiveFile, passProv);
+            PasswordProvider passProv = makePasswordProvider(args);
+            ArchiveInfoContext aic = new ArchiveInfoContext(args.get("archive"), passProv);
             rmdir(aic.getInventory(), args.getString("path"), args.getBoolean("recursive"));
             MetadataWriter.write(aic, passProv);
         }

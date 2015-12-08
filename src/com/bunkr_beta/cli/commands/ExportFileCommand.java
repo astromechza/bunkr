@@ -37,16 +37,10 @@ public class ExportFileCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        File archiveFile = new File(args.getString("archive"));
-        PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
-        if (args.getString("password-file") != null)
-        {
-            passProv.setArchivePassword(new File(args.getString("password-file")));
-        }
-
         try
         {
-            ArchiveInfoContext aic = new ArchiveInfoContext(archiveFile, passProv);
+            PasswordProvider passProv = makePasswordProvider(args);
+            ArchiveInfoContext aic = new ArchiveInfoContext(args.get("archive"), passProv);
             IFFTraversalTarget target = InventoryPather.traverse(aic.getInventory(), args.getString("path"));
             if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString("path"));
 

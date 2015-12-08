@@ -32,18 +32,12 @@ public class NewArchiveCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        File archiveFile = new File(args.getString("archive"));
-        if (archiveFile.exists() && !args.getBoolean("overwrite"))
-            throw new CLIException("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath());
-
-        PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
-        if (args.getString("password-file") != null)
-        {
-            passProv.setArchivePassword(new File(args.getString("password-file")));
-        }
-
         try
         {
+            PasswordProvider passProv = makePasswordProvider(args);
+            File archiveFile = args.get("archive");
+            if (archiveFile.exists() && !args.getBoolean("overwrite"))
+                throw new CLIException("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath());
             ArchiveBuilder.createNewEmptyArchive(archiveFile, Descriptor.makeDefaults(), passProv);
         }
         catch (CryptoException e)

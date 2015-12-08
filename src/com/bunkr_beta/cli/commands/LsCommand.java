@@ -34,19 +34,11 @@ public class LsCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        String targetPath = args.getString("path");
-
-        File archiveFile = new File(args.getString("archive"));
-        PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
-        if (args.getString("password-file") != null)
-        {
-            passProv.setArchivePassword(new File(args.getString("password-file")));
-        }
-
         try
         {
-            ArchiveInfoContext aic = new ArchiveInfoContext(archiveFile, passProv);
-            IFFTraversalTarget t = InventoryPather.traverse(aic.getInventory(), targetPath);
+            PasswordProvider passProv = makePasswordProvider(args);
+            ArchiveInfoContext aic = new ArchiveInfoContext(args.get("archive"), passProv);
+            IFFTraversalTarget t = InventoryPather.traverse(aic.getInventory(), args.getString("path"));
 
             if (t.isAFile())
             {
