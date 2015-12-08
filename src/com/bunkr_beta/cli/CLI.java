@@ -10,6 +10,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,11 @@ import java.util.Map;
  */
 public class CLI
 {
-    public static Map<String, ICLICommand> commands = new HashMap<>();
+    public static final String ARG_ARCHIVE_PATH = "archive";
+    public static final String ARG_PASSWORD_FILE = "password-file";
+    public static final String ARG_SUB_COMMAND = "subcommand";
+
+    public static final Map<String, ICLICommand> commands = new HashMap<>();
     static
     {
         commands.put("auth", new AuthCommand());
@@ -38,15 +43,17 @@ public class CLI
         ArgumentParser parser = ArgumentParsers.newArgumentParser("bunkr");
 
         parser.addArgument("archive")
+                .dest(ARG_ARCHIVE_PATH)
                 .type(Arguments.fileType())
                 .help("path to the archive file");
 
         parser.addArgument("-p", "--password-file")
+                .dest(ARG_PASSWORD_FILE)
                 .type(Arguments.fileType().verifyExists().verifyCanRead())
-                .setDefault("-")
+                .setDefault(new File("-"))
                 .help("read the archive password from the given file");
 
-        Subparsers subparsers = parser.addSubparsers().dest("subcommand");
+        Subparsers subparsers = parser.addSubparsers().dest(ARG_SUB_COMMAND);
         commands.entrySet().stream()
                 .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
                 .forEach(e -> e.getValue().buildParser(subparsers.addParser(e.getKey())));
@@ -57,7 +64,7 @@ public class CLI
             Namespace namespace = parser.parseArgs(args);
 
             // perform sub command and pass in args
-            commands.get(namespace.getString("subcommand")).handle(namespace);
+            commands.get(namespace.getString(ARG_SUB_COMMAND)).handle(namespace);
         }
 
         // if an exception occurs from parsing the command line inputs

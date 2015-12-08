@@ -1,6 +1,7 @@
 package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.PasswordProvider;
+import com.bunkr_beta.cli.CLI;
 import com.bunkr_beta.cli.CLIPasswordPrompt;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
@@ -20,9 +21,9 @@ public interface ICLICommand
     default PasswordProvider makePasswordProvider(Namespace args) throws IOException
     {
         PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
-        if (args.get("password-file") != null)
+        if (args.get(CLI.ARG_PASSWORD_FILE) != null)
         {
-            passProv.setArchivePassword((File) args.get("password-file"));
+            passProv.setArchivePassword((File) args.get(CLI.ARG_PASSWORD_FILE));
         }
         return passProv;
     }

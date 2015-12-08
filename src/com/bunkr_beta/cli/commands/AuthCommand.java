@@ -1,6 +1,7 @@
 package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.ArchiveInfoContext;
+import com.bunkr_beta.cli.CLI;
 import com.bunkr_beta.exceptions.CLIException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
@@ -23,7 +24,7 @@ public class AuthCommand implements ICLICommand
     {
         try
         {
-            new ArchiveInfoContext(args.get("archive"), makePasswordProvider(args));
+            new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), makePasswordProvider(args));
             System.out.println("Decryption Succeeded");
         }
         catch (CryptoException e)
