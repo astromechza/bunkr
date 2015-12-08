@@ -28,6 +28,8 @@ public class CLI
         commands.put("mkdir", new MkdirCommand());
         commands.put("rmdir", new RmdirCommand());
         commands.put("ls", new LsCommand());
+        commands.put("read", new ExportFileCommand());
+        commands.put("write", new ImportFileCommand());
     }
 
     public static void main(String[] args) throws IOException
