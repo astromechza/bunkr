@@ -19,22 +19,24 @@ public class InventoryPather
         return pathPattern.matcher(path).matches();
     }
 
-    public static void assertValid(String path)
+    public static String assertValid(String path)
     {
+        if (path.length() > 1 && path.charAt(path.length() - 1) == '/') path = path.substring(0, path.length() - 1);
         if (! isValid(path))
             throw new IllegalPathException(String.format("Error: '%s' is not a valid path.", path));
+        return path;
     }
 
     public static String[] getParts(String path)
     {
-        assertValid(path);
+        path = assertValid(path);
         if (path.equals("/")) return new String[]{};
         return path.substring(1).split("/");
     }
 
     public static String dirname(String path)
     {
-        assertValid(path);
+        path = assertValid(path);
         if (path.equals("/")) return "/";
         String s = path.substring(0, path.lastIndexOf("/"));
         if (s.equals("")) return "/";
@@ -43,13 +45,14 @@ public class InventoryPather
 
     public static String baseName(String path)
     {
-        assertValid(path);
+        path = assertValid(path);
         if (path.equals("/")) return "";
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
     public static String simpleJoin(String path, String n)
     {
+        path = assertValid(path);
         if (path.equals("/")) return "/" + n;
         return path + "/" + n;
     }

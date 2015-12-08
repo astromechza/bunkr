@@ -9,7 +9,7 @@ import java.util.UUID;
  * Creator: benmeier
  * Created At: 2015-11-08
  */
-public class InventoryItem
+public class InventoryItem implements Comparable<InventoryItem>
 {
     private final UUID uuid;
     private String name;
@@ -37,5 +37,11 @@ public class InventoryItem
     public UUID getUuid()
     {
         return uuid;
+    }
+
+    @Override
+    public int compareTo(InventoryItem o)
+    {
+        return this.getName().compareTo(o.getName());
     }
 }

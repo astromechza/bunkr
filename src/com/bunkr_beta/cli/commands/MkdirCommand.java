@@ -27,7 +27,7 @@ public class MkdirCommand implements ICLICommand
         target.addArgument("path")
                 .type(String.class)
                 .help("archive path to create the new directory");
-        target.addArgument("-r", "--revursive")
+        target.addArgument("-r", "--recursive")
                 .type(Boolean.class)
                 .action(Arguments.storeTrue())
                 .help("build directories revursively");
@@ -59,7 +59,7 @@ public class MkdirCommand implements ICLICommand
         }
     }
 
-    public void mkdirs(Inventory inv, String targetPath, Boolean recursive) throws TraversalException
+    public void mkdirs(Inventory inv, String targetPath, boolean recursive) throws TraversalException
     {
         if (recursive)
         {

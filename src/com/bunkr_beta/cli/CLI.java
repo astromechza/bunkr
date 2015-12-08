@@ -1,9 +1,8 @@
 package com.bunkr_beta.cli;
 
-import com.bunkr_beta.cli.commands.AuthCommand;
-import com.bunkr_beta.cli.commands.NewArchiveCommand;
-import com.bunkr_beta.cli.commands.ICLICommand;
+import com.bunkr_beta.cli.commands.*;
 import com.bunkr_beta.exceptions.CLIException;
+import com.bunkr_beta.exceptions.TraversalException;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -26,6 +25,9 @@ public class CLI
     {
         commands.put("auth", new AuthCommand());
         commands.put("create", new NewArchiveCommand());
+        commands.put("mkdir", new MkdirCommand());
+        commands.put("rmdir", new RmdirCommand());
+        commands.put("ls", new LsCommand());
     }
 
     public static void main(String[] args) throws IOException
@@ -62,7 +64,7 @@ public class CLI
             parser.handleError(e);
             System.exit(3);
         }
-        catch (CLIException e)
+        catch (CLIException | TraversalException e)
         {
             System.err.println(e.getMessage());
             System.exit(1);
