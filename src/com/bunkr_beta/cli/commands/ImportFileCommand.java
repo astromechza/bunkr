@@ -4,6 +4,7 @@ import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.PasswordProvider;
 import com.bunkr_beta.cli.CLI;
+import com.bunkr_beta.cli.ProgressBar;
 import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta.exceptions.IllegalPathException;
 import com.bunkr_beta.exceptions.TraversalException;
@@ -17,9 +18,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import org.bouncycastle.crypto.CryptoException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * Creator: benmeier
@@ -29,6 +28,8 @@ public class ImportFileCommand implements ICLICommand
 {
     public static final String ARG_PATH = "path";
     public static final String ARG_SOURCE_FILE = "source";
+    public static final int PROGRESS_BAR_WIDTH = 78;
+
 
     @Override
     public void buildParser(Subparser target)
@@ -73,17 +74,20 @@ public class ImportFileCommand implements ICLICommand
             else
                 contentInputStream = new FileInputStream(inputFile);
 
-            try
+            ProgressBar pb = new ProgressBar(80, contentInputStream.available());
+
+            try(BufferedInputStream bufferedInput = new BufferedInputStream(contentInputStream))
             {
-                // TODO a progress bar could be fun?
                 try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(aic, targetFile))
                 {
                     byte[] buffer = new byte[4096];
                     int n;
-                    while ((n = contentInputStream.read(buffer)) != -1)
+                    while ((n = bufferedInput.read(buffer)) != -1)
                     {
                         bwos.write(buffer, 0, n);
+                        pb.inc(n);
                     }
+                    pb.finish();
                 }
             }
             finally

@@ -21,7 +21,8 @@ public interface ICLICommand
     default PasswordProvider makePasswordProvider(Namespace args) throws IOException
     {
         PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
-        if (args.get(CLI.ARG_PASSWORD_FILE) != null)
+        File f = args.get(CLI.ARG_PASSWORD_FILE);
+        if (f != null && ! f.getPath().equals("-"))
         {
             passProv.setArchivePassword((File) args.get(CLI.ARG_PASSWORD_FILE));
         }
