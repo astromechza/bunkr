@@ -2,6 +2,7 @@ package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.PasswordProvider;
+import com.bunkr_beta.cli.Formatters;
 import com.bunkr_beta.cli.TabularLayout;
 import com.bunkr_beta.cli.CLI;
 import com.bunkr_beta.exceptions.CLIException;
@@ -24,6 +25,7 @@ public class LsCommand implements ICLICommand
 {
     public static final String ARG_PATH = "path";
     public static final String ARG_NOHEADINGS = "noheadings";
+    public static final String ARG_MACHINEREADABLE = "machinereadable";
 
     @Override
     public void buildParser(Subparser target)
@@ -38,6 +40,11 @@ public class LsCommand implements ICLICommand
                 .type(Boolean.class)
                 .action(Arguments.storeTrue())
                 .help("disable headings in the output");
+        target.addArgument("-M", "--machine-readable")
+                .dest(ARG_MACHINEREADABLE)
+                .type(Boolean.class)
+                .action(Arguments.storeTrue())
+                .help("format data in machine readable form");
     }
 
     @Override
@@ -55,7 +62,7 @@ public class LsCommand implements ICLICommand
             if (t.isAFile())
             {
                 FileInventoryItem file = (FileInventoryItem) t;
-                table.addRow("" + file.getActualSize(), file.getModifiedAtDate().toString(), file.getName());
+                addFileRow(file, table, args.getBoolean(ARG_MACHINEREADABLE));
             }
             else
             {
@@ -70,7 +77,7 @@ public class LsCommand implements ICLICommand
                 Collections.sort(files);
                 for (FileInventoryItem file : files)
                 {
-                    table.addRow("" + file.getActualSize(), file.getModifiedAtDate().toString(), file.getName());
+                    addFileRow(file, table, args.getBoolean(ARG_MACHINEREADABLE));
                 }
             }
             table.printOut();
@@ -83,5 +90,20 @@ public class LsCommand implements ICLICommand
         {
             throw new CLIException("Decryption failed: %s", e.getMessage());
         }
+    }
+
+    private void addFileRow(FileInventoryItem file, TabularLayout table, boolean machinereadable)
+    {
+        String sizeCell;
+        if (machinereadable)
+            sizeCell = "" + file.getActualSize();
+        else
+            sizeCell = Formatters.formatBytes(file.getActualSize());
+        String dateCell;
+        if (machinereadable)
+            dateCell = Formatters.formatIso8601utc(file.getModifiedAt());
+        else
+            dateCell = Formatters.formatPrettyDate(file.getModifiedAt());
+        table.addRow(sizeCell, dateCell, file.getName());
     }
 }
