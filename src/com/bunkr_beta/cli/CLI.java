@@ -31,7 +31,7 @@ public class CLI
         commands.put("auth", new AuthCommand());
         commands.put("create", new NewArchiveCommand());
         commands.put("mkdir", new MkdirCommand());
-        commands.put("rmdir", new RmdirCommand());
+        commands.put("rm", new RmCommand());
         commands.put("ls", new LsCommand());
         commands.put("read", new ExportFileCommand());
         commands.put("write", new ImportFileCommand());

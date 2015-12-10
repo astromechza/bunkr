@@ -17,7 +17,7 @@ import org.bouncycastle.crypto.CryptoException;
  * Creator: benmeier
  * Created At: 2015-12-06
  */
-public class RmdirCommand implements ICLICommand
+public class RmCommand implements ICLICommand
 {
     public static final String ARG_PATH = "path";
     public static final String ARG_RECURSIVE = "recursive";
@@ -25,7 +25,7 @@ public class RmdirCommand implements ICLICommand
     @Override
     public void buildParser(Subparser target)
     {
-        target.help("remove a directory");
+        target.help("remove a file or directory");
         target.addArgument("path")
                 .dest(ARG_PATH)
                 .type(String.class)
@@ -44,8 +44,9 @@ public class RmdirCommand implements ICLICommand
         {
             PasswordProvider passProv = makePasswordProvider(args);
             ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
-            rmdir(aic.getInventory(), args.getString(ARG_PATH), args.getBoolean(ARG_RECURSIVE));
+            deleteItem(aic.getInventory(), args.getString(ARG_PATH), args.getBoolean(ARG_RECURSIVE));
             MetadataWriter.write(aic, passProv);
+            System.out.println(String.format("Deleted %s from archive.", args.getString(ARG_PATH)));
         }
         catch (IllegalPathException | TraversalException e)
         {
@@ -57,7 +58,7 @@ public class RmdirCommand implements ICLICommand
         }
     }
 
-    public void rmdir(Inventory inv, String targetPath, boolean recursive) throws TraversalException
+    public void deleteItem(Inventory inv, String targetPath, boolean recursive) throws TraversalException
     {
         if (targetPath.equals("/")) throw new TraversalException("Cannot remove root directory");
 
@@ -67,19 +68,24 @@ public class RmdirCommand implements ICLICommand
 
         String targetName = InventoryPather.baseName(targetPath);
 
-        if (parentDir.isAFile()) throw new TraversalException("'%s' is a file and does not contain directory '%s'", parentPath, targetName);
+        if (parentDir.isAFile()) throw new TraversalException("'%s' is a file and does not contain item '%s'", parentPath, targetName);
 
         IFFContainer parentContainer = (IFFContainer) parentDir;
 
-        for (FolderInventoryItem item : parentContainer.getFolders())
+        FolderInventoryItem folderItem = (FolderInventoryItem) parentContainer.findFolder(targetName);
+        if (folderItem != null)
         {
-            if (targetName.equals(item.getName()))
-            {
-                if (!recursive && (item.getFiles().size() > 0 || item.getFolders().size() > 0)) throw new TraversalException("Folder '%s' is not empty", targetPath);
-                parentContainer.getFolders().remove(item);
-                return;
-            }
+            if (!recursive && (folderItem.getFiles().size() > 0 || folderItem.getFolders().size() > 0)) throw new TraversalException("Folder '%s' is not empty", targetPath);
+            parentContainer.getFolders().remove(folderItem);
+            return;
         }
-        throw new TraversalException("Folder '%s' does not exist", targetPath);
+        FileInventoryItem fileItem = parentContainer.findFile(targetName);
+        if (fileItem != null)
+        {
+            parentContainer.getFiles().remove(fileItem);
+            return;
+        }
+
+        throw new TraversalException("item '%s' does not exist", targetPath);
     }
 }

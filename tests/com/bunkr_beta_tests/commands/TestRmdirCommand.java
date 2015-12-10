@@ -1,6 +1,6 @@
 package com.bunkr_beta_tests.commands;
 
-import com.bunkr_beta.cli.commands.RmdirCommand;
+import com.bunkr_beta.cli.commands.RmCommand;
 import com.bunkr_beta.exceptions.TraversalException;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
@@ -43,7 +43,7 @@ public class TestRmdirCommand
     {
         Inventory inv = makeSampleInventory();
         InventoryPather.traverse(inv, "/t1").isAFolder();
-        new RmdirCommand().rmdir(inv, "/t1", false);
+        new RmCommand().deleteItem(inv, "/t1", false);
         try
         {
             InventoryPather.traverse(inv, "/t1");
@@ -59,12 +59,12 @@ public class TestRmdirCommand
         InventoryPather.traverse(inv, "/t2").isAFolder();
         try
         {
-            new RmdirCommand().rmdir(inv, "/t2", false);
+            new RmCommand().deleteItem(inv, "/t2", false);
             fail("did not through traversal exception");
         }
         catch(TraversalException ignored) {}
         InventoryPather.traverse(inv, "/t2").isAFolder();
-        new RmdirCommand().rmdir(inv, "/t2", true);
+        new RmCommand().deleteItem(inv, "/t2", true);
         try
         {
             InventoryPather.traverse(inv, "/t2");
@@ -80,12 +80,12 @@ public class TestRmdirCommand
         InventoryPather.traverse(inv, "/t3").isAFolder();
         try
         {
-            new RmdirCommand().rmdir(inv, "/t3", false);
+            new RmCommand().deleteItem(inv, "/t3", false);
             fail("did not through traversal exception");
         }
         catch(TraversalException ignored) {}
         InventoryPather.traverse(inv, "/t3").isAFolder();
-        new RmdirCommand().rmdir(inv, "/t3", true);
+        new RmCommand().deleteItem(inv, "/t3", true);
         try
         {
             InventoryPather.traverse(inv, "/t3");
@@ -101,7 +101,7 @@ public class TestRmdirCommand
         InventoryPather.traverse(inv, "/t4").isAFile();
         try
         {
-            new RmdirCommand().rmdir(inv, "/t4", false);
+            new RmCommand().deleteItem(inv, "/t4", false);
         }
         catch(TraversalException ignored) {}
     }
@@ -112,7 +112,7 @@ public class TestRmdirCommand
         Inventory inv = makeSampleInventory();
         try
         {
-            new RmdirCommand().rmdir(inv, "/t4/t4", false);
+            new RmCommand().deleteItem(inv, "/t4/t4", false);
         }
         catch(TraversalException ignored) {}
     }
@@ -123,7 +123,7 @@ public class TestRmdirCommand
         Inventory inv = makeSampleInventory();
         try
         {
-            new RmdirCommand().rmdir(inv, "/", true);
+            new RmCommand().deleteItem(inv, "/", true);
         }
         catch(TraversalException ignored) {}
     }
