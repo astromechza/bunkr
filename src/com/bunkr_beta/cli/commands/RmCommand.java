@@ -86,6 +86,6 @@ public class RmCommand implements ICLICommand
             return;
         }
 
-        throw new TraversalException("item '%s' does not exist", targetPath);
+        throw new TraversalException("'%s' does not exist", targetPath);
     }
 }

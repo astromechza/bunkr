@@ -36,6 +36,7 @@ public class CLI
         commands.put("read", new ExportFileCommand());
         commands.put("write", new ImportFileCommand());
         commands.put("tags", new TagCommand());
+        commands.put("mv", new MvCommand());
     }
 
     public static void main(String[] args) throws IOException
