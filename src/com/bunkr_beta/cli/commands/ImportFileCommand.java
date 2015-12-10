@@ -19,6 +19,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bouncycastle.crypto.CryptoException;
 
 import java.io.*;
+import java.util.HashSet;
 
 /**
  * Creator: benmeier
@@ -28,7 +29,7 @@ public class ImportFileCommand implements ICLICommand
 {
     public static final String ARG_PATH = "path";
     public static final String ARG_SOURCE_FILE = "source";
-    public static final int PROGRESS_BAR_WIDTH = 78;
+    public static final String ARG_TAGS = "tags";
 
 
     @Override
@@ -43,6 +44,11 @@ public class ImportFileCommand implements ICLICommand
                 .dest(ARG_SOURCE_FILE)
                 .type(Arguments.fileType().acceptSystemIn().verifyCanRead())
                 .help("file to import or - for stdin");
+        target.addArgument("-t", "--tags")
+                .dest(ARG_TAGS)
+                .nargs("*")
+                .type(String.class)
+                .help("a list of tags to associate with this file");
     }
 
     @Override
@@ -66,6 +72,9 @@ public class ImportFileCommand implements ICLICommand
                 targetFile = new FileInventoryItem(InventoryPather.baseName(args.getString(ARG_PATH)));
                 ((IFFContainer) parent).getFiles().add(targetFile);
             }
+
+            // if tags have been supplied, change the tags associated with the target file
+            if (args.getList(ARG_TAGS) != null) targetFile.setCheckTags(new HashSet<>(args.getList(ARG_TAGS)));
 
             InputStream contentInputStream;
             File inputFile = args.get(ARG_SOURCE_FILE);
@@ -107,7 +116,5 @@ public class ImportFileCommand implements ICLICommand
         {
             throw new CLIException("Decryption failed: %s", e.getMessage());
         }
-
-
     }
 }

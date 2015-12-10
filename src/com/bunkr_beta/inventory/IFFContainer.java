@@ -19,6 +19,7 @@ public interface IFFContainer
         return new InventoryIterator(this);
     }
 
+
     class InventoryIterator implements Iterator<FileInventoryItem>
     {
         final Queue<FileInventoryItem> queuedFiles = new ArrayDeque<>();
@@ -77,6 +78,18 @@ public interface IFFContainer
     default IFFContainer findFolder(String name)
     {
         for (FolderInventoryItem item : this.getFolders())
+        {
+            if (item.getName().equals(name))
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    default FileInventoryItem findFile(String name)
+    {
+        for (FileInventoryItem item : this.getFiles())
         {
             if (item.getName().equals(name))
             {

@@ -35,6 +35,7 @@ public class CLI
         commands.put("ls", new LsCommand());
         commands.put("read", new ExportFileCommand());
         commands.put("write", new ImportFileCommand());
+        commands.put("tags", new TagCommand());
     }
 
     public static void main(String[] args) throws IOException

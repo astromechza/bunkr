@@ -57,7 +57,7 @@ public class LsCommand implements ICLICommand
             IFFTraversalTarget t = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
 
             TabularLayout table = new TabularLayout();
-            if (! args.getBoolean(ARG_NOHEADINGS)) table.setHeaders("SIZE", "MODIFIED", "NAME");
+            if (! args.getBoolean(ARG_NOHEADINGS)) table.setHeaders("SIZE", "MODIFIED", "NAME", "TAGS");
 
             if (t.isAFile())
             {
@@ -104,6 +104,7 @@ public class LsCommand implements ICLICommand
             dateCell = Formatters.formatIso8601utc(file.getModifiedAt());
         else
             dateCell = Formatters.formatPrettyDate(file.getModifiedAt());
-        table.addRow(sizeCell, dateCell, file.getName());
+
+        table.addRow(sizeCell, dateCell, file.getName(), String.join(" ", file.getTags()));
     }
 }

@@ -52,7 +52,7 @@ public class TabularLayout
         {
             for (int i = 0; i < headings.size(); i++)
             {
-                String formatString = "%" + ((i < (headings.size() - 1)) ? "": "-") + columnWidths[i] + "s  ";
+                String formatString = "%-" + columnWidths[i] + "s  ";
                 System.out.print(String.format(formatString, headings.get(i)));
             }
             System.out.println();
@@ -61,7 +61,7 @@ public class TabularLayout
         {
             for (int i = 0; i < row.size(); i++)
             {
-                String formatString = "%" + ((i < (columnWidths.length - 1)) ? "": "-") + columnWidths[i] + "s  ";
+                String formatString = "%-" + columnWidths[i] + "s  ";
                 System.out.print(String.format(formatString, row.get(i)));
             }
             System.out.println();
