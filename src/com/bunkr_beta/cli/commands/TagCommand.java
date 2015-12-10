@@ -16,7 +16,9 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import org.bouncycastle.crypto.CryptoException;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Creator: benmeier
@@ -40,10 +42,12 @@ public class TagCommand implements ICLICommand
                 .dest(ARG_TAGS)
                 .type(String.class)
                 .nargs("*")
+                .setDefault(new ArrayList<>())
                 .help("a list of tags to associate with this file");
         target.addArgument("-c", "--clear")
                 .dest(ARG_CLEAR)
                 .type(Boolean.class)
+                .setDefault(false)
                 .action(Arguments.storeTrue())
                 .help("remove all tags associated with the file");
     }
@@ -52,7 +56,7 @@ public class TagCommand implements ICLICommand
     public void handle(Namespace args) throws Exception
     {
         // first do some arg checking
-        if (args.getBoolean(ARG_CLEAR) && (args.getList(ARG_TAGS) != null && args.getList(ARG_TAGS).size() > 0))
+        if (args.getBoolean(ARG_CLEAR) && args.getList(ARG_TAGS).size() > 0)
         {
             throw new CLIException("Please use either --tags or --clear, not both.");
         }

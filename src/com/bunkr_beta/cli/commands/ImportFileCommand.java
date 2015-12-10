@@ -19,6 +19,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bouncycastle.crypto.CryptoException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -47,6 +48,7 @@ public class ImportFileCommand implements ICLICommand
         target.addArgument("-t", "--tags")
                 .dest(ARG_TAGS)
                 .nargs("*")
+                .setDefault(new ArrayList<>())
                 .type(String.class)
                 .help("a list of tags to associate with this file");
     }
@@ -74,7 +76,7 @@ public class ImportFileCommand implements ICLICommand
             }
 
             // if tags have been supplied, change the tags associated with the target file
-            if (args.getList(ARG_TAGS) != null) targetFile.setCheckTags(new HashSet<>(args.getList(ARG_TAGS)));
+            if (args.getList(ARG_TAGS).size() > 0) targetFile.setCheckTags(new HashSet<>(args.getList(ARG_TAGS)));
 
             InputStream contentInputStream;
             File inputFile = args.get(ARG_SOURCE_FILE);
