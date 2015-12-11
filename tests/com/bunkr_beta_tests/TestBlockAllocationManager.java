@@ -25,74 +25,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestBlockAllocationManager
 {
-    class FakeArchiveInfoContext implements IArchiveInfoContext
+    private Inventory fakeInventory()
     {
-        public Inventory inventory;
 
-        public FakeArchiveInfoContext()
-        {
-            ArrayList<FileInventoryItem> files = new ArrayList<>();
-            FileInventoryItem file = new FileInventoryItem("something");
-            file.setBlocks(new FragmentedRange(10, 8));
-            files.add(file);
-
-            inventory = new Inventory(files, new ArrayList<>());
-        }
-
-        @Override
-        public int getBlockSize()
-        {
-            return 1024;
-        }
-
-        @Override
-        public Inventory getInventory()
-        {
-            return inventory;
-        }
-
-        @Override
-        public long getBlockDataLength()
-        {
-            return this.getBlockSize() * 20;
-        }
-
-        @Override
-        public void refresh(PasswordProvider uic) throws IOException, CryptoException
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        @Override
-        public boolean isFresh()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        @Override
-        public void invalidate()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        @Override
-        public void assertFresh()
-        {
-            throw new RuntimeException("Not implemented");
-        }
-
-        @Override
-        public Descriptor getDescriptor()
-        {
-            throw new RuntimeException("Not implemented");
-        }
+        ArrayList<FileInventoryItem> files = new ArrayList<>();
+        FileInventoryItem file = new FileInventoryItem("something");
+        file.setBlocks(new FragmentedRange(10, 8));
+        files.add(file);
+        return new Inventory(files, new ArrayList<>());
     }
-
 
     @Test
     public void testDefault()
     {
-        BlockAllocationManager bam = new BlockAllocationManager(new FakeArchiveInfoContext(), new FragmentedRange());
+        BlockAllocationManager bam = new BlockAllocationManager(fakeInventory(), new FragmentedRange());
 
         assertThat(bam.getNextAllocatableBlockId(), is(equalTo(0)));
         assertThat(bam.allocateNextBlock(), is(equalTo(0)));
@@ -106,8 +52,7 @@ public class TestBlockAllocationManager
     @Test
     public void testOutOfRangeAllocations()
     {
-        FakeArchiveInfoContext aic = new FakeArchiveInfoContext();
-        BlockAllocationManager bam = new BlockAllocationManager(aic, new FragmentedRange());
+        BlockAllocationManager bam = new BlockAllocationManager(fakeInventory(), new FragmentedRange());
 
         try
         {
@@ -116,8 +61,7 @@ public class TestBlockAllocationManager
         }
         catch(Exception ignored) {}
 
-        aic.inventory = new Inventory(new ArrayList<>(), new ArrayList<>());
-        bam = new BlockAllocationManager(aic, new FragmentedRange());
+        bam = new BlockAllocationManager(new Inventory(new ArrayList<>(), new ArrayList<>()), new FragmentedRange());
 
         try
         {
@@ -130,7 +74,7 @@ public class TestBlockAllocationManager
     @Test
     public void testUnallocatedBlocks()
     {
-        BlockAllocationManager bam = new BlockAllocationManager(new FakeArchiveInfoContext(), new FragmentedRange());
+        BlockAllocationManager bam = new BlockAllocationManager(fakeInventory(), new FragmentedRange());
 
         for (int i = 0; i <= 9; i++)
         {

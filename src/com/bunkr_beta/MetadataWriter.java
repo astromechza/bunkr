@@ -32,53 +32,52 @@ public class MetadataWriter
     public static void write(File filePath, Inventory inventory, Descriptor descriptor, PasswordProvider uic)
             throws IOException, CryptoException
     {
-        try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"))
+        try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"); FileChannel fc = raf.getChannel())
         {
-            try(FileChannel fc = raf.getChannel())
+            // When writing metadata we need to be able to truncate unused blocks off of the end of the file after
+            // files are deleted.
+            // TODO!! this should be changed to allow removing of files and their data blocks!
+            long dataBlocksLength;
+            ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, DBL_DATA_POS, Long.BYTES);
+            dataBlocksLength = buf.getLong();
+
+            byte[] inventoryJsonBytes = JSONHelper.stringify(inventory).getBytes();
+            byte[] descriptorJsonBytes = JSONHelper.stringify(descriptor).getBytes();
+
+            long metaLength = Integer.BYTES + inventoryJsonBytes.length + Integer.BYTES + descriptorJsonBytes.length;
+            if (descriptor.getEncryption() != null)
             {
-                // TODO!! this should be changed to allow removing of files and their data blocks!
-                long dataBlocksLength;
-                ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, DBL_DATA_POS, Long.BYTES);
-                dataBlocksLength = buf.getLong();
+                int b = descriptor.getEncryption().aesKeyLength;
+                metaLength += b - (inventoryJsonBytes.length % b);
+            }
 
-                byte[] inventoryJsonBytes = JSONHelper.stringify(inventory).getBytes();
-                byte[] descriptorJsonBytes = JSONHelper.stringify(descriptor).getBytes();
+            buf = fc.map(FileChannel.MapMode.READ_WRITE, DBL_DATA_POS + Long.BYTES + dataBlocksLength, metaLength);
+            buf.putInt(descriptorJsonBytes.length);
+            buf.put(descriptorJsonBytes);
 
-                long metaLength = Integer.BYTES + inventoryJsonBytes.length + Integer.BYTES + descriptorJsonBytes.length;
-                if (descriptor.getEncryption() != null)
-                {
-                    int b = descriptor.getEncryption().aesKeyLength;
-                    metaLength += b - (inventoryJsonBytes.length % b);
-                }
+            if (descriptor.getEncryption() == null)
+            {
+                buf.putInt(inventoryJsonBytes.length);
+                buf.put(inventoryJsonBytes);
+            }
+            else
+            {
+                PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
+                g.init(uic.getArchivePassword(), descriptor.getEncryption().pbkdf2Salt,
+                       descriptor.getEncryption().pbkdf2Iterations);
+                ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
+                        descriptor.getEncryption().aesKeyLength,
+                        descriptor.getEncryption().aesKeyLength)
+                );
 
-                buf = fc.map(FileChannel.MapMode.READ_WRITE, DBL_DATA_POS + Long.BYTES + dataBlocksLength, metaLength);
-                buf.putInt(descriptorJsonBytes.length);
-                buf.put(descriptorJsonBytes);
+                byte[] encryptedInv = SimpleAES.encrypt(
+                        inventoryJsonBytes,
+                        ((KeyParameter) kp.getParameters()).getKey(),
+                        kp.getIV()
+                );
 
-                if (descriptor.getEncryption() == null)
-                {
-                    buf.putInt(inventoryJsonBytes.length);
-                    buf.put(inventoryJsonBytes);
-                }
-                else
-                {
-                    PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init(uic.getArchivePassword(), descriptor.getEncryption().pbkdf2Salt,
-                           descriptor.getEncryption().pbkdf2Iterations);
-                    ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
-                            descriptor.getEncryption().aesKeyLength,
-                            descriptor.getEncryption().aesKeyLength)
-                    );
-
-                    byte[] encryptedInv = SimpleAES.encrypt(
-                            inventoryJsonBytes,
-                            ((KeyParameter) kp.getParameters()).getKey(),
-                            kp.getIV()
-                    );
-
-                    buf.putInt(encryptedInv.length);
-                    buf.put(encryptedInv);
-                }
+                buf.putInt(encryptedInv.length);
+                buf.put(encryptedInv);
             }
         }
     }

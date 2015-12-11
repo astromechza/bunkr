@@ -37,7 +37,7 @@ public class MultilayeredOutputStream extends OutputStream
                     context.filePath,
                     context.getBlockSize(),
                     target,
-                    new BlockAllocationManager(context, target.getBlocks())
+                    new BlockAllocationManager(context.getInventory(), target.getBlocks())
             )
         );
         if (context.getDescriptor().getEncryption() != null)

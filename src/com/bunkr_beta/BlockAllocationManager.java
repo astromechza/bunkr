@@ -2,6 +2,7 @@ package com.bunkr_beta;
 
 import com.bunkr_beta.fragmented_range.FragmentedRange;
 import com.bunkr_beta.inventory.FileInventoryItem;
+import com.bunkr_beta.inventory.Inventory;
 
 import java.util.Iterator;
 
@@ -11,12 +12,12 @@ public class BlockAllocationManager implements IBlockAllocationManager
     private final FragmentedRange unallocatedBlocks = new FragmentedRange();
     private int highestKnownBlockId = -1;
 
-    public BlockAllocationManager(IArchiveInfoContext context, FragmentedRange startingAllocation)
+    public BlockAllocationManager(Inventory inv, FragmentedRange startingAllocation)
     {
         currentAllocation.union(startingAllocation);
         FragmentedRange usedBlocks = new FragmentedRange();
 
-        Iterator<FileInventoryItem> fileIterator = context.getInventory().getIterator();
+        Iterator<FileInventoryItem> fileIterator = inv.getIterator();
         while (fileIterator.hasNext())
         {
             FileInventoryItem item = fileIterator.next();
