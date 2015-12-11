@@ -57,7 +57,10 @@ public class ExportFileCommand implements ICLICommand
             if (inputFile.getPath().equals("-"))
                 contentOutputStream = System.out;
             else
+            {
+                if (inputFile.exists()) throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
                 contentOutputStream = new FileOutputStream(inputFile);
+            }
 
             try
             {
