@@ -1,4 +1,4 @@
-package com.bunkr_beta_tests.cli;
+package com.bunkr_beta_tests.cli.commands;
 
 import com.bunkr_beta.ArchiveBuilder;
 import com.bunkr_beta.ArchiveInfoContext;

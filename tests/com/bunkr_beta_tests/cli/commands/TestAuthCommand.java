@@ -1,4 +1,4 @@
-package com.bunkr_beta_tests.cli;
+package com.bunkr_beta_tests.cli.commands;
 
 import com.bunkr_beta.ArchiveBuilder;
 import com.bunkr_beta.RandomMaker;
@@ -9,10 +9,9 @@ import com.bunkr_beta.descriptor.CompressionDescriptor;
 import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.descriptor.EncryptionDescriptor;
 import com.bunkr_beta_tests.XTemporaryFolder;
+import com.bunkr_beta_tests.cli.PasswordFile;
 import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
-import net.sourceforge.argparse4j.inf.Subparsers;
 import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;

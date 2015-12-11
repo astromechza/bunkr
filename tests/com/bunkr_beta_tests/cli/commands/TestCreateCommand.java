@@ -1,12 +1,12 @@
-package com.bunkr_beta_tests.cli;
+package com.bunkr_beta_tests.cli.commands;
 
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.cli.CLI;
-import com.bunkr_beta.cli.commands.AuthCommand;
 import com.bunkr_beta.cli.commands.NewArchiveCommand;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta_tests.XTemporaryFolder;
+import com.bunkr_beta_tests.cli.PasswordFile;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.junit.Rule;

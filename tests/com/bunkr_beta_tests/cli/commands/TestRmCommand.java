@@ -1,14 +1,12 @@
-package com.bunkr_beta_tests.cli;
+package com.bunkr_beta_tests.cli.commands;
 
 import com.bunkr_beta.ArchiveBuilder;
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.cli.CLI;
-import com.bunkr_beta.cli.commands.MkdirCommand;
 import com.bunkr_beta.cli.commands.RmCommand;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.descriptor.Descriptor;
-import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta.exceptions.TraversalException;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
