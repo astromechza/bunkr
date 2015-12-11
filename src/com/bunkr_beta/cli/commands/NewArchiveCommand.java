@@ -8,10 +8,8 @@ import com.bunkr_beta.descriptor.Descriptor;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bouncycastle.crypto.CryptoException;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Creator: benmeier
@@ -35,18 +33,10 @@ public class NewArchiveCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        try
-        {
-            PasswordProvider passProv = makePasswordProvider(args);
-            File archiveFile = args.get(CLI.ARG_ARCHIVE_PATH);
-            if (archiveFile.exists() && !args.getBoolean(ARG_OVERWRITE))
-                throw new CLIException("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath());
-            ArchiveBuilder.createNewEmptyArchive(archiveFile, Descriptor.makeDefaults(), passProv);
-        }
-        catch (CryptoException e)
-        {
-            e.printStackTrace();
-            throw new IOException("Failure to create new archive");
-        }
+        PasswordProvider passProv = makePasswordProvider(args);
+        File archiveFile = args.get(CLI.ARG_ARCHIVE_PATH);
+        if (archiveFile.exists() && !args.getBoolean(ARG_OVERWRITE))
+            throw new CLIException("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath());
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, Descriptor.makeDefaults(), passProv);
     }
 }

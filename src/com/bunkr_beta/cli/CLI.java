@@ -2,6 +2,7 @@ package com.bunkr_beta.cli;
 
 import com.bunkr_beta.cli.commands.*;
 import com.bunkr_beta.exceptions.CLIException;
+import com.bunkr_beta.exceptions.IllegalPathException;
 import com.bunkr_beta.exceptions.TraversalException;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -9,6 +10,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparsers;
+import org.bouncycastle.crypto.CryptoException;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +78,12 @@ public class CLI
             parser.handleError(e);
             System.exit(3);
         }
-        catch (CLIException | TraversalException e)
+        catch (CryptoException e)
+        {
+            System.err.println(String.format("Decryption failed: %s", e.getMessage()));
+            System.exit(1);
+        }
+        catch (IllegalPathException | CLIException | TraversalException e)
         {
             System.err.println(e.getMessage());
             System.exit(1);

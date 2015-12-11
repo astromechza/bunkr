@@ -4,8 +4,6 @@ import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.cli.CLI;
 import com.bunkr_beta.exceptions.CLIException;
-import com.bunkr_beta.exceptions.IllegalPathException;
-import com.bunkr_beta.exceptions.TraversalException;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.IFFTraversalTarget;
 import com.bunkr_beta.inventory.InventoryPather;
@@ -13,7 +11,6 @@ import com.bunkr_beta.streams.input.MultilayeredInputStream;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bouncycastle.crypto.CryptoException;
 
 import java.io.*;
 
@@ -43,49 +40,35 @@ public class ExportFileCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        try
+        PasswordProvider passProv = makePasswordProvider(args);
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        IFFTraversalTarget target = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
+        if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
+
+        FileInventoryItem targetFile = (FileInventoryItem) target;
+
+        OutputStream contentOutputStream;
+        File inputFile = args.get(ARG_DESTINATION_FILE);
+        if (inputFile.getPath().equals("-"))
+            contentOutputStream = System.out;
+        else
         {
-            PasswordProvider passProv = makePasswordProvider(args);
-            ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
-            IFFTraversalTarget target = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
-            if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
+            if (inputFile.exists()) throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
+            contentOutputStream = new FileOutputStream(inputFile);
+        }
 
-            FileInventoryItem targetFile = (FileInventoryItem) target;
-
-            OutputStream contentOutputStream;
-            File inputFile = args.get(ARG_DESTINATION_FILE);
-            if (inputFile.getPath().equals("-"))
-                contentOutputStream = System.out;
-            else
+        try (MultilayeredInputStream ms = new MultilayeredInputStream(aic, targetFile))
+        {
+            byte[] buffer = new byte[4096];
+            int n;
+            while ((n = ms.read(buffer)) != -1)
             {
-                if (inputFile.exists()) throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
-                contentOutputStream = new FileOutputStream(inputFile);
-            }
-
-            try
-            {
-                try (MultilayeredInputStream ms = new MultilayeredInputStream(aic, targetFile))
-                {
-                    byte[] buffer = new byte[4096];
-                    int n;
-                    while ((n = ms.read(buffer)) != -1)
-                    {
-                        contentOutputStream.write(buffer, 0, n);
-                    }
-                }
-            }
-            finally
-            {
-                contentOutputStream.close();
+                contentOutputStream.write(buffer, 0, n);
             }
         }
-        catch (IllegalPathException | TraversalException e)
+        finally
         {
-            throw new CLIException(e);
-        }
-        catch (CryptoException e)
-        {
-            throw new CLIException("Decryption failed: %s", e.getMessage());
+            contentOutputStream.close();
         }
     }
 }

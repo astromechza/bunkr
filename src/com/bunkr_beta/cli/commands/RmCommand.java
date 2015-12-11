@@ -4,14 +4,11 @@ import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.cli.CLI;
-import com.bunkr_beta.exceptions.CLIException;
-import com.bunkr_beta.exceptions.IllegalPathException;
 import com.bunkr_beta.exceptions.TraversalException;
 import com.bunkr_beta.inventory.*;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bouncycastle.crypto.CryptoException;
 
 /**
  * Creator: benmeier
@@ -40,22 +37,11 @@ public class RmCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        try
-        {
-            PasswordProvider passProv = makePasswordProvider(args);
-            ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
-            deleteItem(aic.getInventory(), args.getString(ARG_PATH), args.getBoolean(ARG_RECURSIVE));
-            MetadataWriter.write(aic, passProv);
-            System.out.println(String.format("Deleted %s from archive.", args.getString(ARG_PATH)));
-        }
-        catch (IllegalPathException | TraversalException e)
-        {
-            throw new CLIException(e);
-        }
-        catch (CryptoException e)
-        {
-            throw new CLIException("Decryption failed: %s", e.getMessage());
-        }
+        PasswordProvider passProv = makePasswordProvider(args);
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        deleteItem(aic.getInventory(), args.getString(ARG_PATH), args.getBoolean(ARG_RECURSIVE));
+        MetadataWriter.write(aic, passProv);
+        System.out.println(String.format("Deleted %s from archive.", args.getString(ARG_PATH)));
     }
 
     public void deleteItem(Inventory inv, String targetPath, boolean recursive) throws TraversalException

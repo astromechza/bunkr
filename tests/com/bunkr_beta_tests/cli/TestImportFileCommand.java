@@ -212,7 +212,7 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/folder");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
-        args.put(ImportFileCommand.ARG_TAGS, Arrays.asList());
+        args.put(ImportFileCommand.ARG_TAGS, Collections.emptyList());
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try

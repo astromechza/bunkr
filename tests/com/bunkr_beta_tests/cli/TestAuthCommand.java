@@ -8,9 +8,9 @@ import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.descriptor.CompressionDescriptor;
 import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.descriptor.EncryptionDescriptor;
-import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta_tests.XTemporaryFolder;
 import net.sourceforge.argparse4j.inf.Namespace;
+import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -76,9 +76,9 @@ public class TestAuthCommand
             new AuthCommand().handle(new Namespace(args));
             fail("Should have raised an exception");
         }
-        catch(CLIException e)
+        catch(CryptoException e)
         {
-            assertThat(e.getMessage(), is(equalTo("Decryption failed: pad block corrupted")));
+            assertThat(e.getMessage(), is(equalTo("pad block corrupted")));
         }
     }
 
