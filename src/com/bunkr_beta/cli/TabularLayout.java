@@ -11,7 +11,7 @@ import java.util.List;
 public class TabularLayout
 {
     private List<String> headings = null;
-    private List<List<String>> rows = new ArrayList<>();
+    private final List<List<String>> rows = new ArrayList<>();
 
     public void setHeaders(String... columns)
     {

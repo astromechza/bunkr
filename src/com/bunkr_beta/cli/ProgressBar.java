@@ -6,11 +6,11 @@ package com.bunkr_beta.cli;
  */
 public class ProgressBar
 {
-    private int oldProgress = -100;
-    private int newProgress = 0;
+    private final long target;
+    private final int innerWidth;
+
+    private int stepProgress = -100;
     private long total;
-    private long target;
-    private int innerWidth;
 
     public ProgressBar(int width, long target)
     {
@@ -27,12 +27,12 @@ public class ProgressBar
 
     public void tick(long progress)
     {
-        newProgress = (int) (this.innerWidth * (float) progress / target);
-        if ((newProgress - oldProgress) >= 1 || newProgress == 100)
+        int newProgress = (int) (this.innerWidth * (float) progress / target);
+        if ((newProgress - stepProgress) >= 1 || newProgress == 100)
         {
             String bar = new String(new char[newProgress]).replace("\0", "=");
             System.out.print(String.format("Importing file: |%-" + innerWidth + "s|\r", bar));
-            oldProgress = newProgress;
+            stepProgress = newProgress;
         }
     }
 

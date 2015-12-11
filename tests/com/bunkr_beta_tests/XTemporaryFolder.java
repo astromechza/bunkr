@@ -17,8 +17,8 @@ public class XTemporaryFolder extends TemporaryFolder
         return File.createTempFile("junit-" + prefix , "", this.getRoot());
     }
 
-    private static SecureRandom random = new SecureRandom();
-    public File newFilePath(String prefix, String suffix) throws IOException
+    private static final SecureRandom random = new SecureRandom();
+    public File newFilePath(String prefix, String suffix)
     {
         String name = "" + prefix + Long.toString(random.nextLong()) + suffix + ".tmp";
         return new File(this.getRoot(), name);

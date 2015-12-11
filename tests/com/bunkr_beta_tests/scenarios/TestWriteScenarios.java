@@ -3,7 +3,6 @@ package com.bunkr_beta_tests.scenarios;
 import com.bunkr_beta.*;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.descriptor.Descriptor;
-import com.bunkr_beta.IArchiveInfoContext;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
@@ -33,8 +32,8 @@ public class TestWriteScenarios
     public void testEmptyArchive() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
-        IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
+        PasswordProvider passProv = new PasswordProvider();
+        IArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), passProv);
         assertTrue(context.getInventory().getFiles().isEmpty());
         assertTrue(context.getInventory().getFolders().isEmpty());
         assertTrue(context.isFresh());
@@ -46,7 +45,7 @@ public class TestWriteScenarios
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 1);
-            assertEquals(dis.readInt(), 1024);
+            assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             assertEquals(dis.readLong(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
@@ -69,8 +68,8 @@ public class TestWriteScenarios
     {
         File tempfile = folder.newFile();
 
-        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
+        PasswordProvider passProv = new PasswordProvider();
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), passProv);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         context.getInventory().getFiles().add(newFile);
@@ -81,7 +80,7 @@ public class TestWriteScenarios
                 bwos.write(65 + i % 26);
             }
         }
-        MetadataWriter.write(context, uic);
+        MetadataWriter.write(context, passProv);
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {
@@ -89,7 +88,7 @@ public class TestWriteScenarios
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 1);
-            assertEquals(dis.readInt(), 1024);
+            assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             assertEquals(dis.readLong(), 4096);
             byte[] data = new byte[4096];
             assertEquals(dis.read(data), 4096);
@@ -124,8 +123,8 @@ public class TestWriteScenarios
     public void testMultipleFiles() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
+        PasswordProvider passProv = new PasswordProvider();
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), passProv);
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
         fileOne.addTag("bob");
@@ -139,7 +138,7 @@ public class TestWriteScenarios
                     bwos.write(65 + i % 26);
                 }
             }
-            MetadataWriter.write(context, uic);
+            MetadataWriter.write(context, passProv);
         }
 
         FileInventoryItem fileTwo = new FileInventoryItem("another file.txt");
@@ -153,7 +152,7 @@ public class TestWriteScenarios
                     bwos.write(65 + i % 26);
                 }
             }
-            MetadataWriter.write(context, uic);
+            MetadataWriter.write(context, passProv);
         }
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
@@ -162,7 +161,7 @@ public class TestWriteScenarios
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 1);
-            assertEquals(dis.readInt(), 1024);
+            assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             assertEquals(dis.readLong(), 5120);
             byte[] data = new byte[4096];
             assertEquals(dis.read(data), 4096);
@@ -171,7 +170,7 @@ public class TestWriteScenarios
                 assertEquals(data[i], (65 + i % 26));
             }
             data = new byte[1024];
-            assertEquals(dis.read(data), 1024);
+            assertEquals(dis.read(data), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             for (int i = 0; i < 50; i++)
             {
                 assertEquals(data[i], (65 + i % 26));
