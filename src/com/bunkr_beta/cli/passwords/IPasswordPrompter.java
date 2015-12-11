@@ -1,4 +1,4 @@
-package com.bunkr_beta.interfaces;
+package com.bunkr_beta.cli.passwords;
 
 /**
  * Creator: benmeier

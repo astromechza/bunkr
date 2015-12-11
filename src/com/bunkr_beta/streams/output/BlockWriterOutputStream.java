@@ -1,7 +1,7 @@
 package com.bunkr_beta.streams.output;
 
 import com.bunkr_beta.MetadataWriter;
-import com.bunkr_beta.interfaces.IBlockAllocationManager;
+import com.bunkr_beta.IBlockAllocationManager;
 import com.bunkr_beta.inventory.FileInventoryItem;
 
 import java.io.File;

@@ -2,9 +2,9 @@ package com.bunkr_beta_tests;
 
 import com.bunkr_beta.BlockAllocationManager;
 import com.bunkr_beta.descriptor.Descriptor;
-import com.bunkr_beta.PasswordProvider;
+import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
-import com.bunkr_beta.interfaces.IArchiveInfoContext;
+import com.bunkr_beta.IArchiveInfoContext;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;

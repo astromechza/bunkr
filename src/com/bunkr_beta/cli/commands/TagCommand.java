@@ -2,7 +2,7 @@ package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.MetadataWriter;
-import com.bunkr_beta.PasswordProvider;
+import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.cli.CLI;
 import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta.exceptions.IllegalPathException;
@@ -18,7 +18,6 @@ import org.bouncycastle.crypto.CryptoException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * Creator: benmeier

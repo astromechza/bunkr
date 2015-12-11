@@ -1,7 +1,7 @@
 package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.ArchiveInfoContext;
-import com.bunkr_beta.PasswordProvider;
+import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.cli.Formatters;
 import com.bunkr_beta.cli.TabularLayout;
 import com.bunkr_beta.cli.CLI;

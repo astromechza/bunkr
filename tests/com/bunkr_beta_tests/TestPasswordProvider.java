@@ -1,7 +1,7 @@
 package com.bunkr_beta_tests;
 
-import com.bunkr_beta.PasswordProvider;
-import com.bunkr_beta.interfaces.IPasswordPrompter;
+import com.bunkr_beta.cli.passwords.PasswordProvider;
+import com.bunkr_beta.cli.passwords.IPasswordPrompter;
 import org.junit.Test;
 
 import static junit.framework.TestCase.fail;

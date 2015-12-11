@@ -1,6 +1,4 @@
-package com.bunkr_beta.cli;
-
-import com.bunkr_beta.interfaces.IPasswordPrompter;
+package com.bunkr_beta.cli.passwords;
 
 import java.io.Console;
 

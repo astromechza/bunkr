@@ -2,6 +2,7 @@ package com.bunkr_beta.cli.commands;
 
 import com.bunkr_beta.*;
 import com.bunkr_beta.cli.CLI;
+import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta.descriptor.Descriptor;
 import net.sourceforge.argparse4j.impl.Arguments;
