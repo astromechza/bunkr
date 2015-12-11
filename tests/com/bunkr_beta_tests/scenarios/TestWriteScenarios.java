@@ -16,6 +16,8 @@ import org.junit.rules.TemporaryFolder;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.*;
 
 /**
@@ -261,5 +263,78 @@ public class TestWriteScenarios
 
             assertEquals(dis.available(), 0);
         }
+    }
+
+    private long readDataLength(File target) throws IOException, CryptoException
+    {
+        ArchiveInfoContext ic = new ArchiveInfoContext(target, new PasswordProvider());
+        return ic.getBlockDataLength();
+    }
+
+    @Test
+    public void testTruncatingUsedBlocks() throws IOException, CryptoException
+    {
+        /*
+         block size = 1024
+         1. add 4 small files each of 4096 bytes
+         2. rewrite file 4 to 2048 bytes, check that file was reduced
+         3. remove file 3, check that no change in files
+         4. remove file 4, check that file was reduced completely
+         */
+
+        // first create empty archive
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(folder.newFile(), new Descriptor(null, null), new PasswordProvider());
+
+        // now write 4 files
+        for (int i = 0; i < 4; i++)
+        {
+            FileInventoryItem newFile = new FileInventoryItem("file" + (i + 1));
+            context.getInventory().getFiles().add(newFile);
+            try(MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, newFile))
+            {
+                bwos.write(RandomMaker.get(4096 * 8));
+            }
+        }
+
+        // now write metadatas
+        MetadataWriter.write(context, new PasswordProvider());
+
+        assertThat(readDataLength(context.filePath), is(equalTo(4 * 4096L)));
+
+        // now modify file 4
+        {
+            FileInventoryItem file4 = context.getInventory().findFile("file4");
+            try(MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, file4))
+            {
+                bwos.write(RandomMaker.get(2048 * 8));
+            }
+        }
+
+        // now write metadatas
+        MetadataWriter.write(context, new PasswordProvider());
+
+        assertThat(readDataLength(context.filePath), is(equalTo(2 * 4096 + 4096 + 2048L)));
+
+        // now remove file 3
+        {
+            FileInventoryItem file3 = context.getInventory().findFile("file3");
+            context.getInventory().getFiles().remove(file3);
+        }
+
+        // now write metadatas
+        MetadataWriter.write(context, new PasswordProvider());
+
+        assertThat(readDataLength(context.filePath), is(equalTo(2 * 4096 + 4096 + 2048L)));
+
+        // now remove file 4
+        {
+            FileInventoryItem file4 = context.getInventory().findFile("file4");
+            context.getInventory().getFiles().remove(file4);
+        }
+
+        // now write metadatas
+        MetadataWriter.write(context, new PasswordProvider());
+
+        assertThat(readDataLength(context.filePath), is(equalTo(2 * 4096L)));
     }
 }

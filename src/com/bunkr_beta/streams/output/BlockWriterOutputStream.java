@@ -31,13 +31,13 @@ public class BlockWriterOutputStream extends OutputStream
         this.blockSize = blockSize;
         this.target = target;
         this.blockAllocMan = blockAllocMan;
+        this.blockAllocMan.clearAllocation();
 
         this.buffer = new byte[this.blockSize];
         this.cursor = 0;
         this.bytesWritten = 0;
         this.partiallyFlushed = false;
 
-        this.blockAllocMan.clearAllocation();
     }
 
     @Override
@@ -61,7 +61,7 @@ public class BlockWriterOutputStream extends OutputStream
         while(srcCursor < len)
         {
             if (this.cursor == this.blockSize) this.flush();
-            int readAmnt = (len - srcCursor) % this.blockSize;
+            int readAmnt = Math.min(len - srcCursor, this.blockSize);
             readAmnt = Math.min(readAmnt, this.blockSize - this.cursor);
             System.arraycopy(b, off + srcCursor, this.buffer, this.cursor, readAmnt);
             this.cursor += readAmnt;

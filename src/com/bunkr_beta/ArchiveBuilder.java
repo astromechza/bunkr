@@ -33,7 +33,7 @@ public class ArchiveBuilder
                 dos.writeLong(0);
             }
         }
-        MetadataWriter.write(path, blankInventory, descriptor, uic);
+        MetadataWriter.write(path, blankInventory, descriptor, uic, DEFAULT_BLOCK_SIZE);
         return new ArchiveInfoContext(path, uic);
     }
 }

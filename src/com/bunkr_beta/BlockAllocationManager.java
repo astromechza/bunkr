@@ -78,4 +78,26 @@ public class BlockAllocationManager implements IBlockAllocationManager
         this.unallocatedBlocks.union(this.currentAllocation);
         this.currentAllocation.clear();
     }
+
+    /**
+     * Utility method. Given an Inventory object, calculate the number of used blocks. Used blocks are not the number
+     * of blocks used by the files but include unallocated blocks that lie between occupied blocks. It also counts from
+     * 0.
+     *
+     * Eg: allocated: 2, 5, 6, 10 -> 11 blocks used.
+     *
+     * @param inv Inventory object to iterate over
+     * @return integer number of used blocks
+     */
+    public static int calculateUsedBlocks(Inventory inv)
+    {
+        int numBlocks = 0;
+        Iterator<FileInventoryItem> fileIterator = inv.getIterator();
+        while (fileIterator.hasNext())
+        {
+            FileInventoryItem item = fileIterator.next();
+            if (!item.getBlocks().isEmpty()) numBlocks = Math.max(numBlocks, item.getBlocks().getMax() + 1);
+        }
+        return numBlocks;
+    }
 }
