@@ -6,7 +6,6 @@ import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.cli.CLI;
 import com.bunkr_beta.cli.commands.ExportFileCommand;
-import com.bunkr_beta.cli.commands.NewArchiveCommand;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.exceptions.CLIException;

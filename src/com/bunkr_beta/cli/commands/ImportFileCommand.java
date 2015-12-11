@@ -60,16 +60,23 @@ public class ImportFileCommand implements ICLICommand
         {
             PasswordProvider passProv = makePasswordProvider(args);
             ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
-            IFFTraversalTarget parent = InventoryPather.traverse(aic.getInventory(), InventoryPather.dirname(args.getString(ARG_PATH)));
+
+            if (args.getString(ARG_PATH).equals("/")) throw new CLIException("Cannot import as /.");
+
+            IFFTraversalTarget parent = InventoryPather.traverse(aic.getInventory(),
+                                                                 InventoryPather.dirname(args.getString(ARG_PATH)));
             if (parent.isAFile()) throw new CLIException("Cannot create file as a child of a file.");
             IFFContainer container = (IFFContainer) parent;
 
             IFFTraversalTarget target = container.findFileOrFolder(InventoryPather.baseName(args.getString(ARG_PATH)));
-            if (target != null && target.isAFolder()) throw new CLIException("Cannot overwrite folder with a file.");
-
             FileInventoryItem targetFile = null;
-            if (target != null) targetFile = (FileInventoryItem) target;
-            if (targetFile == null)
+
+            if (target != null)
+            {
+                if (target.isAFolder()) throw new CLIException("Cannot overwrite folder with a file.");
+                targetFile = (FileInventoryItem) target;
+            }
+            else
             {
                 targetFile = new FileInventoryItem(InventoryPather.baseName(args.getString(ARG_PATH)));
                 ((IFFContainer) parent).getFiles().add(targetFile);
