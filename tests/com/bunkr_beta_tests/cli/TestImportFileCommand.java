@@ -5,6 +5,7 @@ import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.cli.CLI;
+import com.bunkr_beta.cli.commands.ExportFileCommand;
 import com.bunkr_beta.cli.commands.ImportFileCommand;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.descriptor.Descriptor;
@@ -13,6 +14,7 @@ import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
 import com.bunkr_beta_tests.XTemporaryFolder;
+import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +41,12 @@ public class TestImportFileCommand
 {
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
+
+    @Test
+    public void testBuildParser()
+    {
+        new ImportFileCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
+    }
 
     @Test
     public void testImportFile() throws Exception

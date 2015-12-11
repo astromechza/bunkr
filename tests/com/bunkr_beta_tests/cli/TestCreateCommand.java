@@ -2,9 +2,11 @@ package com.bunkr_beta_tests.cli;
 
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.cli.CLI;
+import com.bunkr_beta.cli.commands.AuthCommand;
 import com.bunkr_beta.cli.commands.NewArchiveCommand;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta_tests.XTemporaryFolder;
+import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,6 +23,12 @@ public class TestCreateCommand
 {
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
+
+    @Test
+    public void testBuildParser()
+    {
+        new NewArchiveCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
+    }
 
     @Test
     public void createNewArchive() throws Exception

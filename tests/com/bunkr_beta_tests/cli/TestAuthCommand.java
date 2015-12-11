@@ -9,7 +9,10 @@ import com.bunkr_beta.descriptor.CompressionDescriptor;
 import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.descriptor.EncryptionDescriptor;
 import com.bunkr_beta_tests.XTemporaryFolder;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
+import net.sourceforge.argparse4j.inf.Subparsers;
 import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,6 +35,12 @@ public class TestAuthCommand
 {
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
+
+    @Test
+    public void testBuildParser()
+    {
+        new AuthCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
+    }
 
     @Test
     public void testSuccessfulAuthOnArchive() throws Exception

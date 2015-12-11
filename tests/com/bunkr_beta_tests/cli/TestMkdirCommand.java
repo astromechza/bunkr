@@ -1,11 +1,13 @@
-package com.bunkr_beta_tests.commands;
+package com.bunkr_beta_tests.cli;
 
+import com.bunkr_beta.cli.commands.ImportFileCommand;
 import com.bunkr_beta.cli.commands.MkdirCommand;
 import com.bunkr_beta.exceptions.TraversalException;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
 import com.bunkr_beta.inventory.InventoryPather;
+import net.sourceforge.argparse4j.ArgumentParsers;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ import static junit.framework.TestCase.fail;
  * Creator: benmeier
  * Created At: 2015-12-06
  */
-public class TestMkdirCommands
+public class TestMkdirCommand
 {
     public Inventory makeSampleInventory()
     {
@@ -36,6 +38,12 @@ public class TestMkdirCommands
         d2.getFiles().add(f3);
 
         return i;
+    }
+
+    @Test
+    public void testBuildParser()
+    {
+        new MkdirCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
     }
 
     @Test
