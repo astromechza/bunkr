@@ -4,6 +4,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.SecureRandom;
 
 /**
  * Creator: benmeier
@@ -14,5 +15,16 @@ public class XTemporaryFolder extends TemporaryFolder
     public File newPrefixedFile(String prefix) throws IOException
     {
         return File.createTempFile("junit-" + prefix , "", this.getRoot());
+    }
+
+    private static SecureRandom random = new SecureRandom();
+    public File newFilePath(String prefix, String suffix) throws IOException
+    {
+        String name = "" + prefix + Long.toString(random.nextLong()) + suffix + ".tmp";
+        return new File(this.getRoot(), name);
+    }
+    public File newFilePath() throws IOException
+    {
+        return this.newFilePath("", "");
     }
 }
