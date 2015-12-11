@@ -47,28 +47,32 @@ public class ExportFileCommand implements ICLICommand
 
         FileInventoryItem targetFile = (FileInventoryItem) target;
 
-        OutputStream contentOutputStream;
         File inputFile = args.get(ARG_DESTINATION_FILE);
         if (inputFile.getPath().equals("-"))
-            contentOutputStream = System.out;
+        {
+            writeBlockFileToStream(aic, targetFile, System.out);
+        }
         else
         {
             if (inputFile.exists()) throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
-            contentOutputStream = new FileOutputStream(inputFile);
+            try(OutputStream contentOutputStream = new FileOutputStream(inputFile))
+            {
+                writeBlockFileToStream(aic, targetFile, contentOutputStream);
+            }
         }
+    }
 
-        try (MultilayeredInputStream ms = new MultilayeredInputStream(aic, targetFile))
+    private void writeBlockFileToStream(ArchiveInfoContext ctxt, FileInventoryItem targetFile, OutputStream os)
+            throws IOException
+    {
+        try (MultilayeredInputStream ms = new MultilayeredInputStream(ctxt, targetFile))
         {
             byte[] buffer = new byte[4096];
             int n;
             while ((n = ms.read(buffer)) != -1)
             {
-                contentOutputStream.write(buffer, 0, n);
+                os.write(buffer, 0, n);
             }
-        }
-        finally
-        {
-            contentOutputStream.close();
         }
     }
 }
