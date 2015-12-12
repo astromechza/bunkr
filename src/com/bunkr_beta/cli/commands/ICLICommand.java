@@ -28,6 +28,4 @@ public interface ICLICommand
         }
         return passProv;
     }
-
-
 }

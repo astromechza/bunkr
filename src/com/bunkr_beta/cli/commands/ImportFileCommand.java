@@ -80,18 +80,32 @@ public class ImportFileCommand implements ICLICommand
         // if tags have been supplied, change the tags associated with the target file
         if (args.getList(ARG_TAGS).size() > 0) targetFile.setCheckTags(new HashSet<>(args.getList(ARG_TAGS)));
 
-        InputStream contentInputStream;
         File inputFile = args.get(ARG_SOURCE_FILE);
         if (inputFile.getPath().equals("-"))
-            contentInputStream = System.in;
-        else
-            contentInputStream = new FileInputStream(inputFile);
-
-        ProgressBar pb = new ProgressBar(80, contentInputStream.available());
-
-        try(BufferedInputStream bufferedInput = new BufferedInputStream(contentInputStream))
         {
-            try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(aic, targetFile))
+            readFileFromStream(aic, targetFile, System.in);
+        }
+        else
+        {
+            try (FileInputStream fis = new FileInputStream(inputFile))
+            {
+                readFileFromStream(aic, targetFile, fis);
+            }
+        }
+
+        // TODO think about handling bad issues here.. how do we handle corrupted writes.. maybe it should just
+        // write the metadata regardless of what happens so that at least it is recovered and files can be read
+        // next time.
+        MetadataWriter.write(aic, passProv);
+    }
+
+    private void readFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is) throws IOException
+    {
+        ProgressBar pb = new ProgressBar(80, is.available());
+
+        try(BufferedInputStream bufferedInput = new BufferedInputStream(is))
+        {
+            try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))
             {
                 byte[] buffer = new byte[4096];
                 int n;
@@ -103,13 +117,5 @@ public class ImportFileCommand implements ICLICommand
                 pb.finish();
             }
         }
-        finally
-        {
-            contentInputStream.close();
-        }
-        // TODO think about handling bad issues here.. how do we handle corrupted writes.. maybe it should just
-        // write the metadata regardless of what happens so that at least it is recovered and files can be read
-        // next time.
-        MetadataWriter.write(aic, passProv);
     }
 }
