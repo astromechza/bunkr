@@ -24,35 +24,36 @@ public class TestInventoryPather
     @Test
     public void testIsValidTrues()
     {
-        assertTrue(InventoryPather.isValid("/"));
-        assertTrue(InventoryPather.isValid("/a"));
-        assertTrue(InventoryPather.isValid("/a/b"));
-        assertTrue(InventoryPather.isValid("/something/what/what/tuff"));
-        assertTrue(InventoryPather.isValid("/something/fn.jpg"));
-        assertTrue(InventoryPather.isValid("/something/fn-one.jpg"));
-        assertTrue(InventoryPather.isValid("/something____funny.tuff"));
+        assertTrue(InventoryPather.isValidPath("/"));
+        assertTrue(InventoryPather.isValidPath("/a"));
+        assertTrue(InventoryPather.isValidPath("/a/b"));
+        assertTrue(InventoryPather.isValidPath("/aawd spaces"));
+        assertTrue(InventoryPather.isValidPath("/something/what/what/tuff"));
+        assertTrue(InventoryPather.isValidPath("/something/fn.jpg"));
+        assertTrue(InventoryPather.isValidPath("/something/fn-one.jpg"));
+        assertTrue(InventoryPather.isValidPath("/something____funny.tuff"));
     }
 
     @Test
     public void testIsValidFalses()
     {
-        assertFalse(InventoryPather.isValid(""));
-        assertFalse(InventoryPather.isValid("//"));
-        assertFalse(InventoryPather.isValid("/aawd spaces"));
-        assertFalse(InventoryPather.isValid("/something/what\r\n"));
-        assertFalse(InventoryPather.isValid("/something/\ttab"));
-        assertFalse(InventoryPather.isValid("/something/!@#(*!@&"));
-        assertFalse(InventoryPather.isValid("/something[]"));
+        assertFalse(InventoryPather.isValidPath(""));
+        assertFalse(InventoryPather.isValidPath("//"));
+        assertFalse(InventoryPather.isValidPath("   "));
+        assertFalse(InventoryPather.isValidPath("/something/what\r\n"));
+        assertFalse(InventoryPather.isValidPath("/something/\ttab"));
+        assertFalse(InventoryPather.isValidPath("/something/!@#(*!@&"));
+        assertFalse(InventoryPather.isValidPath("/something[]"));
     }
 
     @Test
     public void testAssertValid()
     {
-        InventoryPather.assertValid("/");
-        InventoryPather.assertValid("/a/b");
+        InventoryPather.assertValidPath("/");
+        InventoryPather.assertValidPath("/a/b");
         try
         {
-            InventoryPather.assertValid("/some //bad path(*!@");
+            InventoryPather.assertValidPath("/some //bad path(*!@");
         }
         catch (IllegalArgumentException ignored) {}
     }

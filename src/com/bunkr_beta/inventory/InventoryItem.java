@@ -20,7 +20,7 @@ public class InventoryItem implements Comparable<InventoryItem>
             @JsonProperty("uuid") UUID uuid
     )
     {
-        this.name = name;
+        this.name = InventoryPather.assertValidName(name);
         this.uuid = uuid;
     }
 

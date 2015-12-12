@@ -58,21 +58,9 @@ public interface IFFContainer
 
     default IFFTraversalTarget findFileOrFolder(String name)
     {
-        for (FolderInventoryItem item : this.getFolders())
-        {
-            if (item.getName().equals(name))
-            {
-                return item;
-            }
-        }
-        for (FileInventoryItem item : this.getFiles())
-        {
-            if (item.getName().equals(name))
-            {
-                return item;
-            }
-        }
-        return null;
+        IFFContainer c = findFolder(name);
+        if (c != null) return (IFFTraversalTarget) c;
+        return findFile(name);
     }
 
     default IFFContainer findFolder(String name)
@@ -101,19 +89,11 @@ public interface IFFContainer
 
     default boolean hasFile(String name)
     {
-        for (FileInventoryItem item : this.getFiles())
-        {
-            if (item.getName().equals(name)) return true;
-        }
-        return false;
+        return (this.findFile(name) != null);
     }
 
     default boolean hasFolder(String name)
     {
-        for (FolderInventoryItem item : this.getFolders())
-        {
-            if (item.getName().equals(name)) return true;
-        }
-        return false;
+        return (this.findFolder(name) != null);
     }
 }

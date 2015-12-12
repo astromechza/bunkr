@@ -11,32 +11,46 @@ import java.util.regex.Pattern;
  */
 public class InventoryPather
 {
-    public static final Pattern namePattern = Pattern.compile("[0-9a-zA-Z\\-_\\.,;]+");
+    public static final Pattern namePattern = Pattern.compile("[0-9a-zA-Z\\-_\\.,; ]+");
     public static final Pattern pathPattern = Pattern.compile("^(?:/" + namePattern.pattern() + ")+|/$");
 
-    public static boolean isValid(String path)
+    public static boolean isValidPath(String path)
     {
         return pathPattern.matcher(path).matches();
     }
 
-    public static String assertValid(String path)
+    public static boolean isValidName(String name)
     {
+        return namePattern.matcher(name).matches();
+    }
+
+    public static String assertValidPath(String path)
+    {
+        path = path.trim();
         if (path.length() > 1 && path.charAt(path.length() - 1) == '/') path = path.substring(0, path.length() - 1);
-        if (! isValid(path))
+        if (! isValidPath(path))
             throw new IllegalPathException(String.format("Error: '%s' is not a valid path.", path));
         return path;
     }
 
+    public static String assertValidName(String name)
+    {
+        name = name.trim();
+        if (! isValidName(name))
+            throw new IllegalPathException(String.format("Error: '%s' is not a valid name.", name));
+        return name;
+    }
+
     public static String[] getParts(String path)
     {
-        path = assertValid(path);
+        path = assertValidPath(path);
         if (path.equals("/")) return new String[]{};
         return path.substring(1).split("/");
     }
 
     public static String dirname(String path)
     {
-        path = assertValid(path);
+        path = assertValidPath(path);
         if (path.equals("/")) return "/";
         String s = path.substring(0, path.lastIndexOf("/"));
         if (s.equals("")) return "/";
@@ -45,14 +59,14 @@ public class InventoryPather
 
     public static String baseName(String path)
     {
-        path = assertValid(path);
+        path = assertValidPath(path);
         if (path.equals("/")) return "";
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
     public static String simpleJoin(String path, String n)
     {
-        path = assertValid(path);
+        path = assertValidPath(path);
         if (path.equals("/")) return "/" + n;
         return path + "/" + n;
     }
