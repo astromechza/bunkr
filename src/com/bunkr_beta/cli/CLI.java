@@ -39,6 +39,7 @@ public class CLI
         commands.put("write", new ImportFileCommand());
         commands.put("tags", new TagCommand());
         commands.put("mv", new MvCommand());
+        commands.put("find", new FindCommand());
     }
 
     public static void main(String[] args) throws IOException

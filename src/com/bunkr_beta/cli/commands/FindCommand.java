@@ -1,0 +1,115 @@
+package com.bunkr_beta.cli.commands;
+
+import com.bunkr_beta.ArchiveInfoContext;
+import com.bunkr_beta.cli.CLI;
+import com.bunkr_beta.cli.passwords.PasswordProvider;
+import com.bunkr_beta.exceptions.CLIException;
+import com.bunkr_beta.inventory.*;
+import net.sourceforge.argparse4j.inf.Namespace;
+import net.sourceforge.argparse4j.inf.Subparser;
+
+import java.util.*;
+
+/**
+ * Creator: benmeier
+ * Created At: 2015-12-12
+ */
+public class FindCommand implements ICLICommand
+{
+    public static final String ARG_TYPE_FOLDER = "folder";
+    public static final String ARG_TYPE_FILE = "file";
+    public static final String ARG_PATH = "path";
+    public static final String ARG_PREFIX = "prefix";
+    public static final String ARG_SUFFIX = "suffix";
+    public static final String ARG_TYPE = "type";
+    public static final String ARG_TAG = "tag";
+    public static final String ARG_DEPTH = "depth";
+
+
+    @Override
+    public void buildParser(Subparser target)
+    {
+        target.help("search for files or folders by name or tags");
+        target.addArgument("path")
+                .dest(ARG_PATH)
+                .type(String.class)
+                .help("path to search in");
+        target.addArgument("--prefix")
+                .dest(ARG_PREFIX)
+                .type(String.class)
+                .help("select only items with a name beginning with this");
+        target.addArgument("--suffix")
+                .dest(ARG_SUFFIX)
+                .type(String.class)
+                .help("select only items with a name ending with this");
+        target.addArgument("--type")
+                .dest(ARG_TYPE)
+                .choices(ARG_TYPE_FILE, ARG_TYPE_FOLDER)
+                .type(String.class)
+                .help("select only items of this type");
+        target.addArgument("--tag")
+                .dest(ARG_TAG)
+                .type(String.class)
+                .help("select only items that have the following tag");
+        target.addArgument("--depth")
+                .dest(ARG_DEPTH)
+                .type(Integer.class)
+                .setDefault(0)
+                .help("recurse into subfolders this many times");
+    }
+
+    @Override
+    public void handle(Namespace args) throws Exception
+    {
+        PasswordProvider passProv = makePasswordProvider(args);
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        IFFTraversalTarget t = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
+
+        if (t.isAFile())
+        {
+            throw new CLIException("'path' target must be a folder, not a file.");
+        }
+        else
+        {
+            IFFContainer c = (IFFContainer) t;
+            printBreadthFirstFindTree(c, args.getString(ARG_PATH), args.getString(ARG_PREFIX),
+                                      args.getString(ARG_SUFFIX),
+                                      args.getString(ARG_TYPE), args.getString(ARG_TAG), args.getInt(ARG_DEPTH));
+        }
+    }
+
+    private void printBreadthFirstFindTree(IFFContainer root, String pathPrefix, String prefix, String suffix, String type, String tag, int depth)
+    {
+        List<InventoryItem> itemsToSort = new ArrayList<>();
+        if (type == null || type.equals(ARG_TYPE_FILE))
+        {
+            for (FileInventoryItem item : root.getFiles())
+            {
+                if ((prefix == null || item.getName().startsWith(prefix)) && (suffix == null || item.getName().endsWith(suffix)) && (tag == null || item.hasTag(tag)))
+                {
+                    itemsToSort.add(item);
+                }
+            }
+        }
+        itemsToSort.addAll(root.getFolders());
+        Collections.sort(itemsToSort);
+
+        for (InventoryItem i : itemsToSort)
+        {
+            if (i instanceof FileInventoryItem)
+            {
+                System.out.println(pathPrefix + " " + i.getName());
+            }
+            else
+            {
+                if ((type == null || type.equals(ARG_TYPE_FOLDER)) && (prefix == null || i.getName().startsWith(prefix)) && (suffix == null || i.getName().endsWith(suffix)))
+                {
+                    System.out.println(pathPrefix + " " + i.getName());
+                }
+                if (depth > 0) printBreadthFirstFindTree((FolderInventoryItem) i, pathPrefix + "/" + i.getName(), prefix, suffix, type, tag, depth - 1);
+            }
+        }
+
+
+    }
+}
