@@ -50,46 +50,35 @@ public class LsCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        try
+        PasswordProvider passProv = makePasswordProvider(args);
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        IFFTraversalTarget t = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
+
+        TabularLayout table = new TabularLayout();
+        if (! args.getBoolean(ARG_NOHEADINGS)) table.setHeaders("SIZE", "MODIFIED", "NAME", "TAGS");
+
+        if (t.isAFile())
         {
-            PasswordProvider passProv = makePasswordProvider(args);
-            ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
-            IFFTraversalTarget t = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
-
-            TabularLayout table = new TabularLayout();
-            if (! args.getBoolean(ARG_NOHEADINGS)) table.setHeaders("SIZE", "MODIFIED", "NAME", "TAGS");
-
-            if (t.isAFile())
+            FileInventoryItem file = (FileInventoryItem) t;
+            addFileRow(file, table, args.getBoolean(ARG_MACHINEREADABLE));
+        }
+        else
+        {
+            IFFContainer c = (IFFContainer) t;
+            List<FolderInventoryItem> folders = c.getFolders();
+            Collections.sort(folders);
+            for (FolderInventoryItem folder : folders)
             {
-                FileInventoryItem file = (FileInventoryItem) t;
+                table.addRow("", "", folder.getName() + "/");
+            }
+            List<FileInventoryItem> files = c.getFiles();
+            Collections.sort(files);
+            for (FileInventoryItem file : files)
+            {
                 addFileRow(file, table, args.getBoolean(ARG_MACHINEREADABLE));
             }
-            else
-            {
-                IFFContainer c = (IFFContainer) t;
-                List<FolderInventoryItem> folders = c.getFolders();
-                Collections.sort(folders);
-                for (FolderInventoryItem folder : folders)
-                {
-                    table.addRow("", "", folder.getName() + "/");
-                }
-                List<FileInventoryItem> files = c.getFiles();
-                Collections.sort(files);
-                for (FileInventoryItem file : files)
-                {
-                    addFileRow(file, table, args.getBoolean(ARG_MACHINEREADABLE));
-                }
-            }
-            table.printOut();
         }
-        catch (IllegalPathException | TraversalException e)
-        {
-            throw new CLIException(e);
-        }
-        catch (CryptoException e)
-        {
-            throw new CLIException("Decryption failed: %s", e.getMessage());
-        }
+        table.printOut();
     }
 
     private void addFileRow(FileInventoryItem file, TabularLayout table, boolean machinereadable)
