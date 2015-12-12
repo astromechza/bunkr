@@ -19,10 +19,7 @@ public interface ITaggable
     default boolean addTag(String tag)
     {
         tag = tag.trim().toLowerCase();
-        if (tag.length() < 3)
-            throw new IllegalArgumentException("Tag length must be at least 3 characters");
-        if (!VALID_CHARS_PATTERN.matcher(tag).matches())
-            throw new IllegalArgumentException("Tag does not match required regex: " + VALID_CHARS_PATTERN.pattern());
+        validateTag(tag);
         return getTags().add(tag);
     }
 
@@ -42,13 +39,18 @@ public interface ITaggable
         for (String tag : tags)
         {
             tag = tag.trim().toLowerCase();
-            if (tag.length() < 3)
-                throw new IllegalArgumentException("Tag length must be at least 3 characters");
-            if (!VALID_CHARS_PATTERN.matcher(tag).matches())
-                throw new IllegalArgumentException("Tag " + tag + " does not match required regex: " + VALID_CHARS_PATTERN.pattern());
+            validateTag(tag);
             ctags.add(tag);
         }
         this.setTags(ctags);
     }
 
+    default void validateTag(String tag)
+    {
+        tag = tag.trim().toLowerCase();
+        if (tag.length() < 3)
+            throw new IllegalArgumentException("Tag length must be at least 3 characters");
+        if (!VALID_CHARS_PATTERN.matcher(tag).matches())
+            throw new IllegalArgumentException("Tag " + tag + " does not match required regex: " + VALID_CHARS_PATTERN.pattern());
+    }
 }

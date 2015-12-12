@@ -25,9 +25,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**

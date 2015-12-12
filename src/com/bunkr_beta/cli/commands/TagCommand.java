@@ -57,15 +57,12 @@ public class TagCommand implements ICLICommand
             throw new CLIException("Please use either --tags or --clear, not both.");
         }
 
+        // load up initial archive
         PasswordProvider passProv = makePasswordProvider(args);
         ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
-        IFFTraversalTarget parent = InventoryPather
-                .traverse(aic.getInventory(), InventoryPather.dirname(args.getString(ARG_PATH)));
-        if (parent.isAFile()) throw new CLIException("'%s' is a file.", InventoryPather.dirname(args.getString(ARG_PATH)));
 
-        IFFTraversalTarget target = ((IFFContainer) parent).findFileOrFolder(InventoryPather.baseName(args.getString(ARG_PATH)));
-        if (target == null) throw new CLIException("No such file '%s'.", args.getString(ARG_PATH));
-        if (target.isAFolder()) throw new CLIException("'%s' is a folder.", args.getString(ARG_PATH));
+        IFFTraversalTarget target = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
+        if (target.isAFolder()) throw new CLIException("Cannot tag a folder.");
 
         FileInventoryItem targetFile = (FileInventoryItem) target;
 

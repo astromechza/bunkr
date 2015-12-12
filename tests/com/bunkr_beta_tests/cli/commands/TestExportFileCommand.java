@@ -13,6 +13,7 @@ import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
 import com.bunkr_beta_tests.XTemporaryFolder;
+import com.bunkr_beta_tests.cli.OutputCapture;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.bouncycastle.crypto.CryptoException;
@@ -87,11 +88,11 @@ public class TestExportFileCommand
         args.put(ExportFileCommand.ARG_PATH, "/a.txt");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, new File("-"));
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(baos));
-        new ExportFileCommand().handle(new Namespace(args));
-        System.setOut(null);
-        assertThat(baos.toByteArray().length, is(equalTo(3333)));
+        try(OutputCapture c = new OutputCapture())
+        {
+            new ExportFileCommand().handle(new Namespace(args));
+            assertThat(c.getBytes().length, is(equalTo(3333)));
+        }
     }
 
     @Test
