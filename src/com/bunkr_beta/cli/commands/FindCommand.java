@@ -72,13 +72,15 @@ public class FindCommand implements ICLICommand
         else
         {
             IFFContainer c = (IFFContainer) t;
-            printBreadthFirstFindTree(c, args.getString(ARG_PATH), args.getString(ARG_PREFIX),
-                                      args.getString(ARG_SUFFIX),
-                                      args.getString(ARG_TYPE), args.getString(ARG_TAG), args.getInt(ARG_DEPTH));
+            int maxDepth = Integer.MAX_VALUE;
+            if (args.get(ARG_DEPTH) != null) maxDepth = args.getInt(ARG_DEPTH);
+            printBreadthFirstFindTree(c, args.get(ARG_PATH), args.get(ARG_PREFIX),
+                                      args.get(ARG_SUFFIX),
+                                      args.get(ARG_TYPE), args.get(ARG_TAG), maxDepth);
         }
     }
 
-    private void printBreadthFirstFindTree(IFFContainer root, String pathPrefix, String prefix, String suffix, String type, String tag, int depth)
+    private void printBreadthFirstFindTree(IFFContainer root, String pathPrefix, String prefix, String suffix, String type, String tag, Integer depth)
     {
         List<InventoryItem> itemsToSort = new ArrayList<>();
         if (type == null || type.equals(ARG_TYPE_FILE))
@@ -98,15 +100,15 @@ public class FindCommand implements ICLICommand
         {
             if (i instanceof FileInventoryItem)
             {
-                System.out.println(pathPrefix + " " + i.getName());
+                System.out.println(InventoryPather.simpleJoin(pathPrefix, i.getName()));
             }
             else
             {
                 if ((type == null || type.equals(ARG_TYPE_FOLDER)) && (prefix == null || i.getName().startsWith(prefix)) && (suffix == null || i.getName().endsWith(suffix)))
                 {
-                    System.out.println(pathPrefix + " " + i.getName());
+                    System.out.println(InventoryPather.simpleJoin(pathPrefix, i.getName()) + "/");
                 }
-                if (depth > 0) printBreadthFirstFindTree((FolderInventoryItem) i, pathPrefix + "/" + i.getName(), prefix, suffix, type, tag, depth - 1);
+                if (depth > 0) printBreadthFirstFindTree((FolderInventoryItem) i, InventoryPather.simpleJoin(pathPrefix, i.getName()), prefix, suffix, type, tag, depth - 1);
             }
         }
 
