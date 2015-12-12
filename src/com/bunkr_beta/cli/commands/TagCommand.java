@@ -6,7 +6,6 @@ import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.cli.CLI;
 import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta.inventory.FileInventoryItem;
-import com.bunkr_beta.inventory.IFFContainer;
 import com.bunkr_beta.inventory.IFFTraversalTarget;
 import com.bunkr_beta.inventory.InventoryPather;
 import net.sourceforge.argparse4j.impl.Arguments;

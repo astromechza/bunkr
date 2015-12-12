@@ -5,14 +5,10 @@ import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.cli.Formatters;
 import com.bunkr_beta.cli.TabularLayout;
 import com.bunkr_beta.cli.CLI;
-import com.bunkr_beta.exceptions.CLIException;
-import com.bunkr_beta.exceptions.IllegalPathException;
-import com.bunkr_beta.exceptions.TraversalException;
 import com.bunkr_beta.inventory.*;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bouncycastle.crypto.CryptoException;
 
 import java.util.Collections;
 import java.util.List;
