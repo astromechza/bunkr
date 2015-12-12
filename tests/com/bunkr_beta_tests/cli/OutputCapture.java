@@ -2,6 +2,8 @@ package com.bunkr_beta_tests.cli;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Creator: benmeier
@@ -27,6 +29,13 @@ public class OutputCapture implements AutoCloseable
     public byte[] getBytes()
     {
         return stream.toByteArray();
+    }
+
+    public List<String> getLines()
+    {
+        String content = this.getContent();
+        content = content.replace("\r", "");
+        return Arrays.asList(content.split("\n"));
     }
 
     @Override

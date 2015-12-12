@@ -104,7 +104,7 @@ public class FindCommand implements ICLICommand
             }
             else
             {
-                if ((type == null || type.equals(ARG_TYPE_FOLDER)) && (prefix == null || i.getName().startsWith(prefix)) && (suffix == null || i.getName().endsWith(suffix)))
+                if ((tag == null) && (type == null || type.equals(ARG_TYPE_FOLDER)) && (prefix == null || i.getName().startsWith(prefix)) && (suffix == null || i.getName().endsWith(suffix)))
                 {
                     System.out.println(InventoryPather.simpleJoin(pathPrefix, i.getName()) + "/");
                 }

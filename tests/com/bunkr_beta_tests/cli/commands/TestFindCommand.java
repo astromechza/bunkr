@@ -11,6 +11,7 @@ import com.bunkr_beta.descriptor.Descriptor;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta_tests.XTemporaryFolder;
+import com.bunkr_beta_tests.cli.OutputCapture;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.bouncycastle.crypto.CryptoException;
@@ -20,7 +21,12 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
  * Creator: benmeier
@@ -40,12 +46,17 @@ public class TestFindCommand
                 new PasswordProvider()
         );
 
-        context.getInventory().getFiles().add(new FileInventoryItem("abc"));
+        FileInventoryItem ff1 = new FileInventoryItem("abc");
+        ff1.addTag("tag1"); ff1.addTag("tag2");
+        context.getInventory().getFiles().add(ff1);
         context.getInventory().getFiles().add(new FileInventoryItem("aabbcc"));
         context.getInventory().getFiles().add(new FileInventoryItem("aaabbbccc"));
 
         FolderInventoryItem folderOne = new FolderInventoryItem("afolder");
-        folderOne.getFiles().add(new FileInventoryItem("abc"));
+
+        FileInventoryItem ff2 = new FileInventoryItem("abc");
+        ff2.addTag("tag1"); ff2.addTag("tag3");
+        folderOne.getFiles().add(ff2);
         folderOne.getFiles().add(new FileInventoryItem("aabbcc"));
         folderOne.getFiles().add(new FileInventoryItem("aaabbbccc"));
 
@@ -73,7 +84,161 @@ public class TestFindCommand
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
         args.put(FindCommand.ARG_PATH, "/");
-        new FindCommand().handle(new Namespace(args));
+        try(OutputCapture oc = new OutputCapture())
+        {
+            new FindCommand().handle(new Namespace(args));
+            List<String> lines = oc.getLines();
+            assertThat(lines.get(0), is(equalTo("/aaabbbccc")));
+            assertThat(lines.get(1), is(equalTo("/aabbcc")));
+            assertThat(lines.get(2), is(equalTo("/abc")));
+            assertThat(lines.get(3), is(equalTo("/afolder/")));
+            assertThat(lines.get(4), is(equalTo("/afolder/aaabbbccc")));
+            assertThat(lines.get(5), is(equalTo("/afolder/aabbcc")));
+            assertThat(lines.get(6), is(equalTo("/afolder/abc")));
+            assertThat(lines.get(7), is(equalTo("/afolder/folderc/")));
+            assertThat(lines.get(8), is(equalTo("/afolder/folderc/example")));
+        }
     }
 
+    @Test
+    public void testFindAllSubFolder() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/afolder");
+        try(OutputCapture oc = new OutputCapture())
+        {
+            new FindCommand().handle(new Namespace(args));
+            List<String> lines = oc.getLines();
+            assertThat(lines.get(0), is(equalTo("/afolder/aaabbbccc")));
+            assertThat(lines.get(1), is(equalTo("/afolder/aabbcc")));
+            assertThat(lines.get(2), is(equalTo("/afolder/abc")));
+            assertThat(lines.get(3), is(equalTo("/afolder/folderc/")));
+            assertThat(lines.get(4), is(equalTo("/afolder/folderc/example")));
+        }
+    }
+
+    @Test
+    public void testFindAllPrefix() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/");
+        args.put(FindCommand.ARG_PREFIX, "aa");
+        try(OutputCapture oc = new OutputCapture())
+        {
+            new FindCommand().handle(new Namespace(args));
+            List<String> lines = oc.getLines();
+            assertThat(lines.get(0), is(equalTo("/aaabbbccc")));
+            assertThat(lines.get(1), is(equalTo("/aabbcc")));
+            assertThat(lines.get(2), is(equalTo("/afolder/aaabbbccc")));
+            assertThat(lines.get(3), is(equalTo("/afolder/aabbcc")));
+        }
+    }
+
+    @Test
+    public void testFindAllSuffix() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/");
+        args.put(FindCommand.ARG_SUFFIX, "c");
+        try(OutputCapture oc = new OutputCapture())
+        {
+            new FindCommand().handle(new Namespace(args));
+            List<String> lines = oc.getLines();
+            assertThat(lines.get(0), is(equalTo("/aaabbbccc")));
+            assertThat(lines.get(1), is(equalTo("/aabbcc")));
+            assertThat(lines.get(2), is(equalTo("/abc")));
+            assertThat(lines.get(3), is(equalTo("/afolder/aaabbbccc")));
+            assertThat(lines.get(4), is(equalTo("/afolder/aabbcc")));
+            assertThat(lines.get(5), is(equalTo("/afolder/abc")));
+        }
+    }
+
+
+    @Test
+    public void testFindAllFiles() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/");
+        args.put(FindCommand.ARG_TYPE, "file");
+        try(OutputCapture oc = new OutputCapture())
+        {
+            new FindCommand().handle(new Namespace(args));
+            List<String> lines = oc.getLines();
+            assertThat(lines.get(0), is(equalTo("/aaabbbccc")));
+            assertThat(lines.get(1), is(equalTo("/aabbcc")));
+            assertThat(lines.get(2), is(equalTo("/abc")));
+            assertThat(lines.get(3), is(equalTo("/afolder/aaabbbccc")));
+            assertThat(lines.get(4), is(equalTo("/afolder/aabbcc")));
+            assertThat(lines.get(5), is(equalTo("/afolder/abc")));
+            assertThat(lines.get(6), is(equalTo("/afolder/folderc/example")));
+        }
+    }
+
+    @Test
+    public void testFindAllFolders() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/");
+        args.put(FindCommand.ARG_TYPE, "folder");
+        try(OutputCapture oc = new OutputCapture())
+        {
+            new FindCommand().handle(new Namespace(args));
+            List<String> lines = oc.getLines();
+            assertThat(lines.get(0), is(equalTo("/afolder/")));
+            assertThat(lines.get(1), is(equalTo("/afolder/folderc/")));
+        }
+    }
+
+    @Test
+    public void testFindAllDepth() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/");
+        args.put(FindCommand.ARG_DEPTH, 0);
+        try(OutputCapture oc = new OutputCapture())
+        {
+            new FindCommand().handle(new Namespace(args));
+            List<String> lines = oc.getLines();
+            assertThat(lines.get(0), is(equalTo("/aaabbbccc")));
+            assertThat(lines.get(1), is(equalTo("/aabbcc")));
+            assertThat(lines.get(2), is(equalTo("/abc")));
+            assertThat(lines.get(3), is(equalTo("/afolder/")));
+        }
+    }
+
+    @Test
+    public void testFindAllTags() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/");
+        args.put(FindCommand.ARG_TAG, "tag1");
+        try(OutputCapture oc = new OutputCapture())
+        {
+            new FindCommand().handle(new Namespace(args));
+            List<String> lines = oc.getLines();
+            assertThat(lines.get(0), is(equalTo("/abc")));
+            assertThat(lines.get(1), is(equalTo("/afolder/abc")));
+        }
+    }
 }
