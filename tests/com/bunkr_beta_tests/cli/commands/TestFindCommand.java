@@ -7,6 +7,8 @@ import com.bunkr_beta.cli.CLI;
 import com.bunkr_beta.cli.commands.FindCommand;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.descriptor.Descriptor;
+import com.bunkr_beta.exceptions.CLIException;
+import com.bunkr_beta.exceptions.TraversalException;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta_tests.XTemporaryFolder;
@@ -23,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -239,5 +242,37 @@ public class TestFindCommand
             assertThat(lines.get(0), is(equalTo("/abc")));
             assertThat(lines.get(1), is(equalTo("/afolder/abc")));
         }
+    }
+
+    @Test
+    public void testFindAllOnFile() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/abc");
+        try
+        {
+            new FindCommand().handle(new Namespace(args));
+            fail("should have failed");
+        }
+        catch (CLIException ignored) {}
+    }
+
+    @Test
+    public void testFindAllOnMissing() throws Exception
+    {
+        ArchiveInfoContext c = buildSampleArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
+        args.put(FindCommand.ARG_PATH, "/unknown-path-item");
+        try
+        {
+            new FindCommand().handle(new Namespace(args));
+            fail("should have failed");
+        }
+        catch (TraversalException ignored) {}
     }
 }

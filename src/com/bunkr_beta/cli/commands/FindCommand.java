@@ -111,7 +111,5 @@ public class FindCommand implements ICLICommand
                 if (depth > 0) printBreadthFirstFindTree((FolderInventoryItem) i, InventoryPather.simpleJoin(pathPrefix, i.getName()), prefix, suffix, type, tag, depth - 1);
             }
         }
-
-
     }
 }

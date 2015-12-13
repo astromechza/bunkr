@@ -11,8 +11,8 @@ import java.util.List;
  */
 public class OutputCapture implements AutoCloseable
 {
-    private PrintStream original;
-    private ByteArrayOutputStream stream;
+    private final PrintStream original;
+    private final ByteArrayOutputStream stream;
 
     public OutputCapture()
     {

@@ -23,7 +23,7 @@ public class XTemporaryFolder extends TemporaryFolder
         String name = "" + prefix + Long.toString(random.nextLong()) + suffix + ".tmp";
         return new File(this.getRoot(), name);
     }
-    public File newFilePath() throws IOException
+    public File newFilePath()
     {
         return this.newFilePath("", "");
     }
