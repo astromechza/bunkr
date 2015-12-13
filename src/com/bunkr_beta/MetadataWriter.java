@@ -2,7 +2,9 @@ package com.bunkr_beta;
 
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.descriptor.Descriptor;
+import com.bunkr_beta.descriptor.DescriptorJSON;
 import com.bunkr_beta.inventory.Inventory;
+import com.bunkr_beta.inventory.InventoryJSON;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -37,8 +39,8 @@ public class MetadataWriter
         {
             try(FileChannel fc = raf.getChannel())
             {
-                byte[] inventoryJsonBytes = JSONHelper.stringify(inventory).getBytes();
-                byte[] descriptorJsonBytes = JSONHelper.stringify(descriptor).getBytes();
+                byte[] inventoryJsonBytes = InventoryJSON.encode(inventory).getBytes();
+                byte[] descriptorJsonBytes = DescriptorJSON.encode(descriptor).getBytes();
 
                 if (descriptor.getEncryption() != null)
                 {

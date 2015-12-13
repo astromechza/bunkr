@@ -1,8 +1,5 @@
 package com.bunkr_beta.inventory;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.UUID;
 
 /**
@@ -14,10 +11,7 @@ public class InventoryItem implements Comparable<InventoryItem>
     private final UUID uuid;
     private String name;
 
-    @JsonCreator
-    public InventoryItem(
-            @JsonProperty("name") String name,
-            @JsonProperty("uuid") UUID uuid
+    public InventoryItem(String name, UUID uuid
     )
     {
         this.name = InventoryPather.assertValidName(name);

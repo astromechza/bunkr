@@ -1,7 +1,7 @@
 package com.bunkr_beta_tests.fragmented_range;
 
-import com.bunkr_beta.JSONHelper;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
+import com.bunkr_beta.fragmented_range.FragmentedRangeJSON;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,15 +22,35 @@ public class TestFragmentedRangeJson
         fr.add(1, 2);
         fr.add(6, 2);
         fr.add(-9, 2);
-        assertEquals("[-9,2,1,2,6,2]", JSONHelper.stringify(fr));
+        assertEquals("[-9,2,1,2,6,2]", FragmentedRangeJSON.encode(fr));
     }
 
     @Test
     public void testDeserialize() throws IOException
     {
-        FragmentedRange fr = JSONHelper.unstringify("[-9, 2,1, 2, 6, 2]", FragmentedRange.class);
+        FragmentedRange fr = FragmentedRangeJSON.decode("[-9, 2,1, 2, 6, 2]");
         assertEquals(fr.toList(), Arrays.asList(
                 -9, -8, 1, 2, 6, 7
         ));
     }
+
+    @Test
+    public void testSerialize2() throws IOException
+    {
+        FragmentedRange fr = new FragmentedRange();
+        fr.add(1, 2);
+        fr.add(6, 2);
+        fr.add(-9, 2);
+        assertEquals("[-9,2,1,2,6,2]", FragmentedRangeJSON.encode(fr));
+    }
+
+    @Test
+    public void testDeserialize2() throws IOException
+    {
+        FragmentedRange fr = FragmentedRangeJSON.decode("[-9, 2,1, 2, 6, 2]");
+        assertEquals(fr.toList(), Arrays.asList(
+                -9, -8, 1, 2, 6, 7
+        ));
+    }
+
 }

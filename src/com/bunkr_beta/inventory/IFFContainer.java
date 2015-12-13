@@ -1,7 +1,5 @@
 package com.bunkr_beta.inventory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.*;
 
 /**
@@ -13,12 +11,10 @@ public interface IFFContainer
     List<FolderInventoryItem> getFolders();
     List<FileInventoryItem> getFiles();
 
-    @JsonIgnore
     default Iterator<FileInventoryItem> getIterator()
     {
         return new InventoryIterator(this);
     }
-
 
     class InventoryIterator implements Iterator<FileInventoryItem>
     {

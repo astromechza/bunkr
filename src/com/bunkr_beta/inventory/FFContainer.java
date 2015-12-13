@@ -1,6 +1,5 @@
 package com.bunkr_beta.inventory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,10 +8,10 @@ import java.util.List;
  */
 public class FFContainer implements IFFContainer
 {
-    private final ArrayList<FolderInventoryItem> folders;
-    private final ArrayList<FileInventoryItem> files;
+    private final List<FolderInventoryItem> folders;
+    private final List<FileInventoryItem> files;
 
-    public FFContainer(ArrayList<FileInventoryItem> files, ArrayList<FolderInventoryItem> folders)
+    public FFContainer(List<FileInventoryItem> files, List<FolderInventoryItem> folders)
     {
         this.folders = folders;
         this.files = files;

@@ -1,8 +1,5 @@
 package com.bunkr_beta.fragmented_range;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,8 +28,6 @@ import java.util.List;
  * O(logN) for contains (probably). O(1) max and min methods.
  *
  */
-@JsonSerialize(using = FragmentedRangeSerializer.class)
-@JsonDeserialize(using = FragmentedRangeDeserializer.class)
 public class FragmentedRange
 {
     private static final int MIN_CAPACITY = 10;

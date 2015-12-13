@@ -1,8 +1,6 @@
 package com.bunkr_beta.descriptor;
 
 import com.bunkr_beta.RandomMaker;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Creator: benmeier
@@ -20,12 +18,7 @@ public class EncryptionDescriptor
     public final int aesKeyLength;
     public final byte[] pbkdf2Salt;
 
-    @JsonCreator
-    public EncryptionDescriptor(
-            @JsonProperty("pbkdf2Iterations") int pbkdf2Iterations,
-            @JsonProperty("aesKeyLength") int aesKeyLength,
-            @JsonProperty("pbkdf2Salt") byte[] pbkdf2Salt
-    )
+    public EncryptionDescriptor(int pbkdf2Iterations, int aesKeyLength, byte[] pbkdf2Salt)
     {
         if (pbkdf2Iterations < MINIMUM_PBKD2_ITERS)
             throw new IllegalArgumentException("pbkdf2Iterations must be at least 4096");

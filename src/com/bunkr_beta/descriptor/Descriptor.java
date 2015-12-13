@@ -1,8 +1,5 @@
 package com.bunkr_beta.descriptor;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * Created by benmeier on 15/10/25.
  *
@@ -13,10 +10,7 @@ public class Descriptor
     private final EncryptionDescriptor encryption;
     private final CompressionDescriptor compression;
 
-    @JsonCreator
-    public Descriptor(
-            @JsonProperty("encryption") EncryptionDescriptor encryption,
-            @JsonProperty("compression") CompressionDescriptor compression
+    public Descriptor(EncryptionDescriptor encryption, CompressionDescriptor compression
     )
     {
         this.encryption = encryption;

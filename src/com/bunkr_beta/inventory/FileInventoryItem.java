@@ -2,9 +2,6 @@ package com.bunkr_beta.inventory;
 
 import com.bunkr_beta.RandomMaker;
 import com.bunkr_beta.fragmented_range.FragmentedRange;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -25,18 +22,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     private long actualSize;
     private Set<String> tags;
 
-    @JsonCreator
-    public FileInventoryItem(
-            @JsonProperty("name") String name,
-            @JsonProperty("uuid") UUID uuid,
-            @JsonProperty("blocks") FragmentedRange blocks,
-            @JsonProperty("sizeOnDisk") long sizeOnDisk,
-            @JsonProperty("actualSize") long actualSize,
-            @JsonProperty("modifiedAt") long modifiedAt,
-            @JsonProperty("encryptionKey") byte[] encryptionKey,
-            @JsonProperty("encryptionIV") byte[] encryptionIV,
-            @JsonProperty("tags") HashSet<String> tags
-    )
+    public FileInventoryItem(String name, UUID uuid, FragmentedRange blocks, long sizeOnDisk, long actualSize, long modifiedAt, byte[] encryptionKey, byte[] encryptionIV, HashSet<String> tags)
     {
         super(name, uuid);
         this.encryptionKey = encryptionKey;
@@ -100,7 +86,6 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         this.modifiedAt = modifiedAt;
     }
 
-    @JsonIgnore
     public Date getModifiedAtDate()
     {
         return new Date(this.getModifiedAt());
@@ -140,7 +125,6 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         return this.tags;
     }
 
-    @JsonIgnore
     @Override
     public boolean isAFile()
     {

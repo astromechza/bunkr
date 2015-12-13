@@ -3,9 +3,11 @@ package com.bunkr_beta_tests.scenarios;
 import com.bunkr_beta.*;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.descriptor.Descriptor;
+import com.bunkr_beta.descriptor.DescriptorJSON;
 import com.bunkr_beta.inventory.FileInventoryItem;
 import com.bunkr_beta.inventory.FolderInventoryItem;
 import com.bunkr_beta.inventory.Inventory;
+import com.bunkr_beta.inventory.InventoryJSON;
 import com.bunkr_beta.streams.output.MultilayeredOutputStream;
 import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
@@ -49,13 +51,13 @@ public class TestWriteScenarios
             assertEquals(dis.readLong(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = JSONHelper.unstringify(desJSON, Descriptor.class);
+            Descriptor descriptor = DescriptorJSON.decode(desJSON);
 
             assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
-            Inventory inventory = JSONHelper.unstringify(invJSON, Inventory.class);
+            Inventory inventory = InventoryJSON.decode(invJSON);
             assertEquals(inventory.getFiles().size(), 0);
             assertEquals(inventory.getFolders().size(), 0);
 
@@ -98,13 +100,13 @@ public class TestWriteScenarios
             }
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = JSONHelper.unstringify(desJSON, Descriptor.class);
+            Descriptor descriptor = DescriptorJSON.decode(desJSON);
 
             assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
-            Inventory inventory = JSONHelper.unstringify(invJSON, Inventory.class);
+            Inventory inventory = InventoryJSON.decode(invJSON);
             assertEquals(inventory.getFiles().size(), 1);
             assertEquals(inventory.getFolders().size(), 0);
             assertEquals(inventory.getFiles().get(0).getName(), "some file.txt");
@@ -177,13 +179,13 @@ public class TestWriteScenarios
             }
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = JSONHelper.unstringify(desJSON, Descriptor.class);
+            Descriptor descriptor = DescriptorJSON.decode(desJSON);
 
             assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
-            Inventory inventory = JSONHelper.unstringify(invJSON, Inventory.class);
+            Inventory inventory = InventoryJSON.decode(invJSON);
             assertEquals(inventory.getFiles().size(), 2);
             assertEquals(inventory.getFolders().size(), 0);
 
@@ -241,13 +243,13 @@ public class TestWriteScenarios
             assertEquals(dis.readLong(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = JSONHelper.unstringify(desJSON, Descriptor.class);
+            Descriptor descriptor = DescriptorJSON.decode(desJSON);
 
             assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
-            Inventory inventory = JSONHelper.unstringify(invJSON, Inventory.class);
+            Inventory inventory = InventoryJSON.decode(invJSON);
 
             assertEquals(inventory.getFiles().size(), 0);
             assertEquals(inventory.getFolders().size(), 2);

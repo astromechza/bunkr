@@ -1,8 +1,5 @@
 package com.bunkr_beta.inventory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,12 +12,7 @@ public class FolderInventoryItem extends InventoryItem implements IFFContainer, 
 {
     private final FFContainer ffcontainer;
 
-    public FolderInventoryItem(
-            @JsonProperty("name") String name,
-            @JsonProperty("uuid") UUID uuid,
-            @JsonProperty("files") ArrayList<FileInventoryItem> files,
-            @JsonProperty("folders") ArrayList<FolderInventoryItem> folders
-    )
+    public FolderInventoryItem(String name, UUID uuid, List<FileInventoryItem> files, List<FolderInventoryItem> folders)
     {
         super(name, uuid);
         this.ffcontainer = new FFContainer(files, folders);
@@ -44,7 +36,6 @@ public class FolderInventoryItem extends InventoryItem implements IFFContainer, 
         return this.ffcontainer.getFiles();
     }
 
-    @JsonIgnore
     @Override
     public boolean isAFolder()
     {
