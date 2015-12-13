@@ -43,6 +43,18 @@ define PROJECT_NAME, layout: layout do
         end
     end
 
+    build do
+        version_dat_file = _('target/main/classes/version.dat')
+        puts 'Writing ' + version_dat_file
+        GIT_HASH = `git rev-parse HEAD`
+        GIT_DATE = `git --no-pager log -n 1 --date=iso-strict --format="%cd"`
+        File.open(version_dat_file, 'w') do |f|
+            f.puts PROJECT_VERSION
+            f.puts GIT_DATE
+            f.puts GIT_HASH
+        end
+    end
+
     task :pulllibs do
         unless Dir.exists? project.path_to('lib')
             puts "Creating 'lib' directory"
