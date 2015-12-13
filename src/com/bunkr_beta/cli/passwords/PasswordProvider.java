@@ -1,5 +1,7 @@
 package com.bunkr_beta.cli.passwords;
 
+import com.bunkr_beta.exceptions.CLIException;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
@@ -53,13 +55,13 @@ public class PasswordProvider
         this.archivePassword = archivePassword;
     }
 
-    public void setArchivePassword(File passwordFile) throws IOException
+    public void setArchivePassword(File passwordFile) throws CLIException, IOException
     {
         Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(passwordFile.toPath());
         if (permissions.contains(PosixFilePermission.OTHERS_READ))
-            throw new IOException("For security reasons, the password file may not be world-readable.");
+            throw new CLIException("For security reasons, the password file may not be world-readable.");
         if (permissions.contains(PosixFilePermission.OTHERS_WRITE))
-            throw new IOException("For security reasons, the password file may not be world-writeable.");
+            throw new CLIException("For security reasons, the password file may not be world-writeable.");
         try(BufferedReader br = new BufferedReader(new FileReader(passwordFile)))
         {
             this.setArchivePassword(br.readLine().getBytes());

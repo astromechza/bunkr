@@ -2,7 +2,7 @@ package com.bunkr_beta_tests.cli.commands;
 
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.cli.CLI;
-import com.bunkr_beta.cli.commands.NewArchiveCommand;
+import com.bunkr_beta.cli.commands.CreateCommand;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
 import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta_tests.XTemporaryFolder;
@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -31,7 +33,7 @@ public class TestCreateCommand
     @Test
     public void testBuildParser()
     {
-        new NewArchiveCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
+        new CreateCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
     }
 
     @Test
@@ -43,8 +45,10 @@ public class TestCreateCommand
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(CLI.ARG_PASSWORD_FILE, pwFile);
-        args.put(NewArchiveCommand.ARG_OVERWRITE, false);
-        new NewArchiveCommand().handle(new Namespace(args));
+        args.put(CreateCommand.ARG_OVERWRITE, false);
+        args.put(CreateCommand.ARG_NOCOMPRESSION, false);
+        args.put(CreateCommand.ARG_NOENCRYPTION, false);
+        new CreateCommand().handle(new Namespace(args));
 
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword(pwFile);
@@ -61,10 +65,12 @@ public class TestCreateCommand
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(CLI.ARG_PASSWORD_FILE, pwFile);
-        args.put(NewArchiveCommand.ARG_OVERWRITE, false);
+        args.put(CreateCommand.ARG_OVERWRITE, false);
+        args.put(CreateCommand.ARG_NOCOMPRESSION, false);
+        args.put(CreateCommand.ARG_NOENCRYPTION, false);
         try
         {
-            new NewArchiveCommand().handle(new Namespace(args));
+            new CreateCommand().handle(new Namespace(args));
             fail("should not overwrite the file");
         }
         catch (CLIException ignored) {}
@@ -81,11 +87,52 @@ public class TestCreateCommand
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(CLI.ARG_PASSWORD_FILE, pwFile);
-        args.put(NewArchiveCommand.ARG_OVERWRITE, true);
-        new NewArchiveCommand().handle(new Namespace(args));
+        args.put(CreateCommand.ARG_OVERWRITE, true);
+        args.put(CreateCommand.ARG_NOCOMPRESSION, false);
+        args.put(CreateCommand.ARG_NOENCRYPTION, false);
+        new CreateCommand().handle(new Namespace(args));
 
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword(pwFile);
         new ArchiveInfoContext(archiveFile, prov);
+    }
+
+    @Test
+    public void createNewArchiveWithoutEncryption() throws Exception
+    {
+        File archiveFile = folder.newFilePath();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
+        args.put(CLI.ARG_PASSWORD_FILE, new File("-"));
+        args.put(CreateCommand.ARG_OVERWRITE, false);
+        args.put(CreateCommand.ARG_NOCOMPRESSION, false);
+        args.put(CreateCommand.ARG_NOENCRYPTION, true);
+        new CreateCommand().handle(new Namespace(args));
+
+        ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, new PasswordProvider());
+        assertNull(c.getDescriptor().getEncryption());
+        assertNotNull(c.getDescriptor().getCompression());
+    }
+
+    @Test
+    public void createNewArchiveWithoutCompression() throws Exception
+    {
+        File pwFile = PasswordFile.genPasswordFile(folder.newFilePath());
+        File archiveFile = folder.newFilePath();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
+        args.put(CLI.ARG_PASSWORD_FILE, pwFile);
+        args.put(CreateCommand.ARG_OVERWRITE, false);
+        args.put(CreateCommand.ARG_NOCOMPRESSION, true);
+        args.put(CreateCommand.ARG_NOENCRYPTION, false);
+        new CreateCommand().handle(new Namespace(args));
+
+        PasswordProvider prov = new PasswordProvider();
+        prov.setArchivePassword(pwFile);
+        ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, prov);
+        assertNotNull(c.getDescriptor().getEncryption());
+        assertNull(c.getDescriptor().getCompression());
     }
 }

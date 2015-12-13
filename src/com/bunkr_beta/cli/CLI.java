@@ -31,7 +31,7 @@ public class CLI
     static
     {
         commands.put("auth", new AuthCommand());
-        commands.put("create", new NewArchiveCommand());
+        commands.put("create", new CreateCommand());
         commands.put("mkdir", new MkdirCommand());
         commands.put("rm", new RmCommand());
         commands.put("ls", new LsCommand());
