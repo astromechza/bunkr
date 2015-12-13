@@ -1,5 +1,6 @@
 package com.bunkr_beta.cli;
 
+import com.bunkr_beta.Version;
 import com.bunkr_beta.cli.commands.*;
 import com.bunkr_beta.exceptions.CLIException;
 import com.bunkr_beta.exceptions.IllegalPathException;
@@ -46,6 +47,9 @@ public class CLI
     {
         // Constructing parser and subcommands
         ArgumentParser parser = ArgumentParsers.newArgumentParser("bunkr");
+
+        parser.version(String.format("version: %s\ncommit date: %s\ncommit hash: %s", Version.versionNumber, Version.gitDate, Version.gitHash));
+        parser.addArgument("--version").action(Arguments.version());
 
         parser.addArgument("archive")
                 .dest(ARG_ARCHIVE_PATH)

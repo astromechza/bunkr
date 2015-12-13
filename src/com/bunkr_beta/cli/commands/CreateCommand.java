@@ -42,7 +42,6 @@ public class CreateCommand implements ICLICommand
                 .type(Boolean.class)
                 .action(Arguments.storeTrue())
                 .help("the archive will not use compression on its files");
-
     }
 
     @Override
