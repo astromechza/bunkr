@@ -101,7 +101,7 @@ public class ImportFileCommand implements ICLICommand
 
     private void readFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is) throws IOException
     {
-        ProgressBar pb = new ProgressBar(80, is.available());
+        ProgressBar pb = new ProgressBar(80, is.available(), "Importing file: ");
 
         try(BufferedInputStream bufferedInput = new BufferedInputStream(is))
         {

@@ -6,14 +6,16 @@ package com.bunkr_beta.cli;
  */
 public class ProgressBar
 {
+    private final String title;
     private final long target;
     private final int innerWidth;
 
     private int stepProgress = -100;
     private long total;
 
-    public ProgressBar(int width, long target)
+    public ProgressBar(int width, long target, String title)
     {
+        this.title = title;
         this.total = 0;
         this.target = target;
         this.innerWidth = width - 2;
@@ -31,7 +33,7 @@ public class ProgressBar
         if ((newProgress - stepProgress) >= 1 || newProgress == 100)
         {
             String bar = new String(new char[newProgress]).replace("\0", "=");
-            System.out.print(String.format("Importing file: |%-" + innerWidth + "s|\r", bar));
+            System.out.print(String.format("%s|%-" + innerWidth + "s|\r", title, bar));
             stepProgress = newProgress;
         }
     }
@@ -39,7 +41,7 @@ public class ProgressBar
     public void finish()
     {
         String bar = new String(new char[innerWidth]).replace("\0", "=");
-        System.out.print(String.format("Importing file: |%-" + innerWidth + "s|\r", bar));
+        System.out.print(String.format("%s|%-" + innerWidth + "s|\r", title, bar));
         System.out.println();
     }
 }

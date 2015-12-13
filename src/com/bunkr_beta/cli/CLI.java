@@ -41,6 +41,7 @@ public class CLI
         commands.put("tags", new TagCommand());
         commands.put("mv", new MvCommand());
         commands.put("find", new FindCommand());
+        commands.put("hash", new HashCommand());
     }
 
     public static void main(String[] args) throws IOException
