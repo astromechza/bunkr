@@ -45,7 +45,10 @@ public class TestAuthCommand
     public void testSuccessfulAuthOnArchive() throws Exception
     {
         String password = DatatypeConverter.printHexBinary(RandomMaker.get(64));
-        PasswordProvider prov = new PasswordProvider(password.getBytes());
+
+        PasswordProvider prov = new PasswordProvider();
+        prov.setArchivePassword(password.getBytes());
+
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
@@ -53,7 +56,7 @@ public class TestAuthCommand
                 prov
         );
 
-        File pwFile = PasswordFile.genPasswordFile(folder.newFilePath(), prov.getArchivePassword());
+        File pwFile = PasswordFile.genPasswordFile(folder.newFilePath(), password.getBytes());
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
@@ -66,7 +69,8 @@ public class TestAuthCommand
     public void testFailedAuthOnArchive() throws Exception
     {
         String password = DatatypeConverter.printHexBinary(RandomMaker.get(64));
-        PasswordProvider prov = new PasswordProvider(password.getBytes());
+        PasswordProvider prov = new PasswordProvider();
+        prov.setArchivePassword(password.getBytes());
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,

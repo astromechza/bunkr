@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -23,7 +24,7 @@ public class TestPasswordProvider
         uic.clearArchivePassword();
         try
         {
-            uic.getArchivePassword();
+            uic.getHashedArchivePassword();
             fail("no prompt error raised");
         }
         catch (IllegalArgumentException ignored) {}
@@ -32,14 +33,15 @@ public class TestPasswordProvider
     @Test
     public void testNoPrompt()
     {
-        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
-        assertThat(uic.getArchivePassword(), is(equalTo("Hunter2".getBytes())));
+        PasswordProvider uic = new PasswordProvider();
+        uic.setArchivePassword("Hunter2".getBytes());
+        assertThat(uic.getHashedArchivePassword(), is(not(equalTo("Hunter2".getBytes()))));
         assertThat(uic.getPrompter(), is(equalTo(null)));
 
         uic.clearArchivePassword();
         try
         {
-            uic.getArchivePassword();
+            uic.getHashedArchivePassword();
             fail("no prompt error raised");
         }
         catch (IllegalArgumentException ignored) {}
@@ -57,13 +59,13 @@ public class TestPasswordProvider
         });
 
         uic.clearArchivePassword();
-        assertThat(uic.getArchivePassword(), is(equalTo("AdventureTime".getBytes())));
+        assertThat(uic.getHashedArchivePassword(), is(not(equalTo("AdventureTime".getBytes()))));
 
         uic.clearArchivePassword();
         uic.setPrompter(null);
         try
         {
-            uic.getArchivePassword();
+            uic.getHashedArchivePassword();
             fail("no prompt error raised");
         }
         catch (IllegalArgumentException ignored) {}

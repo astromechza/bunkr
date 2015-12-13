@@ -1,6 +1,8 @@
 package com.bunkr_beta.cli.passwords;
 
 import com.bunkr_beta.exceptions.CLIException;
+import org.bouncycastle.crypto.digests.GeneralDigest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,46 +16,40 @@ import java.util.Set;
  */
 public class PasswordProvider
 {
-    private byte[] archivePassword;
+    private byte[] hashedArchivePassword;
     private IPasswordPrompter prompter;
 
     public PasswordProvider()
     {
-        this.archivePassword = null;
+        this.hashedArchivePassword = null;
         this.prompter = null;
     }
 
     public PasswordProvider(IPasswordPrompter prompter)
     {
-        this.archivePassword = null;
+        this.hashedArchivePassword = null;
         this.prompter = prompter;
     }
 
-    public PasswordProvider(byte[] password)
+    public byte[] getHashedArchivePassword()
     {
-        this.archivePassword = password;
-        this.prompter = null;
-    }
-
-    public byte[] getArchivePassword()
-    {
-        if (archivePassword == null)
+        if (hashedArchivePassword == null)
         {
             if (prompter != null)
             {
-                this.archivePassword = prompter.getPassword();
+                this.hashedArchivePassword = hash(prompter.getPassword());
             }
             else
             {
                 throw new IllegalArgumentException("Password requested, but no password prompt available.");
             }
         }
-        return archivePassword;
+        return hashedArchivePassword;
     }
 
     public void setArchivePassword(byte[] archivePassword)
     {
-        this.archivePassword = archivePassword;
+        this.hashedArchivePassword = hash(archivePassword);
     }
 
     public void setArchivePassword(File passwordFile) throws CLIException, IOException
@@ -71,8 +67,8 @@ public class PasswordProvider
 
     public void clearArchivePassword()
     {
-        if (this.archivePassword != null) Arrays.fill(this.archivePassword, (byte) 0);
-        this.archivePassword = null;
+        if (this.hashedArchivePassword != null) Arrays.fill(this.hashedArchivePassword, (byte) 0);
+        this.hashedArchivePassword = null;
     }
 
     public IPasswordPrompter getPrompter()
@@ -91,4 +87,15 @@ public class PasswordProvider
         this.clearArchivePassword();
         super.finalize();
     }
+
+    private byte[] hash(byte[] input)
+    {
+        GeneralDigest digest = new SHA256Digest();
+        digest.update(input, 0, input.length);
+        byte[] buffer = new byte[digest.getDigestSize()];
+        digest.doFinal(buffer, 0);
+        Arrays.fill(input, (byte) 0);
+        return buffer;
+    }
+
 }

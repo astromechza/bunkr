@@ -216,8 +216,9 @@ public class TestWriteScenarios
     public void testFoldersAndFile() throws IOException, NoSuchAlgorithmException, CryptoException
     {
         File tempfile = folder.newFile();
-        PasswordProvider uic = new PasswordProvider("Hunter2".getBytes());
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), uic);
+        PasswordProvider prov = new PasswordProvider();
+        prov.setArchivePassword("Hunter2".getBytes());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), prov);
 
         FolderInventoryItem folder1 = new FolderInventoryItem("some folder");
         FolderInventoryItem folder2 = new FolderInventoryItem("another folder");
@@ -228,7 +229,7 @@ public class TestWriteScenarios
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         folder1.getFiles().add(newFile);
-        MetadataWriter.write(context, uic);
+        MetadataWriter.write(context, prov);
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {

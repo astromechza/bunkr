@@ -77,7 +77,7 @@ public class MetadataWriter
                 {
                     // otherwise, do encryption
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init(uic.getArchivePassword(), descriptor.getEncryption().pbkdf2Salt,
+                    g.init(uic.getHashedArchivePassword(), descriptor.getEncryption().pbkdf2Salt,
                            descriptor.getEncryption().pbkdf2Iterations);
                     ParametersWithIV kp = ((ParametersWithIV) g.generateDerivedParameters(
                             descriptor.getEncryption().aesKeyLength,
