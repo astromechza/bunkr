@@ -56,5 +56,6 @@ public class CreateCommand implements ICLICommand
         CompressionDescriptor cd = (args.getBoolean(ARG_NOCOMPRESSION)) ? null : CompressionDescriptor.makeDefaults();
 
         ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(ed, cd), passProv);
+        System.out.println(String.format("Created new archive %s", archiveFile.getAbsolutePath()));
     }
 }

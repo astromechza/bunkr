@@ -85,4 +85,10 @@ public class PasswordProvider
         this.prompter = prompter;
     }
 
+    @Override
+    protected void finalize() throws Throwable
+    {
+        this.clearArchivePassword();
+        super.finalize();
+    }
 }
