@@ -1,0 +1,3 @@
+-injars       target/bunkr_beta-0.1.jar
+-outjars      target/bunkr_beta-0.1-release.jar
+-libraryjars  <java.home>/lib/rt.jar
