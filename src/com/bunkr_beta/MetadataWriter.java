@@ -40,13 +40,28 @@ public class MetadataWriter
                 byte[] inventoryJsonBytes = JSONHelper.stringify(inventory).getBytes();
                 byte[] descriptorJsonBytes = JSONHelper.stringify(descriptor).getBytes();
 
-                long metaLength =
-                        Integer.BYTES + inventoryJsonBytes.length + Integer.BYTES + descriptorJsonBytes.length;
                 if (descriptor.getEncryption() != null)
                 {
-                    int b = descriptor.getEncryption().aesKeyLength;
-                    metaLength += b - (inventoryJsonBytes.length % b);
+                    // otherwise, do encryption
+                    PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
+                    g.init(uic.getHashedArchivePassword(), descriptor.getEncryption().pbkdf2Salt,
+                           descriptor.getEncryption().pbkdf2Iterations);
+                    ParametersWithIV kp = ((ParametersWithIV) g.generateDerivedParameters(
+                            descriptor.getEncryption().aesKeyLength,
+                            descriptor.getEncryption().aesKeyLength)
+                    );
+
+                    // encrypt the inventory
+                    byte[] encryptedInv = SimpleAES.encrypt(
+                            inventoryJsonBytes,
+                            ((KeyParameter) kp.getParameters()).getKey(),
+                            kp.getIV()
+                    );
+                    Arrays.fill(inventoryJsonBytes, (byte) 0);
+                    inventoryJsonBytes = encryptedInv;
                 }
+
+                long metaLength = Integer.BYTES + inventoryJsonBytes.length + Integer.BYTES + descriptorJsonBytes.length;
 
                 // When writing metadata we need to be able to truncate unused blocks off of the end of the file after
                 // files are deleted.
@@ -67,35 +82,8 @@ public class MetadataWriter
                 buf.put(descriptorJsonBytes);
 
                 // now write inventory
-                if (descriptor.getEncryption() == null)
-                {
-                    // if no encryption? just write it normally
-                    buf.putInt(inventoryJsonBytes.length);
-                    buf.put(inventoryJsonBytes);
-                }
-                else
-                {
-                    // otherwise, do encryption
-                    PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init(uic.getHashedArchivePassword(), descriptor.getEncryption().pbkdf2Salt,
-                           descriptor.getEncryption().pbkdf2Iterations);
-                    ParametersWithIV kp = ((ParametersWithIV) g.generateDerivedParameters(
-                            descriptor.getEncryption().aesKeyLength,
-                            descriptor.getEncryption().aesKeyLength)
-                    );
-
-                    // encrypt the inventory
-                    byte[] encryptedInv = SimpleAES.encrypt(
-                            inventoryJsonBytes,
-                            ((KeyParameter) kp.getParameters()).getKey(),
-                            kp.getIV()
-                    );
-                    Arrays.fill(inventoryJsonBytes, (byte) 0);
-
-                    // and write it as normal
-                    buf.putInt(encryptedInv.length);
-                    buf.put(encryptedInv);
-                }
+                buf.putInt(inventoryJsonBytes.length);
+                buf.put(inventoryJsonBytes);
 
                 // truncate file if required
                 raf.setLength(DBL_DATA_POS + Long.BYTES + dataBlocksLength + metaLength);
