@@ -11,6 +11,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 public class BlockWriterOutputStream extends OutputStream
 {
@@ -107,6 +108,8 @@ public class BlockWriterOutputStream extends OutputStream
     public void close() throws IOException
     {
         this.flush();
+
+        Arrays.fill(this.buffer, (byte) 0);
 
         long newDataBlocksLength = this.blockAllocMan.getTotalBlocks() * this.blockSize;
 

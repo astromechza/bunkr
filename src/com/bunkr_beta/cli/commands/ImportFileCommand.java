@@ -17,6 +17,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 /**
@@ -114,8 +115,10 @@ public class ImportFileCommand implements ICLICommand
                     bwos.write(buffer, 0, n);
                     pb.inc(n);
                 }
-                pb.finish();
+                Arrays.fill(buffer, (byte) 0);
             }
         }
+
+        pb.finish();
     }
 }

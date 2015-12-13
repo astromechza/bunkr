@@ -15,6 +15,7 @@ import org.bouncycastle.crypto.digests.*;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Creator: benmeier
@@ -69,6 +70,7 @@ public class HashCommand implements ICLICommand
                 digest.update(buffer, 0, n);
                 pb.inc(n);
             }
+            Arrays.fill(buffer, (byte) 0);
         }
         pb.finish();
 

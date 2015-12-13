@@ -13,6 +13,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * Creator: benmeier
@@ -73,6 +74,7 @@ public class ExportFileCommand implements ICLICommand
             {
                 os.write(buffer, 0, n);
             }
+            Arrays.fill(buffer, (byte) 0);
         }
     }
 }

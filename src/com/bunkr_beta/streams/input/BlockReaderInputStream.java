@@ -6,6 +6,7 @@ import com.bunkr_beta.fragmented_range.FragmentedRange;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 
 /**
  * Creator: benmeier
@@ -108,6 +109,13 @@ public class BlockReaderInputStream extends InputStream
     public boolean markSupported()
     {
         return false;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        Arrays.fill(this.buffer, (byte) 0);
+        super.close();
     }
 
     private void loadNextBlock() throws IOException

@@ -5,6 +5,7 @@ import com.bunkr_beta.exceptions.CLIException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -70,6 +71,7 @@ public class PasswordProvider
 
     public void clearArchivePassword()
     {
+        if (this.archivePassword != null) Arrays.fill(this.archivePassword, (byte) 0);
         this.archivePassword = null;
     }
 

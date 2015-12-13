@@ -11,6 +11,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 
 /**
  * Creator: benmeier
@@ -89,6 +90,7 @@ public class MetadataWriter
                             ((KeyParameter) kp.getParameters()).getKey(),
                             kp.getIV()
                     );
+                    Arrays.fill(inventoryJsonBytes, (byte) 0);
 
                     // and write it as normal
                     buf.putInt(encryptedInv.length);
