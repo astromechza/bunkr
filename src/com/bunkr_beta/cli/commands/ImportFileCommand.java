@@ -1,5 +1,6 @@
 package com.bunkr_beta.cli.commands;
 
+import com.bunkr_beta.AbortableShutdownHook;
 import com.bunkr_beta.ArchiveInfoContext;
 import com.bunkr_beta.MetadataWriter;
 import com.bunkr_beta.cli.passwords.PasswordProvider;
@@ -14,6 +15,7 @@ import com.bunkr_beta.streams.output.MultilayeredOutputStream;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import org.bouncycastle.crypto.CryptoException;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -85,6 +87,9 @@ public class ImportFileCommand implements ICLICommand
 
         File inputFile = args.get(ARG_SOURCE_FILE);
 
+        AbortableShutdownHook emergencyShutdownThread = new EnsuredMetadataWriter(aic, passProv);
+        Runtime.getRuntime().addShutdownHook(emergencyShutdownThread);
+
         try
         {
             if (inputFile.getPath().equals("-"))
@@ -106,6 +111,7 @@ public class ImportFileCommand implements ICLICommand
             // if an exception was raised due to some IO issue, then we still want to write a hopefully correct
             // metadata section so that the file can be correctly read in future.
             MetadataWriter.write(aic, passProv);
+            Runtime.getRuntime().removeShutdownHook(emergencyShutdownThread);
         }
     }
 
@@ -134,5 +140,31 @@ public class ImportFileCommand implements ICLICommand
         }
 
         pb.finish();
+    }
+
+    private static class EnsuredMetadataWriter extends AbortableShutdownHook
+    {
+        private final ArchiveInfoContext context;
+        private final PasswordProvider prov;
+
+        public EnsuredMetadataWriter(ArchiveInfoContext context, PasswordProvider prov)
+        {
+            this.context = context;
+            this.prov = prov;
+        }
+
+        @Override
+        public void innerRun()
+        {
+            try
+            {
+                System.err.println("Performing emergency metadata write for recovery");
+                MetadataWriter.write(this.context, this.prov);
+            }
+            catch (CryptoException | IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 }
