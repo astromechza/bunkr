@@ -7,11 +7,12 @@ package com.bunkr_beta.cli;
 public class ProgressBar
 {
     private final String title;
-    private final long target;
-    private final int innerWidth;
 
-    private int stepProgress = -100;
+    private final long target;
     private long total;
+
+    private final int innerWidth;
+    private int currentWidth = -1;
 
     public ProgressBar(int width, long target, String title)
     {
@@ -29,12 +30,15 @@ public class ProgressBar
 
     public void tick(long progress)
     {
-        int newProgress = (int) (this.innerWidth * (float) progress / target);
-        if ((newProgress - stepProgress) >= 1 || newProgress == 100)
+        this.total = progress;
+        double fraction = Math.min(this.total / (double) this.target, 1);
+
+        int newWidth = (int) (fraction * this.innerWidth);
+        if ((newWidth - currentWidth) >= 1 || newWidth >= this.innerWidth)
         {
-            String bar = new String(new char[newProgress]).replace("\0", "=");
+            currentWidth = newWidth;
+            String bar = new String(new char[currentWidth]).replace("\0", "=");
             System.out.print(String.format("%s|%-" + innerWidth + "s|\r", title, bar));
-            stepProgress = newProgress;
         }
     }
 

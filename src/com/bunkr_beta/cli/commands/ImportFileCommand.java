@@ -16,6 +16,8 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
 import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -91,9 +93,10 @@ public class ImportFileCommand implements ICLICommand
             }
             else
             {
-                try (FileInputStream fis = new FileInputStream(inputFile))
+                FileChannel fc = new RandomAccessFile(inputFile, "r").getChannel();
+                try (InputStream fis = Channels.newInputStream(fc))
                 {
-                    importFileFromStream(aic, targetFile, fis);
+                    importFileFromStream(aic, targetFile, fis, inputFile.length());
                 }
             }
         }
@@ -108,13 +111,18 @@ public class ImportFileCommand implements ICLICommand
 
     private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is) throws IOException
     {
-        ProgressBar pb = new ProgressBar(80, is.available(), "Importing file: ");
+        importFileFromStream(context, target, is, is.available());
+    }
+
+    private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is, long expectedBytes) throws IOException
+    {
+        ProgressBar pb = new ProgressBar(80, expectedBytes, "Importing file: ");
 
         try(BufferedInputStream bufferedInput = new BufferedInputStream(is))
         {
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))
             {
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[8192];
                 int n;
                 while ((n = bufferedInput.read(buffer)) != -1)
                 {

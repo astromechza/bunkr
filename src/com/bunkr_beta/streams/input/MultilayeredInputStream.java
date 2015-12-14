@@ -59,6 +59,10 @@ public class MultilayeredInputStream extends InputStream
     }
 
     @Override
+    /**
+     * NOTE: this will return some value in bytes, not necessarily the total length of the stream, just a number of
+     * bytes that can be read immediately without blocking.
+     */
     public int available() throws IOException
     {
         return this.streams.peek().available();

@@ -31,7 +31,8 @@ public class BlockReaderInputStream extends InputStream
         this.blockSize = blockSize;
         this.dataLength = dataLength;
 
-        if (dataLength > blocks.size() * blockSize)
+        long blockDataLength = ((long) blocks.size()) * blockSize;
+        if (dataLength > blockDataLength)
             throw new IllegalArgumentException("File dataLength is greater than block count * block size");
 
         this.buffer = new byte[blockSize];
@@ -127,7 +128,8 @@ public class BlockReaderInputStream extends InputStream
         {
             try(FileChannel fc = raf.getChannel())
             {
-                ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, DATABLOCKS_START + blockId * blockSize, blockSize);
+                long position = DATABLOCKS_START + ((long) blockId) * blockSize;
+                ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, position, blockSize);
                 buf.get(this.buffer);
                 this.bytesConsumed += (blockSize - this.cursor);
                 this.cursor = 0;

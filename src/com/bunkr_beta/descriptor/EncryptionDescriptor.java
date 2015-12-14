@@ -21,10 +21,10 @@ public class EncryptionDescriptor
     public EncryptionDescriptor(int pbkdf2Iterations, int aesKeyLength, byte[] pbkdf2Salt)
     {
         if (pbkdf2Iterations < MINIMUM_PBKD2_ITERS)
-            throw new IllegalArgumentException("pbkdf2Iterations must be at least 4096");
+            throw new IllegalArgumentException(String.format("pbkdf2Iterations must be at least %d", MINIMUM_PBKD2_ITERS));
 
         if (aesKeyLength != MINIMUM_AES_KEY_LENGTH)
-            throw new IllegalArgumentException("aesKeyLength must be 256");
+            throw new IllegalArgumentException(String.format("aesKeyLength must be %d", MINIMUM_AES_KEY_LENGTH));
 
         this.pbkdf2Iterations = pbkdf2Iterations;
         this.aesKeyLength = aesKeyLength;

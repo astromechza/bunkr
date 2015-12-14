@@ -13,6 +13,8 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
 import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 /**
@@ -56,7 +58,8 @@ public class ExportFileCommand implements ICLICommand
         else
         {
             if (inputFile.exists()) throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
-            try(OutputStream contentOutputStream = new FileOutputStream(inputFile))
+            FileChannel fc = new RandomAccessFile(inputFile, "rw").getChannel();
+            try(OutputStream contentOutputStream = Channels.newOutputStream(fc))
             {
                 writeBlockFileToStream(aic, targetFile, contentOutputStream);
             }
@@ -68,7 +71,7 @@ public class ExportFileCommand implements ICLICommand
     {
         try (MultilayeredInputStream ms = new MultilayeredInputStream(ctxt, targetFile))
         {
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[8196];
             int n;
             while ((n = ms.read(buffer)) != -1)
             {

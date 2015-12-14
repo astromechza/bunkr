@@ -89,9 +89,9 @@ public class BlockAllocationManager implements IBlockAllocationManager
      * @param inv Inventory object to iterate over
      * @return integer number of used blocks
      */
-    public static int calculateUsedBlocks(Inventory inv)
+    public static long calculateUsedBlocks(Inventory inv)
     {
-        int numBlocks = 0;
+        long numBlocks = 0;
         Iterator<FileInventoryItem> fileIterator = inv.getIterator();
         while (fileIterator.hasNext())
         {

@@ -9,6 +9,7 @@ public class IO
 
     public static String readNByteString(InputStream dis, int n) throws IOException
     {
+        assert n < 0xFFFFFF;
         byte[] buffer = new byte[n];
         int r = dis.read(buffer);
         return new String(buffer).substring(0, r);

@@ -21,7 +21,7 @@ public class BlockWriterOutputStream extends OutputStream
     private final IBlockAllocationManager blockAllocMan;
     private final byte[] buffer;
 
-    private int cursor;
+    private int blockCursor;
     private long bytesWritten;
     private boolean partiallyFlushed;
 
@@ -35,7 +35,7 @@ public class BlockWriterOutputStream extends OutputStream
         this.blockAllocMan.clearAllocation();
 
         this.buffer = new byte[this.blockSize];
-        this.cursor = 0;
+        this.blockCursor = 0;
         this.bytesWritten = 0;
         this.partiallyFlushed = false;
 
@@ -44,8 +44,8 @@ public class BlockWriterOutputStream extends OutputStream
     @Override
     public void write(int b) throws IOException
     {
-        if (this.cursor == this.blockSize) this.flush();
-        this.buffer[this.cursor++] = (byte) b;
+        if (this.blockCursor == this.blockSize) this.flush();
+        this.buffer[this.blockCursor++] = (byte) b;
         bytesWritten += 1;
     }
 
@@ -61,11 +61,11 @@ public class BlockWriterOutputStream extends OutputStream
         int srcCursor = 0;
         while(srcCursor < len)
         {
-            if (this.cursor == this.blockSize) this.flush();
+            if (this.blockCursor == this.blockSize) this.flush();
             int readAmnt = Math.min(len - srcCursor, this.blockSize);
-            readAmnt = Math.min(readAmnt, this.blockSize - this.cursor);
-            System.arraycopy(b, off + srcCursor, this.buffer, this.cursor, readAmnt);
-            this.cursor += readAmnt;
+            readAmnt = Math.min(readAmnt, this.blockSize - this.blockCursor);
+            System.arraycopy(b, off + srcCursor, this.buffer, this.blockCursor, readAmnt);
+            this.blockCursor += readAmnt;
             srcCursor += readAmnt;
             bytesWritten += readAmnt;
         }
@@ -74,22 +74,22 @@ public class BlockWriterOutputStream extends OutputStream
     @Override
     public void flush() throws IOException
     {
-        if (this.cursor > 0)
+        if (this.blockCursor > 0)
         {
             if (partiallyFlushed) throw new RuntimeException(
                     "Block stream has already been partially flushed on a partial block. Flushing again would cause " +
                     "stream damage.");
-            if (this.cursor < this.blockSize)
+            if (this.blockCursor < this.blockSize)
             {
                 SecureRandom r = new SecureRandom();
-                byte[] remaining = new byte[this.blockSize - this.cursor];
+                byte[] remaining = new byte[this.blockSize - this.blockCursor];
                 r.nextBytes(remaining);
                 this.write(remaining);
                 this.bytesWritten -= remaining.length;
                 partiallyFlushed = true;
             }
 
-            int blockId = this.blockAllocMan.allocateNextBlock();
+            long blockId = this.blockAllocMan.allocateNextBlock();
 
             long writePosition = blockId * this.blockSize + MetadataWriter.DBL_DATA_POS + Long.BYTES;
             try(RandomAccessFile raf = new RandomAccessFile(this.filePath, "rw"))
@@ -97,10 +97,10 @@ public class BlockWriterOutputStream extends OutputStream
                 try(FileChannel fc = raf.getChannel())
                 {
                     ByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, writePosition, this.blockSize);
-                    buf.put(this.buffer, 0, cursor);
+                    buf.put(this.buffer, 0, blockCursor);
                 }
             }
-            this.cursor = 0;
+            this.blockCursor = 0;
         }
     }
 

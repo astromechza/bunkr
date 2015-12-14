@@ -38,6 +38,7 @@ public class HashCommand implements ICLICommand
                 .dest(ARG_ALGORITHM)
                 .type(String.class)
                 .choices("md5", "sha1", "sha224", "sha256")
+                .setDefault("md5")
                 .help("the digest to use");
     }
 
@@ -63,7 +64,7 @@ public class HashCommand implements ICLICommand
         digest.reset();
         try (MultilayeredInputStream ms = new MultilayeredInputStream(context, target))
         {
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[8196];
             int n;
             while ((n = ms.read(buffer)) != -1)
             {
