@@ -1,9 +1,9 @@
 require 'fileutils'
 require 'buildr/jacoco'
 
-PROJECT_NAME = 'bunkr_beta'
-PROJECT_GROUP = "com.#{PROJECT_NAME}"
-PROJECT_VERSION = '0.1'
+PROJECT_NAME = 'bunkr'
+PROJECT_GROUP = "org.#{PROJECT_NAME}"
+PROJECT_VERSION = '0.2'
 
 # where to pull maven dependencies from
 repositories.remote << 'https://repo.maven.apache.org/maven2'

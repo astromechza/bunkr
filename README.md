@@ -1,4 +1,4 @@
-# bunkr_beta
+# Bunkr
 
 ## Run unit tests
 
@@ -22,7 +22,7 @@ $ bundle exec buildr package
 
 ```
 $ bundle exec buildr idea
-$ bundle exec buildr bunkr_beta:pulllibs
+$ bundle exec buildr bunkr:pulllibs
 ```
 
 ## To produce a compacted release version
