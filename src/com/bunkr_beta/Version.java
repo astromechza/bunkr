@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
  * Creator: benmeier
  * Created At: 2015-12-13
  */
-public class Version
+public final class Version
 {
     public static final String versionNumber;
     public static final String gitDate;

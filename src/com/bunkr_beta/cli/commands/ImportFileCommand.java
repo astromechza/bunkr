@@ -82,25 +82,31 @@ public class ImportFileCommand implements ICLICommand
         if (args.getList(ARG_TAGS).size() > 0) targetFile.setCheckTags(new HashSet<>(args.getList(ARG_TAGS)));
 
         File inputFile = args.get(ARG_SOURCE_FILE);
-        if (inputFile.getPath().equals("-"))
+
+        try
         {
-            readFileFromStream(aic, targetFile, System.in);
-        }
-        else
-        {
-            try (FileInputStream fis = new FileInputStream(inputFile))
+            if (inputFile.getPath().equals("-"))
             {
-                readFileFromStream(aic, targetFile, fis);
+                importFileFromStream(aic, targetFile, System.in);
+            }
+            else
+            {
+                try (FileInputStream fis = new FileInputStream(inputFile))
+                {
+                    importFileFromStream(aic, targetFile, fis);
+                }
             }
         }
-
-        // TODO think about handling bad issues here.. how do we handle corrupted writes.. maybe it should just
-        // write the metadata regardless of what happens so that at least it is recovered and files can be read
-        // next time.
-        MetadataWriter.write(aic, passProv);
+        finally
+        {
+            // This finally block is a basic attempt at handling bad problems like corrupted writes when saving a file.
+            // if an exception was raised due to some IO issue, then we still want to write a hopefully correct
+            // metadata section so that the file can be correctly read in future.
+            MetadataWriter.write(aic, passProv);
+        }
     }
 
-    private void readFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is) throws IOException
+    private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is) throws IOException
     {
         ProgressBar pb = new ProgressBar(80, is.available(), "Importing file: ");
 
