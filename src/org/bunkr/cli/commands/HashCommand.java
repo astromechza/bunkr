@@ -29,17 +29,17 @@ public class HashCommand implements ICLICommand
     @Override
     public void buildParser(Subparser target)
     {
-        target.help("calculate a integrity hash for a file in the archive");
+        target.help("calculate a hash over the contents of a file in the archive");
         target.addArgument("path")
                 .dest(ARG_PATH)
                 .type(String.class)
-                .help("archive path to create the new directory");
+                .help("path of the file in the archive");
         target.addArgument("-a", "--algorithm")
                 .dest(ARG_ALGORITHM)
                 .type(String.class)
                 .choices("md5", "sha1", "sha224", "sha256")
                 .setDefault("md5")
-                .help("the digest to use");
+                .help("the digest algorithm to use");
     }
 
     @Override

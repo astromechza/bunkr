@@ -32,7 +32,7 @@ public class TagCommand implements ICLICommand
         target.addArgument("path")
                 .dest(ARG_PATH)
                 .type(String.class)
-                .help("target path in the archive");
+                .help("path of the file to tag");
         target.addArgument("-t", "--tags")
                 .dest(ARG_TAGS)
                 .type(String.class)

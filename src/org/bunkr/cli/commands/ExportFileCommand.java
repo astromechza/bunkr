@@ -44,7 +44,7 @@ public class ExportFileCommand implements ICLICommand
                 .dest(ARG_IGNORE_INTEGRITY_CHECK)
                 .type(Boolean.class)
                 .action(Arguments.storeTrue())
-                .help("Ignore integrity check error caused by data corruption");
+                .help("ignore integrity check error caused by data corruption");
     }
 
     @Override

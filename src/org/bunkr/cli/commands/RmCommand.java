@@ -26,7 +26,7 @@ public class RmCommand implements ICLICommand
         target.addArgument("path")
                 .dest(ARG_PATH)
                 .type(String.class)
-                .help("archive path to create the new directory");
+                .help("path of directory to remove from the archive");
         target.addArgument("-r", "--recursive")
                 .dest(ARG_RECURSIVE)
                 .type(Boolean.class)
