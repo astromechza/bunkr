@@ -6,7 +6,6 @@ import org.bunkr.MetadataWriter;
 import org.bunkr.IBlockAllocationManager;
 import org.bunkr.inventory.FileInventoryItem;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
