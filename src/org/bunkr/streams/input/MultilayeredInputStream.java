@@ -28,15 +28,7 @@ public class MultilayeredInputStream extends InputStream
     public MultilayeredInputStream(ArchiveInfoContext context, FileInventoryItem target)
     {
         this.emptyFile = target.getActualSize() == 0;
-
-        this.streams.push(
-            new BlockReaderInputStream(
-                    context.filePath,
-                    context.getBlockSize(),
-                    target.getBlocks(),
-                    target.getSizeOnDisk()
-            )
-        );
+        this.streams.push(new BlockReaderInputStream(context.filePath, context.getBlockSize(), target));
         if (context.getDescriptor().getEncryption() != null)
         {
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());

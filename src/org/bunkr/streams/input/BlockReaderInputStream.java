@@ -2,6 +2,7 @@ package org.bunkr.streams.input;
 
 import org.bunkr.MetadataWriter;
 import org.bunkr.fragmented_range.FragmentedRange;
+import org.bunkr.inventory.FileInventoryItem;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -21,24 +22,24 @@ public class BlockReaderInputStream extends InputStream
     private final long dataLength;
     private final byte[] buffer;
     private final FragmentedRange blocks;
+
     private long bytesConsumed;
     private int cursor;
 
-    public BlockReaderInputStream(File path, int blockSize, FragmentedRange blocks, long dataLength)
+    public BlockReaderInputStream(File path, int blockSize, FileInventoryItem target)
     {
         super();
         this.filePath = path;
         this.blockSize = blockSize;
-        this.dataLength = dataLength;
+        this.dataLength = target.getSizeOnDisk();
+        this.blocks = target.getBlocks().copy();
+        this.buffer = new byte[blockSize];
 
         long blockDataLength = ((long) blocks.size()) * blockSize;
         if (dataLength > blockDataLength)
             throw new IllegalArgumentException("File dataLength is greater than block count * block size");
 
-        this.buffer = new byte[blockSize];
         this.cursor = this.blockSize;
-
-        this.blocks = blocks.copy();
         this.bytesConsumed = 0;
     }
 

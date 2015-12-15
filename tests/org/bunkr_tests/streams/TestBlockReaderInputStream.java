@@ -3,6 +3,7 @@ package org.bunkr_tests.streams;
 import org.bunkr.IO;
 import org.bunkr.RandomMaker;
 import org.bunkr.fragmented_range.FragmentedRange;
+import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.streams.input.BlockReaderInputStream;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,7 +48,10 @@ public class TestBlockReaderInputStream
     public void testBasicReading() throws IOException
     {
         File f = buildFake();
-        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 4 + 17);
+        FileInventoryItem fakeFile = new FileInventoryItem("fake");
+        fakeFile.setSizeOnDisk(32 * 4 + 17);
+        fakeFile.setBlocks(new FragmentedRange(0, 5));
+        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, fakeFile);
         String all = IO.readNByteString(bis, 32 * 4 + 17);
         assertThat(all, is(equalTo("abababababababababababababababab" +
                                            "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd" +
@@ -60,7 +64,10 @@ public class TestBlockReaderInputStream
     public void testSkip() throws IOException
     {
         File f = buildFake();
-        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 4 + 17);
+        FileInventoryItem fakeFile = new FileInventoryItem("fake");
+        fakeFile.setSizeOnDisk(32 * 4 + 17);
+        fakeFile.setBlocks(new FragmentedRange(0, 5));
+        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, fakeFile);
         assertThat(bis.read(), is(equalTo(97)));
         assertThat(bis.read(), is(equalTo(98)));
         assertThat(bis.skip(72), is(equalTo(72L)));
@@ -75,7 +82,10 @@ public class TestBlockReaderInputStream
     public void testRead() throws IOException
     {
         File f = buildFake();
-        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 4 + 17);
+        FileInventoryItem fakeFile = new FileInventoryItem("fake");
+        fakeFile.setSizeOnDisk(32 * 4 + 17);
+        fakeFile.setBlocks(new FragmentedRange(0, 5));
+        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, fakeFile);
         assertThat(bis.read(), is(equalTo(97)));
         assertThat(bis.read(), is(equalTo(98)));
         byte[] buffer = new byte[200];
@@ -93,12 +103,18 @@ public class TestBlockReaderInputStream
         File f = buildFake();
         try
         {
-            new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 10);
+            FileInventoryItem fakeFile = new FileInventoryItem("fake");
+            fakeFile.setSizeOnDisk(32 * 10);
+            fakeFile.setBlocks(new FragmentedRange(0, 5));
+            new BlockReaderInputStream(f, 32, fakeFile);
             fail("bad datalength");
         }
         catch (IllegalArgumentException ignored) {}
 
-        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, new FragmentedRange(0, 5), 32 * 4 + 17);
+        FileInventoryItem fakeFile = new FileInventoryItem("fake");
+        fakeFile.setSizeOnDisk(32 * 4 + 17);
+        fakeFile.setBlocks(new FragmentedRange(0, 5));
+        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, fakeFile);
         assertFalse(bis.markSupported());
     }
 
