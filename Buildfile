@@ -30,6 +30,9 @@ define PROJECT_NAME, layout: layout do
 
     test.with JAR_JUNIT
     compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE
+    compile.options.source = '1.8'
+    compile.options.target = '1.8'
+    compile.options.lint = 'all'
     package(:jar).merge(compile.dependencies).exclude('META-INF/BCKEY.*')
     package(:jar).with(manifest: {'Main-Class' => MAIN_CLASS})
     run.using main: MAIN_CLASS
