@@ -2,13 +2,11 @@ package org.bunkr.streams.input;
 
 import org.bouncycastle.crypto.digests.GeneralDigest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bunkr.IO;
 import org.bunkr.MetadataWriter;
 import org.bunkr.exceptions.IntegrityHashError;
 import org.bunkr.fragmented_range.FragmentedRange;
 import org.bunkr.inventory.FileInventoryItem;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -28,9 +26,9 @@ public class BlockReaderInputStream extends InputStream
     private final byte[] buffer;
     private final FragmentedRange blocks;
     private final GeneralDigest digest;
-    private final boolean checkHashOnClose;
     private final byte[] expectedDigest;
 
+    private boolean checkHashOnFinish;
     private long bytesConsumed;
     private int cursor;
     private byte[] finishedDigest = null;
@@ -43,7 +41,7 @@ public class BlockReaderInputStream extends InputStream
         this.dataLength = target.getSizeOnDisk();
         this.blocks = target.getBlocks().copy();
         this.buffer = new byte[blockSize];
-        this.checkHashOnClose = true;
+        this.checkHashOnFinish = true;
         this.expectedDigest = target.getIntegrityHash();
         this.digest = new SHA1Digest();
 
@@ -138,6 +136,11 @@ public class BlockReaderInputStream extends InputStream
         return Arrays.equals(expectedDigest, finishedDigest);
     }
 
+    public void setCheckHashOnFinish(boolean b)
+    {
+        this.checkHashOnFinish = b;
+    }
+
     private void loadNextBlock() throws IOException
     {
         if (this.blocks.isEmpty()) throw new IOException("No more blocks to load");
@@ -156,14 +159,11 @@ public class BlockReaderInputStream extends InputStream
             }
         }
 
-        if (this.blocks.isEmpty())
+        if (this.checkHashOnFinish && this.blocks.isEmpty())
         {
             finishedDigest = new byte[digest.getDigestSize()];
             digest.doFinal(finishedDigest, 0);
-            if (checkHashOnClose)
-            {
-                if (! this.doesHashMatch()) throw new IntegrityHashError("Integrity hash did not match!");
-            }
+            if (! this.doesHashMatch()) throw new IntegrityHashError("Integrity hash did not match!");
         }
     }
 

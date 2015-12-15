@@ -85,6 +85,7 @@ public class TestExportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archive);
         args.put(ExportFileCommand.ARG_PATH, "/a.txt");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, new File("-"));
+        args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
 
         try(OutputCapture c = new OutputCapture())
         {
@@ -103,6 +104,7 @@ public class TestExportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archive);
         args.put(ExportFileCommand.ARG_PATH, "/folder/b.txt");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, outputFile);
+        args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
 
         new ExportFileCommand().handle(new Namespace(args));
         assertThat(outputFile.length(), is(equalTo(50L)));
@@ -118,6 +120,7 @@ public class TestExportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archive);
         args.put(ExportFileCommand.ARG_PATH, "/folder");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, outputFile);
+        args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
 
         try
         {
@@ -137,6 +140,7 @@ public class TestExportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archive);
         args.put(ExportFileCommand.ARG_PATH, "/");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, outputFile);
+        args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
 
         try
         {
@@ -158,6 +162,7 @@ public class TestExportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archive);
         args.put(ExportFileCommand.ARG_PATH, "/a.txt");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, outputFile);
+        args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
 
         try
         {

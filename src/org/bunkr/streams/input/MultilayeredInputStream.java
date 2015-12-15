@@ -21,6 +21,7 @@ import java.util.zip.InflaterInputStream;
  */
 public class MultilayeredInputStream extends InputStream
 {
+    private final BlockReaderInputStream baseStream;
     private final ArrayStack<InputStream> streams = new ArrayStack<>();
 
     private final boolean emptyFile;
@@ -28,7 +29,9 @@ public class MultilayeredInputStream extends InputStream
     public MultilayeredInputStream(ArchiveInfoContext context, FileInventoryItem target)
     {
         this.emptyFile = target.getActualSize() == 0;
-        this.streams.push(new BlockReaderInputStream(context.filePath, context.getBlockSize(), target));
+
+        this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
+        this.streams.push(this.baseStream);
         if (context.getDescriptor().getEncryption() != null)
         {
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
@@ -98,5 +101,10 @@ public class MultilayeredInputStream extends InputStream
     public boolean markSupported()
     {
         return false;
+    }
+
+    public void setCheckHashOnFinish(boolean b)
+    {
+        this.baseStream.setCheckHashOnFinish(b);
     }
 }
