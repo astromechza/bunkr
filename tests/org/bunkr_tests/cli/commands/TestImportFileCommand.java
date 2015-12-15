@@ -15,6 +15,7 @@ import org.bunkr.streams.output.MultilayeredOutputStream;
 import org.bunkr_tests.XTemporaryFolder;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
+import org.bunkr_tests.cli.OutputCapture;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -66,8 +67,10 @@ public class TestImportFileCommand
         args.put(ImportFileCommand.ARG_SOURCE_FILE, fileToImport);
         args.put(ImportFileCommand.ARG_TAGS, Arrays.asList("tag1", "tag2"));
 
-        new ImportFileCommand().handle(new Namespace(args));
-
+        try (OutputCapture ignored = new OutputCapture())
+        {
+            new ImportFileCommand().handle(new Namespace(args));
+        }
         ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, new PasswordProvider());
 
         FileInventoryItem f = context.getInventory().findFile("a.txt");
@@ -94,7 +97,10 @@ public class TestImportFileCommand
                 "01234567890123456789012345678901234567890123456789012345678901234567890123456789".getBytes());
 
         System.setIn(bais);
-        new ImportFileCommand().handle(new Namespace(args));
+        try (OutputCapture ignored = new OutputCapture())
+        {
+            new ImportFileCommand().handle(new Namespace(args));
+        }
         System.setIn(null);
 
         ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, new PasswordProvider());
@@ -122,8 +128,11 @@ public class TestImportFileCommand
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try
         {
-            new ImportFileCommand().handle(new Namespace(args));
-            fail("Should fail");
+            try (OutputCapture ignored = new OutputCapture())
+            {
+                new ImportFileCommand().handle(new Namespace(args));
+                fail("Should fail");
+            }
         }
         catch(CLIException ignored) {}
         System.setIn(null);
@@ -157,8 +166,11 @@ public class TestImportFileCommand
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try
         {
-            new ImportFileCommand().handle(new Namespace(args));
-            fail("Should fail");
+            try (OutputCapture ignored = new OutputCapture())
+            {
+                new ImportFileCommand().handle(new Namespace(args));
+                fail("Should fail");
+            }
         }
         catch(CLIException ignored) {}
         System.setIn(null);
@@ -190,7 +202,10 @@ public class TestImportFileCommand
         args.put(ImportFileCommand.ARG_TAGS, Collections.emptyList());
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
-        new ImportFileCommand().handle(new Namespace(args));
+        try (OutputCapture ignored = new OutputCapture())
+        {
+            new ImportFileCommand().handle(new Namespace(args));
+        }
         System.setIn(null);
 
         {
@@ -222,7 +237,7 @@ public class TestImportFileCommand
         args.put(ImportFileCommand.ARG_TAGS, Collections.emptyList());
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
-        try
+        try (OutputCapture ignored = new OutputCapture())
         {
             new ImportFileCommand().handle(new Namespace(args));
             fail("Should fail");
