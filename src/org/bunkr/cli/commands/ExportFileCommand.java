@@ -4,6 +4,7 @@ import org.bunkr.ArchiveInfoContext;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
 import org.bunkr.exceptions.CLIException;
+import org.bunkr.exceptions.IntegrityHashError;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.IFFTraversalTarget;
 import org.bunkr.inventory.InventoryPather;
@@ -49,27 +50,35 @@ public class ExportFileCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        PasswordProvider passProv = makePasswordProvider(args);
-        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
-        IFFTraversalTarget target = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
-        if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
-
-        FileInventoryItem targetFile = (FileInventoryItem) target;
-
-        File inputFile = args.get(ARG_DESTINATION_FILE);
-        boolean checkHash = (! args.getBoolean(ARG_IGNORE_INTEGRITY_CHECK));
-        if (inputFile.getPath().equals("-"))
+        try
         {
-            writeBlockFileToStream(aic, targetFile, System.out, checkHash);
-        }
-        else
-        {
-            if (inputFile.exists()) throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
-            FileChannel fc = new RandomAccessFile(inputFile, "rw").getChannel();
-            try(OutputStream contentOutputStream = Channels.newOutputStream(fc))
+            PasswordProvider passProv = makePasswordProvider(args);
+            ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+            IFFTraversalTarget target = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
+            if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
+
+            FileInventoryItem targetFile = (FileInventoryItem) target;
+
+            File inputFile = args.get(ARG_DESTINATION_FILE);
+            boolean checkHash = (!args.getBoolean(ARG_IGNORE_INTEGRITY_CHECK));
+            if (inputFile.getPath().equals("-"))
             {
-                writeBlockFileToStream(aic, targetFile, contentOutputStream, checkHash);
+                writeBlockFileToStream(aic, targetFile, System.out, checkHash);
             }
+            else
+            {
+                if (inputFile.exists())
+                    throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
+                FileChannel fc = new RandomAccessFile(inputFile, "rw").getChannel();
+                try (OutputStream contentOutputStream = Channels.newOutputStream(fc))
+                {
+                    writeBlockFileToStream(aic, targetFile, contentOutputStream, checkHash);
+                }
+            }
+        }
+        catch (IntegrityHashError e)
+        {
+            throw new CLIException(e);
         }
     }
 
