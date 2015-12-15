@@ -1,9 +1,14 @@
 package org.bunkr.streams.input;
 
+import org.bouncycastle.crypto.digests.GeneralDigest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bunkr.IO;
 import org.bunkr.MetadataWriter;
+import org.bunkr.exceptions.IntegrityHashError;
 import org.bunkr.fragmented_range.FragmentedRange;
 import org.bunkr.inventory.FileInventoryItem;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -22,9 +27,13 @@ public class BlockReaderInputStream extends InputStream
     private final long dataLength;
     private final byte[] buffer;
     private final FragmentedRange blocks;
+    private final GeneralDigest digest;
+    private final boolean checkHashOnClose;
+    private final byte[] expectedDigest;
 
     private long bytesConsumed;
     private int cursor;
+    private byte[] finishedDigest = null;
 
     public BlockReaderInputStream(File path, int blockSize, FileInventoryItem target)
     {
@@ -34,6 +43,9 @@ public class BlockReaderInputStream extends InputStream
         this.dataLength = target.getSizeOnDisk();
         this.blocks = target.getBlocks().copy();
         this.buffer = new byte[blockSize];
+        this.checkHashOnClose = true;
+        this.expectedDigest = target.getIntegrityHash();
+        this.digest = new SHA1Digest();
 
         long blockDataLength = ((long) blocks.size()) * blockSize;
         if (dataLength > blockDataLength)
@@ -120,6 +132,12 @@ public class BlockReaderInputStream extends InputStream
         super.close();
     }
 
+    public boolean doesHashMatch() throws IOException
+    {
+        if (finishedDigest == null) throw new IOException("Cannot check hash before entire file has been read or skipped");
+        return Arrays.equals(expectedDigest, finishedDigest);
+    }
+
     private void loadNextBlock() throws IOException
     {
         if (this.blocks.isEmpty()) throw new IOException("No more blocks to load");
@@ -132,9 +150,22 @@ public class BlockReaderInputStream extends InputStream
                 long position = DATABLOCKS_START + ((long) blockId) * blockSize;
                 ByteBuffer buf = fc.map(FileChannel.MapMode.READ_ONLY, position, blockSize);
                 buf.get(this.buffer);
+                digest.update(this.buffer, 0, this.buffer.length);
                 this.bytesConsumed += (blockSize - this.cursor);
                 this.cursor = 0;
             }
         }
+
+        if (this.blocks.isEmpty())
+        {
+            finishedDigest = new byte[digest.getDigestSize()];
+            digest.doFinal(finishedDigest, 0);
+            if (checkHashOnClose)
+            {
+                if (! this.doesHashMatch()) throw new IntegrityHashError("Integrity hash did not match!");
+            }
+        }
     }
+
+
 }

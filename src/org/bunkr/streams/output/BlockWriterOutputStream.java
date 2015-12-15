@@ -6,6 +6,7 @@ import org.bunkr.MetadataWriter;
 import org.bunkr.IBlockAllocationManager;
 import org.bunkr.inventory.FileInventoryItem;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,7 +23,7 @@ public class BlockWriterOutputStream extends OutputStream
     private final FileInventoryItem target;
     private final IBlockAllocationManager blockAllocMan;
     private final byte[] buffer;
-    private final GeneralDigest digest;
+    private final GeneralDigest digester;
 
     private int blockCursor;
     private long bytesWritten;
@@ -43,7 +44,7 @@ public class BlockWriterOutputStream extends OutputStream
         this.bytesWritten = 0;
         this.partiallyFlushed = false;
 
-        this.digest = new SHA1Digest();
+        this.digester = new SHA1Digest();
     }
 
     @Override
@@ -66,7 +67,10 @@ public class BlockWriterOutputStream extends OutputStream
         int srcCursor = 0;
         while(srcCursor < len)
         {
-            if (this.blockCursor == this.blockSize) this.flush();
+            if (this.blockCursor == this.blockSize)
+            {
+                this.flush();
+            }
             int readAmnt = Math.min(len - srcCursor, this.blockSize);
             readAmnt = Math.min(readAmnt, this.blockSize - this.blockCursor);
             System.arraycopy(b, off + srcCursor, this.buffer, this.blockCursor, readAmnt);
@@ -112,9 +116,9 @@ public class BlockWriterOutputStream extends OutputStream
             {
                 try(FileChannel fc = raf.getChannel())
                 {
-                    ByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, writePosition, this.blockSize);
-                    buf.put(this.buffer, 0, blockCursor);
-                    this.digest.update(this.buffer, 0, blockCursor);
+                    ByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, writePosition, buffer.length);
+                    buf.put(this.buffer, 0, this.buffer.length);
+                    this.digester.update(this.buffer, 0, buffer.length);
                 }
             }
             // reset the cursor
@@ -144,8 +148,8 @@ public class BlockWriterOutputStream extends OutputStream
         }
 
         // retrieve hash from digest
-        byte[] digest = new byte[this.digest.getDigestSize()];
-        this.digest.doFinal(digest, 0);
+        byte[] digest = new byte[this.digester.getDigestSize()];
+        this.digester.doFinal(digest, 0);
 
         // set attributes on output file
         target.setBlocks(this.blockAllocMan.getCurrentAllocation());

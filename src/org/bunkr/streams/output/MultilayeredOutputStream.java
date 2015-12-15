@@ -62,7 +62,7 @@ public class MultilayeredOutputStream extends OutputStream
         }
         if (context.getDescriptor().getCompression() != null)
         {
-            this.streams.push(new DeflaterOutputStream(this.streams.peek()));
+            this.streams.push(new DeflaterOutputStream(new NonClosableOutputStream(this.streams.peek())));
         }
     }
 

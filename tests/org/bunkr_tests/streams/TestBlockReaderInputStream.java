@@ -1,7 +1,10 @@
 package org.bunkr_tests.streams;
 
+import org.bouncycastle.crypto.digests.GeneralDigest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bunkr.IO;
 import org.bunkr.RandomMaker;
+import org.bunkr.exceptions.IntegrityHashError;
 import org.bunkr.fragmented_range.FragmentedRange;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.streams.input.BlockReaderInputStream;
@@ -19,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Creator: benmeier
@@ -26,8 +30,26 @@ import static org.junit.Assert.assertFalse;
  */
 public class TestBlockReaderInputStream
 {
+    public static final String content = "abababababababababababababababab" +
+            "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd" +
+            "efefefefefEfefefefefefefefefefef" +
+            "ghghghghghghghghghghghghghghghgh" +
+            "ijijijijijijijiji";
+
+    public static final String suffixPad = "xxxxxxxxxxxxxxx";
+    public static final String badSuffixPad = "yyyyyyyyyyyyyyy";
+
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
+
+    public byte[] hashUp(byte[] input)
+    {
+        GeneralDigest d = new SHA1Digest();
+        d.update(input, 0, input.length);
+        byte[] b = new byte[d.getDigestSize()];
+        d.doFinal(b, 0);
+        return b;
+    }
 
     public File buildFake() throws IOException
     {
@@ -35,11 +57,7 @@ public class TestBlockReaderInputStream
         try(DataOutputStream dos = new DataOutputStream(new FileOutputStream(f)))
         {
             dos.write(RandomMaker.get((int) BlockReaderInputStream.DATABLOCKS_START * 8));
-            dos.write("abababababababababababababababab".getBytes());
-            dos.write("cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd".getBytes());
-            dos.write("efefefefefEfefefefefefefefefefef".getBytes());
-            dos.write("ghghghghghghghghghghghghghghghgh".getBytes());
-            dos.write("ijijijijijijijijixxxxxxxxxxxxxxx".getBytes());
+            dos.write((content + suffixPad).getBytes());
         }
         return f;
     }
@@ -51,13 +69,29 @@ public class TestBlockReaderInputStream
         FileInventoryItem fakeFile = new FileInventoryItem("fake");
         fakeFile.setSizeOnDisk(32 * 4 + 17);
         fakeFile.setBlocks(new FragmentedRange(0, 5));
+        fakeFile.setIntegrityHash(this.hashUp((content + suffixPad).getBytes()));
         BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, fakeFile);
         String all = IO.readNByteString(bis, 32 * 4 + 17);
-        assertThat(all, is(equalTo("abababababababababababababababab" +
-                                           "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd" +
-                                           "efefefefefEfefefefefefefefefefef" +
-                                           "ghghghghghghghghghghghghghghghgh" +
-                                           "ijijijijijijijiji")));
+        assertThat(all, is(equalTo(content)));
+        assertTrue(bis.doesHashMatch());
+    }
+
+    @Test
+    public void testReadingBadHash() throws IOException
+    {
+        File f = buildFake();
+        FileInventoryItem fakeFile = new FileInventoryItem("fake");
+        fakeFile.setSizeOnDisk(32 * 4 + 17);
+        fakeFile.setBlocks(new FragmentedRange(0, 5));
+        fakeFile.setIntegrityHash(this.hashUp((content + badSuffixPad).getBytes()));
+        BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, fakeFile);
+        try
+        {
+            IO.readNByteString(bis, 32 * 4 + 17);
+            fail("Should have raised integrityhasherror");
+        }
+        catch (IntegrityHashError ignored) {}
+        assertFalse(bis.doesHashMatch());
     }
 
     @Test
@@ -67,6 +101,7 @@ public class TestBlockReaderInputStream
         FileInventoryItem fakeFile = new FileInventoryItem("fake");
         fakeFile.setSizeOnDisk(32 * 4 + 17);
         fakeFile.setBlocks(new FragmentedRange(0, 5));
+        fakeFile.setIntegrityHash(this.hashUp((content + suffixPad).getBytes()));
         BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, fakeFile);
         assertThat(bis.read(), is(equalTo(97)));
         assertThat(bis.read(), is(equalTo(98)));
@@ -85,6 +120,7 @@ public class TestBlockReaderInputStream
         FileInventoryItem fakeFile = new FileInventoryItem("fake");
         fakeFile.setSizeOnDisk(32 * 4 + 17);
         fakeFile.setBlocks(new FragmentedRange(0, 5));
+        fakeFile.setIntegrityHash(this.hashUp((content + suffixPad).getBytes()));
         BlockReaderInputStream bis = new BlockReaderInputStream(f, 32, fakeFile);
         assertThat(bis.read(), is(equalTo(97)));
         assertThat(bis.read(), is(equalTo(98)));
@@ -106,6 +142,7 @@ public class TestBlockReaderInputStream
             FileInventoryItem fakeFile = new FileInventoryItem("fake");
             fakeFile.setSizeOnDisk(32 * 10);
             fakeFile.setBlocks(new FragmentedRange(0, 5));
+            fakeFile.setIntegrityHash(this.hashUp((content + suffixPad).getBytes()));
             new BlockReaderInputStream(f, 32, fakeFile);
             fail("bad datalength");
         }
