@@ -18,15 +18,17 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     private long modifiedAt;
     private byte[] encryptionKey;
     private byte[] encryptionIV;
+    private byte[] integrityHash;
     private FragmentedRange blocks;
     private long actualSize;
     private Set<String> tags;
 
-    public FileInventoryItem(String name, UUID uuid, FragmentedRange blocks, long sizeOnDisk, long actualSize, long modifiedAt, byte[] encryptionKey, byte[] encryptionIV, HashSet<String> tags)
+    public FileInventoryItem(String name, UUID uuid, FragmentedRange blocks, long sizeOnDisk, long actualSize, long modifiedAt, byte[] encryptionKey, byte[] encryptionIV, byte[] integrityHash, HashSet<String> tags)
     {
         super(name, uuid);
         this.encryptionKey = encryptionKey;
         this.encryptionIV = encryptionIV;
+        this.integrityHash = integrityHash;
         this.sizeOnDisk = sizeOnDisk;
         this.actualSize = actualSize;
         this.modifiedAt = modifiedAt;
@@ -42,6 +44,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         this.modifiedAt = System.currentTimeMillis();
         this.encryptionKey = RandomMaker.get(256);
         this.encryptionIV = RandomMaker.get(256);
+        this.integrityHash = null;
         this.tags = new HashSet<>();
     }
 
@@ -73,6 +76,16 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     public void setEncryptionKey(byte[] encryptionKey)
     {
         this.encryptionKey = encryptionKey;
+    }
+
+    public byte[] getIntegrityHash()
+    {
+        return integrityHash;
+    }
+
+    public void setIntegrityHash(byte[] integrityHash)
+    {
+        this.integrityHash = integrityHash;
     }
 
     public long getModifiedAt()
