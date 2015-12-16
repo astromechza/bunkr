@@ -30,8 +30,8 @@ public class CLI
     public static final Map<String, ICLICommand> commands = new HashMap<>();
     static
     {
-        commands.put("checkpassword", new CheckPasswordCommand());
-        commands.put("changepassword", new ChangePasswordCommand());
+        commands.put("check-password", new CheckPasswordCommand());
+        commands.put("change-password", new ChangePasswordCommand());
         commands.put("create", new CreateCommand());
         commands.put("mkdir", new MkdirCommand());
         commands.put("rm", new RmCommand());
