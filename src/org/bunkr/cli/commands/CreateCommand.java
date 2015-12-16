@@ -47,7 +47,7 @@ public class CreateCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        PasswordProvider passProv = makePasswordProvider(args);
+        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
         passProv.getHashedArchivePassword();
 
         File archiveFile = args.get(CLI.ARG_ARCHIVE_PATH);

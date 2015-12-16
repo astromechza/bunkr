@@ -59,7 +59,7 @@ public class ImportFileCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        PasswordProvider passProv = makePasswordProvider(args);
+        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
         ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
 
         if (args.getString(ARG_PATH).equals("/")) throw new CLIException("Cannot import as /.");

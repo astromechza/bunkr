@@ -2,9 +2,7 @@ package org.bunkr.cli;
 
 import org.bunkr.Version;
 import org.bunkr.exceptions.BaseBunkrException;
-import org.bunkr.exceptions.CLIException;
 import org.bunkr.exceptions.IllegalPathException;
-import org.bunkr.exceptions.TraversalException;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -32,7 +30,8 @@ public class CLI
     public static final Map<String, ICLICommand> commands = new HashMap<>();
     static
     {
-        commands.put("auth", new AuthCommand());
+        commands.put("checkpassword", new CheckPasswordCommand());
+        commands.put("changepassword", new ChangePasswordCommand());
         commands.put("create", new CreateCommand());
         commands.put("mkdir", new MkdirCommand());
         commands.put("rm", new RmCommand());

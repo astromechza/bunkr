@@ -3,7 +3,7 @@ package org.bunkr_tests.cli.commands;
 import org.bunkr.ArchiveBuilder;
 import org.bunkr.RandomMaker;
 import org.bunkr.cli.CLI;
-import org.bunkr.cli.commands.AuthCommand;
+import org.bunkr.cli.commands.CheckPasswordCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.descriptor.CompressionDescriptor;
 import org.bunkr.descriptor.Descriptor;
@@ -30,7 +30,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Creator: benmeier
  * Created At: 2015-12-11
  */
-public class TestAuthCommand
+public class TestCheckPasswordCommand
 {
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
@@ -38,7 +38,7 @@ public class TestAuthCommand
     @Test
     public void testBuildParser()
     {
-        new AuthCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
+        new CheckPasswordCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class TestAuthCommand
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(CLI.ARG_PASSWORD_FILE, pwFile);
-        new AuthCommand().handle(new Namespace(args));
+        new CheckPasswordCommand().handle(new Namespace(args));
     }
 
 
@@ -85,7 +85,7 @@ public class TestAuthCommand
         args.put(CLI.ARG_PASSWORD_FILE, pwFile);
         try
         {
-            new AuthCommand().handle(new Namespace(args));
+            new CheckPasswordCommand().handle(new Namespace(args));
             fail("Should have raised an exception");
         }
         catch(CryptoException e)
@@ -107,6 +107,6 @@ public class TestAuthCommand
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
-        new AuthCommand().handle(new Namespace(args));
+        new CheckPasswordCommand().handle(new Namespace(args));
     }
 }
