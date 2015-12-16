@@ -1,4 +1,4 @@
-package org.bunkr;
+package org.bunkr.core;
 
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.descriptor.Descriptor;

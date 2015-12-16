@@ -1,7 +1,7 @@
 package org.bunkr_tests.cli.commands;
 
-import org.bunkr.ArchiveBuilder;
-import org.bunkr.RandomMaker;
+import org.bunkr.core.ArchiveBuilder;
+import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.CheckPasswordCommand;
 import org.bunkr.cli.passwords.PasswordProvider;

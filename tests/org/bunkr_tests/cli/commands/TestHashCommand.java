@@ -2,10 +2,10 @@ package org.bunkr_tests.cli.commands;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.bunkr.ArchiveBuilder;
-import org.bunkr.ArchiveInfoContext;
-import org.bunkr.MetadataWriter;
-import org.bunkr.RandomMaker;
+import org.bunkr.core.ArchiveBuilder;
+import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.MetadataWriter;
+import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.HashCommand;
 import org.bunkr.cli.passwords.PasswordProvider;

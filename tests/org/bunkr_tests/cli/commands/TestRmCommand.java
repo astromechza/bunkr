@@ -1,8 +1,8 @@
 package org.bunkr_tests.cli.commands;
 
-import org.bunkr.ArchiveBuilder;
-import org.bunkr.ArchiveInfoContext;
-import org.bunkr.MetadataWriter;
+import org.bunkr.core.ArchiveBuilder;
+import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.RmCommand;
 import org.bunkr.cli.passwords.PasswordProvider;

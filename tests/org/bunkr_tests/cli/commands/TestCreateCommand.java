@@ -1,6 +1,6 @@
 package org.bunkr_tests.cli.commands;
 
-import org.bunkr.ArchiveInfoContext;
+import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.CreateCommand;
 import org.bunkr.cli.passwords.PasswordProvider;

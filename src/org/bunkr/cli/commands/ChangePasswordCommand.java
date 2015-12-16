@@ -3,8 +3,8 @@ package org.bunkr.cli.commands;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bunkr.ArchiveInfoContext;
-import org.bunkr.MetadataWriter;
+import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.passwords.PasswordProvider;
 

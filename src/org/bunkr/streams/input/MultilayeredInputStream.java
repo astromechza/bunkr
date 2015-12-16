@@ -1,7 +1,7 @@
 package org.bunkr.streams.input;
 
-import org.bunkr.ArchiveInfoContext;
-import org.bunkr.ArrayStack;
+import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.utils.ArrayStack;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;

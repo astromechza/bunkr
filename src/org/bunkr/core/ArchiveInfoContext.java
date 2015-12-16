@@ -1,5 +1,7 @@
-package org.bunkr;
+package org.bunkr.core;
 
+import org.bunkr.utils.IO;
+import org.bunkr.utils.SimpleAES;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.descriptor.Descriptor;
 import org.bunkr.descriptor.DescriptorJSON;

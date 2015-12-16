@@ -1,6 +1,6 @@
 package org.bunkr.inventory;
 
-import org.bunkr.RandomMaker;
+import org.bunkr.utils.RandomMaker;
 import org.bunkr.fragmented_range.FragmentedRange;
 
 import java.util.Date;

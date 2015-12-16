@@ -1,4 +1,4 @@
-package org.bunkr;
+package org.bunkr.core;
 
 import org.bunkr.fragmented_range.FragmentedRange;
 import org.bunkr.inventory.FileInventoryItem;

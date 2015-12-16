@@ -1,8 +1,8 @@
 package org.bunkr.cli.commands;
 
-import org.bunkr.AbortableShutdownHook;
-import org.bunkr.ArchiveInfoContext;
-import org.bunkr.MetadataWriter;
+import org.bunkr.utils.AbortableShutdownHook;
+import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.ProgressBar;

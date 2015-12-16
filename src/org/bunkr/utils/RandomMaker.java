@@ -1,4 +1,4 @@
-package org.bunkr;
+package org.bunkr.utils;
 
 import java.security.SecureRandom;
 

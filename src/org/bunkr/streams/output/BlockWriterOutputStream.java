@@ -2,8 +2,8 @@ package org.bunkr.streams.output;
 
 import org.bouncycastle.crypto.digests.GeneralDigest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bunkr.MetadataWriter;
-import org.bunkr.IBlockAllocationManager;
+import org.bunkr.core.MetadataWriter;
+import org.bunkr.core.IBlockAllocationManager;
 import org.bunkr.inventory.FileInventoryItem;
 
 import java.io.File;

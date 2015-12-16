@@ -1,6 +1,6 @@
 package org.bunkr.cli.commands;
 
-import org.bunkr.ArchiveBuilder;
+import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.descriptor.CompressionDescriptor;

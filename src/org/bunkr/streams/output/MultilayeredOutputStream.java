@@ -1,9 +1,9 @@
 package org.bunkr.streams.output;
 
-import org.bunkr.ArchiveInfoContext;
-import org.bunkr.BlockAllocationManager;
-import org.bunkr.ArrayStack;
-import org.bunkr.RandomMaker;
+import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.BlockAllocationManager;
+import org.bunkr.utils.ArrayStack;
+import org.bunkr.utils.RandomMaker;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;

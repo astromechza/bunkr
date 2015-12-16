@@ -1,7 +1,7 @@
 package org.bunkr_tests;
 
-import org.bunkr.RandomMaker;
-import org.bunkr.SimpleAES;
+import org.bunkr.utils.RandomMaker;
+import org.bunkr.utils.SimpleAES;
 import org.bouncycastle.crypto.CryptoException;
 import org.junit.Test;
 

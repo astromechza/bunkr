@@ -1,9 +1,9 @@
 package org.bunkr_tests.scenarios;
 
-import org.bunkr.ArchiveBuilder;
-import org.bunkr.ArchiveInfoContext;
-import org.bunkr.IO;
-import org.bunkr.MetadataWriter;
+import org.bunkr.core.ArchiveBuilder;
+import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.utils.IO;
+import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.descriptor.CompressionDescriptor;
 import org.bunkr.descriptor.Descriptor;

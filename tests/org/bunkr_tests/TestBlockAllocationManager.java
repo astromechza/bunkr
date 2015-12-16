@@ -1,6 +1,6 @@
 package org.bunkr_tests;
 
-import org.bunkr.BlockAllocationManager;
+import org.bunkr.core.BlockAllocationManager;
 import org.bunkr.fragmented_range.FragmentedRange;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.Inventory;

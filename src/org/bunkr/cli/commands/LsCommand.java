@@ -1,6 +1,6 @@
 package org.bunkr.cli.commands;
 
-import org.bunkr.ArchiveInfoContext;
+import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.Formatters;
 import org.bunkr.cli.TabularLayout;

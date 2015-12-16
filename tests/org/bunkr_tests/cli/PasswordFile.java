@@ -1,6 +1,6 @@
 package org.bunkr_tests.cli;
 
-import org.bunkr.RandomMaker;
+import org.bunkr.utils.RandomMaker;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;

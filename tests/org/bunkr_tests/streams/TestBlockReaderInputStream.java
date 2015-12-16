@@ -2,8 +2,8 @@ package org.bunkr_tests.streams;
 
 import org.bouncycastle.crypto.digests.GeneralDigest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bunkr.IO;
-import org.bunkr.RandomMaker;
+import org.bunkr.utils.IO;
+import org.bunkr.utils.RandomMaker;
 import org.bunkr.exceptions.IntegrityHashError;
 import org.bunkr.fragmented_range.FragmentedRange;
 import org.bunkr.inventory.FileInventoryItem;

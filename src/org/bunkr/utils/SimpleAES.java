@@ -1,4 +1,4 @@
-package org.bunkr;
+package org.bunkr.utils;
 
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.engines.AESEngine;

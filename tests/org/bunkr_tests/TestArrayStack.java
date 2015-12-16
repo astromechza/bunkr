@@ -1,6 +1,6 @@
 package org.bunkr_tests;
 
-import org.bunkr.ArrayStack;
+import org.bunkr.utils.ArrayStack;
 import org.junit.Test;
 
 import java.util.ArrayList;

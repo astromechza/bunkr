@@ -1,6 +1,6 @@
 package org.bunkr.descriptor;
 
-import org.bunkr.RandomMaker;
+import org.bunkr.utils.RandomMaker;
 
 /**
  * Creator: benmeier
