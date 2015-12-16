@@ -14,6 +14,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 /**
@@ -54,7 +55,7 @@ public class MultilayeredOutputStream extends OutputStream
 
         if (context.getDescriptor().hasCompression())
         {
-            this.topstream = new DeflaterOutputStream(this.topstream);
+            this.topstream = new DeflaterOutputStream(this.topstream, new Deflater(Deflater.BEST_SPEED));
         }
     }
 
