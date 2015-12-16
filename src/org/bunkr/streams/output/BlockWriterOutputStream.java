@@ -6,10 +6,7 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.IBlockAllocationManager;
 import org.bunkr.inventory.FileInventoryItem;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.SecureRandom;
@@ -17,22 +14,25 @@ import java.util.Arrays;
 
 public class BlockWriterOutputStream extends OutputStream
 {
-    private final File filePath;
     private final int blockSize;
     private final FileInventoryItem target;
     private final IBlockAllocationManager blockAllocMan;
     private final byte[] buffer;
     private final GeneralDigest digester;
+    private final RandomAccessFile inputFile;
+    private final FileChannel inputFileChannel;
 
+    private ByteBuffer copyBuf;
     private int blockCursor;
     private long bytesWritten;
     private boolean partiallyFlushed;
 
 
     public BlockWriterOutputStream(File path, int blockSize, FileInventoryItem target, IBlockAllocationManager blockAllocMan)
+
+            throws FileNotFoundException
     {
         super();
-        this.filePath = path;
         this.blockSize = blockSize;
         this.target = target;
         this.blockAllocMan = blockAllocMan;
@@ -43,6 +43,8 @@ public class BlockWriterOutputStream extends OutputStream
         this.bytesWritten = 0;
         this.partiallyFlushed = false;
 
+        this.inputFile = new RandomAccessFile(path, "rw");
+        this.inputFileChannel = this.inputFile.getChannel();
         this.digester = new SHA1Digest();
     }
 
@@ -111,15 +113,10 @@ public class BlockWriterOutputStream extends OutputStream
             long writePosition = blockId * this.blockSize + MetadataWriter.DBL_DATA_POS + Long.BYTES;
 
             // open up the file and write it!
-            try(RandomAccessFile raf = new RandomAccessFile(this.filePath, "rw"))
-            {
-                try(FileChannel fc = raf.getChannel())
-                {
-                    ByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, writePosition, buffer.length);
-                    buf.put(this.buffer, 0, this.buffer.length);
-                    this.digester.update(this.buffer, 0, buffer.length);
-                }
-            }
+            this.copyBuf = this.inputFileChannel.map(FileChannel.MapMode.READ_WRITE, writePosition, buffer.length);
+            this.copyBuf.put(this.buffer, 0, this.buffer.length);
+            this.digester.update(this.buffer, 0, buffer.length);
+
             // reset the cursor
             this.blockCursor = 0;
         }
@@ -137,14 +134,11 @@ public class BlockWriterOutputStream extends OutputStream
         // now because we've written new data to the file, we need to update the block data length
         // by opening the file and inserting the data back at the beginning of the file.
         long newDataBlocksLength = this.blockAllocMan.getTotalBlocks() * this.blockSize;
-        try(RandomAccessFile raf = new RandomAccessFile(this.filePath, "rw"))
-        {
-            try (FileChannel fc = raf.getChannel())
-            {
-                ByteBuffer buf = fc.map(FileChannel.MapMode.READ_WRITE, MetadataWriter.DBL_DATA_POS, Long.BYTES);
-                buf.putLong(newDataBlocksLength);
-            }
-        }
+        this.copyBuf = this.inputFileChannel.map(FileChannel.MapMode.READ_WRITE, MetadataWriter.DBL_DATA_POS, Long.BYTES);
+        this.copyBuf.putLong(newDataBlocksLength);
+
+        this.inputFileChannel.close();
+        this.inputFile.close();
 
         // retrieve hash from digest
         byte[] digest = new byte[this.digester.getDigestSize()];

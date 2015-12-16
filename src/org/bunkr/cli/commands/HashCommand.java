@@ -64,7 +64,7 @@ public class HashCommand implements ICLICommand
         digest.reset();
         try (MultilayeredInputStream ms = new MultilayeredInputStream(context, target))
         {
-            byte[] buffer = new byte[8196];
+            byte[] buffer = new byte[1024 * 1024];
             int n;
             while ((n = ms.read(buffer)) != -1)
             {

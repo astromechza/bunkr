@@ -125,19 +125,16 @@ public class ImportFileCommand implements ICLICommand
     {
         ProgressBar pb = new ProgressBar(80, expectedBytes, "Importing file: ");
 
-        try(BufferedInputStream bufferedInput = new BufferedInputStream(is))
+        try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))
         {
-            try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))
+            byte[] buffer = new byte[1024 * 1024];
+            int n;
+            while ((n = is.read(buffer)) != -1)
             {
-                byte[] buffer = new byte[8192];
-                int n;
-                while ((n = bufferedInput.read(buffer)) != -1)
-                {
-                    bwos.write(buffer, 0, n);
-                    pb.inc(n);
-                }
-                Arrays.fill(buffer, (byte) 0);
+                bwos.write(buffer, 0, n);
+                pb.inc(n);
             }
+            Arrays.fill(buffer, (byte) 0);
         }
 
         pb.finish();

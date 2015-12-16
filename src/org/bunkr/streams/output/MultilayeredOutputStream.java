@@ -12,6 +12,7 @@ import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -26,10 +27,12 @@ public class MultilayeredOutputStream extends OutputStream
     private final FileInventoryItem target;
 
     private final ArrayStack<OutputStream> streams = new ArrayStack<>();
+    private final OutputStream topstream;
 
     private long writtenBytes = 0;
 
     public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target, boolean refreshKeys)
+            throws FileNotFoundException
     {
         this.target = target;
         this.streams.push(
@@ -64,9 +67,11 @@ public class MultilayeredOutputStream extends OutputStream
         {
             this.streams.push(new DeflaterOutputStream(new NonClosableOutputStream(this.streams.peek())));
         }
+
+        topstream = this.streams.peek();
     }
 
-    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target)
+    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws FileNotFoundException
     {
         this(context, target, true);
     }
@@ -74,21 +79,21 @@ public class MultilayeredOutputStream extends OutputStream
     @Override
     public void write(int b) throws IOException
     {
-        this.streams.peek().write(b);
+        this.topstream.write(b);
         writtenBytes += 1;
     }
 
     @Override
     public void write(byte[] b) throws IOException
     {
-        this.streams.peek().write(b);
+        this.topstream.write(b);
         writtenBytes += b.length;
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException
     {
-        this.streams.peek().write(b, off, len);
+        this.topstream.write(b, off, len);
         writtenBytes += len;
     }
 

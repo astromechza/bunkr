@@ -7,6 +7,7 @@ import org.bunkr.core.IArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.descriptor.Descriptor;
 import org.bunkr.descriptor.DescriptorJSON;
+import org.bunkr.fragmented_range.FragmentedRange;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.FolderInventoryItem;
 import org.bunkr.inventory.Inventory;
@@ -32,6 +33,16 @@ public class TestWriteScenarios
 {
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
+
+    public long updiv(long n, long d)
+    {
+        return (long) Math.ceil(n / (float) d);
+    }
+
+    public long upround(long n, long d)
+    {
+        return updiv(n, d) * d;
+    }
 
     @Test
     public void testEmptyArchive() throws Exception
@@ -109,12 +120,14 @@ public class TestWriteScenarios
             assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
+            FragmentedRange expected = new FragmentedRange(0, 4096 / ArchiveBuilder.DEFAULT_BLOCK_SIZE);
+
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);
             assertEquals(inventory.getFiles().size(), 1);
             assertEquals(inventory.getFolders().size(), 0);
             assertEquals(inventory.getFiles().get(0).getName(), "some file.txt");
-            assertEquals(inventory.getFiles().get(0).getBlocks().toString(), "FragmentedRange{0,1,2,3,}");
+            assertEquals(inventory.getFiles().get(0).getBlocks().toString(), expected.toString());
             assertEquals(inventory.getFiles().get(0).getUuid(), newFile.getUuid());
             assertEquals(inventory.getFiles().get(0).getSizeOnDisk(), newFile.getSizeOnDisk());
             assertEquals(inventory.getFiles().get(0).getModifiedAt(), newFile.getModifiedAt());
@@ -168,15 +181,15 @@ public class TestWriteScenarios
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 1);
             assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
-            assertEquals(dis.readLong(), 5120);
-            byte[] data = new byte[4096];
-            assertEquals(dis.read(data), 4096);
+            assertEquals(dis.readLong(), upround(3333, ArchiveBuilder.DEFAULT_BLOCK_SIZE) + upround(50, ArchiveBuilder.DEFAULT_BLOCK_SIZE));
+            byte[] data = new byte[(int) upround(3333, ArchiveBuilder.DEFAULT_BLOCK_SIZE)];
+            assertEquals(dis.read(data), data.length);
             for (int i = 0; i < 3333; i++)
             {
                 assertEquals(data[i], (65 + i % 26));
             }
-            data = new byte[1024];
-            assertEquals(dis.read(data), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
+            data = new byte[ArchiveBuilder.DEFAULT_BLOCK_SIZE];
+            assertEquals(dis.read(data), data.length);
             for (int i = 0; i < 50; i++)
             {
                 assertEquals(data[i], (65 + i % 26));
@@ -243,7 +256,7 @@ public class TestWriteScenarios
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 0);
             assertEquals(dis.read(), 1);
-            assertEquals(dis.readInt(), 1024);
+            assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             assertEquals(dis.readLong(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());

@@ -88,7 +88,7 @@ public class ExportFileCommand implements ICLICommand
         try (MultilayeredInputStream ms = new MultilayeredInputStream(ctxt, targetFile))
         {
             ms.setCheckHashOnFinish(checkHash);
-            byte[] buffer = new byte[8196];
+            byte[] buffer = new byte[1024 * 1024];
             int n;
             while ((n = ms.read(buffer)) != -1)
             {
