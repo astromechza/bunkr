@@ -2,7 +2,6 @@ package org.bunkr.streams.output;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.BlockAllocationManager;
-import org.bunkr.utils.ArrayStack;
 import org.bunkr.utils.RandomMaker;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -15,7 +14,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.zip.DeflaterOutputStream;
 
 /**
@@ -26,23 +24,20 @@ public class MultilayeredOutputStream extends OutputStream
 {
     private final FileInventoryItem target;
 
-    private final ArrayStack<OutputStream> streams = new ArrayStack<>();
-    private final OutputStream topstream;
-
+    private OutputStream topstream;
     private long writtenBytes = 0;
 
     public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target, boolean refreshKeys)
             throws FileNotFoundException
     {
         this.target = target;
-        this.streams.push(
-            new BlockWriterOutputStream(
+        this.topstream = new BlockWriterOutputStream(
                     context.filePath,
                     context.getBlockSize(),
                     target,
                     new BlockAllocationManager(context.getInventory(), target.getBlocks())
-            )
         );
+
         if (context.getDescriptor().hasEncryption())
         {
             if (refreshKeys)
@@ -52,23 +47,15 @@ public class MultilayeredOutputStream extends OutputStream
             }
 
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
-            fileCipher.init(
-                    true,
-                    new ParametersWithIV(new KeyParameter(target.getEncryptionKey()), target.getEncryptionIV())
-            );
-            this.streams.push(
-                new CipherOutputStream(
-                        new NonClosableOutputStream(this.streams.peek()),
-                        new BufferedBlockCipher(fileCipher)
-                )
-            );
-        }
-        if (context.getDescriptor().hasCompression())
-        {
-            this.streams.push(new DeflaterOutputStream(new NonClosableOutputStream(this.streams.peek())));
+            ParametersWithIV keyparams = new ParametersWithIV(new KeyParameter(target.getEncryptionKey()), target.getEncryptionIV());
+            fileCipher.init(true, keyparams);
+            this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
         }
 
-        topstream = this.streams.peek();
+        if (context.getDescriptor().hasCompression())
+        {
+            this.topstream = new DeflaterOutputStream(this.topstream);
+        }
     }
 
     public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws FileNotFoundException
@@ -100,15 +87,13 @@ public class MultilayeredOutputStream extends OutputStream
     @Override
     public void flush() throws IOException
     {
-        Iterator<OutputStream> i = this.streams.topToBottom();
-        while(i.hasNext()) i.next().flush();
+        this.topstream.flush();
     }
 
     @Override
     public void close() throws IOException
     {
-        Iterator<OutputStream> i = this.streams.topToBottom();
-        while(i.hasNext()) i.next().close();
+        this.topstream.close();
         target.setActualSize(this.writtenBytes);
     }
 }

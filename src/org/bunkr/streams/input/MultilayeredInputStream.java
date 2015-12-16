@@ -1,7 +1,6 @@
 package org.bunkr.streams.input;
 
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.utils.ArrayStack;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -12,7 +11,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.zip.InflaterInputStream;
 
 /**
@@ -22,16 +20,17 @@ import java.util.zip.InflaterInputStream;
 public class MultilayeredInputStream extends InputStream
 {
     private final BlockReaderInputStream baseStream;
-    private final ArrayStack<InputStream> streams = new ArrayStack<>();
-
     private final boolean emptyFile;
+
+    private InputStream topstream;
 
     public MultilayeredInputStream(ArchiveInfoContext context, FileInventoryItem target)
     {
         this.emptyFile = target.getActualSize() == 0;
 
         this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
-        this.streams.push(this.baseStream);
+        this.topstream = this.baseStream;
+
         if (context.getDescriptor().hasEncryption())
         {
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
@@ -40,16 +39,12 @@ public class MultilayeredInputStream extends InputStream
                     new ParametersWithIV(new KeyParameter(target.getEncryptionKey()), target.getEncryptionIV())
             );
 
-            this.streams.push(
-                new CipherInputStream(
-                    new NonClosableInputStream(this.streams.peek()),
-                    new BufferedBlockCipher(fileCipher)
-                )
-            );
+            this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
         }
+
         if (context.getDescriptor().hasCompression())
         {
-            this.streams.push(new InflaterInputStream(this.streams.peek()));
+            this.topstream = new InflaterInputStream(this.topstream);
         }
     }
 
@@ -60,41 +55,40 @@ public class MultilayeredInputStream extends InputStream
      */
     public int available() throws IOException
     {
-        return this.streams.peek().available();
+        return this.topstream.available();
     }
 
     @Override
     public long skip(long n) throws IOException
     {
-        return this.streams.peek().skip(n);
+        return this.topstream.skip(n);
     }
 
     @Override
     public int read() throws IOException
     {
         if(this.emptyFile) return -1;
-        return this.streams.peek().read();
+        return this.topstream.read();
     }
 
     @Override
     public int read(byte[] b) throws IOException
     {
         if(this.emptyFile) return -1;
-        return this.streams.peek().read(b);
+        return this.topstream.read(b);
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException
     {
         if(this.emptyFile) return -1;
-        return this.streams.peek().read(b, off, len);
+        return this.topstream.read(b, off, len);
     }
 
     @Override
     public void close() throws IOException
     {
-        Iterator<InputStream> i = this.streams.topToBottom();
-        while(i.hasNext())  i.next().close();
+        topstream.close();
     }
 
     @Override
