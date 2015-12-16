@@ -31,4 +31,14 @@ public class Descriptor
     {
         return encryption;
     }
+
+    public boolean hasEncryption()
+    {
+        return this.encryption != null;
+    }
+
+    public boolean hasCompression()
+    {
+        return this.compression != null;
+    }
 }

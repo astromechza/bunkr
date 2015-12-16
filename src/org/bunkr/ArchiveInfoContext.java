@@ -45,11 +45,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                 String descjson = IO.readString(dis);
                 this.descriptor = DescriptorJSON.decode(descjson);
 
-                if (this.descriptor.getEncryption() == null)
-                {
-                    this.inventory = InventoryJSON.decode(IO.readString(dis));
-                }
-                else
+                if (this.descriptor.hasEncryption())
                 {
                     int l = dis.readInt();
                     byte[] encryptedInventory = new byte[l];
@@ -70,6 +66,10 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                     );
 
                     this.inventory = InventoryJSON.decode(new String(decryptedInv));
+                }
+                else
+                {
+                    this.inventory = InventoryJSON.decode(IO.readString(dis));
                 }
             }
         }

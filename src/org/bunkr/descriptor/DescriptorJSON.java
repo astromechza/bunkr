@@ -13,14 +13,14 @@ public class DescriptorJSON
     public static String encode(Descriptor input)
     {
         JSONObject out = new JSONObject();
-        if (input.getEncryption() == null)
-            out.put("encryption", null);
-        else
+        if (input.hasEncryption())
             out.put("encryption", EncryptionDescriptorJSON.encodeO(input.getEncryption()));
-        if (input.getCompression() == null)
-            out.put("compression", null);
         else
+            out.put("encryption", null);
+        if (input.hasCompression())
             out.put("compression", CompressionDescriptorJSON.encodeO(input.getCompression()));
+        else
+            out.put("compression", null);
         return out.toJSONString();
     }
 

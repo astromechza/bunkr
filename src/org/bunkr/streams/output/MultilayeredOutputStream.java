@@ -40,7 +40,7 @@ public class MultilayeredOutputStream extends OutputStream
                     new BlockAllocationManager(context.getInventory(), target.getBlocks())
             )
         );
-        if (context.getDescriptor().getEncryption() != null)
+        if (context.getDescriptor().hasEncryption())
         {
             if (refreshKeys)
             {
@@ -60,7 +60,7 @@ public class MultilayeredOutputStream extends OutputStream
                 )
             );
         }
-        if (context.getDescriptor().getCompression() != null)
+        if (context.getDescriptor().hasCompression())
         {
             this.streams.push(new DeflaterOutputStream(new NonClosableOutputStream(this.streams.peek())));
         }

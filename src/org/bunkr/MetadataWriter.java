@@ -42,7 +42,7 @@ public class MetadataWriter
                 byte[] inventoryJsonBytes = InventoryJSON.encode(inventory).getBytes();
                 byte[] descriptorJsonBytes = DescriptorJSON.encode(descriptor).getBytes();
 
-                if (descriptor.getEncryption() != null)
+                if (descriptor.hasEncryption())
                 {
                     // otherwise, do encryption
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();

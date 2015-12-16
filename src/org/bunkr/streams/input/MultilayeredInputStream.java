@@ -32,7 +32,7 @@ public class MultilayeredInputStream extends InputStream
 
         this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
         this.streams.push(this.baseStream);
-        if (context.getDescriptor().getEncryption() != null)
+        if (context.getDescriptor().hasEncryption())
         {
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
             fileCipher.init(
@@ -47,7 +47,7 @@ public class MultilayeredInputStream extends InputStream
                 )
             );
         }
-        if (context.getDescriptor().getCompression() != null)
+        if (context.getDescriptor().hasCompression())
         {
             this.streams.push(new InflaterInputStream(this.streams.peek()));
         }
