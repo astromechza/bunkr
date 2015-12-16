@@ -14,7 +14,7 @@ public class CLIException extends BaseBunkrException
         super(e);
     }
 
-    public CLIException(String message, String... args)
+    public CLIException(String message, Object... args)
     {
         super(message, args);
     }

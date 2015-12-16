@@ -3,7 +3,7 @@ package org.bunkr.cli.commands;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.passwords.CLIPasswordPrompt;
-import org.bunkr.exceptions.CLIException;
+import org.bunkr.exceptions.BaseBunkrException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
@@ -19,7 +19,7 @@ public interface ICLICommand
     void buildParser(Subparser target);
     void handle(Namespace args) throws Exception;
 
-    default PasswordProvider makePasswordProvider(Namespace args) throws IOException, CLIException
+    default PasswordProvider makePasswordProvider(Namespace args) throws IOException, BaseBunkrException
     {
         PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
         File f = args.get(CLI.ARG_PASSWORD_FILE);

@@ -12,13 +12,10 @@ import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.streams.input.MultilayeredInputStream;
 import org.bunkr.streams.output.MultilayeredOutputStream;
 import org.bunkr_tests.XTemporaryFolder;
-import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,7 +30,7 @@ public class TestReadScenarios
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
 
-    private void runThreeFileTestOnContext(ArchiveInfoContext context, PasswordProvider uic) throws IOException, CryptoException
+    private void runThreeFileTestOnContext(ArchiveInfoContext context, PasswordProvider uic) throws Exception
     {
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         fileOne.addTag("something");
@@ -96,11 +93,11 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingPlain() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void testReadingPlain() throws Exception
     {
         File tempfile = folder.newPrefixedFile("plain");
         PasswordProvider prov = new PasswordProvider();
-        prov.setArchivePassword("Hunter2".getBytes());
+        prov.setArchivePassword("HunterTwo".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), prov);
@@ -109,11 +106,11 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingWithCompression() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void testReadingWithCompression() throws Exception
     {
         File tempfile = folder.newPrefixedFile("withcompres");
         PasswordProvider prov = new PasswordProvider();
-        prov.setArchivePassword("Hunter2".getBytes());
+        prov.setArchivePassword("HunterTwo".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, CompressionDescriptor.makeDefaults()), prov);
@@ -122,11 +119,11 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingWithEncryption() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void testReadingWithEncryption() throws Exception
     {
         File tempfile = folder.newPrefixedFile("withencrypt");
         PasswordProvider prov = new PasswordProvider();
-        prov.setArchivePassword("Hunter2".getBytes());
+        prov.setArchivePassword("HunterTwo".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults(), null), prov);
@@ -135,11 +132,11 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingWithCompressionAndEncryption() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void testReadingWithCompressionAndEncryption() throws Exception
     {
         File tempfile = folder.newPrefixedFile("withboth");
         PasswordProvider prov = new PasswordProvider();
-        prov.setArchivePassword("Hunter2".getBytes());
+        prov.setArchivePassword("HunterTwo".getBytes());
 
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults(), CompressionDescriptor.makeDefaults()), prov);

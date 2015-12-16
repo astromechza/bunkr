@@ -6,6 +6,7 @@ import org.bunkr.MetadataWriter;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.ProgressBar;
+import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.IFFContainer;
@@ -161,7 +162,7 @@ public class ImportFileCommand implements ICLICommand
                 System.err.println("Performing emergency metadata write for recovery");
                 MetadataWriter.write(this.context, this.prov);
             }
-            catch (CryptoException | IOException e)
+            catch (CryptoException | IOException | BaseBunkrException e)
             {
                 e.printStackTrace();
             }

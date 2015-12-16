@@ -3,6 +3,8 @@ package org.bunkr;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.descriptor.Descriptor;
 import org.bunkr.descriptor.DescriptorJSON;
+import org.bunkr.exceptions.BaseBunkrException;
+import org.bunkr.exceptions.IllegalPasswordException;
 import org.bunkr.inventory.Inventory;
 import org.bunkr.inventory.InventoryJSON;
 import org.bouncycastle.crypto.CryptoException;
@@ -21,14 +23,15 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     private long blockDataLength;
     private boolean fresh = false;
 
-    public ArchiveInfoContext(File filePath, PasswordProvider uic) throws IOException, CryptoException
+    public ArchiveInfoContext(File filePath, PasswordProvider uic) throws IOException, CryptoException,
+            BaseBunkrException
     {
         this.filePath = filePath;
         this.refresh(uic);
     }
 
     @Override
-    public void refresh(PasswordProvider uic) throws IOException, CryptoException
+    public void refresh(PasswordProvider uic) throws IOException, CryptoException, IllegalPasswordException
     {
         try(FileInputStream fis = new FileInputStream(this.filePath))
         {

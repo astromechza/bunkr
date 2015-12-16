@@ -3,6 +3,7 @@ package org.bunkr;
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.descriptor.Descriptor;
 import org.bunkr.descriptor.DescriptorJSON;
+import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.inventory.Inventory;
 import org.bunkr.inventory.InventoryJSON;
 import org.bouncycastle.crypto.CryptoException;
@@ -27,13 +28,13 @@ public class MetadataWriter
             Integer.BYTES
     );
 
-    public static void write(ArchiveInfoContext context, PasswordProvider uic) throws IOException, CryptoException
+    public static void write(ArchiveInfoContext context, PasswordProvider uic) throws IOException, CryptoException, BaseBunkrException
     {
         write(context.filePath, context.getInventory(), context.getDescriptor(), uic, context.getBlockSize());
     }
 
     public static void write(File filePath, Inventory inventory, Descriptor descriptor, PasswordProvider uic, int blockSize)
-            throws IOException, CryptoException
+            throws IOException, CryptoException, BaseBunkrException
     {
         try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"))
         {

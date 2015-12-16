@@ -2,6 +2,7 @@ package org.bunkr;
 
 import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.descriptor.Descriptor;
+import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
 
@@ -19,7 +20,7 @@ public class ArchiveBuilder
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
     public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor, PasswordProvider uic)
-            throws IOException, CryptoException
+            throws IOException, CryptoException, BaseBunkrException
     {
         Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>());
 

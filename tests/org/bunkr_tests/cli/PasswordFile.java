@@ -17,11 +17,11 @@ public class PasswordFile
 {
     public static File genPasswordFile(File dest, byte[] content) throws IOException
     {
-        if (content == null) content = DatatypeConverter.printHexBinary(RandomMaker.get(64)).getBytes();
+        String password = DatatypeConverter.printBase64Binary(RandomMaker.get(100));
+        if (content == null) content = password.getBytes();
         try(BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest)))
         {
             bos.write(content);
-            bos.write('\n');
         }
         Set<PosixFilePermission> permissions = new HashSet<>();
         permissions.add(PosixFilePermission.OWNER_READ);

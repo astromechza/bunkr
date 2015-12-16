@@ -14,12 +14,10 @@ import org.bunkr_tests.XTemporaryFolder;
 import org.bunkr_tests.cli.OutputCapture;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +38,7 @@ public class TestLsCommand
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
 
-    public ArchiveInfoContext buildSampleArchive() throws IOException, CryptoException
+    public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder

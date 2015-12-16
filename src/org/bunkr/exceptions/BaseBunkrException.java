@@ -6,7 +6,7 @@ package org.bunkr.exceptions;
  */
 public class BaseBunkrException extends Exception
 {
-    public BaseBunkrException(String message, String... args)
+    public BaseBunkrException(String message, Object... args)
     {
         super(String.format(message, args));
     }

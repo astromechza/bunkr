@@ -100,11 +100,12 @@ public class TestCreateCommand
     @Test
     public void createNewArchiveWithoutEncryption() throws Exception
     {
+        File pwFile = PasswordFile.genPasswordFile(folder.newFilePath());
         File archiveFile = folder.newFilePath();
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
-        args.put(CLI.ARG_PASSWORD_FILE, new File("-"));
+        args.put(CLI.ARG_PASSWORD_FILE, pwFile);
         args.put(CreateCommand.ARG_OVERWRITE, false);
         args.put(CreateCommand.ARG_NOCOMPRESSION, false);
         args.put(CreateCommand.ARG_NOENCRYPTION, true);

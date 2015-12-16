@@ -2,6 +2,7 @@ package org.bunkr;
 
 import org.bunkr.descriptor.Descriptor;
 import org.bunkr.cli.passwords.PasswordProvider;
+import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
  */
 public interface IArchiveInfoContext
 {
-    void refresh(PasswordProvider uic) throws IOException, CryptoException;
+    void refresh(PasswordProvider uic) throws IOException, CryptoException, BaseBunkrException;
 
     boolean isFresh();
 

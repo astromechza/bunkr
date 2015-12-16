@@ -48,6 +48,8 @@ public class CreateCommand implements ICLICommand
     public void handle(Namespace args) throws Exception
     {
         PasswordProvider passProv = makePasswordProvider(args);
+        passProv.getHashedArchivePassword();
+
         File archiveFile = args.get(CLI.ARG_ARCHIVE_PATH);
         if (archiveFile.exists() && !args.getBoolean(ARG_OVERWRITE))
             throw new CLIException("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath());
@@ -58,4 +60,6 @@ public class CreateCommand implements ICLICommand
         ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(ed, cd), passProv);
         System.out.println(String.format("Created new archive %s", archiveFile.getAbsolutePath()));
     }
+
+
 }

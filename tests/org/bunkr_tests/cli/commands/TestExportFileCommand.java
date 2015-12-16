@@ -16,12 +16,10 @@ import org.bunkr_tests.XTemporaryFolder;
 import org.bunkr_tests.cli.OutputCapture;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +44,7 @@ public class TestExportFileCommand
         new ExportFileCommand().buildParser(ArgumentParsers.newArgumentParser("abc").addSubparsers().addParser("xyz"));
     }
 
-    public File buildArchive() throws IOException, CryptoException
+    public File buildArchive() throws Exception
     {
         File archiveFile = folder.newFile();
 

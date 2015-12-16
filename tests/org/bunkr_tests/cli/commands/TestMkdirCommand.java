@@ -15,12 +15,10 @@ import org.bunkr.inventory.InventoryPather;
 import org.bunkr_tests.XTemporaryFolder;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +54,7 @@ public class TestMkdirCommand
         return i;
     }
 
-    public ArchiveInfoContext buildSampleArchive() throws IOException, CryptoException
+    public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new Descriptor(null, null), new PasswordProvider());

@@ -9,13 +9,11 @@ import org.bunkr.inventory.FolderInventoryItem;
 import org.bunkr.inventory.Inventory;
 import org.bunkr.inventory.InventoryJSON;
 import org.bunkr.streams.output.MultilayeredOutputStream;
-import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.*;
-import java.security.NoSuchAlgorithmException;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -31,7 +29,7 @@ public class TestWriteScenarios
     public final TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void testEmptyArchive() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void testEmptyArchive() throws Exception
     {
         File tempfile = folder.newFile();
         PasswordProvider passProv = new PasswordProvider();
@@ -67,7 +65,7 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void testSingleFile() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void testSingleFile() throws Exception
     {
         File tempfile = folder.newFile();
 
@@ -123,7 +121,7 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void testMultipleFiles() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void testMultipleFiles() throws Exception
     {
         File tempfile = folder.newFile();
         PasswordProvider passProv = new PasswordProvider();
@@ -216,11 +214,11 @@ public class TestWriteScenarios
     }
 
     @Test
-    public void testFoldersAndFile() throws IOException, NoSuchAlgorithmException, CryptoException
+    public void testFoldersAndFile() throws Exception
     {
         File tempfile = folder.newFile();
         PasswordProvider prov = new PasswordProvider();
-        prov.setArchivePassword("Hunter2".getBytes());
+        prov.setArchivePassword("HunterTwo".getBytes());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), prov);
 
         FolderInventoryItem folder1 = new FolderInventoryItem("some folder");
@@ -268,14 +266,14 @@ public class TestWriteScenarios
         }
     }
 
-    private long readDataLength(File target) throws IOException, CryptoException
+    private long readDataLength(File target) throws Exception
     {
         ArchiveInfoContext ic = new ArchiveInfoContext(target, new PasswordProvider());
         return ic.getBlockDataLength();
     }
 
     @Test
-    public void testTruncatingUsedBlocks() throws IOException, CryptoException
+    public void testTruncatingUsedBlocks() throws Exception
     {
         /*
          block size = 1024

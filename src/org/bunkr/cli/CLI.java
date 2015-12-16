@@ -1,6 +1,7 @@
 package org.bunkr.cli;
 
 import org.bunkr.Version;
+import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.exceptions.IllegalPathException;
 import org.bunkr.exceptions.TraversalException;
@@ -89,7 +90,7 @@ public class CLI
             System.err.println(String.format("Decryption failed: %s", e.getMessage()));
             System.exit(1);
         }
-        catch (IllegalPathException | CLIException | TraversalException e)
+        catch (IllegalPathException | BaseBunkrException e)
         {
             System.err.println(e.getMessage());
             System.exit(1);
