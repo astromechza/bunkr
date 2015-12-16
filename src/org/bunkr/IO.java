@@ -7,6 +7,14 @@ import java.io.InputStream;
 public class IO
 {
 
+    public static byte[] readNBytes(InputStream dis, int n) throws IOException
+    {
+        byte[] buffer = new byte[n];
+        int r = dis.read(buffer);
+        if (r != n) throw new IOException(String.format("Expected to read %d bytes, only read %d", n, r));
+        return buffer;
+    }
+
     public static String readNByteString(InputStream dis, int n) throws IOException
     {
         assert n < 0xFFFFFF;

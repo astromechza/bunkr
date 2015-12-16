@@ -47,9 +47,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
 
                 if (this.descriptor.hasEncryption())
                 {
-                    int l = dis.readInt();
-                    byte[] encryptedInventory = new byte[l];
-                    if (dis.read(encryptedInventory) != l) throw new IOException("Did not read enough bytes");
+                    byte[] encryptedInventory = IO.readNBytes(dis, dis.readInt());
 
                     PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
                     g.init(uic.getHashedArchivePassword(), this.descriptor.getEncryption().pbkdf2Salt,
