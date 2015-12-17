@@ -1,6 +1,5 @@
 package org.bunkr.inventory;
 
-import org.bunkr.utils.RandomMaker;
 import org.bunkr.fragmented_range.FragmentedRange;
 
 import java.util.Date;
@@ -16,18 +15,16 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
 {
     private long sizeOnDisk;
     private long modifiedAt;
-    private byte[] encryptionKey;
-    private byte[] encryptionIV;
+    private byte[] encryptionData;
     private byte[] integrityHash;
     private FragmentedRange blocks;
     private long actualSize;
     private Set<String> tags;
 
-    public FileInventoryItem(String name, UUID uuid, FragmentedRange blocks, long sizeOnDisk, long actualSize, long modifiedAt, byte[] encryptionKey, byte[] encryptionIV, byte[] integrityHash, HashSet<String> tags)
+    public FileInventoryItem(String name, UUID uuid, FragmentedRange blocks, long sizeOnDisk, long actualSize, long modifiedAt, byte[] encryptionData, byte[] integrityHash, HashSet<String> tags)
     {
         super(name, uuid);
-        this.encryptionKey = encryptionKey;
-        this.encryptionIV = encryptionIV;
+        this.encryptionData = encryptionData;
         this.integrityHash = integrityHash;
         this.sizeOnDisk = sizeOnDisk;
         this.actualSize = actualSize;
@@ -42,8 +39,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         this.sizeOnDisk = 0;
         this.blocks = new FragmentedRange();
         this.modifiedAt = System.currentTimeMillis();
-        this.encryptionKey = RandomMaker.get(256);
-        this.encryptionIV = RandomMaker.get(256);
+        this.encryptionData = null;
         this.integrityHash = null;
         this.tags = new HashSet<>();
     }
@@ -58,24 +54,14 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         this.blocks = blocks;
     }
 
-    public byte[] getEncryptionIV()
+    public byte[] getEncryptionData()
     {
-        return encryptionIV;
+        return encryptionData;
     }
 
-    public void setEncryptionIV(byte[] encryptionIV)
+    public void setencryptionData(byte[] encryptionData)
     {
-        this.encryptionIV = encryptionIV;
-    }
-
-    public byte[] getEncryptionKey()
-    {
-        return encryptionKey;
-    }
-
-    public void setEncryptionKey(byte[] encryptionKey)
-    {
-        this.encryptionKey = encryptionKey;
+        this.encryptionData = encryptionData;
     }
 
     public byte[] getIntegrityHash()

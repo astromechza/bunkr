@@ -131,8 +131,7 @@ public class TestWriteScenarios
             assertEquals(inventory.getFiles().get(0).getUuid(), newFile.getUuid());
             assertEquals(inventory.getFiles().get(0).getSizeOnDisk(), newFile.getSizeOnDisk());
             assertEquals(inventory.getFiles().get(0).getModifiedAt(), newFile.getModifiedAt());
-            assertArrayEquals(inventory.getFiles().get(0).getEncryptionIV(), newFile.getEncryptionIV());
-            assertArrayEquals(inventory.getFiles().get(0).getEncryptionKey(), newFile.getEncryptionKey());
+            assertArrayEquals(inventory.getFiles().get(0).getEncryptionData(), newFile.getEncryptionData());
 
             assertEquals(dis.available(), 0);
         }
@@ -214,8 +213,7 @@ public class TestWriteScenarios
             assertEquals(inventory.getFiles().get(0).getUuid(), fileOne.getUuid());
             assertEquals(inventory.getFiles().get(0).getSizeOnDisk(), fileOne.getSizeOnDisk());
             assertEquals(inventory.getFiles().get(0).getModifiedAt(), fileOne.getModifiedAt());
-            assertArrayEquals(inventory.getFiles().get(0).getEncryptionIV(), fileOne.getEncryptionIV());
-            assertArrayEquals(inventory.getFiles().get(0).getEncryptionKey(), fileOne.getEncryptionKey());
+            assertArrayEquals(inventory.getFiles().get(0).getEncryptionData(), fileOne.getEncryptionData());
 
             assertEquals(inventory.getFiles().get(1).getName(), fileTwo.getName());
             assertTrue(inventory.getFiles().get(1).hasTag("thing_one"));
@@ -224,8 +222,7 @@ public class TestWriteScenarios
             assertEquals(inventory.getFiles().get(1).getUuid(), fileTwo.getUuid());
             assertEquals(inventory.getFiles().get(1).getSizeOnDisk(), fileTwo.getSizeOnDisk());
             assertEquals(inventory.getFiles().get(1).getModifiedAt(), fileTwo.getModifiedAt());
-            assertArrayEquals(inventory.getFiles().get(1).getEncryptionIV(), fileTwo.getEncryptionIV());
-            assertArrayEquals(inventory.getFiles().get(1).getEncryptionKey(), fileTwo.getEncryptionKey());
+            assertArrayEquals(inventory.getFiles().get(1).getEncryptionData(), fileTwo.getEncryptionData());
 
             assertEquals(dis.available(), 0);
         }
@@ -277,8 +274,7 @@ public class TestWriteScenarios
             assertEquals(holder.getUuid(), newFile.getUuid());
             assertEquals(holder.getSizeOnDisk(), newFile.getSizeOnDisk());
             assertEquals(holder.getModifiedAt(), newFile.getModifiedAt());
-            assertArrayEquals(holder.getEncryptionIV(), newFile.getEncryptionIV());
-            assertArrayEquals(holder.getEncryptionKey(), newFile.getEncryptionKey());
+            assertArrayEquals(holder.getEncryptionData(), newFile.getEncryptionData());
 
             assertEquals(dis.available(), 0);
         }

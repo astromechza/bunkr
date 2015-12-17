@@ -22,4 +22,9 @@ public class RandomMaker
         RandomMaker.getRandomSource().nextBytes(data);
         return data;
     }
+
+    public static void fill(byte[] edata)
+    {
+        RandomMaker.getRandomSource().nextBytes(edata);
+    }
 }

@@ -11,6 +11,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.zip.InflaterInputStream;
 
 /**
@@ -19,32 +20,34 @@ import java.util.zip.InflaterInputStream;
  */
 public class MultilayeredInputStream extends InputStream
 {
-    private final BlockReaderInputStream baseStream;
     private final boolean emptyFile;
 
-    private InputStream topstream;
+    private BlockReaderInputStream baseStream;
+    private InputStream topstream = null;
 
     public MultilayeredInputStream(ArchiveInfoContext context, FileInventoryItem target)
     {
         this.emptyFile = target.getActualSize() == 0;
-
-        this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
-        this.topstream = this.baseStream;
-
-        if (context.getDescriptor().hasEncryption())
+        if (! emptyFile)
         {
-            SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
-            fileCipher.init(
-                    false,
-                    new ParametersWithIV(new KeyParameter(target.getEncryptionKey()), target.getEncryptionIV())
-            );
+            this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
+            this.topstream = this.baseStream;
 
-            this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
-        }
+            if (context.getDescriptor().hasEncryption())
+            {
+                byte[] edata = target.getEncryptionData();
+                byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
+                byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
 
-        if (context.getDescriptor().hasCompression())
-        {
-            this.topstream = new InflaterInputStream(this.topstream);
+                SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
+                fileCipher.init(false, new ParametersWithIV(new KeyParameter(ekey), eiv));
+                this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
+            }
+
+            if (context.getDescriptor().hasCompression())
+            {
+                this.topstream = new InflaterInputStream(this.topstream);
+            }
         }
     }
 
@@ -55,12 +58,14 @@ public class MultilayeredInputStream extends InputStream
      */
     public int available() throws IOException
     {
+        if(this.emptyFile) return -1;
         return this.topstream.available();
     }
 
     @Override
     public long skip(long n) throws IOException
     {
+        if(this.emptyFile) return -1;
         return this.topstream.skip(n);
     }
 
@@ -88,7 +93,7 @@ public class MultilayeredInputStream extends InputStream
     @Override
     public void close() throws IOException
     {
-        topstream.close();
+        if (topstream != null) topstream.close();
     }
 
     @Override
@@ -99,6 +104,6 @@ public class MultilayeredInputStream extends InputStream
 
     public void setCheckHashOnFinish(boolean b)
     {
-        this.baseStream.setCheckHashOnFinish(b);
+        if (this.baseStream != null) this.baseStream.setCheckHashOnFinish(b);
     }
 }

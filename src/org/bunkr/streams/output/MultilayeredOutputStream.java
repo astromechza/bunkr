@@ -14,6 +14,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -41,14 +42,22 @@ public class MultilayeredOutputStream extends OutputStream
 
         if (context.getDescriptor().hasEncryption())
         {
-            if (refreshKeys)
+            byte[] edata = target.getEncryptionData();
+            if (edata == null)
             {
-                target.setEncryptionKey(RandomMaker.get(context.getDescriptor().getEncryption().aesKeyLength));
-                target.setEncryptionIV(RandomMaker.get(context.getDescriptor().getEncryption().aesKeyLength));
+                edata = RandomMaker.get(256 * 2);
+                target.setencryptionData(edata);
             }
+            else if (refreshKeys)
+            {
+                RandomMaker.fill(edata);
+                target.setencryptionData(edata);
+            }
+            byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
+            byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
 
             SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
-            ParametersWithIV keyparams = new ParametersWithIV(new KeyParameter(target.getEncryptionKey()), target.getEncryptionIV());
+            ParametersWithIV keyparams = new ParametersWithIV(new KeyParameter(ekey), eiv);
             fileCipher.init(true, keyparams);
             this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
         }
