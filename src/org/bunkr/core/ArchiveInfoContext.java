@@ -1,18 +1,11 @@
 package org.bunkr.core;
 
+import org.bunkr.descriptor.DescriptorBuilder;
 import org.bunkr.utils.IO;
-import org.bunkr.utils.SimpleAES;
-import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
-import org.bunkr.descriptor.DescriptorJSON;
+import org.bunkr.descriptor.IDescriptor;
 import org.bunkr.exceptions.BaseBunkrException;
-import org.bunkr.exceptions.IllegalPasswordException;
 import org.bunkr.inventory.Inventory;
-import org.bunkr.inventory.InventoryJSON;
 import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.*;
 
@@ -20,12 +13,12 @@ public class ArchiveInfoContext implements IArchiveInfoContext
 {
     public final File filePath;
     private Inventory inventory;
-    private Descriptor descriptor;
+    private IDescriptor descriptor;
     private int blockSize;
     private long blockDataLength;
     private boolean fresh = false;
 
-    public ArchiveInfoContext(File filePath, PasswordProvider uic) throws IOException, CryptoException,
+    public ArchiveInfoContext(File filePath, UserSecurityProvider uic) throws IOException, CryptoException,
             BaseBunkrException
     {
         this.filePath = filePath;
@@ -33,7 +26,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     }
 
     @Override
-    public void refresh(PasswordProvider uic) throws IOException, CryptoException, IllegalPasswordException
+    public void refresh(UserSecurityProvider uic) throws IOException, BaseBunkrException
     {
         try(FileInputStream fis = new FileInputStream(this.filePath))
         {
@@ -47,33 +40,8 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                 this.blockSize = dis.readInt();
                 this.blockDataLength = dis.readLong();
                 IO.reliableSkip(dis, this.blockDataLength);
-                String descjson = IO.readString(dis);
-                this.descriptor = DescriptorJSON.decode(descjson);
-
-                if (this.descriptor.hasEncryption())
-                {
-                    byte[] encryptedInventory = IO.readNBytes(dis, dis.readInt());
-
-                    PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init(uic.getHashedArchivePassword(), this.descriptor.getEncryption().pbkdf2Salt,
-                           this.descriptor.getEncryption().pbkdf2Iterations);
-                    ParametersWithIV kp = ((ParametersWithIV)g.generateDerivedParameters(
-                            this.descriptor.getEncryption().aesKeyLength,
-                            this.descriptor.getEncryption().aesKeyLength)
-                    );
-
-                    byte[] decryptedInv = SimpleAES.decrypt(
-                            encryptedInventory,
-                            ((KeyParameter) kp.getParameters()).getKey(),
-                            kp.getIV()
-                    );
-
-                    this.inventory = InventoryJSON.decode(new String(decryptedInv));
-                }
-                else
-                {
-                    this.inventory = InventoryJSON.decode(IO.readString(dis));
-                }
+                this.descriptor = DescriptorBuilder.fromJSON(IO.readString(dis));
+                this.inventory = this.descriptor.readInventoryFromBytes(IO.readNBytes(dis, dis.readInt()), uic);
             }
         }
         this.fresh = true;
@@ -86,28 +54,13 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     }
 
     @Override
-    public void invalidate()
-    {
-        this.fresh = false;
-    }
-
-    @Override
-    public void assertFresh()
-    {
-        if (! isFresh())
-        {
-            throw new AssertionError("ArchiveInfoContext is no longer fresh");
-        }
-    }
-
-    @Override
     public int getBlockSize()
     {
         return blockSize;
     }
 
     @Override
-    public Descriptor getDescriptor()
+    public IDescriptor getDescriptor()
     {
         return descriptor;
     }

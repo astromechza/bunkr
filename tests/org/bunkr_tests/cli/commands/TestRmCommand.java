@@ -6,7 +6,8 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.RmCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.exceptions.TraversalException;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.FolderInventoryItem;
@@ -57,8 +58,9 @@ public class TestRmCommand
     public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider(), false, false);
+                .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
 
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
         context.getInventory().getFolders().add(d1);
@@ -74,7 +76,7 @@ public class TestRmCommand
         FileInventoryItem t4 = new FileInventoryItem("t4");
         context.getInventory().getFiles().add(t4);
 
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
         return context;
     }
@@ -114,7 +116,7 @@ public class TestRmCommand
         args.put(RmCommand.ARG_RECURSIVE, false);
         new RmCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
         try
         {
             InventoryPather.traverse(context.getInventory(), "/t1");

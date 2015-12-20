@@ -2,8 +2,8 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
-import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
+import org.bunkr.core.UserSecurityProvider;
 import org.bunkr.exceptions.CLIException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
@@ -46,8 +46,8 @@ public class MvCommand implements ICLICommand
         String toPathName = InventoryPather.baseName(args.getString(ARG_TOPATH));
 
         // load up the archive
-        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
-        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
 
         // find the container that has the source item
         IFFTraversalTarget fromParent = InventoryPather.traverse(aic.getInventory(), fromPathParent);
@@ -70,7 +70,7 @@ public class MvCommand implements ICLICommand
             targetFile.setName(toPathName);
             fromContainer.getFiles().remove(targetFile);
             toContainer.getFiles().add(targetFile);
-            MetadataWriter.write(aic, passProv);
+            MetadataWriter.write(aic, usp);
             System.out.println(String.format("Moved file '%s' to '%s'", args.getString(ARG_FROMPATH), args.getString(ARG_TOPATH)));
         }
         else
@@ -79,7 +79,7 @@ public class MvCommand implements ICLICommand
             targetFolder.setName(toPathName);
             fromContainer.getFolders().remove(targetFolder);
             toContainer.getFolders().add(targetFolder);
-            MetadataWriter.write(aic, passProv);
+            MetadataWriter.write(aic, usp);
             System.out.println(String.format("Moved folder '%s' to '%s'", args.getString(ARG_FROMPATH), args.getString(ARG_TOPATH)));
         }
     }

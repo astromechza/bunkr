@@ -3,11 +3,12 @@ package org.bunkr_tests.cli.commands;
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.ExportFileCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.FolderInventoryItem;
@@ -47,8 +48,8 @@ public class TestExportFileCommand
     public File buildArchive() throws Exception
     {
         File archiveFile = folder.newFile();
-
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null), new PasswordProvider(), false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
 
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         context.getInventory().getFiles().add(fileOne);
@@ -69,7 +70,7 @@ public class TestExportFileCommand
         folderOne.getFiles().add(fileTwo);
         context.getInventory().getFolders().add(folderOne);
 
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
         return archiveFile;
     }

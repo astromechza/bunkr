@@ -6,7 +6,8 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.LsCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.exceptions.TraversalException;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.FolderInventoryItem;
@@ -41,8 +42,9 @@ public class TestLsCommand
     public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider(), false, false);
+                .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
 
         FileInventoryItem untaggedFile = new FileInventoryItem("untagged-file");
 
@@ -58,7 +60,7 @@ public class TestLsCommand
         folder.getFiles().add(new FileInventoryItem("subfile2"));
         context.getInventory().getFolders().add(folder);
 
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
         return context;
     }

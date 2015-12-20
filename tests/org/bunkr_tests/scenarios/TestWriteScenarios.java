@@ -1,12 +1,10 @@
 package org.bunkr_tests.scenarios;
 
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.core.ArchiveBuilder;
-import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.IArchiveInfoContext;
-import org.bunkr.core.MetadataWriter;
-import org.bunkr.descriptor.Descriptor;
-import org.bunkr.descriptor.DescriptorJSON;
+import org.bunkr.core.*;
+import org.bunkr.descriptor.DescriptorBuilder;
+import org.bunkr.descriptor.IDescriptor;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.fragmented_range.FragmentedRange;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.FolderInventoryItem;
@@ -49,8 +47,9 @@ public class TestWriteScenarios
     {
         File tempfile = folder.newFile();
         PasswordProvider passProv = new PasswordProvider();
+        UserSecurityProvider usp = new UserSecurityProvider(passProv);
         IArchiveInfoContext
-                context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), passProv, false, false);
+                context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, false);
         assertTrue(context.getInventory().getFiles().isEmpty());
         assertTrue(context.getInventory().getFolders().isEmpty());
         assertTrue(context.isFresh());
@@ -66,9 +65,8 @@ public class TestWriteScenarios
             assertEquals(dis.readLong(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = DescriptorJSON.decode(desJSON);
-
-            assertEquals(descriptor.getEncryption(), null);
+            IDescriptor descriptor = DescriptorBuilder.fromJSON(desJSON);
+            assertEquals(descriptor.mustEncryptFiles(), false);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);
@@ -85,7 +83,8 @@ public class TestWriteScenarios
         File tempfile = folder.newFile();
 
         PasswordProvider passProv = new PasswordProvider();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), passProv, false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(passProv);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, false);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         context.getInventory().getFiles().add(newFile);
@@ -96,7 +95,7 @@ public class TestWriteScenarios
                 bwos.write(65 + i % 26);
             }
         }
-        MetadataWriter.write(context, passProv);
+        MetadataWriter.write(context, usp);
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {
@@ -113,12 +112,11 @@ public class TestWriteScenarios
                 assertEquals(data[i], (65 + i % 26));
             }
 
-            String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = DescriptorJSON.decode(desJSON);
-
-            assertEquals(descriptor.getEncryption(), null);
-
             FragmentedRange expected = new FragmentedRange(0, 4096 / ArchiveBuilder.DEFAULT_BLOCK_SIZE);
+
+            String desJSON = IO.readNByteString(dis, dis.readInt());
+            IDescriptor descriptor = DescriptorBuilder.fromJSON(desJSON);
+            assertEquals(descriptor.mustEncryptFiles(), false);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);
@@ -140,7 +138,8 @@ public class TestWriteScenarios
     {
         File tempfile = folder.newFile();
         PasswordProvider passProv = new PasswordProvider();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), passProv, false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(passProv);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, false);
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
         fileOne.addTag("bob");
@@ -154,7 +153,7 @@ public class TestWriteScenarios
                     bwos.write(65 + i % 26);
                 }
             }
-            MetadataWriter.write(context, passProv);
+            MetadataWriter.write(context, usp);
         }
 
         FileInventoryItem fileTwo = new FileInventoryItem("another file.txt");
@@ -168,7 +167,7 @@ public class TestWriteScenarios
                     bwos.write(65 + i % 26);
                 }
             }
-            MetadataWriter.write(context, passProv);
+            MetadataWriter.write(context, usp);
         }
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
@@ -193,9 +192,8 @@ public class TestWriteScenarios
             }
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = DescriptorJSON.decode(desJSON);
-
-            assertEquals(descriptor.getEncryption(), null);
+            IDescriptor descriptor = DescriptorBuilder.fromJSON(desJSON);
+            assertEquals(descriptor.mustEncryptFiles(), false);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);
@@ -231,7 +229,8 @@ public class TestWriteScenarios
         File tempfile = folder.newFile();
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword("HunterTwo".getBytes());
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), prov, false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, false);
 
         FolderInventoryItem folder1 = new FolderInventoryItem("some folder");
         FolderInventoryItem folder2 = new FolderInventoryItem("another folder");
@@ -242,7 +241,7 @@ public class TestWriteScenarios
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         folder1.getFiles().add(newFile);
-        MetadataWriter.write(context, prov);
+        MetadataWriter.write(context, usp);
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {
@@ -254,9 +253,8 @@ public class TestWriteScenarios
             assertEquals(dis.readLong(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            Descriptor descriptor = DescriptorJSON.decode(desJSON);
-
-            assertEquals(descriptor.getEncryption(), null);
+            IDescriptor descriptor = DescriptorBuilder.fromJSON(desJSON);
+            assertEquals(descriptor.mustEncryptFiles(), false);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);
@@ -276,9 +274,9 @@ public class TestWriteScenarios
         }
     }
 
-    private long readDataLength(File target) throws Exception
+    private long readDataLength(File target, UserSecurityProvider usp) throws Exception
     {
-        ArchiveInfoContext ic = new ArchiveInfoContext(target, new PasswordProvider());
+        ArchiveInfoContext ic = new ArchiveInfoContext(target, usp);
         return ic.getBlockDataLength();
     }
 
@@ -294,7 +292,8 @@ public class TestWriteScenarios
          */
 
         // first create empty archive
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(folder.newFile(), new Descriptor(null), new PasswordProvider(), false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(folder.newFile(), new PlaintextDescriptor(), usp, false);
 
         // now write 4 files
         for (int i = 0; i < 4; i++)
@@ -308,9 +307,9 @@ public class TestWriteScenarios
         }
 
         // now write metadatas
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
-        assertThat(readDataLength(context.filePath), is(equalTo(4 * 4096L)));
+        assertThat(readDataLength(context.filePath, usp), is(equalTo(4 * 4096L)));
 
         // now modify file 4
         {
@@ -322,9 +321,9 @@ public class TestWriteScenarios
         }
 
         // now write metadatas
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
-        assertThat(readDataLength(context.filePath), is(equalTo(2 * 4096 + 4096 + 2048L)));
+        assertThat(readDataLength(context.filePath, usp), is(equalTo(2 * 4096 + 4096 + 2048L)));
 
         // now remove file 3
         {
@@ -333,9 +332,9 @@ public class TestWriteScenarios
         }
 
         // now write metadatas
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
-        assertThat(readDataLength(context.filePath), is(equalTo(2 * 4096 + 4096 + 2048L)));
+        assertThat(readDataLength(context.filePath, usp), is(equalTo(2 * 4096 + 4096 + 2048L)));
 
         // now remove file 4
         {
@@ -344,8 +343,8 @@ public class TestWriteScenarios
         }
 
         // now write metadatas
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
-        assertThat(readDataLength(context.filePath), is(equalTo(2 * 4096L)));
+        assertThat(readDataLength(context.filePath, usp), is(equalTo(2 * 4096L)));
     }
 }

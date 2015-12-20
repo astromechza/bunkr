@@ -2,8 +2,8 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
-import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
+import org.bunkr.core.UserSecurityProvider;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.IFFTraversalTarget;
@@ -57,8 +57,8 @@ public class TagCommand implements ICLICommand
         }
 
         // load up initial archive
-        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
-        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
 
         IFFTraversalTarget target = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
         if (target.isAFolder()) throw new CLIException("Cannot tag a folder.");
@@ -68,7 +68,7 @@ public class TagCommand implements ICLICommand
         if (args.getBoolean(ARG_CLEAR))
         {
             targetFile.setTags(new HashSet<>());
-            MetadataWriter.write(aic, passProv);
+            MetadataWriter.write(aic, usp);
             System.out.println(String.format("Cleared tags on file %s", args.getString(ARG_PATH)));
         }
         else if (args.getList(ARG_TAGS).size() > 0)
@@ -76,7 +76,7 @@ public class TagCommand implements ICLICommand
             try
             {
                 targetFile.setCheckTags(new HashSet<>(args.getList(ARG_TAGS)));
-                MetadataWriter.write(aic, passProv);
+                MetadataWriter.write(aic, usp);
                 System.out.println(String.format("Set %d tags on file %s", args.getList(ARG_TAGS).size(),
                                                  args.getString(ARG_PATH)));
             }

@@ -1,8 +1,8 @@
 package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
+import org.bunkr.core.UserSecurityProvider;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.exceptions.IntegrityHashError;
 import org.bunkr.inventory.FileInventoryItem;
@@ -52,8 +52,9 @@ public class ExportFileCommand implements ICLICommand
     {
         try
         {
-            PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
-            ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+            UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+
+            ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
             IFFTraversalTarget target = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
             if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
 

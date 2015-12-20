@@ -6,7 +6,8 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.MkdirCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.exceptions.TraversalException;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.FolderInventoryItem;
@@ -57,7 +58,8 @@ public class TestMkdirCommand
     public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider(), false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
 
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         context.getInventory().getFolders().add(d1);
@@ -73,7 +75,7 @@ public class TestMkdirCommand
         FileInventoryItem f3 = new FileInventoryItem("d2.f3");
         d2.getFiles().add(f3);
 
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
         return context;
     }
@@ -95,7 +97,7 @@ public class TestMkdirCommand
         args.put(MkdirCommand.ARG_RECURSIVE, false);
         new MkdirCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
         InventoryPather.traverse(context.getInventory(), "/d4").isAFolder();
     }
 

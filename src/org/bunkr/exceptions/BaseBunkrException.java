@@ -15,4 +15,9 @@ public class BaseBunkrException extends Exception
     {
         super(e);
     }
+
+    public BaseBunkrException(Throwable cause, String message, Object... args)
+    {
+        super(String.format(message, args), cause);
+    }
 }

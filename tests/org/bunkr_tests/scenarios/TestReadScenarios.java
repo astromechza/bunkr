@@ -2,14 +2,16 @@ package org.bunkr_tests.scenarios;
 
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PBKDF2Descriptor;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.utils.IO;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
-import org.bunkr.descriptor.EncryptionDescriptor;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.streams.input.MultilayeredInputStream;
 import org.bunkr.streams.output.MultilayeredOutputStream;
+import org.bunkr.utils.RandomMaker;
 import org.bunkr_tests.XTemporaryFolder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,7 +31,7 @@ public class TestReadScenarios
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
 
-    private void runThreeFileTestOnContext(ArchiveInfoContext context, PasswordProvider uic) throws Exception
+    private void runThreeFileTestOnContext(ArchiveInfoContext context, UserSecurityProvider uic) throws Exception
     {
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         fileOne.addTag("something");
@@ -97,11 +99,12 @@ public class TestReadScenarios
         File tempfile = folder.newPrefixedFile("plain");
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword("HunterTwo".getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), prov, false, false);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, false);
 
-        runThreeFileTestOnContext(context, prov);
+        runThreeFileTestOnContext(context, usp);
     }
 
     @Test
@@ -110,11 +113,12 @@ public class TestReadScenarios
         File tempfile = folder.newPrefixedFile("withcompres");
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword("HunterTwo".getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), prov, false, true);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, true);
 
-        runThreeFileTestOnContext(context, prov);
+        runThreeFileTestOnContext(context, usp);
     }
 
     @Test
@@ -123,11 +127,13 @@ public class TestReadScenarios
         File tempfile = folder.newPrefixedFile("withencrypt");
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword("HunterTwo".getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults()), prov, true, false);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PBKDF2Descriptor(256, 10000,
+                                                                                                         RandomMaker.get(128)), usp, false);
 
-        runThreeFileTestOnContext(context, prov);
+        runThreeFileTestOnContext(context, usp);
     }
 
     @Test
@@ -136,10 +142,13 @@ public class TestReadScenarios
         File tempfile = folder.newPrefixedFile("withboth");
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword("HunterTwo".getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults()), prov, true, true);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PBKDF2Descriptor(256, 10000,
+                                                                                                         RandomMaker.get(
+                                                                                                                 128)), usp, true);
 
-        runThreeFileTestOnContext(context, prov);
+        runThreeFileTestOnContext(context, usp);
     }
 }

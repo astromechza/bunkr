@@ -1,9 +1,9 @@
 package org.bunkr.cli.commands;
 
+import org.bunkr.core.UserSecurityProvider;
 import org.bunkr.utils.AbortableShutdownHook;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
-import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.ProgressBar;
 import org.bunkr.exceptions.BaseBunkrException;
@@ -59,8 +59,8 @@ public class ImportFileCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
-        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
 
         if (args.getString(ARG_PATH).equals("/")) throw new CLIException("Cannot import as /.");
 
@@ -88,7 +88,7 @@ public class ImportFileCommand implements ICLICommand
 
         File inputFile = args.get(ARG_SOURCE_FILE);
 
-        AbortableShutdownHook emergencyShutdownThread = new EnsuredMetadataWriter(aic, passProv);
+        AbortableShutdownHook emergencyShutdownThread = new EnsuredMetadataWriter(aic, usp);
         Runtime.getRuntime().addShutdownHook(emergencyShutdownThread);
 
         try
@@ -111,7 +111,7 @@ public class ImportFileCommand implements ICLICommand
             // This finally block is a basic attempt at handling bad problems like corrupted writes when saving a file.
             // if an exception was raised due to some IO issue, then we still want to write a hopefully correct
             // metadata section so that the file can be correctly read in future.
-            MetadataWriter.write(aic, passProv);
+            MetadataWriter.write(aic, usp);
             Runtime.getRuntime().removeShutdownHook(emergencyShutdownThread);
         }
     }
@@ -143,9 +143,9 @@ public class ImportFileCommand implements ICLICommand
     private static class EnsuredMetadataWriter extends AbortableShutdownHook
     {
         private final ArchiveInfoContext context;
-        private final PasswordProvider prov;
+        private final UserSecurityProvider prov;
 
-        public EnsuredMetadataWriter(ArchiveInfoContext context, PasswordProvider prov)
+        public EnsuredMetadataWriter(ArchiveInfoContext context, UserSecurityProvider prov)
         {
             this.context = context;
             this.prov = prov;

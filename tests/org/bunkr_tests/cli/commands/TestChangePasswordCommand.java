@@ -2,15 +2,15 @@ package org.bunkr_tests.cli.commands;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.bouncycastle.crypto.CryptoException;
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PBKDF2Descriptor;
+import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.ChangePasswordCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
-import org.bunkr.descriptor.EncryptionDescriptor;
 import org.bunkr_tests.XTemporaryFolder;
 import org.bunkr_tests.cli.PasswordFile;
 import org.junit.Rule;
@@ -43,55 +43,55 @@ public class TestChangePasswordCommand
     {
 
         String originalPassword = DatatypeConverter.printHexBinary(RandomMaker.get(64));
-        File originalPassowrdFile = PasswordFile.genPasswordFile(folder.newFilePath(), originalPassword.getBytes());
+        File originalPasswordFile = PasswordFile.genPasswordFile(folder.newFilePath(), originalPassword.getBytes());
         PasswordProvider originalPasswordProv = new PasswordProvider();
-        originalPasswordProv.setArchivePassword(originalPassowrdFile);
+        originalPasswordProv.setArchivePassword(originalPasswordFile);
+        UserSecurityProvider originalUSP = new UserSecurityProvider(originalPasswordProv);
 
         File archiveFile = folder.newFilePath();
 
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new Descriptor(EncryptionDescriptor.makeDefaults()),
-                originalPasswordProv,
-                true,
+                new PBKDF2Descriptor(256, 10000, RandomMaker.get(128)),
+                originalUSP,
                 true
         );
 
         {
-            new ArchiveInfoContext(archiveFile, originalPasswordProv);
+            new ArchiveInfoContext(archiveFile, originalUSP);
         }
 
         String newPassword = DatatypeConverter.printHexBinary(RandomMaker.get(64));
         File newPassowrdFile = PasswordFile.genPasswordFile(folder.newFilePath(), newPassword.getBytes());
         PasswordProvider newPasswordProv = new PasswordProvider();
         newPasswordProv.setArchivePassword(newPassowrdFile);
+        UserSecurityProvider newUSP = new UserSecurityProvider(newPasswordProv);
 
         try
         {
-            new ArchiveInfoContext(archiveFile, newPasswordProv);
+            new ArchiveInfoContext(archiveFile, newUSP);
             fail("should fail to decrypt");
         }
-        catch (CryptoException ignored) {}
+        catch (BaseBunkrException ignored) {}
 
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
-        args.put(CLI.ARG_PASSWORD_FILE, originalPassowrdFile);
-        args.put(ChangePasswordCommand.ARG_NEW_PASSWORD, newPassowrdFile);
+        args.put(CLI.ARG_PASSWORD_FILE, originalPasswordFile);
+        args.put(ChangePasswordCommand.ARG_NEW_PASSWORD_FILE, newPassowrdFile);
 
         new ChangePasswordCommand().handle(new Namespace(args));
 
-
         {
-            new ArchiveInfoContext(archiveFile, newPasswordProv);
+            new ArchiveInfoContext(archiveFile, newUSP);
         }
 
         try
         {
-            new ArchiveInfoContext(archiveFile, originalPasswordProv);
+            new ArchiveInfoContext(archiveFile, originalUSP);
             fail("should fail to decrypt");
         }
-        catch (CryptoException ignored) {}
+        catch (BaseBunkrException ignored) {}
 
     }
 }

@@ -3,11 +3,12 @@ package org.bunkr_tests.cli.commands;
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.ImportFileCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.FolderInventoryItem;
@@ -53,7 +54,8 @@ public class TestImportFileCommand
     {
         File archiveFile = folder.newFile();
 
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null),new PasswordProvider(), false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
 
         File fileToImport = folder.newFile();
         try(FileOutputStream fos = new FileOutputStream(fileToImport))
@@ -71,7 +73,7 @@ public class TestImportFileCommand
         {
             new ImportFileCommand().handle(new Namespace(args));
         }
-        ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, new PasswordProvider());
+        ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, usp);
 
         FileInventoryItem f = context.getInventory().findFile("a.txt");
         assertThat(f.getTags().size(), is(equalTo(2)));
@@ -84,8 +86,8 @@ public class TestImportFileCommand
     public void testImportStdin() throws Exception
     {
         File archiveFile = folder.newFile();
-
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null), new PasswordProvider(), false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
@@ -103,7 +105,7 @@ public class TestImportFileCommand
         }
         System.setIn(null);
 
-        ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, new PasswordProvider());
+        ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, usp);
 
         FileInventoryItem f = context.getInventory().findFile("b.txt");
         assertThat(f.getTags().size(), is(equalTo(2)));
@@ -116,8 +118,8 @@ public class TestImportFileCommand
     public void testImportAsRootError() throws Exception
     {
         File archiveFile = folder.newFile();
-
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null), new PasswordProvider(), false, false);
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
@@ -142,9 +144,9 @@ public class TestImportFileCommand
     public void testImportAsFileChild() throws Exception
     {
         File archiveFile = folder.newFile();
-
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new Descriptor(null), new PasswordProvider(), false, false
+                archiveFile, new PlaintextDescriptor(), usp, false
         );
 
         {
@@ -154,7 +156,7 @@ public class TestImportFileCommand
             {
                 bwos.write(RandomMaker.get(10 * 8));
             }
-            MetadataWriter.write(context, new PasswordProvider());
+            MetadataWriter.write(context, usp);
         }
 
         Map<String, Object> args = new HashMap<>();
@@ -180,9 +182,9 @@ public class TestImportFileCommand
     public void testImportOverFile() throws Exception
     {
         File archiveFile = folder.newFile();
-
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new Descriptor(null), new PasswordProvider(), false, false
+                archiveFile, new PlaintextDescriptor(), usp, false
         );
 
         {
@@ -192,7 +194,7 @@ public class TestImportFileCommand
             {
                 bwos.write(RandomMaker.get(10 * 8));
             }
-            MetadataWriter.write(context, new PasswordProvider());
+            MetadataWriter.write(context, usp);
         }
 
         Map<String, Object> args = new HashMap<>();
@@ -209,7 +211,7 @@ public class TestImportFileCommand
         System.setIn(null);
 
         {
-            context.refresh(new PasswordProvider());
+            context.refresh(usp);
             FileInventoryItem fileOne = context.getInventory().findFile("a.txt");
             assertThat(fileOne.getActualSize(), is(equalTo(40L)));
         }
@@ -219,15 +221,15 @@ public class TestImportFileCommand
     public void testImportOverFolder() throws Exception
     {
         File archiveFile = folder.newFile();
-
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new Descriptor(null), new PasswordProvider(), false, false
+                archiveFile, new PlaintextDescriptor(), usp, false
         );
 
         {
             FolderInventoryItem folderOne = new FolderInventoryItem("folder");
             context.getInventory().getFolders().add(folderOne);
-            MetadataWriter.write(context, new PasswordProvider());
+            MetadataWriter.write(context, usp);
         }
 
         Map<String, Object> args = new HashMap<>();

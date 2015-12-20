@@ -6,7 +6,8 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.MvCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.exceptions.TraversalException;
 import org.bunkr.inventory.FileInventoryItem;
@@ -37,8 +38,9 @@ public class TestMvCommand
     public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider(), false, false);
+                .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
 
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
         context.getInventory().getFolders().add(d1);
@@ -54,7 +56,7 @@ public class TestMvCommand
         FileInventoryItem t4 = new FileInventoryItem("t4");
         context.getInventory().getFiles().add(t4);
 
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
         return context;
     }
@@ -76,7 +78,7 @@ public class TestMvCommand
         args.put(MvCommand.ARG_TOPATH, "/x4");
         new MvCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
         assertTrue(context.getInventory().hasFile("x4"));
         assertFalse(context.getInventory().hasFile("t4"));
     }
@@ -93,7 +95,7 @@ public class TestMvCommand
         args.put(MvCommand.ARG_TOPATH, "/t1/x4");
         new MvCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
 
         assertTrue(InventoryPather.traverse(context.getInventory(), "/t1").isAFolder());
 
@@ -116,7 +118,7 @@ public class TestMvCommand
         args.put(MvCommand.ARG_TOPATH, "/rootfile");
         new MvCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
 
         try
         {
@@ -138,7 +140,7 @@ public class TestMvCommand
         args.put(MvCommand.ARG_TOPATH, "/x1");
         new MvCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
         assertTrue(context.getInventory().hasFolder("x1"));
         assertFalse(context.getInventory().hasFolder("t1"));
     }
@@ -155,7 +157,7 @@ public class TestMvCommand
         args.put(MvCommand.ARG_TOPATH, "/t2/x1");
         new MvCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
 
         try
         {
@@ -176,7 +178,7 @@ public class TestMvCommand
         args.put(MvCommand.ARG_TOPATH, "/t6");
         new MvCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
 
         try
         {

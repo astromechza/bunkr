@@ -6,7 +6,8 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.TagCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.exceptions.TraversalException;
 import org.bunkr.inventory.FileInventoryItem;
@@ -39,8 +40,9 @@ public class TestTagCommand
     public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider(), false, false);
+                .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
 
         FileInventoryItem untaggedFile = new FileInventoryItem("untagged-file");
 
@@ -53,7 +55,7 @@ public class TestTagCommand
 
         context.getInventory().getFolders().add(new FolderInventoryItem("some-folder"));
 
-        MetadataWriter.write(context, new PasswordProvider());
+        MetadataWriter.write(context, usp);
 
         return context;
     }
@@ -77,7 +79,7 @@ public class TestTagCommand
 
         new TagCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
 
         FileInventoryItem fi = context.getInventory().findFile("untagged-file");
         assertTrue(fi.hasTag("newtag-one"));
@@ -116,7 +118,7 @@ public class TestTagCommand
 
         new TagCommand().handle(new Namespace(args));
 
-        context.refresh(new PasswordProvider());
+        context.refresh(new UserSecurityProvider(new PasswordProvider()));
 
         FileInventoryItem fi = context.getInventory().findFile("tagged-file");
         assertThat(fi.getTags().size(), is(equalTo(0)));

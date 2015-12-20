@@ -4,6 +4,7 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.CLI;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import org.bunkr.core.UserSecurityProvider;
 
 /**
  * Creator: benmeier
@@ -20,7 +21,8 @@ public class CheckPasswordCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
         System.out.println("Decryption Succeeded");
     }
 }

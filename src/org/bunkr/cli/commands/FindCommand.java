@@ -2,7 +2,7 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.CLI;
-import org.bunkr.cli.passwords.PasswordProvider;
+import org.bunkr.core.UserSecurityProvider;
 import org.bunkr.exceptions.CLIException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
@@ -61,8 +61,8 @@ public class FindCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
-        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
         IFFTraversalTarget t = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
 
         if (t.isAFile())

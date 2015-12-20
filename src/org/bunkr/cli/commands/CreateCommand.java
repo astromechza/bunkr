@@ -2,13 +2,15 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.cli.CLI;
-import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.EncryptionDescriptor;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PBKDF2Descriptor;
+import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.exceptions.CLIException;
-import org.bunkr.descriptor.Descriptor;
+import org.bunkr.descriptor.IDescriptor;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import org.bunkr.utils.RandomMaker;
 
 import java.io.File;
 
@@ -46,18 +48,19 @@ public class CreateCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
-        passProv.getHashedArchivePassword();
+        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
 
         File archiveFile = args.get(CLI.ARG_ARCHIVE_PATH);
         if (archiveFile.exists() && !args.getBoolean(ARG_OVERWRITE))
             throw new CLIException("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath());
 
-        EncryptionDescriptor ed = (args.getBoolean(ARG_NOENCRYPTION)) ? null : EncryptionDescriptor.makeDefaults();
+        IDescriptor descriptor = new PlaintextDescriptor();
+        if (!args.getBoolean(ARG_NOENCRYPTION))
+        {
+            descriptor = new PBKDF2Descriptor(256, 100000, RandomMaker.get(128));
+        }
 
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(ed), passProv, ed != null, !args.getBoolean(ARG_NOCOMPRESSION));
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, descriptor, usp, !args.getBoolean(ARG_NOCOMPRESSION));
         System.out.println(String.format("Created new archive %s", archiveFile.getAbsolutePath()));
     }
-
-
 }

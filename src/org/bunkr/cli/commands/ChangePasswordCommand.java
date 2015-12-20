@@ -6,7 +6,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
-import org.bunkr.cli.passwords.PasswordProvider;
+import org.bunkr.core.UserSecurityProvider;
 
 import java.io.File;
 
@@ -16,7 +16,7 @@ import java.io.File;
  */
 public class ChangePasswordCommand implements ICLICommand
 {
-    public static final String ARG_NEW_PASSWORD = "newpassword";
+    public static final String ARG_NEW_PASSWORD_FILE = "newpassword";
 
     @Override
     public void buildParser(Subparser target)
@@ -24,7 +24,7 @@ public class ChangePasswordCommand implements ICLICommand
         target.help("change the password protecting the archive");
 
         target.addArgument("new-password")
-                .dest(ARG_NEW_PASSWORD)
+                .dest(ARG_NEW_PASSWORD_FILE)
                 .type(Arguments.fileType().verifyExists().verifyCanRead())
                 .setDefault(new File("-"))
                 .help("read the new archive password from the given file or '-' for stdin");
@@ -33,9 +33,14 @@ public class ChangePasswordCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        ArchiveInfoContext context = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
-        PasswordProvider newPassword = makePasswordProvider(args.get(ARG_NEW_PASSWORD));
-        MetadataWriter.write(context, newPassword);
+        UserSecurityProvider currentSecurity = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        // force user to enter this BEFORE we load the file
+        currentSecurity.getHashedPassword();
+
+        ArchiveInfoContext context = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), currentSecurity);
+
+        UserSecurityProvider newSecurity = new UserSecurityProvider(makePasswordProvider(args.get(ARG_NEW_PASSWORD_FILE)));
+        MetadataWriter.write(context, newSecurity);
         System.out.println("Successfully changed password for achive");
     }
 }

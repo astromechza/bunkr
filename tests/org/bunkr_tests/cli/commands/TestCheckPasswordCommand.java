@@ -1,17 +1,18 @@
 package org.bunkr_tests.cli.commands;
 
 import org.bunkr.core.ArchiveBuilder;
+import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.descriptor.PBKDF2Descriptor;
+import org.bunkr.descriptor.PlaintextDescriptor;
+import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.CheckPasswordCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
-import org.bunkr.descriptor.EncryptionDescriptor;
 import org.bunkr_tests.XTemporaryFolder;
 import org.bunkr_tests.cli.PasswordFile;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
-import org.bouncycastle.crypto.CryptoException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -47,13 +48,13 @@ public class TestCheckPasswordCommand
 
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword(password.getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new Descriptor(EncryptionDescriptor.makeDefaults()),
-                prov,
-                true,
+                new PBKDF2Descriptor(256, 10000, RandomMaker.get(128)),
+                usp,
                 true
         );
 
@@ -72,12 +73,12 @@ public class TestCheckPasswordCommand
         String password = DatatypeConverter.printHexBinary(RandomMaker.get(64));
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword(password.getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new Descriptor(EncryptionDescriptor.makeDefaults()),
-                prov,
-                true,
+                new PBKDF2Descriptor(256, 10000, RandomMaker.get(128)),
+                usp,
                 true
         );
 
@@ -91,9 +92,9 @@ public class TestCheckPasswordCommand
             new CheckPasswordCommand().handle(new Namespace(args));
             fail("Should have raised an exception");
         }
-        catch(CryptoException e)
+        catch(BaseBunkrException e)
         {
-            assertThat(e.getMessage(), is(equalTo("pad block corrupted")));
+            assertThat(e.getMessage(), is(equalTo("org.bouncycastle.crypto.InvalidCipherTextException: pad block corrupted")));
         }
     }
 
@@ -104,9 +105,8 @@ public class TestCheckPasswordCommand
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new Descriptor(null),
-                new PasswordProvider(),
-                false,
+                new PlaintextDescriptor(),
+                new UserSecurityProvider(new PasswordProvider()),
                 true
         );
 

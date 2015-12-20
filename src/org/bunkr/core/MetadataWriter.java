@@ -1,21 +1,14 @@
 package org.bunkr.core;
 
-import org.bunkr.utils.SimpleAES;
-import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.Descriptor;
-import org.bunkr.descriptor.DescriptorJSON;
+import org.bunkr.descriptor.DescriptorBuilder;
+import org.bunkr.descriptor.IDescriptor;
 import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.inventory.Inventory;
-import org.bunkr.inventory.InventoryJSON;
 import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
 
 /**
  * Creator: benmeier
@@ -29,41 +22,20 @@ public class MetadataWriter
             Integer.BYTES
     );
 
-    public static void write(ArchiveInfoContext context, PasswordProvider uic) throws IOException, CryptoException, BaseBunkrException
+    public static void write(ArchiveInfoContext context, UserSecurityProvider uic) throws IOException, CryptoException, BaseBunkrException
     {
         write(context.filePath, context.getInventory(), context.getDescriptor(), uic, context.getBlockSize());
     }
 
-    public static void write(File filePath, Inventory inventory, Descriptor descriptor, PasswordProvider uic, int blockSize)
+    public static void write(File filePath, Inventory inventory, IDescriptor descriptor, UserSecurityProvider uic, int blockSize)
             throws IOException, CryptoException, BaseBunkrException
     {
         try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"))
         {
             try(FileChannel fc = raf.getChannel())
             {
-                byte[] inventoryJsonBytes = InventoryJSON.encode(inventory).getBytes();
-                byte[] descriptorJsonBytes = DescriptorJSON.encode(descriptor).getBytes();
-
-                if (descriptor.hasEncryption())
-                {
-                    // otherwise, do encryption
-                    PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
-                    g.init(uic.getHashedArchivePassword(), descriptor.getEncryption().pbkdf2Salt,
-                           descriptor.getEncryption().pbkdf2Iterations);
-                    ParametersWithIV kp = ((ParametersWithIV) g.generateDerivedParameters(
-                            descriptor.getEncryption().aesKeyLength,
-                            descriptor.getEncryption().aesKeyLength)
-                    );
-
-                    // encrypt the inventory
-                    byte[] encryptedInv = SimpleAES.encrypt(
-                            inventoryJsonBytes,
-                            ((KeyParameter) kp.getParameters()).getKey(),
-                            kp.getIV()
-                    );
-                    Arrays.fill(inventoryJsonBytes, (byte) 0);
-                    inventoryJsonBytes = encryptedInv;
-                }
+                byte[] inventoryJsonBytes = descriptor.writeInventoryToBytes(inventory, uic);
+                byte[] descriptorJsonBytes = DescriptorBuilder.toJSON(descriptor).getBytes();
 
                 long metaLength = Integer.BYTES + inventoryJsonBytes.length + Integer.BYTES + descriptorJsonBytes.length;
 

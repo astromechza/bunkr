@@ -4,6 +4,7 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.CreateCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
+import org.bunkr.core.UserSecurityProvider;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr_tests.XTemporaryFolder;
 import org.bunkr_tests.cli.PasswordFile;
@@ -17,9 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Creator: benmeier
@@ -52,7 +51,8 @@ public class TestCreateCommand
 
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword(pwFile);
-        new ArchiveInfoContext(archiveFile, prov);
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
+        new ArchiveInfoContext(archiveFile, usp);
     }
 
     @Test
@@ -94,7 +94,8 @@ public class TestCreateCommand
 
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword(pwFile);
-        new ArchiveInfoContext(archiveFile, prov);
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
+        new ArchiveInfoContext(archiveFile, usp);
     }
 
     @Test
@@ -111,8 +112,8 @@ public class TestCreateCommand
         args.put(CreateCommand.ARG_NOENCRYPTION, true);
         new CreateCommand().handle(new Namespace(args));
 
-        ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, new PasswordProvider());
-        assertNull(c.getDescriptor().getEncryption());
+        ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, new UserSecurityProvider(new PasswordProvider()));
+        assertFalse(c.getDescriptor().mustEncryptFiles());
     }
 
     @Test
@@ -131,7 +132,8 @@ public class TestCreateCommand
 
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword(pwFile);
-        ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, prov);
-        assertNotNull(c.getDescriptor().getEncryption());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
+        ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, usp);
+        assertTrue(c.getDescriptor().mustEncryptFiles());
     }
 }

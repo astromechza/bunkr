@@ -2,8 +2,8 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
-import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.CLI;
+import org.bunkr.core.UserSecurityProvider;
 import org.bunkr.exceptions.TraversalException;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -37,10 +37,10 @@ public class MkdirCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
-        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
         mkdirs(aic.getInventory(), args.getString(ARG_PATH), args.getBoolean(ARG_RECURSIVE));
-        MetadataWriter.write(aic, passProv);
+        MetadataWriter.write(aic, usp);
     }
 
     public void mkdirs(Inventory inv, String targetPath, boolean recursive) throws TraversalException

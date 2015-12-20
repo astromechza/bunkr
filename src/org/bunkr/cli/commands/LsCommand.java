@@ -1,13 +1,13 @@
 package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.cli.Formatters;
 import org.bunkr.cli.TabularLayout;
 import org.bunkr.cli.CLI;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import org.bunkr.core.UserSecurityProvider;
 import org.bunkr.inventory.*;
 
 import java.util.Collections;
@@ -46,8 +46,8 @@ public class LsCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        PasswordProvider passProv = makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE));
-        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), passProv);
+        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
         IFFTraversalTarget t = InventoryPather.traverse(aic.getInventory(), args.getString(ARG_PATH));
 
         TabularLayout table = new TabularLayout();
