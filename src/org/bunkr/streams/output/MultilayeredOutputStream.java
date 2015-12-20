@@ -40,7 +40,7 @@ public class MultilayeredOutputStream extends OutputStream
                     new BlockAllocationManager(context.getInventory(), target.getBlocks())
         );
 
-        if (context.getDescriptor().hasEncryption())
+        if (context.getInventory().areFilesEncrypted())
         {
             byte[] edata = target.getEncryptionData();
             if (edata == null)
@@ -62,7 +62,7 @@ public class MultilayeredOutputStream extends OutputStream
             this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
         }
 
-        if (context.getDescriptor().hasCompression())
+        if (context.getInventory().areFilesCompressed())
         {
             this.topstream = new DeflaterOutputStream(this.topstream, new Deflater(Deflater.BEST_SPEED));
         }

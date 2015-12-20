@@ -93,7 +93,7 @@ public class TestInventoryPather
 
     private static Inventory buildFakeInventory()
     {
-        Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>());
+        Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>(), false, false);
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         i.getFolders().add(d1);
         FolderInventoryItem d2 = new FolderInventoryItem("d2");

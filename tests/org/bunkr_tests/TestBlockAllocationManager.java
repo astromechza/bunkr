@@ -27,7 +27,7 @@ public class TestBlockAllocationManager
         FileInventoryItem file = new FileInventoryItem("something");
         file.setBlocks(new FragmentedRange(10, 8));
         files.add(file);
-        return new Inventory(files, new ArrayList<>());
+        return new Inventory(files, new ArrayList<>(), false, false);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class TestBlockAllocationManager
         }
         catch(Exception ignored) {}
 
-        bam = new BlockAllocationManager(new Inventory(new ArrayList<>(), new ArrayList<>()), new FragmentedRange());
+        bam = new BlockAllocationManager(new Inventory(new ArrayList<>(), new ArrayList<>(), false, false), new FragmentedRange());
 
         try
         {

@@ -8,12 +8,17 @@ import java.util.List;
  */
 public class Inventory implements IFFContainer, IFFTraversalTarget
 {
+    private final boolean filesCompressed;
+    private final boolean filesEncrypted;
     private final FFContainer ffcontainer;
 
-    public Inventory(List<FileInventoryItem> files, List<FolderInventoryItem> folders
+    public Inventory(List<FileInventoryItem> files, List<FolderInventoryItem> folders,
+                     boolean encrypted, boolean compressed
     )
     {
         this.ffcontainer = new FFContainer(files, folders);
+        this.filesCompressed = compressed;
+        this.filesEncrypted = encrypted;
     }
 
     public List<FolderInventoryItem> getFolders()
@@ -36,5 +41,15 @@ public class Inventory implements IFFContainer, IFFTraversalTarget
     public boolean isRoot()
     {
         return true;
+    }
+
+    public boolean areFilesCompressed()
+    {
+        return filesCompressed;
+    }
+
+    public boolean areFilesEncrypted()
+    {
+        return filesEncrypted;
     }
 }

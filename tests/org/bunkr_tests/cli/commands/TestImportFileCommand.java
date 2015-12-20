@@ -53,7 +53,7 @@ public class TestImportFileCommand
     {
         File archiveFile = folder.newFile();
 
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null, null),new PasswordProvider());
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null),new PasswordProvider(), false, false);
 
         File fileToImport = folder.newFile();
         try(FileOutputStream fos = new FileOutputStream(fileToImport))
@@ -85,7 +85,7 @@ public class TestImportFileCommand
     {
         File archiveFile = folder.newFile();
 
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null, null), new PasswordProvider());
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null), new PasswordProvider(), false, false);
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
@@ -117,7 +117,7 @@ public class TestImportFileCommand
     {
         File archiveFile = folder.newFile();
 
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null, null), new PasswordProvider());
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null), new PasswordProvider(), false, false);
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
@@ -144,7 +144,7 @@ public class TestImportFileCommand
         File archiveFile = folder.newFile();
 
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new Descriptor(null, null), new PasswordProvider()
+                archiveFile, new Descriptor(null), new PasswordProvider(), false, false
         );
 
         {
@@ -182,7 +182,7 @@ public class TestImportFileCommand
         File archiveFile = folder.newFile();
 
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new Descriptor(null, null), new PasswordProvider()
+                archiveFile, new Descriptor(null), new PasswordProvider(), false, false
         );
 
         {
@@ -221,7 +221,7 @@ public class TestImportFileCommand
         File archiveFile = folder.newFile();
 
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new Descriptor(null, null), new PasswordProvider()
+                archiveFile, new Descriptor(null), new PasswordProvider(), false, false
         );
 
         {

@@ -5,7 +5,6 @@ import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.CheckPasswordCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.CompressionDescriptor;
 import org.bunkr.descriptor.Descriptor;
 import org.bunkr.descriptor.EncryptionDescriptor;
 import org.bunkr_tests.XTemporaryFolder;
@@ -52,8 +51,10 @@ public class TestCheckPasswordCommand
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new Descriptor(EncryptionDescriptor.makeDefaults(), CompressionDescriptor.makeDefaults()),
-                prov
+                new Descriptor(EncryptionDescriptor.makeDefaults()),
+                prov,
+                true,
+                true
         );
 
         File pwFile = PasswordFile.genPasswordFile(folder.newFilePath(), password.getBytes());
@@ -74,8 +75,10 @@ public class TestCheckPasswordCommand
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new Descriptor(EncryptionDescriptor.makeDefaults(), CompressionDescriptor.makeDefaults()),
-                prov
+                new Descriptor(EncryptionDescriptor.makeDefaults()),
+                prov,
+                true,
+                true
         );
 
         File pwFile = PasswordFile.genPasswordFile(folder.newFilePath(), "this is definitely not the password".getBytes());
@@ -101,8 +104,10 @@ public class TestCheckPasswordCommand
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new Descriptor(null, CompressionDescriptor.makeDefaults()),
-                new PasswordProvider()
+                new Descriptor(null),
+                new PasswordProvider(),
+                false,
+                true
         );
 
         Map<String, Object> args = new HashMap<>();

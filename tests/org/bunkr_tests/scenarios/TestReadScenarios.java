@@ -5,7 +5,6 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.utils.IO;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.CompressionDescriptor;
 import org.bunkr.descriptor.Descriptor;
 import org.bunkr.descriptor.EncryptionDescriptor;
 import org.bunkr.inventory.FileInventoryItem;
@@ -100,7 +99,7 @@ public class TestReadScenarios
         prov.setArchivePassword("HunterTwo".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), prov);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), prov, false, false);
 
         runThreeFileTestOnContext(context, prov);
     }
@@ -113,7 +112,7 @@ public class TestReadScenarios
         prov.setArchivePassword("HunterTwo".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, CompressionDescriptor.makeDefaults()), prov);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), prov, false, true);
 
         runThreeFileTestOnContext(context, prov);
     }
@@ -126,7 +125,7 @@ public class TestReadScenarios
         prov.setArchivePassword("HunterTwo".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults(), null), prov);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults()), prov, true, false);
 
         runThreeFileTestOnContext(context, prov);
     }
@@ -139,7 +138,7 @@ public class TestReadScenarios
         prov.setArchivePassword("HunterTwo".getBytes());
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults(), CompressionDescriptor.makeDefaults()), prov);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(EncryptionDescriptor.makeDefaults()), prov, true, true);
 
         runThreeFileTestOnContext(context, prov);
     }

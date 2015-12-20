@@ -113,7 +113,6 @@ public class TestCreateCommand
 
         ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, new PasswordProvider());
         assertNull(c.getDescriptor().getEncryption());
-        assertNotNull(c.getDescriptor().getCompression());
     }
 
     @Test
@@ -134,6 +133,5 @@ public class TestCreateCommand
         prov.setArchivePassword(pwFile);
         ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, prov);
         assertNotNull(c.getDescriptor().getEncryption());
-        assertNull(c.getDescriptor().getCompression());
     }
 }

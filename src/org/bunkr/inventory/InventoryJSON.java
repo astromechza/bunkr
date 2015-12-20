@@ -31,6 +31,8 @@ public class InventoryJSON
             folders.add(FolderInventoryItemJSON.encodeO(item));
         }
         out.put("folders", folders);
+        out.put("encrypted", input.areFilesEncrypted());
+        out.put("compressed", input.areFilesCompressed());
         return out;
     }
 
@@ -55,7 +57,7 @@ public class InventoryJSON
             folders.add(FolderInventoryItemJSON.decodeO((JSONObject) item));
         }
 
-        return new Inventory(files, folders);
+        return new Inventory(files, folders, (boolean) input.get("encrypted"), (boolean) input.get("compressed"));
     }
 
     public static Inventory decode(String input)

@@ -42,8 +42,8 @@ public class TestFindCommand
         File archivePath = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
                 archivePath,
-                new Descriptor(null, null),
-                new PasswordProvider()
+                new Descriptor(null),
+                new PasswordProvider(), false, false
         );
 
         FileInventoryItem ff1 = new FileInventoryItem("abc");

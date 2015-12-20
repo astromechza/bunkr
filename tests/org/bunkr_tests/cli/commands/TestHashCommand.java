@@ -46,7 +46,7 @@ public class TestHashCommand
         File archiveFile = folder.newFile();
 
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archiveFile, new Descriptor(null, null), new PasswordProvider());
+                .createNewEmptyArchive(archiveFile, new Descriptor(null), new PasswordProvider(), false, false);
 
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         context.getInventory().getFiles().add(fileOne);

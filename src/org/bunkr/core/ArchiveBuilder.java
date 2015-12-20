@@ -19,10 +19,10 @@ public class ArchiveBuilder
     public static final byte[] VERSION_BYTES = new byte[] {0, 0, 1};
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
-    public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor, PasswordProvider uic)
+    public static ArchiveInfoContext createNewEmptyArchive(File path, Descriptor descriptor, PasswordProvider uic, boolean encrypted, boolean compressed)
             throws IOException, CryptoException, BaseBunkrException
     {
-        Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>());
+        Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>(), encrypted, compressed);
 
         try(FileOutputStream fos = new FileOutputStream(path))
         {

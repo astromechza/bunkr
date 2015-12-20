@@ -36,7 +36,7 @@ public class TestMkdirCommand
 
     public Inventory makeSampleInventory()
     {
-        Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>());
+        Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>(), false, false);
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         i.getFolders().add(d1);
         FolderInventoryItem d2 = new FolderInventoryItem("d2");
@@ -57,7 +57,7 @@ public class TestMkdirCommand
     public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new Descriptor(null, null), new PasswordProvider());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider(), false, false);
 
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         context.getInventory().getFolders().add(d1);

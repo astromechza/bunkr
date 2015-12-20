@@ -33,7 +33,7 @@ public class MultilayeredInputStream extends InputStream
             this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
             this.topstream = this.baseStream;
 
-            if (context.getDescriptor().hasEncryption())
+            if (context.getInventory().areFilesEncrypted())
             {
                 byte[] edata = target.getEncryptionData();
                 byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
@@ -44,7 +44,7 @@ public class MultilayeredInputStream extends InputStream
                 this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
             }
 
-            if (context.getDescriptor().hasCompression())
+            if (context.getInventory().areFilesCompressed())
             {
                 this.topstream = new InflaterInputStream(this.topstream);
             }
