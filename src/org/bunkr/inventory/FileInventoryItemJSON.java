@@ -1,6 +1,7 @@
 package org.bunkr.inventory;
 
 import org.bunkr.fragmented_range.FragmentedRangeJSON;
+import org.bunkr.streams.AlgorithmIdentifier;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
@@ -25,6 +26,7 @@ public class FileInventoryItemJSON
     public static final String KEY_ACTUAL_SIZE = "actualSize";
     public static final String KEY_MODIFIED_AT = "modifiedAt";
     public static final String KEY_ENCRYPTION_DATA = "encryptionData";
+    public static final String KEY_ALGORITHMS = "algorithms";
     public static final String KEY_INTEGRITY_HASH = "integrityHash";
     public static final String KEY_TAGS = "tags";
 
@@ -50,6 +52,11 @@ public class FileInventoryItemJSON
         else
             out.put(KEY_INTEGRITY_HASH, null);
 
+        if (input.getAlgorithms() != null)
+            out.put(KEY_ALGORITHMS, input.getAlgorithms().toString());
+        else
+            out.put(KEY_ALGORITHMS, null);
+
         out.put(KEY_TAGS, new ArrayList<>(input.getTags()));
 
         return out;
@@ -69,6 +76,10 @@ public class FileInventoryItemJSON
         byte[] intH = null;
         if (input.getOrDefault(KEY_INTEGRITY_HASH, null) != null) intH = DatatypeConverter.parseBase64Binary((String) input.get(KEY_INTEGRITY_HASH));
 
+        AlgorithmIdentifier aid = null;
+        if (input.getOrDefault(KEY_ALGORITHMS, null) != null) aid = new AlgorithmIdentifier((String) input.get(
+                KEY_ALGORITHMS));
+
         return new FileInventoryItem(
                 (String) input.get(KEY_NAME),
                 UUID.fromString((String) input.get(KEY_UUID)),
@@ -77,6 +88,7 @@ public class FileInventoryItemJSON
                 (Long) input.get(KEY_ACTUAL_SIZE),
                 (Long) input.get(KEY_MODIFIED_AT),
                 encD,
+                aid,
                 intH,
                 new HashSet<>((JSONArray) input.get(KEY_TAGS))
         );

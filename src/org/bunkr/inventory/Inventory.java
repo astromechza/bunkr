@@ -1,5 +1,7 @@
 package org.bunkr.inventory;
 
+import org.bunkr.streams.AlgorithmIdentifier;
+
 import java.util.List;
 
 /**
@@ -9,10 +11,11 @@ import java.util.List;
 public class Inventory implements IFFContainer, IFFTraversalTarget
 {
     private final FFContainer ffcontainer;
+    private final AlgorithmIdentifier defaultAlgorithms;
 
-    public Inventory(List<FileInventoryItem> files, List<FolderInventoryItem> folders
-    )
+    public Inventory(AlgorithmIdentifier defaults, List<FileInventoryItem> files, List<FolderInventoryItem> folders)
     {
+        this.defaultAlgorithms = defaults;
         this.ffcontainer = new FFContainer(files, folders);
     }
 
@@ -36,5 +39,10 @@ public class Inventory implements IFFContainer, IFFTraversalTarget
     public boolean isRoot()
     {
         return true;
+    }
+
+    public AlgorithmIdentifier getDefaultAlgorithms()
+    {
+        return defaultAlgorithms;
     }
 }

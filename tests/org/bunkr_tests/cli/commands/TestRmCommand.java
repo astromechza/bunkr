@@ -58,7 +58,7 @@ public class TestRmCommand
     {
         File archivePath = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archivePath, new Descriptor(null, null), new PasswordProvider());
+                .createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider());
 
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
         context.getInventory().getFolders().add(d1);

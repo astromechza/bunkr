@@ -9,7 +9,6 @@ import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.ChangePasswordCommand;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.CompressionDescriptor;
 import org.bunkr.descriptor.Descriptor;
 import org.bunkr.descriptor.EncryptionDescriptor;
 import org.bunkr_tests.XTemporaryFolder;
@@ -52,7 +51,7 @@ public class TestChangePasswordCommand
 
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new Descriptor(EncryptionDescriptor.makeDefaults(), CompressionDescriptor.makeDefaults()),
+                new Descriptor(EncryptionDescriptor.makeDefaults()),
                 originalPasswordProv
         );
 

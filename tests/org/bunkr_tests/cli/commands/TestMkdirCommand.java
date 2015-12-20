@@ -57,7 +57,7 @@ public class TestMkdirCommand
     public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new Descriptor(null, null), new PasswordProvider());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider());
 
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         context.getInventory().getFolders().add(d1);

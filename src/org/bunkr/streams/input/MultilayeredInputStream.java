@@ -1,5 +1,7 @@
 package org.bunkr.streams.input;
 
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -8,6 +10,7 @@ import org.bouncycastle.crypto.io.CipherInputStream;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bunkr.streams.AlgorithmIdentifier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,21 +36,9 @@ public class MultilayeredInputStream extends InputStream
             this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
             this.topstream = this.baseStream;
 
-            if (context.getDescriptor().hasEncryption())
-            {
-                byte[] edata = target.getEncryptionData();
-                byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
-                byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
-
-                SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
-                fileCipher.init(false, new ParametersWithIV(new KeyParameter(ekey), eiv));
-                this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
-            }
-
-            if (context.getDescriptor().hasCompression())
-            {
-                this.topstream = new InflaterInputStream(this.topstream);
-            }
+            AlgorithmIdentifier aid = target.getAlgorithms();
+            if (aid.getEngine() != null) addOnEncryptionStream(aid, target.getEncryptionData());
+            if (aid.getCompressor() != null) addOnCompressorStream(aid);
         }
     }
 
@@ -105,5 +96,47 @@ public class MultilayeredInputStream extends InputStream
     public void setCheckHashOnFinish(boolean b)
     {
         if (this.baseStream != null) this.baseStream.setCheckHashOnFinish(b);
+    }
+
+    private void addOnEncryptionStream(AlgorithmIdentifier aid, byte[] encryptionData)
+    {
+        BlockCipher baseCipher;
+        CipherParameters cipherParameters;
+        if (aid.getEngine() == AlgorithmIdentifier.Engine.AES256)
+        {
+            int blockLength = 256 / 8;
+            if (encryptionData.length != 2 * blockLength)
+                throw new IllegalArgumentException(String.format("Not enough encryption data provided for AES256. %d != %d", encryptionData.length, 2 * blockLength));
+            baseCipher = new AESEngine();
+
+            byte[] ekey = Arrays.copyOfRange(encryptionData, 0, blockLength);
+            byte[] eiv = Arrays.copyOfRange(encryptionData, blockLength, encryptionData.length);
+
+            cipherParameters = new ParametersWithIV(new KeyParameter(ekey), eiv);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Encryption algorithm not implemented on MultilayeredInputStream");
+        }
+
+        if (aid.getAlgorithm() == AlgorithmIdentifier.Algorithm.CTR)
+        {
+            baseCipher = new SICBlockCipher(baseCipher);
+        }
+
+        baseCipher.init(false, cipherParameters);
+        this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(baseCipher));
+    }
+
+    private void addOnCompressorStream(AlgorithmIdentifier aid)
+    {
+        if (aid.getCompressor() == AlgorithmIdentifier.Compressor.DEFLATE)
+        {
+            this.topstream = new InflaterInputStream(this.topstream);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Compressor not implemented on MultilayeredInputStream");
+        }
     }
 }

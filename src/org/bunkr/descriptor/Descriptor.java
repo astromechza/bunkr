@@ -8,23 +8,10 @@ package org.bunkr.descriptor;
 public class Descriptor
 {
     private final EncryptionDescriptor encryption;
-    private final CompressionDescriptor compression;
 
-    public Descriptor(EncryptionDescriptor encryption, CompressionDescriptor compression
-    )
+    public Descriptor(EncryptionDescriptor encryption)
     {
         this.encryption = encryption;
-        this.compression = compression;
-    }
-
-    public static Descriptor makeDefaults()
-    {
-        return new Descriptor(EncryptionDescriptor.makeDefaults(), CompressionDescriptor.makeDefaults());
-    }
-
-    public CompressionDescriptor getCompression()
-    {
-        return compression;
     }
 
     public EncryptionDescriptor getEncryption()
@@ -35,10 +22,5 @@ public class Descriptor
     public boolean hasEncryption()
     {
         return this.encryption != null;
-    }
-
-    public boolean hasCompression()
-    {
-        return this.compression != null;
     }
 }

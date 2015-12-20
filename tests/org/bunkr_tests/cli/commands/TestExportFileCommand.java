@@ -3,6 +3,7 @@ package org.bunkr_tests.cli.commands;
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
+import org.bunkr.streams.AlgorithmIdentifier;
 import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.ExportFileCommand;
@@ -48,7 +49,7 @@ public class TestExportFileCommand
     {
         File archiveFile = folder.newFile();
 
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null, null), new PasswordProvider());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(null), new PasswordProvider());
 
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
         context.getInventory().getFiles().add(fileOne);

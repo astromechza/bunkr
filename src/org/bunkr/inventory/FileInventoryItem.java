@@ -1,6 +1,7 @@
 package org.bunkr.inventory;
 
 import org.bunkr.fragmented_range.FragmentedRange;
+import org.bunkr.streams.AlgorithmIdentifier;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -16,15 +17,17 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     private long sizeOnDisk;
     private long modifiedAt;
     private byte[] encryptionData;
+    private AlgorithmIdentifier algorithms;
     private byte[] integrityHash;
     private FragmentedRange blocks;
     private long actualSize;
     private Set<String> tags;
 
-    public FileInventoryItem(String name, UUID uuid, FragmentedRange blocks, long sizeOnDisk, long actualSize, long modifiedAt, byte[] encryptionData, byte[] integrityHash, HashSet<String> tags)
+    public FileInventoryItem(String name, UUID uuid, FragmentedRange blocks, long sizeOnDisk, long actualSize, long modifiedAt, byte[] encryptionData, AlgorithmIdentifier algorithm, byte[] integrityHash, HashSet<String> tags)
     {
         super(name, uuid);
         this.encryptionData = encryptionData;
+        this.algorithms = algorithm;
         this.integrityHash = integrityHash;
         this.sizeOnDisk = sizeOnDisk;
         this.actualSize = actualSize;
@@ -40,6 +43,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         this.blocks = new FragmentedRange();
         this.modifiedAt = System.currentTimeMillis();
         this.encryptionData = null;
+        this.algorithms = new AlgorithmIdentifier(null, null, null, null);
         this.integrityHash = null;
         this.tags = new HashSet<>();
     }
@@ -62,6 +66,16 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     public void setencryptionData(byte[] encryptionData)
     {
         this.encryptionData = encryptionData;
+    }
+
+    public AlgorithmIdentifier getAlgorithms()
+    {
+        return algorithms;
+    }
+
+    public void setAlgorithms(AlgorithmIdentifier algorithms)
+    {
+        this.algorithms = algorithms;
     }
 
     public byte[] getIntegrityHash()

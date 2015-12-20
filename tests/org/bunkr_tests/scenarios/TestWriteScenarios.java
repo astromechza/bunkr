@@ -12,6 +12,7 @@ import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.inventory.FolderInventoryItem;
 import org.bunkr.inventory.Inventory;
 import org.bunkr.inventory.InventoryJSON;
+import org.bunkr.streams.AlgorithmIdentifier;
 import org.bunkr.streams.output.MultilayeredOutputStream;
 import org.bunkr.utils.IO;
 import org.bunkr.utils.RandomMaker;
@@ -50,7 +51,7 @@ public class TestWriteScenarios
         File tempfile = folder.newFile();
         PasswordProvider passProv = new PasswordProvider();
         IArchiveInfoContext
-                context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), passProv);
+                context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), passProv);
         assertTrue(context.getInventory().getFiles().isEmpty());
         assertTrue(context.getInventory().getFolders().isEmpty());
         assertTrue(context.isFresh());
@@ -68,7 +69,6 @@ public class TestWriteScenarios
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = DescriptorJSON.decode(desJSON);
 
-            assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
@@ -86,7 +86,7 @@ public class TestWriteScenarios
         File tempfile = folder.newFile();
 
         PasswordProvider passProv = new PasswordProvider();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), passProv);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), passProv);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
         context.getInventory().getFiles().add(newFile);
@@ -117,7 +117,6 @@ public class TestWriteScenarios
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = DescriptorJSON.decode(desJSON);
 
-            assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
             FragmentedRange expected = new FragmentedRange(0, 4096 / ArchiveBuilder.DEFAULT_BLOCK_SIZE);
@@ -142,7 +141,7 @@ public class TestWriteScenarios
     {
         File tempfile = folder.newFile();
         PasswordProvider passProv = new PasswordProvider();
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), passProv);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), passProv);
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
         fileOne.addTag("bob");
@@ -197,7 +196,6 @@ public class TestWriteScenarios
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = DescriptorJSON.decode(desJSON);
 
-            assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
@@ -234,7 +232,7 @@ public class TestWriteScenarios
         File tempfile = folder.newFile();
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword("HunterTwo".getBytes());
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null, null), prov);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new Descriptor(null), prov);
 
         FolderInventoryItem folder1 = new FolderInventoryItem("some folder");
         FolderInventoryItem folder2 = new FolderInventoryItem("another folder");
@@ -259,7 +257,6 @@ public class TestWriteScenarios
             String desJSON = IO.readNByteString(dis, dis.readInt());
             Descriptor descriptor = DescriptorJSON.decode(desJSON);
 
-            assertEquals(descriptor.getCompression(), null);
             assertEquals(descriptor.getEncryption(), null);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
@@ -298,7 +295,7 @@ public class TestWriteScenarios
          */
 
         // first create empty archive
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(folder.newFile(), new Descriptor(null, null), new PasswordProvider());
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(folder.newFile(), new Descriptor(null), new PasswordProvider());
 
         // now write 4 files
         for (int i = 0; i < 4; i++)

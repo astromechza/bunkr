@@ -3,7 +3,6 @@ package org.bunkr.cli.commands;
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.descriptor.CompressionDescriptor;
 import org.bunkr.descriptor.EncryptionDescriptor;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.descriptor.Descriptor;
@@ -37,11 +36,6 @@ public class CreateCommand implements ICLICommand
                 .type(Boolean.class)
                 .action(Arguments.storeTrue())
                 .help("the archive will not require a password");
-        target.addArgument("--no-compression")
-                .dest(ARG_NOCOMPRESSION)
-                .type(Boolean.class)
-                .action(Arguments.storeTrue())
-                .help("the archive will not use compression on its files");
     }
 
     @Override
@@ -55,9 +49,8 @@ public class CreateCommand implements ICLICommand
             throw new CLIException("File %s already exists. Pass --overwrite in order to overwrite it.", archiveFile.getAbsolutePath());
 
         EncryptionDescriptor ed = (args.getBoolean(ARG_NOENCRYPTION)) ? null : EncryptionDescriptor.makeDefaults();
-        CompressionDescriptor cd = (args.getBoolean(ARG_NOCOMPRESSION)) ? null : CompressionDescriptor.makeDefaults();
 
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(ed, cd), passProv);
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new Descriptor(ed), passProv);
         System.out.println(String.format("Created new archive %s", archiveFile.getAbsolutePath()));
     }
 

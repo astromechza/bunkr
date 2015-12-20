@@ -42,7 +42,7 @@ public class TestFindCommand
         File archivePath = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
                 archivePath,
-                new Descriptor(null, null),
+                new Descriptor(null),
                 new PasswordProvider()
         );
 

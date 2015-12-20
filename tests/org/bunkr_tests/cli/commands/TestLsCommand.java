@@ -42,7 +42,7 @@ public class TestLsCommand
     {
         File archivePath = folder.newFile();
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archivePath, new Descriptor(null, null), new PasswordProvider());
+                .createNewEmptyArchive(archivePath, new Descriptor(null), new PasswordProvider());
 
         FileInventoryItem untaggedFile = new FileInventoryItem("untagged-file");
 

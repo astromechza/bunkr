@@ -1,7 +1,10 @@
 package org.bunkr.streams.output;
 
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.BlockAllocationManager;
+import org.bunkr.streams.AlgorithmIdentifier;
 import org.bunkr.utils.RandomMaker;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -40,32 +43,9 @@ public class MultilayeredOutputStream extends OutputStream
                     new BlockAllocationManager(context.getInventory(), target.getBlocks())
         );
 
-        if (context.getDescriptor().hasEncryption())
-        {
-            byte[] edata = target.getEncryptionData();
-            if (edata == null)
-            {
-                edata = RandomMaker.get(256 * 2);
-                target.setencryptionData(edata);
-            }
-            else if (refreshKeys)
-            {
-                RandomMaker.fill(edata);
-                target.setencryptionData(edata);
-            }
-            byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
-            byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
-
-            SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
-            ParametersWithIV keyparams = new ParametersWithIV(new KeyParameter(ekey), eiv);
-            fileCipher.init(true, keyparams);
-            this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
-        }
-
-        if (context.getDescriptor().hasCompression())
-        {
-            this.topstream = new DeflaterOutputStream(this.topstream, new Deflater(Deflater.BEST_SPEED));
-        }
+        AlgorithmIdentifier aid = target.getAlgorithms();
+        if(aid.getEngine() != null) addOnEncryptionStream(aid, target.getEncryptionData(), refreshKeys);
+        if(aid.getCompressor() != null) addOnCompressorStream(aid);
     }
 
     public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws FileNotFoundException
@@ -105,5 +85,57 @@ public class MultilayeredOutputStream extends OutputStream
     {
         this.topstream.close();
         target.setActualSize(this.writtenBytes);
+    }
+
+
+    private void addOnEncryptionStream(AlgorithmIdentifier aid, byte[] encryptionData, boolean refreshKeys)
+    {
+        BlockCipher baseCipher;
+        CipherParameters cipherParameters;
+        if (aid.getEngine() == AlgorithmIdentifier.Engine.AES256)
+        {
+            int blockLength = 256 / 8;
+            byte[] edata = target.getEncryptionData();
+            if (edata == null)
+            {
+                edata = RandomMaker.get(256 * 2);
+                target.setencryptionData(edata);
+            }
+            else if (refreshKeys)
+            {
+                RandomMaker.fill(edata);
+                target.setencryptionData(edata);
+            }
+            baseCipher = new AESEngine();
+
+            byte[] ekey = Arrays.copyOfRange(encryptionData, 0, blockLength);
+            byte[] eiv = Arrays.copyOfRange(encryptionData, blockLength, encryptionData.length);
+
+            cipherParameters = new ParametersWithIV(new KeyParameter(ekey), eiv);
+        }
+        else
+        {
+            throw new IllegalArgumentException("Encryption algorithm not implemented on MultilayeredInputStream");
+        }
+
+        if (aid.getAlgorithm() == AlgorithmIdentifier.Algorithm.CTR)
+        {
+            baseCipher = new SICBlockCipher(baseCipher);
+        }
+
+        baseCipher.init(true, cipherParameters);
+        this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(baseCipher));
+    }
+
+    private void addOnCompressorStream(AlgorithmIdentifier aid)
+    {
+        if (aid.getCompressor() == AlgorithmIdentifier.Compressor.DEFLATE)
+        {
+            this.topstream = new DeflaterOutputStream(this.topstream, new Deflater(Deflater.BEST_SPEED));
+        }
+        else
+        {
+            throw new IllegalArgumentException("Compressor not implemented on MultilayeredInputStream");
+        }
     }
 }
