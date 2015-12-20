@@ -52,7 +52,7 @@ public class TestChangePasswordCommand
 
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new PBKDF2Descriptor(256, 10000, RandomMaker.get(128)),
+                PBKDF2Descriptor.makeDefaults(),
                 originalUSP,
                 true
         );

@@ -53,7 +53,7 @@ public class TestCheckPasswordCommand
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new PBKDF2Descriptor(256, 10000, RandomMaker.get(128)),
+                PBKDF2Descriptor.makeDefaults(),
                 usp,
                 true
         );
@@ -77,7 +77,7 @@ public class TestCheckPasswordCommand
         File archiveFile = folder.newFilePath();
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
-                new PBKDF2Descriptor(256, 10000, RandomMaker.get(128)),
+                PBKDF2Descriptor.makeDefaults(),
                 usp,
                 true
         );

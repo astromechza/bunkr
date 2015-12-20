@@ -10,7 +10,6 @@ import org.bunkr.descriptor.IDescriptor;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bunkr.utils.RandomMaker;
 
 import java.io.File;
 
@@ -57,7 +56,7 @@ public class CreateCommand implements ICLICommand
         IDescriptor descriptor = new PlaintextDescriptor();
         if (!args.getBoolean(ARG_NOENCRYPTION))
         {
-            descriptor = new PBKDF2Descriptor(256, 100000, RandomMaker.get(128));
+            descriptor = PBKDF2Descriptor.makeDefaults();
         }
 
         ArchiveBuilder.createNewEmptyArchive(archiveFile, descriptor, usp, !args.getBoolean(ARG_NOCOMPRESSION));

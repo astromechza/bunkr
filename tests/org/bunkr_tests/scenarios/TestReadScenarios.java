@@ -11,7 +11,6 @@ import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.streams.input.MultilayeredInputStream;
 import org.bunkr.streams.output.MultilayeredOutputStream;
-import org.bunkr.utils.RandomMaker;
 import org.bunkr_tests.XTemporaryFolder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -130,8 +129,7 @@ public class TestReadScenarios
         UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PBKDF2Descriptor(256, 10000,
-                                                                                                         RandomMaker.get(128)), usp, false);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp, false);
 
         runThreeFileTestOnContext(context, usp);
     }
@@ -145,9 +143,7 @@ public class TestReadScenarios
         UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PBKDF2Descriptor(256, 10000,
-                                                                                                         RandomMaker.get(
-                                                                                                                 128)), usp, true);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp, true);
 
         runThreeFileTestOnContext(context, usp);
     }

@@ -9,6 +9,7 @@ import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.exceptions.IllegalPasswordException;
 import org.bunkr.inventory.Inventory;
 import org.bunkr.inventory.InventoryJSON;
+import org.bunkr.utils.RandomMaker;
 import org.bunkr.utils.SimpleAES;
 import org.json.simple.JSONObject;
 
@@ -131,4 +132,10 @@ public class PBKDF2Descriptor implements IDescriptor
     {
         return true;
     }
+
+    public static IDescriptor makeDefaults()
+    {
+        return new PBKDF2Descriptor(256, 10000, RandomMaker.get(128));
+    }
+
 }
