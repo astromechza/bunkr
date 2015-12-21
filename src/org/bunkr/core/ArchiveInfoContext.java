@@ -16,7 +16,6 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     private IDescriptor descriptor;
     private int blockSize;
     private long blockDataLength;
-    private boolean fresh = false;
 
     public ArchiveInfoContext(File filePath, UserSecurityProvider uic) throws IOException, CryptoException,
             BaseBunkrException
@@ -44,13 +43,6 @@ public class ArchiveInfoContext implements IArchiveInfoContext
                 this.inventory = this.descriptor.readInventoryFromBytes(IO.readNBytes(dis, dis.readInt()), uic);
             }
         }
-        this.fresh = true;
-    }
-
-    @Override
-    public boolean isFresh()
-    {
-        return this.fresh;
     }
 
     @Override

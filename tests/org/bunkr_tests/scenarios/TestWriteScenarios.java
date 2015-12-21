@@ -52,7 +52,6 @@ public class TestWriteScenarios
                 context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, false);
         assertTrue(context.getInventory().getFiles().isEmpty());
         assertTrue(context.getInventory().getFolders().isEmpty());
-        assertTrue(context.isFresh());
         assertEquals(context.getBlockSize(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))

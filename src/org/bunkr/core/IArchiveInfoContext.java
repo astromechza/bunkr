@@ -15,8 +15,6 @@ public interface IArchiveInfoContext
 {
     void refresh(UserSecurityProvider uic) throws IOException, CryptoException, BaseBunkrException;
 
-    boolean isFresh();
-
     long getBlockDataLength();
 
     int getBlockSize();
