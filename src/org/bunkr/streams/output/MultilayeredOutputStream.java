@@ -29,8 +29,7 @@ public class MultilayeredOutputStream extends OutputStream
     private OutputStream topstream;
     private long writtenBytes = 0;
 
-    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target, boolean refreshKeys)
-            throws FileNotFoundException
+    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws FileNotFoundException
     {
         this.target = target;
         this.topstream = new BlockWriterOutputStream(
@@ -43,16 +42,10 @@ public class MultilayeredOutputStream extends OutputStream
         if (context.getInventory().areFilesEncrypted())
         {
             byte[] edata = target.getEncryptionData();
-            if (edata == null)
-            {
-                edata = RandomMaker.get(256 * 2);
-                target.setencryptionData(edata);
-            }
-            else if (refreshKeys)
-            {
-                RandomMaker.fill(edata);
-                target.setencryptionData(edata);
-            }
+            if (edata == null) edata = new byte[2 * 256 / 8];
+            RandomMaker.fill(edata);
+            target.setencryptionData(edata);
+
             byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
             byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
 
@@ -66,11 +59,6 @@ public class MultilayeredOutputStream extends OutputStream
         {
             this.topstream = new DeflaterOutputStream(this.topstream, new Deflater(Deflater.BEST_SPEED));
         }
-    }
-
-    public MultilayeredOutputStream(ArchiveInfoContext context, FileInventoryItem target) throws FileNotFoundException
-    {
-        this(context, target, true);
     }
 
     @Override
