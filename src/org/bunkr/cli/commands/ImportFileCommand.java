@@ -1,6 +1,6 @@
 package org.bunkr.cli.commands;
 
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.utils.AbortableShutdownHook;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;

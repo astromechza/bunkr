@@ -2,7 +2,7 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.cli.CLI;
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.descriptor.PBKDF2Descriptor;
 import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.exceptions.CLIException;

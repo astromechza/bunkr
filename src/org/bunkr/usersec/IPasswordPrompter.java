@@ -1,4 +1,4 @@
-package org.bunkr.cli.passwords;
+package org.bunkr.usersec;
 
 /**
  * Creator: benmeier

@@ -2,12 +2,12 @@ package org.bunkr_tests.scenarios;
 
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.descriptor.PBKDF2Descriptor;
 import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.utils.IO;
 import org.bunkr.core.MetadataWriter;
-import org.bunkr.cli.passwords.PasswordProvider;
+import org.bunkr.usersec.PasswordProvider;
 import org.bunkr.inventory.FileInventoryItem;
 import org.bunkr.streams.input.MultilayeredInputStream;
 import org.bunkr.streams.output.MultilayeredOutputStream;

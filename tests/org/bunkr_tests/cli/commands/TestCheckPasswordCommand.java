@@ -1,14 +1,14 @@
 package org.bunkr_tests.cli.commands;
 
 import org.bunkr.core.ArchiveBuilder;
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.descriptor.PBKDF2Descriptor;
 import org.bunkr.descriptor.PlaintextDescriptor;
 import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.utils.RandomMaker;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.CheckPasswordCommand;
-import org.bunkr.cli.passwords.PasswordProvider;
+import org.bunkr.usersec.PasswordProvider;
 import org.bunkr_tests.XTemporaryFolder;
 import org.bunkr_tests.cli.PasswordFile;
 import net.sourceforge.argparse4j.ArgumentParsers;

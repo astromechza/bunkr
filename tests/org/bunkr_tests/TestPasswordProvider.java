@@ -1,7 +1,7 @@
 package org.bunkr_tests;
 
-import org.bunkr.cli.passwords.PasswordProvider;
-import org.bunkr.cli.passwords.IPasswordPrompter;
+import org.bunkr.usersec.PasswordProvider;
+import org.bunkr.usersec.IPasswordPrompter;
 import org.bunkr.exceptions.IllegalPasswordException;
 import org.junit.Rule;
 import org.junit.Test;

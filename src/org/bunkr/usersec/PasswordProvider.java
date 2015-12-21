@@ -1,4 +1,4 @@
-package org.bunkr.cli.passwords;
+package org.bunkr.usersec;
 
 import org.bouncycastle.crypto.digests.GeneralDigest;
 import org.bouncycastle.crypto.digests.SHA256Digest;

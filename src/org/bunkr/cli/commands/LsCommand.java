@@ -7,7 +7,7 @@ import org.bunkr.cli.CLI;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.inventory.*;
 
 import java.util.Collections;

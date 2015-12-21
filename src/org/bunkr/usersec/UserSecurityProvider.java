@@ -1,6 +1,5 @@
-package org.bunkr.core;
+package org.bunkr.usersec;
 
-import org.bunkr.cli.passwords.PasswordProvider;
 import org.bunkr.exceptions.IllegalPasswordException;
 
 /**

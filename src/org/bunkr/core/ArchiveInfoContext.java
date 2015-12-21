@@ -1,6 +1,7 @@
 package org.bunkr.core;
 
 import org.bunkr.descriptor.DescriptorBuilder;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.utils.IO;
 import org.bunkr.descriptor.IDescriptor;
 import org.bunkr.exceptions.BaseBunkrException;

@@ -5,6 +5,7 @@ import org.bunkr.descriptor.IDescriptor;
 import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
+import org.bunkr.usersec.UserSecurityProvider;
 
 import java.io.*;
 import java.nio.ByteBuffer;

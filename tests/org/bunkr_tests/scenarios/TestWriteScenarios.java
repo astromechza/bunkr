@@ -1,6 +1,6 @@
 package org.bunkr_tests.scenarios;
 
-import org.bunkr.cli.passwords.PasswordProvider;
+import org.bunkr.usersec.PasswordProvider;
 import org.bunkr.core.*;
 import org.bunkr.descriptor.DescriptorBuilder;
 import org.bunkr.descriptor.IDescriptor;
@@ -11,6 +11,7 @@ import org.bunkr.inventory.FolderInventoryItem;
 import org.bunkr.inventory.Inventory;
 import org.bunkr.inventory.InventoryJSON;
 import org.bunkr.streams.output.MultilayeredOutputStream;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.utils.IO;
 import org.bunkr.utils.RandomMaker;
 import org.junit.Rule;

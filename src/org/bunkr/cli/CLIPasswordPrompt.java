@@ -1,4 +1,6 @@
-package org.bunkr.cli.passwords;
+package org.bunkr.cli;
+
+import org.bunkr.usersec.IPasswordPrompter;
 
 import java.io.Console;
 

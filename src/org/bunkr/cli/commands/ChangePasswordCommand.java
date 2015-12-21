@@ -6,7 +6,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 
 import java.io.File;
 

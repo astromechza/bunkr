@@ -1,6 +1,6 @@
 package org.bunkr.descriptor;
 
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.inventory.Inventory;
 import org.json.simple.JSONObject;

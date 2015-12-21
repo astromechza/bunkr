@@ -4,7 +4,7 @@ import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.exceptions.IllegalPasswordException;
 import org.bunkr.inventory.Inventory;

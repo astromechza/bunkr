@@ -2,7 +2,7 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.CLI;
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.exceptions.CLIException;
 import org.bunkr.exceptions.IntegrityHashError;
 import org.bunkr.inventory.FileInventoryItem;

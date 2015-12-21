@@ -4,7 +4,7 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.CLI;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bunkr.core.UserSecurityProvider;
+import org.bunkr.usersec.UserSecurityProvider;
 
 /**
  * Creator: benmeier
