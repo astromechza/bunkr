@@ -1,5 +1,5 @@
--injars       target/bunkr-0.2.jar
--outjars      target/bunkr-0.2-release.jar
+-injars       target/bunkr-0.3.0.jar
+-outjars      target/bunkr-0.3.0-release.jar
 -libraryjars  <java.home>/lib/rt.jar
 
 -keep public class org.bunkr.cli.CLI {
