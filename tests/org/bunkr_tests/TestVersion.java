@@ -17,7 +17,7 @@ public class TestVersion
     @Test
     public void testValuesAssigned()
     {
-        assertNotNull(Version.versionNumber);
+        assertNotNull(Version.versionString);
         assertNotNull(Version.gitDate);
         assertNotNull(Version.gitHash);
         assertTrue(Version.versionMajor >= 0);

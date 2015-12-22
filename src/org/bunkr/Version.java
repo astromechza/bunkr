@@ -10,39 +10,47 @@ import java.io.InputStreamReader;
  */
 public final class Version
 {
-    public static final String versionNumber;
+    public static final String versionString;
     public static final byte versionMajor;
     public static final byte versionMinor;
     public static final byte versionBugfix;
+    public static final String compatibleVersionString;
+    private static final byte compatibleVersionMajor;
+    private static final byte compatibleVersionMinor;
+    private static final byte compatibleVersionBugfix;
     public static final String gitDate;
     public static final String gitHash;
-
-    private static final byte earliestCompatibleVersionMajor = 0;
-    private static final byte earliestCompatibleVersionMinor = 0;
-    private static final byte earliestCompatibleVersionBugfix = 0;
 
     static
     {
         String tversionNumber = "0.0.0";
+        String tcompatVersionNumber = "0.0.0";
         String tgitDate = "1970-01-01T00:00:00+00:00";
         String tgitHash = "????????????????????????????????????????";
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(Version.class.getResourceAsStream("/version.dat"))))
         {
             tversionNumber = br.readLine();
+            tcompatVersionNumber = br.readLine();
             tgitDate = br.readLine();
             tgitHash = br.readLine();
         }
         catch (IOException | NullPointerException ignored) { }
 
-        versionNumber = tversionNumber;
+        versionString = tversionNumber;
+        compatibleVersionString = tcompatVersionNumber;
         gitDate = tgitDate;
         gitHash = tgitHash;
 
-        String[] parts = versionNumber.split("\\.", -1);
+        String[] parts = versionString.split("\\.", -1);
         versionMajor = Byte.parseByte(parts[0]);
         versionMinor = Byte.parseByte(parts[1]);
         versionBugfix = Byte.parseByte(parts[2]);
+
+        parts = compatibleVersionString.split("\\.", -1);
+        compatibleVersionMajor = Byte.parseByte(parts[0]);
+        compatibleVersionMinor = Byte.parseByte(parts[1]);
+        compatibleVersionBugfix = Byte.parseByte(parts[2]);
     }
 
     /**
@@ -58,20 +66,23 @@ public final class Version
     {
         int currentVersion = (versionMajor * 256 + versionMinor) * 256 + versionBugfix;
         int inputVersion = (major * 256 + minor) * 256 + bugfix;
-        int earliestVersion = (earliestCompatibleVersionMajor * 256 + earliestCompatibleVersionMinor) * 256 +
-                earliestCompatibleVersionBugfix;
+        int earliestVersion = (compatibleVersionMajor * 256 + compatibleVersionMinor) * 256 + compatibleVersionBugfix;
         return inputVersion >= earliestVersion && !(strict && inputVersion > currentVersion);
     }
 
+    /**
+     * Similar to isCompatible() but as an assertion.
+     * @throws IOException if not compatible.
+     */
     public static void assertCompatible(byte major, byte minor, byte bugfix, boolean strict) throws IOException
     {
         if (! isCompatible(major, minor, bugfix, strict)) throw new IOException(
                 String.format(
-                        "Archive version %d.%d.%d is not compatible with Application version %d.%d.%d",
+                        "Archive version %d.%d.%d is not compatible with Application version range %s - %s",
                         major, minor, bugfix,
-                        versionMajor, versionMinor, versionBugfix
+                        compatibleVersionString,
+                        versionString
                 )
         );
     }
-
 }

@@ -3,7 +3,8 @@ require 'buildr/jacoco'
 
 PROJECT_NAME = 'bunkr'
 PROJECT_GROUP = "org.#{PROJECT_NAME}"
-PROJECT_VERSION = '0.2'
+PROJECT_VERSION = '0.3.0'
+COMPATIBLE_PROJECT_VERSION = '0.3.0'
 
 # where to pull maven dependencies from
 repositories.remote << 'https://repo.maven.apache.org/maven2'
@@ -51,6 +52,7 @@ define PROJECT_NAME, layout: layout do
         GIT_DATE = `git --no-pager log -n 1 --date=iso-strict --format="%cd"`
         File.open(version_dat_file, 'w') do |f|
             f.puts PROJECT_VERSION
+            f.puts COMPATIBLE_PROJECT_VERSION
             f.puts GIT_DATE
             f.puts GIT_HASH
         end

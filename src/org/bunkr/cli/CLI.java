@@ -49,7 +49,7 @@ public class CLI
         // Constructing parser and subcommands
         ArgumentParser parser = ArgumentParsers.newArgumentParser("bunkr");
 
-        parser.version(String.format("version: %s\ncommit date: %s\ncommit hash: %s", Version.versionNumber, Version.gitDate, Version.gitHash));
+        parser.version(String.format("version: %s\ncommit date: %s\ncommit hash: %s", Version.versionString, Version.gitDate, Version.gitHash));
         parser.addArgument("--version").action(Arguments.version());
 
         parser.addArgument("archive")
