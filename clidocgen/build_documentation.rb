@@ -61,7 +61,7 @@ d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} mkdir
 d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} write /sample/dir/file_two #{file_two}"
 
 d.add_documentation 'Show everything in the tree so far:'
-d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} find / --depth 2"
+d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} find /"
 
 d.add_documentation 'See how the file reflects the size in bytes'
 d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} ls /sample/dir/ --machine-readable"

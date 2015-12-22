@@ -54,7 +54,6 @@ public class FindCommand implements ICLICommand
         target.addArgument("--depth")
                 .dest(ARG_DEPTH)
                 .type(Integer.class)
-                .setDefault(0)
                 .help("recurse into subfolders this many times");
     }
 
