@@ -16,6 +16,11 @@ public final class Version
     public static final byte versionBugfix;
     public static final String gitDate;
     public static final String gitHash;
+
+    private static final byte earliestCompatibleVersionMajor = 0;
+    private static final byte earliestCompatibleVersionMinor = 0;
+    private static final byte earliestCompatibleVersionBugfix = 0;
+
     static
     {
         String tversionNumber = "0.0.0";
@@ -39,4 +44,34 @@ public final class Version
         versionMinor = Byte.parseByte(parts[1]);
         versionBugfix = Byte.parseByte(parts[2]);
     }
+
+    /**
+     * Need some way of declaring and checking backward compatibility.
+     *
+     * Keep the earliestCompatibleVersion numbers up to date as breaking changes are made to the meta data. This means
+     * that opening a file that is too old will bring up an error.
+     *
+     * The Boolean 'strict' will cause the function to return false when the file was created with a newer version of
+     * the software. This is optional since the user may want to just try to open the file anyway.
+     */
+    public static boolean isCompatible(byte major, byte minor, byte bugfix, boolean strict)
+    {
+        int currentVersion = (versionMajor * 256 + versionMinor) * 256 + versionBugfix;
+        int inputVersion = (major * 256 + minor) * 256 + bugfix;
+        int earliestVersion = (earliestCompatibleVersionMajor * 256 + earliestCompatibleVersionMinor) * 256 +
+                earliestCompatibleVersionBugfix;
+        return inputVersion >= earliestVersion && !(strict && inputVersion > currentVersion);
+    }
+
+    public static void assertCompatible(byte major, byte minor, byte bugfix, boolean strict) throws IOException
+    {
+        if (! isCompatible(major, minor, bugfix, strict)) throw new IOException(
+                String.format(
+                        "Archive version %d.%d.%d is not compatible with Application version %d.%d.%d",
+                        major, minor, bugfix,
+                        versionMajor, versionMinor, versionBugfix
+                )
+        );
+    }
+
 }

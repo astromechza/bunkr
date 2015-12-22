@@ -1,5 +1,6 @@
 package org.bunkr.core;
 
+import org.bunkr.Version;
 import org.bunkr.descriptor.DescriptorBuilder;
 import org.bunkr.usersec.UserSecurityProvider;
 import org.bunkr.utils.IO;
@@ -34,9 +35,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
             {
                 String fivebytes = IO.readNByteString(dis, 5);
                 if (! fivebytes.equals("BUNKR")) throw new IOException("File format header does not match 'BUNKR'");
-                dis.readByte();
-                dis.readByte();
-                dis.readByte();
+                Version.assertCompatible(dis.readByte(), dis.readByte(), dis.readByte(), false);
                 this.blockSize = dis.readInt();
                 this.blockDataLength = dis.readLong();
                 IO.reliableSkip(dis, this.blockDataLength);
