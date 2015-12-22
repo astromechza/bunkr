@@ -19,7 +19,7 @@ public class MetadataWriter
 {
     public static final long DBL_DATA_POS = (
             ArchiveBuilder.FORMAT_SIG.length +
-            ArchiveBuilder.VERSION_BYTES.length +
+            3 +
             Integer.BYTES
     );
 

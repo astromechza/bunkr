@@ -4,6 +4,7 @@ import org.bunkr.Version;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Creator: benmeier
@@ -17,5 +18,8 @@ public class TestVersion
         assertNotNull(Version.versionNumber);
         assertNotNull(Version.gitDate);
         assertNotNull(Version.gitHash);
+        assertTrue(Version.versionMajor >= 0);
+        assertTrue(Version.versionMinor >= 0);
+        assertTrue(Version.versionBugfix >= 0);
     }
 }

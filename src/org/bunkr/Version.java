@@ -11,6 +11,9 @@ import java.io.InputStreamReader;
 public final class Version
 {
     public static final String versionNumber;
+    public static final byte versionMajor;
+    public static final byte versionMinor;
+    public static final byte versionBugfix;
     public static final String gitDate;
     public static final String gitHash;
     static
@@ -30,5 +33,10 @@ public final class Version
         versionNumber = tversionNumber;
         gitDate = tgitDate;
         gitHash = tgitHash;
+
+        String[] parts = versionNumber.split("\\.", -1);
+        versionMajor = Byte.parseByte(parts[0]);
+        versionMinor = Byte.parseByte(parts[1]);
+        versionBugfix = Byte.parseByte(parts[2]);
     }
 }

@@ -1,5 +1,6 @@
 package org.bunkr.core;
 
+import org.bunkr.Version;
 import org.bunkr.descriptor.IDescriptor;
 import org.bunkr.exceptions.BaseBunkrException;
 import org.bunkr.inventory.Inventory;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 public class ArchiveBuilder
 {
     public static final byte[] FORMAT_SIG = "BUNKR".getBytes();
-    public static final byte[] VERSION_BYTES = new byte[] {0, 0, 1};
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
     public static ArchiveInfoContext createNewEmptyArchive(File path, IDescriptor descriptor, UserSecurityProvider uic, boolean compressed)
@@ -29,7 +29,9 @@ public class ArchiveBuilder
             try(DataOutputStream dos = new DataOutputStream(fos))
             {
                 dos.write(FORMAT_SIG);
-                dos.write(VERSION_BYTES);
+                dos.write(Version.versionMajor);
+                dos.write(Version.versionMinor);
+                dos.write(Version.versionBugfix);
                 dos.writeInt(DEFAULT_BLOCK_SIZE);
                 dos.writeLong(0);
             }

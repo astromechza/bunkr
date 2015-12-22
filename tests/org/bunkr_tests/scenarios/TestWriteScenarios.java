@@ -1,5 +1,6 @@
 package org.bunkr_tests.scenarios;
 
+import org.bunkr.Version;
 import org.bunkr.usersec.PasswordProvider;
 import org.bunkr.core.*;
 import org.bunkr.descriptor.DescriptorBuilder;
@@ -58,9 +59,9 @@ public class TestWriteScenarios
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {
             assertEquals(IO.readNByteString(dis, 5), "BUNKR");
-            assertEquals(dis.read(), 0);
-            assertEquals(dis.read(), 0);
-            assertEquals(dis.read(), 1);
+            assertEquals(dis.read(), Version.versionMajor);
+            assertEquals(dis.read(), Version.versionMinor);
+            assertEquals(dis.read(), Version.versionBugfix);
             assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             assertEquals(dis.readLong(), 0);
 
@@ -100,9 +101,9 @@ public class TestWriteScenarios
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {
             assertEquals(IO.readNByteString(dis, 5), "BUNKR");
-            assertEquals(dis.read(), 0);
-            assertEquals(dis.read(), 0);
-            assertEquals(dis.read(), 1);
+            assertEquals(dis.read(), Version.versionMajor);
+            assertEquals(dis.read(), Version.versionMinor);
+            assertEquals(dis.read(), Version.versionBugfix);
             assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             assertEquals(dis.readLong(), 4096);
             byte[] data = new byte[4096];
@@ -173,9 +174,9 @@ public class TestWriteScenarios
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {
             assertEquals(IO.readNByteString(dis, 5), "BUNKR");
-            assertEquals(dis.read(), 0);
-            assertEquals(dis.read(), 0);
-            assertEquals(dis.read(), 1);
+            assertEquals(dis.read(), Version.versionMajor);
+            assertEquals(dis.read(), Version.versionMinor);
+            assertEquals(dis.read(), Version.versionBugfix);
             assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             assertEquals(dis.readLong(), upround(3333, ArchiveBuilder.DEFAULT_BLOCK_SIZE) + upround(50, ArchiveBuilder.DEFAULT_BLOCK_SIZE));
             byte[] data = new byte[(int) upround(3333, ArchiveBuilder.DEFAULT_BLOCK_SIZE)];
@@ -246,9 +247,9 @@ public class TestWriteScenarios
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
         {
             assertEquals(IO.readNByteString(dis, 5), "BUNKR");
-            assertEquals(dis.read(), 0);
-            assertEquals(dis.read(), 0);
-            assertEquals(dis.read(), 1);
+            assertEquals(dis.read(), Version.versionMajor);
+            assertEquals(dis.read(), Version.versionMinor);
+            assertEquals(dis.read(), Version.versionBugfix);
             assertEquals(dis.readInt(), ArchiveBuilder.DEFAULT_BLOCK_SIZE);
             assertEquals(dis.readLong(), 0);
 
