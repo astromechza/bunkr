@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -85,6 +86,25 @@ public class TestHashCommand
         try(OutputCapture c = new OutputCapture())
         {
             new HashCommand().handle(new Namespace(args));
+            assertTrue(c.getContent().contains("=============="));
+            assertTrue(c.getContent().trim().endsWith(expectedHash));
+        }
+    }
+
+    public void checkHashNoProgress(String algorithm, String expectedHash) throws Exception
+    {
+        File archive = buildArchive();
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, archive);
+        args.put(HashCommand.ARG_PATH, "/a.txt");
+        args.put(HashCommand.ARG_ALGORITHM, algorithm);
+        args.put(HashCommand.ARG_NO_PROGRESS, true);
+
+        try(OutputCapture c = new OutputCapture())
+        {
+            new HashCommand().handle(new Namespace(args));
+            assertFalse(c.getContent().contains("=============="));
             assertTrue(c.getContent().trim().endsWith(expectedHash));
         }
     }
@@ -113,6 +133,11 @@ public class TestHashCommand
         checkHash("sha256", "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592");
     }
 
+    @Test
+    public void testNoProgress() throws Exception
+    {
+        checkHashNoProgress("md5", "9e107d9d372bb6826bd81d3542a419d6");
+    }
 
     @Test
     public void testUnknown() throws Exception

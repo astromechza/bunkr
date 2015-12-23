@@ -34,6 +34,7 @@ public class ImportFileCommand implements ICLICommand
     public static final String ARG_PATH = "path";
     public static final String ARG_SOURCE_FILE = "source";
     public static final String ARG_TAGS = "tags";
+    public static final String ARG_NO_PROGRESS = "noprogress";
 
 
     @Override
@@ -54,6 +55,12 @@ public class ImportFileCommand implements ICLICommand
                 .setDefault(new ArrayList<>())
                 .type(String.class)
                 .help("a list of tags to associate with this file");
+        target.addArgument("--no-progress")
+                .dest(ARG_NO_PROGRESS)
+                .action(Arguments.storeTrue())
+                .setDefault(false)
+                .type(Boolean.class)
+                .help("don't display a progress bar while importing the file");
     }
 
     @Override
@@ -91,18 +98,19 @@ public class ImportFileCommand implements ICLICommand
         AbortableShutdownHook emergencyShutdownThread = new EnsuredMetadataWriter(aic, usp);
         Runtime.getRuntime().addShutdownHook(emergencyShutdownThread);
 
+        boolean noProgress = (Boolean) getOrDefault(args.get(ARG_NO_PROGRESS), false);
         try
         {
             if (inputFile.getPath().equals("-"))
             {
-                importFileFromStream(aic, targetFile, System.in);
+                importFileFromStream(aic, targetFile, System.in, !noProgress);
             }
             else
             {
                 FileChannel fc = new RandomAccessFile(inputFile, "r").getChannel();
                 try (InputStream fis = Channels.newInputStream(fc))
                 {
-                    importFileFromStream(aic, targetFile, fis, inputFile.length());
+                    importFileFromStream(aic, targetFile, fis, inputFile.length(), !noProgress);
                 }
             }
         }
@@ -116,14 +124,16 @@ public class ImportFileCommand implements ICLICommand
         }
     }
 
-    private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is) throws IOException
+    private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target,
+                                      InputStream is, boolean showProgress) throws IOException
     {
-        importFileFromStream(context, target, is, is.available());
+        importFileFromStream(context, target, is, is.available(), showProgress);
     }
 
-    private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is, long expectedBytes) throws IOException
+    private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target,
+                                      InputStream is, long expectedBytes, boolean showProgress) throws IOException
     {
-        ProgressBar pb = new ProgressBar(80, expectedBytes, "Importing file: ");
+        ProgressBar pb = new ProgressBar(80, expectedBytes, "Importing file: ", showProgress);
 
         try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))
         {
@@ -164,5 +174,11 @@ public class ImportFileCommand implements ICLICommand
                 e.printStackTrace();
             }
         }
+    }
+
+    private Object getOrDefault(Object v, Object d)
+    {
+        if (v == null) return d;
+        return v;
     }
 }

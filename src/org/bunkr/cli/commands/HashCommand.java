@@ -1,5 +1,6 @@
 package org.bunkr.cli.commands;
 
+import net.sourceforge.argparse4j.impl.Arguments;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.ProgressBar;
@@ -25,6 +26,7 @@ public class HashCommand implements ICLICommand
 {
     public static final String ARG_PATH = "path";
     public static final String ARG_ALGORITHM = "algorithm";
+    public static final String ARG_NO_PROGRESS = "noprogress";
 
     @Override
     public void buildParser(Subparser target)
@@ -40,6 +42,12 @@ public class HashCommand implements ICLICommand
                 .choices("md5", "sha1", "sha224", "sha256")
                 .setDefault("md5")
                 .help("the digest algorithm to use");
+        target.addArgument("--no-progress")
+                .dest(ARG_NO_PROGRESS)
+                .action(Arguments.storeTrue())
+                .setDefault(false)
+                .type(Boolean.class)
+                .help("don't display a progress bar while importing the file");
     }
 
     @Override
@@ -51,14 +59,14 @@ public class HashCommand implements ICLICommand
         if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
 
         FileInventoryItem targetFile = (FileInventoryItem) target;
-
-        System.out.println(DatatypeConverter.printHexBinary(calculateHash(aic, targetFile, args.getString(ARG_ALGORITHM))).toLowerCase());
+        boolean noProgress = (Boolean) getOrDefault(args.get(ARG_NO_PROGRESS), false);
+        System.out.println(DatatypeConverter.printHexBinary(calculateHash(aic, targetFile, args.getString(ARG_ALGORITHM), !noProgress)).toLowerCase());
     }
 
-    private byte[] calculateHash(ArchiveInfoContext context, FileInventoryItem target, String algorithm)
+    private byte[] calculateHash(ArchiveInfoContext context, FileInventoryItem target, String algorithm, boolean showProgress)
             throws IOException, CLIException
     {
-        ProgressBar pb = new ProgressBar(80, target.getActualSize(), "Calculating hash: ");
+        ProgressBar pb = new ProgressBar(80, target.getActualSize(), "Calculating hash: ", showProgress);
 
         GeneralDigest digest = getDigest(algorithm);
         digest.reset();
@@ -89,5 +97,11 @@ public class HashCommand implements ICLICommand
         if (algorithm.equals("sha224")) return new SHA224Digest();
         if (algorithm.equals("sha256")) return new SHA256Digest();
         throw new CLIException("unsupported algorithm: " + algorithm);
+    }
+
+    private Object getOrDefault(Object v, Object d)
+    {
+        if (v == null) return d;
+        return v;
     }
 }

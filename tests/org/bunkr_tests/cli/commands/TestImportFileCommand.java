@@ -32,6 +32,7 @@ import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -102,6 +103,41 @@ public class TestImportFileCommand
         try (OutputCapture ignored = new OutputCapture())
         {
             new ImportFileCommand().handle(new Namespace(args));
+            assertTrue(ignored.getContent().contains("==================="));
+        }
+        System.setIn(null);
+
+        ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, usp);
+
+        FileInventoryItem f = context.getInventory().findFile("b.txt");
+        assertThat(f.getTags().size(), is(equalTo(2)));
+        assertTrue(f.getTags().contains("tag3"));
+        assertTrue(f.getTags().contains("tag4"));
+        assertThat(f.getActualSize(), is(equalTo(80L)));
+    }
+
+    @Test
+    public void testImportStdinNoProgress() throws Exception
+    {
+        File archiveFile = folder.newFile();
+        UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
+
+        Map<String, Object> args = new HashMap<>();
+        args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
+        args.put(ImportFileCommand.ARG_PATH, "/b.txt");
+        args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
+        args.put(ImportFileCommand.ARG_TAGS, Arrays.asList("tag3", "tag4"));
+        args.put(ImportFileCommand.ARG_NO_PROGRESS, true);
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(
+                "01234567890123456789012345678901234567890123456789012345678901234567890123456789".getBytes());
+
+        System.setIn(bais);
+        try (OutputCapture ignored = new OutputCapture())
+        {
+            new ImportFileCommand().handle(new Namespace(args));
+            assertFalse(ignored.getContent().contains("==================="));
         }
         System.setIn(null);
 
