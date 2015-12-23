@@ -27,6 +27,11 @@ public class LsCommand implements ICLICommand
     public void buildParser(Subparser target)
     {
         target.help("list the contents of a folder");
+        target.description(
+            "List the contents of a path in the archive. Use / to list the contents of the root directory. If the " +
+            "path is a file then the attributes of only that file will be printed. File sizes are formatted as IEC " +
+            "bytes (powers of 2) unless --machine-readable is used which will show the unformatted number of bytes."
+        );
         target.addArgument("path")
                 .dest(ARG_PATH)
                 .type(String.class)
