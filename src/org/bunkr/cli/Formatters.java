@@ -10,32 +10,32 @@ import java.util.Date;
  */
 public class Formatters
 {
-    public static final long KILOBYTE = 1024;
-    public static final long MEGABYTE = 1024 * KILOBYTE;
-    public static final long GIGABYTE = 1024 * MEGABYTE;
-    public static final long TERABYTE = 1024 * GIGABYTE;
+    public static final long KIBIBYTE = 1024;
+    public static final long MEBIBYTE = 1024 * KIBIBYTE;
+    public static final long GIBIBYTE = 1024 * MEBIBYTE;
+    public static final long TEBIBYTE = 1024 * GIBIBYTE;
 
     public static String formatBytes(long numBytes)
     {
-        if (numBytes < KILOBYTE)
+        if (numBytes < KIBIBYTE)
         {
             return String.format("%dB", numBytes);
         }
-        else if (numBytes < MEGABYTE)
+        else if (numBytes < MEBIBYTE)
         {
-            return String.format("%.1fK", numBytes / (float)KILOBYTE);
+            return String.format("%.1fKi", numBytes / (float) KIBIBYTE);
         }
-        else if (numBytes < GIGABYTE)
+        else if (numBytes < GIBIBYTE)
         {
-            return String.format("%.1fM", numBytes / (float)MEGABYTE);
+            return String.format("%.1fMi", numBytes / (float) MEBIBYTE);
         }
-        else if (numBytes < TERABYTE)
+        else if (numBytes < TEBIBYTE)
         {
-            return String.format("%.1fG", numBytes / (float)GIGABYTE);
+            return String.format("%.1fGi", numBytes / (float) GIBIBYTE);
         }
         else
         {
-            return String.format("%.1fT", numBytes / (float)TERABYTE);
+            return String.format("%.1fTi", numBytes / (float) TEBIBYTE);
         }
     }
 
