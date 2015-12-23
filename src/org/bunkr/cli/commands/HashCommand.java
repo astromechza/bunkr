@@ -47,7 +47,7 @@ public class HashCommand implements ICLICommand
                 .action(Arguments.storeTrue())
                 .setDefault(false)
                 .type(Boolean.class)
-                .help("don't display a progress bar while importing the file");
+                .help("don't display a progress bar while hashing the file");
     }
 
     @Override
