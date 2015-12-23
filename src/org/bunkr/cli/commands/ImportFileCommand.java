@@ -46,7 +46,7 @@ public class ImportFileCommand implements ICLICommand
                 .help("destination path in the archive");
         target.addArgument("source")
                 .dest(ARG_SOURCE_FILE)
-                .type(Arguments.fileType().acceptSystemIn().verifyCanRead())
+                .type(Arguments.fileType().acceptSystemIn().verifyExists().verifyCanRead())
                 .help("file to import or - for stdin");
         target.addArgument("-t", "--tags")
                 .dest(ARG_TAGS)
