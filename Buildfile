@@ -16,47 +16,34 @@ JAR_BC = "org.bouncycastle:bcprov-jdk15on:jar:1.53"
 JAR_JSON_SIMPLE = "com.googlecode.json-simple:json-simple:jar:1.1.1"
 JAR_ARGPARSE = "net.sourceforge.argparse4j:argparse4j:jar:0.6.0"
 
+layout = Layout.new
+layout[:source, :main, :java] = 'src'
+layout[:source, :test, :java] = 'tests'
+layout[:target, :generated] = '../target'
+layout[:target, :main, :classes] = '../target/classes'
+
 # define main project
 define PROJECT_NAME do
 
     project.version = PROJECT_VERSION
     project.group = PROJECT_GROUP
 
-    desc 'sub-project for cli'
-    define 'cli' do
-
-        CLI_MAIN_CLASS = "#{PROJECT_GROUP}.cli.CLI"
-        CLI_OUTPUT_JAR = _('..', 'target', "bunkr-cli-#{project.version}.jar")
-
+    define 'bunkr-core', layout: layout do
         test.with JAR_JUNIT
-
-        compile.from(_('..', 'src', 'org', 'bunkr'))
-        compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE
-        compile.into(_('..', 'target', 'classes'))
+        compile.with JAR_BC, JAR_JSON_SIMPLE
         compile.using(source: '1.8', target: '1.8', lint: 'all')
-
-        package(:jar, file: CLI_OUTPUT_JAR).merge(compile.dependencies).exclude('META-INF/BCKEY.*')
-        package(:jar, file: CLI_OUTPUT_JAR).with(manifest: {'Main-Class' => CLI_MAIN_CLASS})
-
-        run.using main: CLI_MAIN_CLASS
     end
 
-    desc 'sub-project for gui'
-        define 'gui' do
+    define 'bunkr-cli', layout: layout do
+        test.with JAR_JUNIT
+        compile.with projects('bunkr-core'), JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE
+        compile.using(source: '1.8', target: '1.8', lint: 'all')
+    end
 
-            GUI_MAIN_CLASS = "#{PROJECT_GROUP}.gui.GuiEntryPoint"
-            GUI_OUTPUT_JAR = _('..', 'target', "bunkr-gui-#{project.version}.jar")
+    define 'bunkr-gui', layout: layout do
+        test.with JAR_JUNIT
+        compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE
+        compile.using(source: '1.8', target: '1.8', lint: 'all')
+    end
 
-            test.with JAR_JUNIT
-
-            compile.from(_('..', 'src', 'org', 'bunkr'))
-            compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE
-            compile.into(_('..', 'target', 'classes'))
-            compile.using(source: '1.8', target: '1.8', lint: 'all')
-
-            package(:jar, file: GUI_OUTPUT_JAR).merge(compile.dependencies).exclude('META-INF/BCKEY.*')
-            package(:jar, file: GUI_OUTPUT_JAR).with(manifest: {'Main-Class' => GUI_MAIN_CLASS})
-
-            run.using main: GUI_MAIN_CLASS
-        end
 end
