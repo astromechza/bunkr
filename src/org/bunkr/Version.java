@@ -28,7 +28,7 @@ public final class Version
         String tgitDate = "1970-01-01T00:00:00+00:00";
         String tgitHash = "????????????????????????????????????????";
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Version.class.getResourceAsStream("/version.dat"))))
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Resources.getStream("/version.dat"))))
         {
             tversionNumber = br.readLine();
             tcompatVersionNumber = br.readLine();
