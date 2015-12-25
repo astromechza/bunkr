@@ -9,17 +9,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.bunkr.core.Resources;
 import org.bunkr.core.Version;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
  * Creator: benmeier
  * Created At: 2015-12-24
  */
-public class OpenArchiveWindow extends BaseWindow
+public class LandingWindow extends BaseWindow
 {
     private static final int WINDOW_WIDTH = 400, WINDOW_HEIGHT = 300;
 
@@ -28,7 +30,7 @@ public class OpenArchiveWindow extends BaseWindow
     private Label versionLabel;
     private ImageView logoImage;
 
-    public OpenArchiveWindow(Stage container) throws IOException
+    public LandingWindow(Stage container) throws IOException
     {
         super(container);
         this.cssPath = Resources.getExternalPath("/resources/css/open_archive_window.css");
@@ -92,7 +94,45 @@ public class OpenArchiveWindow extends BaseWindow
     @Override
     void bindEvents()
     {
+        this.newArchiveButton.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Archive ...");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Bunkr Archives", "*.bunkr"),
+                    new FileChooser.ExtensionFilter("All Files", "*.*"));
+            File selectedPath = fileChooser.showSaveDialog(LandingWindow.this.getStage());
+            if (selectedPath != null)
+            {
+                // display new archive window
+                // - show options for password
+                // - show options for encryption
+                // - show cancel/create buttons
+                try
+                {
+                    new NewArchiveSettingsWindow();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
 
+        this.openArchiveButton.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Archive ...");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Bunkr Archives", "*.bunkr"),
+                    new FileChooser.ExtensionFilter("All Files", "*.*"));
+            File selectedPath = fileChooser.showOpenDialog(LandingWindow.this.getStage());
+            if (selectedPath != null)
+            {
+                // display open archive window
+                // try open archive
+                // - catch password requirement
+                // if password
+            }
+        });
     }
 
     @Override

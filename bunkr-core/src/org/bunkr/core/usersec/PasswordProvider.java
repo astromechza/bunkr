@@ -4,7 +4,6 @@ import org.bouncycastle.crypto.digests.GeneralDigest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
@@ -17,8 +16,6 @@ import java.util.Set;
  */
 public class PasswordProvider
 {
-    private static final int MINIMUM_PASSWORD_LENGTH = 8;
-
     private byte[] hashedArchivePassword;
     private IPasswordPrompter prompter;
 
@@ -52,7 +49,7 @@ public class PasswordProvider
 
     public void setArchivePassword(byte[] archivePassword) throws IllegalPasswordException
     {
-        checkPassword(archivePassword);
+        PasswordRequirements.checkPasses(archivePassword);
         this.hashedArchivePassword = hash(archivePassword);
     }
 
@@ -100,29 +97,5 @@ public class PasswordProvider
         digest.doFinal(buffer, 0);
         Arrays.fill(input, (byte) 0);
         return buffer;
-    }
-
-    /**
-     * This method makes sure the password meets the required complexity checks. It should be purely printable
-     * ascii characters.
-     */
-    private void checkPassword(byte[] input) throws IllegalPasswordException
-    {
-        if (input.length < MINIMUM_PASSWORD_LENGTH) throw new IllegalPasswordException(
-            "Password does not meet complexity requirement: it must be at least %d characters.",
-            MINIMUM_PASSWORD_LENGTH
-        );
-
-        for (byte b : input)
-        {
-            if (b < (byte) 0x20) throw new IllegalPasswordException(
-                "Password does not meet validity requirement: cannot contain byte %s",
-                DatatypeConverter.printByte(b)
-            );
-            if (b > (byte) 0x7E) throw new IllegalPasswordException(
-                "Password does not meet validity requirement: cannot contain byte %s",
-                DatatypeConverter.printByte(b)
-            );
-        }
     }
 }
