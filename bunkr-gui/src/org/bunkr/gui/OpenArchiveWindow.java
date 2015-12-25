@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.bunkr.core.Resources;
@@ -22,14 +23,16 @@ public class OpenArchiveWindow extends BaseWindow
 {
     private static final int WINDOW_WIDTH = 400, WINDOW_HEIGHT = 300;
 
-    private final String cssPath;
+    private final String cssPath, logoPath;
     private Button newArchiveButton, openArchiveButton;
     private Label versionLabel;
+    private ImageView logoImage;
 
     public OpenArchiveWindow(Stage container) throws IOException
     {
         super(container);
         this.cssPath = Resources.getExternalPath("/resources/css/open_archive_window.css");
+        this.logoPath = Resources.getExternalPath("/resources/images/bunkr-logo-200x200.png");
         this.initialise();
         this.getStage().show();
     }
@@ -43,6 +46,8 @@ public class OpenArchiveWindow extends BaseWindow
                                                     Version.versionString,
                                                     Version.gitDate,
                                                     Version.gitHash.substring(0, 8)));
+
+        this.logoImage = new ImageView(this.logoPath);
     }
 
     @Override
@@ -65,10 +70,10 @@ public class OpenArchiveWindow extends BaseWindow
         rootLayout.setHgap(10);
         rootLayout.setVgap(10);
 
-//        this.mainImage.setPreserveRatio(true);
-//        this.mainImage.setFitHeight(120);
-//        this.rootLayout.add(this.mainImage, 0, 0);
-//        GridPane.setHalignment(this.mainImage, HPos.CENTER);
+        this.logoImage.setPreserveRatio(true);
+        this.logoImage.setFitHeight(120);
+        rootLayout.add(this.logoImage, 0, 0);
+        GridPane.setHalignment(this.logoImage, HPos.CENTER);
 
         this.newArchiveButton.setPrefWidth(180);
         rootLayout.add(this.newArchiveButton, 0, 1);

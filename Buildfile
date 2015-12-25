@@ -36,6 +36,11 @@ def write_version_file_for_project(project_name)
     end
 end
 
+def write_resources_for_project(project_name)
+    puts "Copying GUI resources to target for #{project_name}..."
+    FileUtils.cp_r project(project_name)._('resources/.'), project(project_name)._('target/main/classes'), verbose: true
+end
+
 # define main project
 define PROJECT_NAME do
 
@@ -82,8 +87,7 @@ define PROJECT_NAME do
 
         build do
             write_version_file_for_project('bunkr-gui')
-
-            FileUtils.cp_r project('bunkr-gui')._('resources/.'), project('bunkr-gui')._('target/main/classes')
+            write_resources_for_project('bunkr-gui')
         end
     end
 
