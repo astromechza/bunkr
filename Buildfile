@@ -63,6 +63,10 @@ define PROJECT_NAME do
         package(:jar, id: 'bunkr-cli').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
         package(:jar, id: 'bunkr-cli').with(manifest: {'Main-Class' => CLI_MAIN_CLASS})
         run.using main: CLI_MAIN_CLASS
+
+        build do
+            write_version_file_for_project('bunkr-core')
+        end
     end
 
     define 'bunkr-gui', layout: layout do
@@ -72,6 +76,10 @@ define PROJECT_NAME do
         package(:jar, id: 'bunkr-gui').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
         package(:jar, id: 'bunkr-gui').with(manifest: {'Main-Class' => GUI_MAIN_CLASS})
         run.using main: GUI_MAIN_CLASS
+
+        build do
+            write_version_file_for_project('bunkr-core')
+        end
     end
 
     # ----------------------------------------------------------------------------------------
