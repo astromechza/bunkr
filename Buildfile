@@ -3,7 +3,7 @@ require 'buildr/jacoco'
 
 PROJECT_NAME = 'bunkr'
 PROJECT_GROUP = "org.#{PROJECT_NAME}"
-PROJECT_VERSION = '0.3.0'
+PROJECT_VERSION = '0.4.0'
 COMPATIBLE_PROJECT_VERSION = '0.3.0'
 
 # where to pull maven dependencies from
