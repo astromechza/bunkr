@@ -1,0 +1,8 @@
+.background {
+    -fx-background-color: linear-gradient(to bottom, #BBBBBB, #FFFFFF);
+}
+
+#version-label {
+    -fx-text-fill: #999999;
+    -fx-font: italic 10px sans-serif;
+}

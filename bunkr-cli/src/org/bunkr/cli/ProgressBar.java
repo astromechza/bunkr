@@ -34,11 +34,6 @@ public class ProgressBar
         this(width, total, title, enabled, total / 100);
     }
 
-    public ProgressBar(int width, long total, String title)
-    {
-        this(width, total, title, true, total / 100);
-    }
-
     public void startFresh()
     {
         if (enabled)
@@ -56,16 +51,13 @@ public class ProgressBar
     public void tick(long n)
     {
         this.n = n;
-        if (enabled)
+        long deltaIt = n - lastPrintN;
+        if (enabled && deltaIt > minIters)
         {
-            long deltaIt = n - lastPrintN;
-            if (deltaIt > minIters)
-            {
-                long elapsed = System.currentTimeMillis() - this.startTime;
-                System.out.print('\r');
-                System.out.print(formatStateWithRate(n, total, width, title, elapsed));
-                lastPrintN = n;
-            }
+            long elapsed = System.currentTimeMillis() - this.startTime;
+            System.out.print('\r');
+            System.out.print(formatStateWithRate(n, total, width, title, elapsed));
+            lastPrintN = n;
         }
     }
 
