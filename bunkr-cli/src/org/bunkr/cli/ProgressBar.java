@@ -128,18 +128,16 @@ public class ProgressBar
             Arrays.fill(bar, 0, barWidth, '=');
             Arrays.fill(bar, barWidth, bar.length, ' ');
 
-            if (elapsedMs > 0 && ncols > 12)
+            if (elapsedMs > 0 && ncols >= 12)
             {
                 String rateBar = Formatters.formatPrettyInt(1000 * n / elapsedMs);
-                int startOfRateSection = ncols / 2 - rateBar.length() / 2;
+                int rateBarL = rateBar.length();
+                int startOfRateSection = ncols / 2 - rateBarL / 2;
                 bar[startOfRateSection - 1] = '[';
-                for (int i = 0; i < rateBar.length(); i++)
-                {
-                    bar[startOfRateSection + i] = rateBar.charAt(i);
-                }
-                bar[startOfRateSection + rateBar.length()] = '/';
-                bar[startOfRateSection + rateBar.length() + 1] = 's';
-                bar[startOfRateSection + rateBar.length() + 2] = ']';
+                System.arraycopy(rateBar.toCharArray(), 0, bar, startOfRateSection, rateBarL);
+                bar[startOfRateSection + rateBarL] = '/';
+                bar[startOfRateSection + rateBarL + 1] = 's';
+                bar[startOfRateSection + rateBarL + 2] = ']';
             }
             return String.format("%s|%s|%s", left, new String(bar), right);
         }
