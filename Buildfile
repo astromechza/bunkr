@@ -19,8 +19,6 @@ JAR_ARGPARSE = "net.sourceforge.argparse4j:argparse4j:jar:0.6.0"
 layout = Layout.new
 layout[:source, :main, :java] = 'src'
 layout[:source, :test, :java] = 'tests'
-layout[:target, :generated] = '../target'
-layout[:target, :main, :classes] = '../target/classes'
 
 # define main project
 define PROJECT_NAME do
@@ -32,18 +30,50 @@ define PROJECT_NAME do
         test.with JAR_JUNIT
         compile.with JAR_BC, JAR_JSON_SIMPLE
         compile.using(source: '1.8', target: '1.8', lint: 'all')
+        package(:jar).merge(compile.dependencies).exclude('META-INF/BCKEY.*')
+        package(:jar)
     end
 
     define 'bunkr-cli', layout: layout do
-        test.with JAR_JUNIT
-        compile.with projects('bunkr-core'), JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE
+        test.with JAR_JUNIT, project('bunkr-core').test.compile.target
+        compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE, project('bunkr-core')
         compile.using(source: '1.8', target: '1.8', lint: 'all')
     end
 
     define 'bunkr-gui', layout: layout do
-        test.with JAR_JUNIT
-        compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE
+        test.with JAR_JUNIT, project('bunkr-core').test.compile.target
+        compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE, project('bunkr-core')
         compile.using(source: '1.8', target: '1.8', lint: 'all')
     end
 
+    # ----------------------------------------------------------------------------------------
+
+    def lib_copy(project_name)
+        project(project_name).compile.dependencies.each do |t|
+            if t.to_s.match(/\.jar$/) then
+                unless File.exists? File.join(project.path_to('lib'), File.basename(t.to_s))
+                    puts "Copying #{t} to 'lib' directory"
+                    cp t.to_s, project.path_to('lib')
+                end
+            end
+        end
+        project(project_name).test.dependencies.each do |t|
+            if t.to_s.match(/\.jar$/) then
+                unless File.exists? File.join(project.path_to('lib'), File.basename(t.to_s))
+                    puts "Copying #{t} to 'lib' directory"
+                    cp t.to_s, project.path_to('lib')
+                end
+            end
+        end
+    end
+
+    task :pulllibs do
+        unless Dir.exists? project.path_to('lib')
+            puts "Creating 'lib' directory"
+            Dir.mkdir project.path_to('lib')
+        end
+        lib_copy('bunkr-core')
+        lib_copy('bunkr-cli')
+        lib_copy('bunkr-gui')
+    end
 end
