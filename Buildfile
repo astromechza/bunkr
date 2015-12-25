@@ -46,6 +46,7 @@ define PROJECT_NAME do
 
     define 'bunkr-core', layout: layout do
         test.with JAR_JUNIT
+        jacoco.generate_html = true
         compile.with JAR_BC, JAR_JSON_SIMPLE
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-core').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
@@ -58,6 +59,7 @@ define PROJECT_NAME do
 
     define 'bunkr-cli', layout: layout do
         test.with JAR_JUNIT, project('bunkr-core').test.compile.target
+        jacoco.generate_html = true
         compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE, project('bunkr-core')
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-cli').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
@@ -71,6 +73,7 @@ define PROJECT_NAME do
 
     define 'bunkr-gui', layout: layout do
         test.with JAR_JUNIT, project('bunkr-core').test.compile.target
+        jacoco.generate_html = true
         compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE, project('bunkr-core')
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-gui').merge(compile.dependencies).exclude('META-INF/BCKEY.*')

@@ -49,18 +49,18 @@ d.add_command "java -jar #{target_jar} #{archive_path} --password-file #{passwor
 d.add_documentation '## 4. Add some content from a file'
 file_one = File.join(working_dir, 'file1.txt')
 d.add_command "echo 'The quick brown fox jumped over the lazy dog' > #{file_one}", no_output: true
-d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} write /file_one #{file_one} -t demo-tag"
+d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} write /file_one #{file_one} -t demo-tag --no-progress"
 d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} ls /"
 
 d.add_documentation '## 5. Check integrity'
-d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} hash /file_one -a md5"
+d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} hash /file_one -a md5 --no-progress"
 d.add_command "md5 #{file_one}"
 
 d.add_documentation '## 6. Add some folders and another file'
 file_two = File.join(working_dir, 'file2.txt')
 d.add_command "head -c 514229 /dev/urandom  > #{file_two}", no_output: true
 d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} mkdir /sample/dir -r", no_output: true
-d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} write /sample/dir/file_two #{file_two}"
+d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} write /sample/dir/file_two #{file_two} --no-progress"
 
 d.add_documentation 'Show everything in the tree so far:'
 d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} find /"
@@ -79,9 +79,17 @@ d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} write
 d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} ls /"
 d.add_command "ls -al #{archive_path}"
 d.add_documentation <<-EOF
-That compressed much better. It only added 1024 bytes to the size. Files are managed using blocks of 1024 bytes, so that is the minimum size on disk.
+That compressed much better. The file of 10800 bytes only added 1024 bytes to the archive size. Files are managed using blocks of 1024 bytes, so that is the minimum effect on disk size.
 EOF
 
+d.add_documentation 'Now move it to another location'
+d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} mv /file_three /sample/file_three", no_output: true
+d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} find / --type file"
+
+d.add_documentation 'And finally extract it and prove that we didnt lose anything'
+file_four = File.join(working_dir, 'file3-output.txt')
+d.add_command "java -jar #{target_jar} #{archive_path} -p #{password_path} read /sample/file_three #{file_four}", no_output: true
+d.add_command "md5 #{file_three} #{file_four}"
 
 d.add_generated_with(target_jar)
 File.open(output_file, 'w') do |f|
