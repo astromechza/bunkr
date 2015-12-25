@@ -67,7 +67,7 @@ public class HashCommand implements ICLICommand
             throws IOException, CLIException
     {
         ProgressBar pb = new ProgressBar(80, target.getActualSize(), "Calculating hash: ", showProgress);
-
+        pb.startFresh();
         GeneralDigest digest = getDigest(algorithm);
         digest.reset();
         try (MultilayeredInputStream ms = new MultilayeredInputStream(context, target))

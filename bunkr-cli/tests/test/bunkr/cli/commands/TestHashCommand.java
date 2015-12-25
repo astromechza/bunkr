@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Creator: benmeier
@@ -86,8 +86,11 @@ public class TestHashCommand
         try(OutputCapture c = new OutputCapture())
         {
             new HashCommand().handle(new Namespace(args));
-            assertTrue(c.getContent().contains("=============="));
-            assertTrue(c.getContent().trim().endsWith(expectedHash));
+            c.close();
+            assertThat(c.getContent(), containsString("=============="));
+            assertThat(c.getContent(), containsString("|  0%"));
+            assertThat(c.getContent(), containsString("|100%"));
+            assertThat(c.getContent().trim(), endsWith(expectedHash));
         }
     }
 
@@ -104,8 +107,11 @@ public class TestHashCommand
         try(OutputCapture c = new OutputCapture())
         {
             new HashCommand().handle(new Namespace(args));
-            assertFalse(c.getContent().contains("=============="));
-            assertTrue(c.getContent().trim().endsWith(expectedHash));
+            c.close();
+            assertThat(c.getContent(), not(containsString("==============")));
+            assertThat(c.getContent(), not(containsString("|  0%")));
+            assertThat(c.getContent(), not(containsString("|100%")));
+            assertThat(c.getContent().trim(), endsWith(expectedHash));
         }
     }
 

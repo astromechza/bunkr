@@ -1,50 +1,68 @@
 package org.bunkr.cli;
 
+import java.util.Arrays;
+
 /**
  * Creator: benmeier
  * Created At: 2015-12-09
  */
 public class ProgressBar
 {
-    private final String title;
-
-    private final long target;
-    private long total;
     private final boolean enabled;
-    private final int innerWidth;
-    private int currentWidth = -1;
+    private final String title;
+    private final long total;
+    private final long minIters;
+    private final int width;
+    private long n;
+    private long lastPrintN;
 
-    public ProgressBar(int width, long target, String title, boolean enabled)
+    public ProgressBar(int width, long total, String title, boolean enabled, long minIters)
     {
-        this.title = title;
-        this.total = 0;
-        this.target = target;
-        this.innerWidth = width - 2;
         this.enabled = enabled;
+        this.title = title;
+        this.total = total;
+        this.minIters = minIters;
+        this.width = width;
+        this.n = 0;
+        this.lastPrintN = 0;
     }
 
-    public ProgressBar(int width, long target, String title)
+    public ProgressBar(int width, long total, String title, boolean enabled)
     {
-        this(width, target, title, true);
+        this(width, total, title, enabled, total / 100);
+    }
+
+    public ProgressBar(int width, long total, String title)
+    {
+        this(width, total, title, true, total / 100);
+    }
+
+    public void startFresh()
+    {
+        if (enabled)
+        {
+            System.out.print('\r');
+            System.out.print(formatState(n, total, width, title));
+        }
     }
 
     public void inc(long d)
     {
-        this.total += d;
-        tick(this.total);
+        tick(this.n + d);
     }
 
-    public void tick(long progress)
+    public void tick(long n)
     {
-        this.total = progress;
-        double fraction = Math.min(this.total / (double) this.target, 1);
-
-        int newWidth = (int) (fraction * this.innerWidth);
-        if (enabled && ((newWidth - currentWidth) >= 1 || newWidth >= this.innerWidth))
+        this.n = n;
+        if (enabled)
         {
-            currentWidth = newWidth;
-            String bar = new String(new char[currentWidth]).replace("\0", "=");
-            System.out.print(String.format("%s|%-" + innerWidth + "s|\r", title, bar));
+            long deltaIt = n - lastPrintN;
+            if (deltaIt > minIters)
+            {
+                System.out.print('\r');
+                System.out.print(formatState(n, total, width, title));
+                lastPrintN = n;
+            }
         }
     }
 
@@ -52,9 +70,35 @@ public class ProgressBar
     {
         if (enabled)
         {
-            String bar = new String(new char[innerWidth]).replace("\0", "=");
-            System.out.print(String.format("%s|%-" + innerWidth + "s|\r", title, bar));
-            System.out.println();
+            if (n > lastPrintN)
+            {
+                System.out.print('\r');
+                System.out.println(formatState(n, total, width, title));
+            }
+        }
+    }
+
+    private static String formatState(long n, long total, int ncols, String prefix)
+    {
+        double frac = n / (double) total;
+        double percentage = frac * 100;
+        String left = (prefix != null) ? prefix : "";
+        String right = String.format("%3.0f%%", percentage);
+        ncols -= left.length();
+        ncols -= right.length();
+        if (ncols < 4)
+        {
+            return left + right;
+        }
+        else
+        {
+            ncols -= 2;
+            int barWidth = (int) (frac * ncols);
+            char[] bar = new char[barWidth];
+            char[] space = new char[ncols - barWidth];
+            Arrays.fill(bar, '=');
+            Arrays.fill(space, ' ');
+            return String.format("%s|%s%s|%s", left, new String(bar), new String(space), right);
         }
     }
 }
