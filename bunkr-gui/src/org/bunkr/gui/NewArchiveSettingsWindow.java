@@ -18,6 +18,7 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordRequirements;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Creator: benmeier
@@ -25,7 +26,7 @@ import java.io.IOException;
  */
 public class NewArchiveSettingsWindow extends BaseWindow
 {
-    private static final int WINDOW_WIDTH = 400, WINDOW_HEIGHT = 300;
+    private static final int WINDOW_WIDTH = 400;
     private static final String PW_NOTE_DEFAULT = "Please enter a password";
     private static final String PW_NOTE_CONFIRM = "Please confirm password";
     private static final String PW_NOTE_MATCH = "Confirmation matches password";
@@ -123,7 +124,9 @@ public class NewArchiveSettingsWindow extends BaseWindow
     void bindEvents()
     {
         this.encryptionCheckBox.setOnAction(event -> {
+            Arrays.fill(this.passwordField.getText().getBytes(), (byte) 0);
             this.passwordField.setText("");
+            Arrays.fill(this.confirmPasswordField.getText().getBytes(), (byte) 0);
             this.confirmPasswordField.setText("");
             this.confirmPasswordField.setDisable(true);
             this.passwordNote.getStyleClass().clear();
@@ -141,11 +144,12 @@ public class NewArchiveSettingsWindow extends BaseWindow
         });
 
         this.passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
-            this.confirmPasswordField.textProperty().setValue("");
+            Arrays.fill(this.confirmPasswordField.getText().getBytes(), (byte) 0);
+            this.confirmPasswordField.setText("");
             this.confirmPasswordField.setDisable(true);
             this.passwordNote.getStyleClass().clear();
 
-            if (this.passwordField.textProperty().get().equals(""))
+            if (this.passwordField.getText().equals(""))
             {
                 this.passwordNote.setText(PW_NOTE_DEFAULT);
             }
@@ -153,7 +157,7 @@ public class NewArchiveSettingsWindow extends BaseWindow
             {
                 try
                 {
-                    PasswordRequirements.checkPasses(this.passwordField.textProperty().get().getBytes());
+                    PasswordRequirements.checkPasses(this.passwordField.getText().getBytes());
                     this.confirmPasswordField.setDisable(false);
                     this.passwordNote.setText(PW_NOTE_CONFIRM);
                 }
