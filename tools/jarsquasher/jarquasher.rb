@@ -50,7 +50,12 @@ file_content = <<-EOF
     public static void main(java.lang.String[]);
 }
 
--dontwarn javax.crypto.**
+-keep public class org.bunkr.gui.GuiEntryPoint {
+    public static void main(java.lang.String[]);
+}
+
+-dontwarn javax.**
+-dontwarn javafx.**
 -dontwarn org.bouncycastle.jcajce.provider.asymmetric.util.BaseCipherSpi
 -keepattributes *Annotation*
 -keepattributes Signature
