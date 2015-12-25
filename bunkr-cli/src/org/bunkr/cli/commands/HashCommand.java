@@ -66,7 +66,7 @@ public class HashCommand implements ICLICommand
     private byte[] calculateHash(ArchiveInfoContext context, FileInventoryItem target, String algorithm, boolean showProgress)
             throws IOException, CLIException
     {
-        ProgressBar pb = new ProgressBar(80, target.getActualSize(), "Calculating hash: ", showProgress);
+        ProgressBar pb = new ProgressBar(120, target.getActualSize(), "Calculating hash: ", showProgress);
         pb.startFresh();
         GeneralDigest digest = getDigest(algorithm);
         digest.reset();

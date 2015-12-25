@@ -11,9 +11,14 @@ import java.util.Date;
 public class Formatters
 {
     public static final long KIBIBYTE = 1024;
-    public static final long MEBIBYTE = 1024 * KIBIBYTE;
-    public static final long GIBIBYTE = 1024 * MEBIBYTE;
-    public static final long TEBIBYTE = 1024 * GIBIBYTE;
+    public static final long MEBIBYTE = KIBIBYTE * KIBIBYTE;
+    public static final long GIBIBYTE = KIBIBYTE * MEBIBYTE;
+    public static final long TEBIBYTE = KIBIBYTE * GIBIBYTE;
+
+    public static final long KILO = 1000;
+    public static final long MEGA = KILO * KILO;
+    public static final long GIGA = KILO * MEGA;
+    public static final long TERA = KILO * GIGA;
 
     public static String formatBytes(long numBytes)
     {
@@ -36,6 +41,30 @@ public class Formatters
         else
         {
             return String.format("%.1fTi", numBytes / (float) TEBIBYTE);
+        }
+    }
+
+    public static String formatPrettyInt(long n)
+    {
+        if (n < KILO)
+        {
+            return String.format("%d", n);
+        }
+        else if (n < MEGA)
+        {
+            return String.format("%.1fK", n / (double) KILO);
+        }
+        else if (n < GIGA)
+        {
+            return String.format("%.1fM", n / (double) MEGA);
+        }
+        else if (n < TERA)
+        {
+            return String.format("%.1fG", n / (double) GIGA);
+        }
+        else
+        {
+            return String.format("%.1fT", n / (double) TERA);
         }
     }
 

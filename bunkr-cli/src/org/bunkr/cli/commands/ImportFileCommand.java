@@ -133,7 +133,7 @@ public class ImportFileCommand implements ICLICommand
     private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target,
                                       InputStream is, long expectedBytes, boolean showProgress) throws IOException
     {
-        ProgressBar pb = new ProgressBar(80, expectedBytes, "Importing file: ", showProgress);
+        ProgressBar pb = new ProgressBar(120, expectedBytes, "Importing file: ", showProgress);
         pb.startFresh();
 
         try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))

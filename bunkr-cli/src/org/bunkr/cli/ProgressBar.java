@@ -15,6 +15,7 @@ public class ProgressBar
     private final int width;
     private long n;
     private long lastPrintN;
+    private long startTime;
 
     public ProgressBar(int width, long total, String title, boolean enabled, long minIters)
     {
@@ -25,6 +26,7 @@ public class ProgressBar
         this.width = width;
         this.n = 0;
         this.lastPrintN = 0;
+        this.startTime = System.currentTimeMillis();
     }
 
     public ProgressBar(int width, long total, String title, boolean enabled)
@@ -59,8 +61,9 @@ public class ProgressBar
             long deltaIt = n - lastPrintN;
             if (deltaIt > minIters)
             {
+                long elapsed = System.currentTimeMillis() - this.startTime;
                 System.out.print('\r');
-                System.out.print(formatState(n, total, width, title));
+                System.out.print(formatStateWithRate(n, total, width, title, elapsed));
                 lastPrintN = n;
             }
         }
@@ -72,8 +75,9 @@ public class ProgressBar
         {
             if (n > lastPrintN)
             {
+                long elapsed = System.currentTimeMillis() - this.startTime;
                 System.out.print('\r');
-                System.out.println(formatState(n, total, width, title));
+                System.out.println(formatStateWithRate(n, total, width, title, elapsed));
             }
         }
     }
@@ -99,6 +103,45 @@ public class ProgressBar
             Arrays.fill(bar, '=');
             Arrays.fill(space, ' ');
             return String.format("%s|%s%s|%s", left, new String(bar), new String(space), right);
+        }
+    }
+
+    private static String formatStateWithRate(long n, long total, int ncols, String prefix, long elapsedMs)
+    {
+        double frac = n / (double) total;
+        double percentage = frac * 100;
+        String left = (prefix != null) ? prefix : "";
+        String right = String.format("%3.0f%%", percentage);
+        ncols -= left.length();
+        ncols -= right.length();
+        if (ncols < 4)
+        {
+            return left + right;
+        }
+        else
+        {
+            ncols -= 2;
+
+            int barWidth = (int) (frac * ncols);
+
+            char[] bar = new char[ncols];
+            Arrays.fill(bar, 0, barWidth, '=');
+            Arrays.fill(bar, barWidth, bar.length, ' ');
+
+            if (elapsedMs > 0 && ncols > 12)
+            {
+                String rateBar = Formatters.formatPrettyInt(1000 * n / elapsedMs);
+                int startOfRateSection = ncols / 2 - rateBar.length() / 2;
+                bar[startOfRateSection - 1] = '[';
+                for (int i = 0; i < rateBar.length(); i++)
+                {
+                    bar[startOfRateSection + i] = rateBar.charAt(i);
+                }
+                bar[startOfRateSection + rateBar.length()] = '/';
+                bar[startOfRateSection + rateBar.length() + 1] = 's';
+                bar[startOfRateSection + rateBar.length() + 2] = ']';
+            }
+            return String.format("%s|%s|%s", left, new String(bar), right);
         }
     }
 }
