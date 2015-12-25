@@ -23,11 +23,26 @@ layout[:source, :test, :java] = 'tests'
 CLI_MAIN_CLASS = "org.bunkr.cli.CLI"
 GUI_MAIN_CLASS = "org.bunkr.gui.GuiEntryPoint"
 
+def write_version_file_for_project(project_name)
+    version_dat_file = project(project_name)._('target/main/classes/version.dat')
+    puts 'Writing ' + version_dat_file
+    git_hash = `git rev-parse HEAD`
+    git_date = `git --no-pager log -n 1 --date=iso-strict --format="%cd"`
+    File.open(version_dat_file, 'w') do |f|
+        f.puts PROJECT_VERSION
+        f.puts COMPATIBLE_PROJECT_VERSION
+        f.puts git_date
+        f.puts git_hash
+    end
+end
+
 # define main project
 define PROJECT_NAME do
 
     project.version = PROJECT_VERSION
     project.group = PROJECT_GROUP
+
+    # ----------------------------------------------------------------------------------------
 
     define 'bunkr-core', layout: layout do
         test.with JAR_JUNIT
@@ -35,6 +50,10 @@ define PROJECT_NAME do
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-core').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
         package(:jar, id: 'bunkr-core')
+
+        build do
+            write_version_file_for_project('bunkr-core')
+        end
     end
 
     define 'bunkr-cli', layout: layout do
@@ -85,4 +104,5 @@ define PROJECT_NAME do
         lib_copy('bunkr-cli')
         lib_copy('bunkr-gui')
     end
+
 end
