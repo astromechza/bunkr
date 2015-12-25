@@ -65,7 +65,7 @@ define PROJECT_NAME do
         run.using main: CLI_MAIN_CLASS
 
         build do
-            write_version_file_for_project('bunkr-core')
+            write_version_file_for_project('bunkr-cli')
         end
     end
 
@@ -78,7 +78,9 @@ define PROJECT_NAME do
         run.using main: GUI_MAIN_CLASS
 
         build do
-            write_version_file_for_project('bunkr-core')
+            write_version_file_for_project('bunkr-gui')
+
+            FileUtils.cp_r project('bunkr-gui')._('resources/.'), project('bunkr-gui')._('target/main/classes')
         end
     end
 

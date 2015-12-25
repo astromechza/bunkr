@@ -19,7 +19,7 @@ public class OpenArchiveWindow extends BaseWindow
     public OpenArchiveWindow(Stage container) throws IOException
     {
         super(container);
-        this.cssPath = Resources.getExternalPath("/css/open_archive_window.css");
+        this.cssPath = Resources.getExternalPath("/resources/css/open_archive_window.css");
         this.initialise();
         this.getStage().show();
     }
