@@ -36,7 +36,6 @@ public class LandingWindow extends BaseWindow
         this.cssPath = Resources.getExternalPath("/resources/css/open_archive_window.css");
         this.logoPath = Resources.getExternalPath("/resources/images/bunkr-logo-200x200.png");
         this.initialise();
-        this.getStage().show();
     }
 
     @Override
@@ -109,7 +108,8 @@ public class LandingWindow extends BaseWindow
                 // - show cancel/create buttons
                 try
                 {
-                    new NewArchiveSettingsWindow();
+                    new NewArchiveSettingsWindow(this.getStage(), selectedPath.getAbsolutePath()).getStage().show();
+                    this.getStage().hide();
                 }
                 catch (IOException e)
                 {

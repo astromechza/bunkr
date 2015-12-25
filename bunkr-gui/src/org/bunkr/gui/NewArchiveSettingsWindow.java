@@ -1,18 +1,19 @@
 package org.bunkr.gui;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
+import javafx.scene.control.*;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordRequirements;
@@ -33,24 +34,33 @@ public class NewArchiveSettingsWindow extends BaseWindow
     private static final String PW_NOTE_NO_MATCH = "Confirmation does not match password";
     private static final String PW_NOTE_CLASS_OK = "pw-note-success";
     private static final String PW_NOTE_CLASS_NOT_OK = "pw-note-failure";
+
     private final String cssPath;
+    private final Stage previousWindow;
+    private final String selectedPath;
 
     private CheckBox encryptionCheckBox, compressionCheckBox;
     private PasswordField passwordField, confirmPasswordField;
-    private Label passwordNote;
+    private Label passwordNote, topLabel;
     private Button cancelButton, createButton;
+    private TextField pathField;
 
-    public NewArchiveSettingsWindow() throws IOException
+    public NewArchiveSettingsWindow(Stage previousWindow, String selectedPath) throws IOException
     {
         super();
+        this.previousWindow = previousWindow;
+        this.selectedPath = selectedPath;
         this.cssPath = Resources.getExternalPath("/resources/css/new_archive_settings_window.css");
         this.initialise();
-        this.getStage().show();
     }
 
     @Override
     void initControls()
     {
+        this.topLabel= new Label("Create new archive in:");
+        this.pathField = new TextField(this.selectedPath);
+        this.pathField.setEditable(false);
+        this.pathField.setFocusTraversable(false);
         this.encryptionCheckBox = new CheckBox("Encrypt the archive");
         this.encryptionCheckBox.setSelected(true);
         this.compressionCheckBox = new CheckBox("Compress files stored in the archive");
@@ -90,31 +100,39 @@ public class NewArchiveSettingsWindow extends BaseWindow
         rootLayout.setHgap(10);
         rootLayout.setVgap(10);
 
-        rootLayout.add(this.encryptionCheckBox, 0, 1);
+        rootLayout.add(this.topLabel, 0, 0);
         GridPane.setColumnSpan(this.encryptionCheckBox, 2);
         GridPane.setHalignment(this.encryptionCheckBox, HPos.LEFT);
 
-        rootLayout.add(this.passwordField, 0, 2);
+        rootLayout.add(this.pathField, 0, 1);
+        GridPane.setColumnSpan(this.pathField, 2);
+        GridPane.setHalignment(this.pathField, HPos.LEFT);
+
+        rootLayout.add(this.encryptionCheckBox, 0, 2);
+        GridPane.setColumnSpan(this.encryptionCheckBox, 2);
+        GridPane.setHalignment(this.encryptionCheckBox, HPos.LEFT);
+
+        rootLayout.add(this.passwordField, 0, 3);
         GridPane.setColumnSpan(this.passwordField, 2);
         GridPane.setHalignment(this.passwordField, HPos.LEFT);
 
-        rootLayout.add(this.confirmPasswordField, 0, 3);
+        rootLayout.add(this.confirmPasswordField, 0, 4);
         GridPane.setColumnSpan(this.confirmPasswordField, 2);
         GridPane.setHalignment(this.confirmPasswordField, HPos.LEFT);
 
-        rootLayout.add(this.passwordNote, 0, 4);
+        rootLayout.add(this.passwordNote, 0, 5);
         GridPane.setColumnSpan(this.passwordNote, 2);
         GridPane.setHalignment(this.passwordNote, HPos.RIGHT);
 
-        rootLayout.add(this.compressionCheckBox, 0, 5);
+        rootLayout.add(this.compressionCheckBox, 0, 6);
         GridPane.setColumnSpan(this.compressionCheckBox, 2);
         GridPane.setHalignment(this.compressionCheckBox, HPos.LEFT);
 
         this.cancelButton.setMaxWidth(Double.MAX_VALUE);
-        rootLayout.add(this.cancelButton, 0, 6);
+        rootLayout.add(this.cancelButton, 0, 7);
         GridPane.setHalignment(this.cancelButton, HPos.LEFT);
         this.createButton.setMaxWidth(Double.MAX_VALUE);
-        rootLayout.add(this.createButton, 1, 6);
+        rootLayout.add(this.createButton, 1, 7);
         GridPane.setHalignment(this.createButton, HPos.RIGHT);
 
         return rootLayout;
@@ -185,6 +203,13 @@ public class NewArchiveSettingsWindow extends BaseWindow
                 this.passwordNote.setText(PW_NOTE_NO_MATCH);
                 this.passwordNote.getStyleClass().add(PW_NOTE_CLASS_NOT_OK);
             }
+        });
+
+        this.getStage().setOnCloseRequest(event -> this.previousWindow.show());
+
+        this.cancelButton.setOnAction(event -> {
+            this.previousWindow.show();
+            this.getStage().close();
         });
     }
 

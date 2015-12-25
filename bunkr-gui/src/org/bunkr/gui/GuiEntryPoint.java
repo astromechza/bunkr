@@ -17,6 +17,6 @@ public class GuiEntryPoint extends Application
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        new LandingWindow(primaryStage);
+        new LandingWindow(primaryStage).getStage().show();
     }
 }
