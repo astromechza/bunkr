@@ -10,6 +10,11 @@ public class UserSecurityProvider
 {
     private PasswordProvider passwordProvider;
 
+    public UserSecurityProvider()
+    {
+        this.passwordProvider = null;
+    }
+
     public UserSecurityProvider(PasswordProvider passwordProvider)
     {
         this.passwordProvider = passwordProvider;

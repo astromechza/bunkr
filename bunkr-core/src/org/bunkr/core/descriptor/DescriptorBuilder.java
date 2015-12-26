@@ -1,7 +1,14 @@
 package org.bunkr.core.descriptor;
 
+import org.bunkr.core.Version;
+import org.bunkr.core.utils.IO;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Creator: benmeier
@@ -34,5 +41,21 @@ public class DescriptorBuilder
         jo.put(KEY_NAME, source.getIdentifier());
         jo.put(KEY_PARAMS, source.getParams());
         return jo.toJSONString();
+    }
+
+    public static IDescriptor fromFile(File path) throws IOException
+    {
+        try(FileInputStream fis = new FileInputStream(path))
+        {
+            try(DataInputStream dis = new DataInputStream(fis))
+            {
+                String fivebytes = IO.readNByteString(dis, 5);
+                if (! fivebytes.equals("BUNKR")) throw new IOException("File format header does not match 'BUNKR'");
+                Version.assertCompatible(dis.readByte(), dis.readByte(), dis.readByte(), false);
+                dis.readInt();
+                IO.reliableSkip(dis, dis.readLong());
+                return DescriptorBuilder.fromJSON(IO.readString(dis));
+            }
+        }
     }
 }

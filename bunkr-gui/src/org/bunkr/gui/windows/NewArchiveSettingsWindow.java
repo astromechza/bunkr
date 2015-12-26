@@ -12,6 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.bouncycastle.crypto.CryptoException;
 import org.bunkr.core.ArchiveBuilder;
@@ -288,6 +289,7 @@ public class NewArchiveSettingsWindow extends BaseWindow
         this.getStage().setScene(scene);
         this.getStage().setResizable(false);
         this.getStage().sizeToScene();
+        this.getStage().initModality(Modality.APPLICATION_MODAL);
         return scene;
     }
 }

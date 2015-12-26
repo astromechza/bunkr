@@ -11,9 +11,20 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.bouncycastle.crypto.CryptoException;
+import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
 import org.bunkr.core.Version;
+import org.bunkr.core.descriptor.DescriptorBuilder;
+import org.bunkr.core.descriptor.IDescriptor;
+import org.bunkr.core.descriptor.PBKDF2Descriptor;
+import org.bunkr.core.descriptor.PlaintextDescriptor;
+import org.bunkr.core.exceptions.BaseBunkrException;
+import org.bunkr.core.exceptions.IllegalPasswordException;
+import org.bunkr.core.usersec.PasswordProvider;
+import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.gui.dialogs.ExceptionDialog;
+import org.bunkr.gui.dialogs.PasswordDialog;
 
 import java.io.File;
 import java.io.IOException;
@@ -116,8 +127,49 @@ public class LandingWindow extends BaseWindow
             File selectedPath = fileChooser.showOpenDialog(LandingWindow.this.getStage());
             if (selectedPath != null)
             {
-                new OpenArchiveWindow(this.getStage(), selectedPath).getStage().show();
-                this.getStage().hide();
+                try
+                {
+                    IDescriptor descriptor = DescriptorBuilder.fromFile(selectedPath);
+                    UserSecurityProvider usp;
+
+                    if (descriptor instanceof PlaintextDescriptor)
+                    {
+                        usp = new UserSecurityProvider();
+                    }
+                    else if (descriptor instanceof PBKDF2Descriptor)
+                    {
+                        PasswordProvider passProv = new PasswordProvider();
+                        PasswordDialog dialog = new PasswordDialog();
+                        dialog.getStage().showAndWait();
+                        if (dialog.hasFile())
+                        {
+                            passProv.setArchivePassword(dialog.getFile());
+                        }
+                        else if (dialog.hasPassword())
+                        {
+                            passProv.setArchivePassword(dialog.getPassword());
+                        }
+                        else
+                        {
+                            return;
+                        }
+
+                        usp = new UserSecurityProvider(passProv);
+                    }
+                    else
+                    {
+                        throw new BaseBunkrException("Archive Open is not implemented for Descriptor type %s", descriptor.getIdentifier());
+                    }
+
+                    ArchiveInfoContext archive = new ArchiveInfoContext(selectedPath, usp);
+                    new MainWindow(archive).getStage().show();
+                    this.getStage().close();
+                }
+                catch (Exception e)
+                {
+                    new ExceptionDialog(e).getStage().showAndWait();
+                    this.getStage().show();
+                }
             }
         });
     }
