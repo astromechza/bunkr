@@ -1,4 +1,4 @@
-package org.bunkr.gui;
+package org.bunkr.gui.windows;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -33,11 +33,11 @@ public abstract class BaseWindow
         this.scene = this.initScene();
     }
 
-    abstract void initControls();
-    abstract Parent initLayout();
-    abstract void bindEvents();
-    abstract void applyStyling();
-    abstract Scene initScene();
+    public abstract void initControls();
+    public abstract Parent initLayout();
+    public abstract void bindEvents();
+    public abstract void applyStyling();
+    public abstract Scene initScene();
 
     public Stage getStage()
     {

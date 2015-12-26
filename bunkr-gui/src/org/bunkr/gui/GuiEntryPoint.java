@@ -2,6 +2,7 @@ package org.bunkr.gui;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.bunkr.gui.windows.LandingWindow;
 
 /**
  * Creator: benmeier

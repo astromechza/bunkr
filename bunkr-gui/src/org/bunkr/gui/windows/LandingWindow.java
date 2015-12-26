@@ -1,4 +1,4 @@
-package org.bunkr.gui;
+package org.bunkr.gui.windows;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -13,6 +13,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.bunkr.core.Resources;
 import org.bunkr.core.Version;
+import org.bunkr.gui.dialogs.ExceptionDialog;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class LandingWindow extends BaseWindow
     }
 
     @Override
-    void initControls()
+    public void initControls()
     {
         this.newArchiveButton = new Button("New Archive");
         this.openArchiveButton = new Button("Open Archive");
@@ -52,7 +53,7 @@ public class LandingWindow extends BaseWindow
     }
 
     @Override
-    Parent initLayout()
+    public Parent initLayout()
     {
         GridPane rootLayout = new GridPane();
 
@@ -91,30 +92,18 @@ public class LandingWindow extends BaseWindow
     }
 
     @Override
-    void bindEvents()
+    public void bindEvents()
     {
         this.newArchiveButton.setOnAction(event -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save Archive ...");
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Bunkr Archives", "*.bunkr"),
-                    new FileChooser.ExtensionFilter("All Files", "*.*"));
-            File selectedPath = fileChooser.showSaveDialog(LandingWindow.this.getStage());
-            if (selectedPath != null)
+            try
             {
-                // display new archive window
-                // - show options for password
-                // - show options for encryption
-                // - show cancel/create buttons
-                try
-                {
-                    new NewArchiveSettingsWindow(this.getStage(), selectedPath.getAbsolutePath()).getStage().show();
-                    this.getStage().hide();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
+                new NewArchiveSettingsWindow(this.getStage()).getStage().show();
+                this.getStage().hide();
+            }
+            catch (IOException e)
+            {
+                new ExceptionDialog(e).getStage().showAndWait();
+                this.getStage().show();
             }
         });
 
@@ -127,23 +116,21 @@ public class LandingWindow extends BaseWindow
             File selectedPath = fileChooser.showOpenDialog(LandingWindow.this.getStage());
             if (selectedPath != null)
             {
-                // display open archive window
-                // try open archive
-                // - catch password requirement
-                // if password
+                new OpenArchiveWindow(this.getStage(), selectedPath).getStage().show();
+                this.getStage().hide();
             }
         });
     }
 
     @Override
-    void applyStyling()
+    public void applyStyling()
     {
         this.versionLabel.setId("version-label");
         this.getRootLayout().getStyleClass().add("background");
     }
 
     @Override
-    Scene initScene()
+    public Scene initScene()
     {
         Scene scene = new Scene(this.getRootLayout(), WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.getStylesheets().add(this.cssPath);
