@@ -26,7 +26,7 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.PasswordRequirements;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.gui.dialogs.ExceptionDialog;
+import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.File;
 import java.io.IOException;
@@ -260,11 +260,7 @@ public class NewArchiveSettingsWindow extends BaseWindow
             catch (CryptoException | BaseBunkrException | IOException e)
             {
                 // TODO probably some exceptions we can display with a better message instead of defaulting to ExceptionDialog
-
-                new ExceptionDialog(
-                        "An exception occured while constructing the new archive",
-                        e
-                ).getStage().showAndWait();
+                QuickDialogs.exception(e);
             }
             finally
             {

@@ -1,5 +1,6 @@
 package org.bunkr.gui.components;
 
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -9,6 +10,7 @@ import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.inventory.FolderInventoryItem;
 import org.bunkr.core.inventory.IFFContainer;
 import org.bunkr.core.inventory.InventoryItem;
+import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -20,12 +22,104 @@ import java.util.UUID;
  */
 public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
 {
-    private ArchiveInfoContext archive;
+    private final ContextMenus callbackMenus;
+    private final ArchiveInfoContext archive;
 
     public InventoryTreeView(ArchiveInfoContext archive)
     {
         this.archive = archive;
-        this.setCellFactory(new CellFactoryCallback(new ContextMenus()));
+        this.callbackMenus = new ContextMenus();
+        this.setCellFactory(new CellFactoryCallback(callbackMenus));
+        this.bindEvents();
+    }
+
+    private void bindEvents()
+    {
+        this.callbackMenus.fileDelete.setOnAction(event -> {
+            try
+            {
+                TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+
+                if (!QuickDialogs
+                        .confirm(String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
+                    return;
+
+                // find parent item
+                TreeItem<IntermedInvTreeDS> parent = selected.getParent();
+
+                // find inventory item
+                IFFContainer parentContainer;
+                if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+                {
+                    parentContainer = this.archive.getInventory();
+                }
+                else
+                {
+                    parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
+                }
+
+                // just get inventory item
+                InventoryItem target = parentContainer.search(selected.getValue().getUuid());
+
+                if (target instanceof FileInventoryItem)
+                {
+                    FileInventoryItem targetFile = (FileInventoryItem) target;
+                    parentContainer.getFiles().remove(targetFile);
+                    parent.getChildren().remove(selected);
+                }
+                else
+                {
+                    throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
+                }
+            }
+            catch (Exception e)
+            {
+                QuickDialogs.exception(e);
+            }
+        });
+
+        this.callbackMenus.dirDelete.setOnAction(event -> {
+            try
+            {
+                TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+
+                if (!QuickDialogs
+                        .confirm(String.format("Are you sure you want to delete '%s' and all of its children?", selected.getValue().getName())))
+                    return;
+
+                // find parent item
+                TreeItem<IntermedInvTreeDS> parent = selected.getParent();
+
+                // find inventory item
+                IFFContainer parentContainer;
+                if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+                {
+                    parentContainer = this.archive.getInventory();
+                }
+                else
+                {
+                    parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
+                }
+
+                // just get inventory item
+                InventoryItem target = parentContainer.search(selected.getValue().getUuid());
+
+                if (target instanceof FolderInventoryItem)
+                {
+                    FolderInventoryItem targetFolder = (FolderInventoryItem) target;
+                    parentContainer.getFolders().remove(targetFolder);
+                    parent.getChildren().remove(selected);
+                }
+                else
+                {
+                    throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
+                }
+            }
+            catch (Exception e)
+            {
+                QuickDialogs.exception(e);
+            }
+        });
     }
 
     /**
@@ -54,6 +148,7 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         {
             subject.getChildren().clear();
             genFolder(subject, (IFFContainer) item);
+
         }
 
         IntermedInvTreeDS newValue = new IntermedInvTreeDS(
@@ -107,5 +202,11 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
             queue.addAll(item.getChildren());
         }
         return null;
+    }
+
+    private TreeItem<IntermedInvTreeDS> getSelectedTreeItem() throws BaseBunkrException
+    {
+        if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
+        throw new BaseBunkrException("No item selected");
     }
 }

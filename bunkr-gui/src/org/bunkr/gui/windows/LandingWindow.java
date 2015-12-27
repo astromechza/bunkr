@@ -11,7 +11,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.bouncycastle.crypto.CryptoException;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
 import org.bunkr.core.Version;
@@ -20,11 +19,10 @@ import org.bunkr.core.descriptor.IDescriptor;
 import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.exceptions.BaseBunkrException;
-import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.gui.dialogs.ExceptionDialog;
 import org.bunkr.gui.dialogs.PasswordDialog;
+import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,7 +111,7 @@ public class LandingWindow extends BaseWindow
             }
             catch (IOException e)
             {
-                new ExceptionDialog(e).getStage().showAndWait();
+                QuickDialogs.exception(e);
                 this.getStage().show();
             }
         });
@@ -167,7 +165,7 @@ public class LandingWindow extends BaseWindow
                 }
                 catch (Exception e)
                 {
-                    new ExceptionDialog(e).getStage().showAndWait();
+                    QuickDialogs.exception(e);
                     this.getStage().show();
                 }
             }
