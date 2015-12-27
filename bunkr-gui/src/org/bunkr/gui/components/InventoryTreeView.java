@@ -6,10 +6,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.exceptions.BaseBunkrException;
-import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.FolderInventoryItem;
-import org.bunkr.core.inventory.IFFContainer;
-import org.bunkr.core.inventory.InventoryItem;
+import org.bunkr.core.inventory.*;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.util.ArrayDeque;
@@ -83,8 +80,9 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
             {
                 TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
 
-                if (!QuickDialogs
-                        .confirm(String.format("Are you sure you want to delete '%s' and all of its children?", selected.getValue().getName())))
+                if (! QuickDialogs.confirm(
+                        String.format("Are you sure you want to delete '%s' and all of its children?",
+                                      selected.getValue().getName())))
                     return;
 
                 // find parent item
@@ -114,6 +112,56 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
                 {
                     throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
                 }
+            }
+            catch (Exception e)
+            {
+                QuickDialogs.exception(e);
+            }
+        });
+
+        this.callbackMenus.fileRename.setOnAction(event -> {
+            try
+            {
+                TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+
+                String newName = QuickDialogs.input("Enter a new file name:", selected.getValue().getName());
+                if (newName == null) return;
+
+                if (! InventoryPather.isValidName(newName))
+                {
+                    QuickDialogs.error("Rename Error", "'%s' is an invalid file name.");
+                    return;
+                }
+
+                IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newName, selected.getValue().getType());
+                selected.setValue(newValue);
+                Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+
+            }
+            catch (Exception e)
+            {
+                QuickDialogs.exception(e);
+            }
+        });
+
+        this.callbackMenus.dirRename.setOnAction(event -> {
+            try
+            {
+                TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+
+                String newName = QuickDialogs.input("Enter a new folder name:", selected.getValue().getName());
+                if (newName == null) return;
+
+                if (! InventoryPather.isValidName(newName))
+                {
+                    QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                    return;
+                }
+
+                IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newName, selected.getValue().getType());
+                selected.setValue(newValue);
+                Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+
             }
             catch (Exception e)
             {
