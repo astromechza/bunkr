@@ -16,6 +16,7 @@ import org.bunkr.gui.windows.BaseWindow;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Creator: benmeier
@@ -180,5 +181,15 @@ public class PasswordDialog extends BaseWindow
     public byte[] getPassword()
     {
         return this.passwordField.getText().getBytes();
+    }
+
+    /**
+     * Have no idea if this is actually helping.. For all I know the password fields fill the heap with old passwords
+     * as you change the text. I'm just going to do this as best-effort for now.
+     */
+    public void clean()
+    {
+        Arrays.fill(this.passwordFilePathBox.getText().getBytes(), (byte) 0);
+        Arrays.fill(this.passwordField.getText().getBytes(), (byte) 0);
     }
 }

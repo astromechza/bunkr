@@ -92,4 +92,34 @@ public interface IFFContainer
     {
         return (this.findFolder(name) != null);
     }
+
+    /**
+     * Do a breadth first search to find the item with the given UUID.
+     * This can be optimised in the future if needed.
+     * @param uuid item uuid to find
+     * @return an inventory item, either a file or a folder
+     */
+    default InventoryItem search(UUID uuid)
+    {
+        final Queue<FileInventoryItem> queuedFiles = new ArrayDeque<>(this.getFiles());
+        final Queue<FolderInventoryItem> queuedFolders = new ArrayDeque<>(this.getFolders());
+
+        while ( (! queuedFolders.isEmpty()) && (! queuedFiles.isEmpty()) )
+        {
+            if (queuedFiles.isEmpty())
+            {
+                FolderInventoryItem f = queuedFolders.poll();
+                if (f.getUuid().equals(uuid)) return f;
+
+                queuedFolders.addAll(f.getFolders());
+                queuedFiles.addAll(f.getFiles());
+            }
+            else
+            {
+                FileInventoryItem f = queuedFiles.poll();
+                if (f.getUuid().equals(uuid)) return f;
+            }
+        }
+        return null;
+    }
 }

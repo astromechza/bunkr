@@ -1,6 +1,7 @@
 package org.bunkr.core.inventory;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Creator: benmeier
