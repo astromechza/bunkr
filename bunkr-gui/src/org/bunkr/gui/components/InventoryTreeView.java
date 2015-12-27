@@ -25,8 +25,7 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
     public InventoryTreeView(ArchiveInfoContext archive)
     {
         this.archive = archive;
-        this.setShowRoot(false);
-        this.setCellFactory(new CellFactoryCallback());
+        this.setCellFactory(new CellFactoryCallback(new ContextMenus()));
     }
 
     /**
@@ -35,8 +34,9 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
      */
     public void refreshAll()
     {
-        TreeItem<IntermedInvTreeDS> root = new TreeItem<>(new IntermedInvTreeDS(null, "/"));
+        TreeItem<IntermedInvTreeDS> root = new TreeItem<>(new IntermedInvTreeDS(null, "/", IntermedInvTreeDS.Type.ROOT));
         genFolder(root, this.archive.getInventory());
+        root.setExpanded(true);
         this.setRoot(root);
     }
 
@@ -46,21 +46,22 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
      */
     public void refreshSpecific(TreeItem<IntermedInvTreeDS> subject, boolean rebuildChildren) throws BaseBunkrException
     {
-        InventoryItem item = this.archive.getInventory().search(subject.getValue().getUuid());
+        UUID subjectUUID = subject.getValue().getUuid();
+        if (subjectUUID == null) throw new BaseBunkrException("Cannot refresh root, to do this, use refreshAll()");
+        InventoryItem item = this.archive.getInventory().search(subjectUUID);
         if (item == null) throw new BaseBunkrException("Could not find item for %s", subject.getValue().getUuid());
         if (rebuildChildren && item instanceof FolderInventoryItem)
         {
             subject.getChildren().clear();
             genFolder(subject, (IFFContainer) item);
         }
-        Event.fireEvent(
-                subject,
-                new TreeItem.TreeModificationEvent<>(
-                        TreeItem.valueChangedEvent(),
-                        subject,
-                        new IntermedInvTreeDS(item.getUuid(), item.getName())
-                )
+
+        IntermedInvTreeDS newValue = new IntermedInvTreeDS(
+                item.getUuid(), item.getName(),
+                (item instanceof FolderInventoryItem) ? IntermedInvTreeDS.Type.FOLDER : IntermedInvTreeDS.Type.FILE
         );
+
+        Event.fireEvent(subject, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), subject, newValue));
     }
 
     /**
@@ -74,7 +75,9 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         }
         for (FileInventoryItem subfile : mirror.getFiles())
         {
-            parent.getChildren().add(new TreeItem<>(new IntermedInvTreeDS(subfile.getUuid(), subfile.getName())));
+            parent.getChildren().add(new TreeItem<>(new IntermedInvTreeDS(
+                    subfile.getUuid(), subfile.getName(), IntermedInvTreeDS.Type.FILE
+            )));
         }
         return parent;
     }
@@ -83,7 +86,9 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
      */
     private TreeItem<IntermedInvTreeDS> genFolder(FolderInventoryItem folder)
     {
-        return genFolder(new TreeItem<>(new IntermedInvTreeDS(folder.getUuid(), folder.getName())), folder);
+        return genFolder(new TreeItem<>(new IntermedInvTreeDS(
+                folder.getUuid(), folder.getName(), IntermedInvTreeDS.Type.FOLDER)), folder
+        );
     }
 
     /**
@@ -103,5 +108,4 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         }
         return null;
     }
-
 }

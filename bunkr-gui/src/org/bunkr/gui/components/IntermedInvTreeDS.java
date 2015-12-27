@@ -11,13 +11,17 @@ import java.util.UUID;
  */
 public class IntermedInvTreeDS
 {
+    public enum Type {ROOT, FOLDER, FILE}
+
     private final UUID uuid;
     private final String name;
+    private final Type type;
 
-    public IntermedInvTreeDS(UUID uuid, String name)
+    public IntermedInvTreeDS(UUID uuid, String name, Type type)
     {
         this.uuid = uuid;
         this.name = name;
+        this.type = type;
     }
 
     public String getName()
@@ -28,5 +32,10 @@ public class IntermedInvTreeDS
     public UUID getUuid()
     {
         return uuid;
+    }
+
+    public Type getType()
+    {
+        return type;
     }
 }
