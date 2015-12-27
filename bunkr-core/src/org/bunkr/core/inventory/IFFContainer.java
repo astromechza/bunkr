@@ -104,7 +104,7 @@ public interface IFFContainer
         final Queue<FileInventoryItem> queuedFiles = new ArrayDeque<>(this.getFiles());
         final Queue<FolderInventoryItem> queuedFolders = new ArrayDeque<>(this.getFolders());
 
-        while ( (! queuedFolders.isEmpty()) && (! queuedFiles.isEmpty()) )
+        while ( (! queuedFolders.isEmpty()) || (! queuedFiles.isEmpty()) )
         {
             if (queuedFiles.isEmpty())
             {
