@@ -40,7 +40,8 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         this.callbackMenus.dirNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnDir());
         this.callbackMenus.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnRoot());
 
-        
+        this.callbackMenus.dirNewFile.setOnAction(event -> this.handleCMNewFileOnDir());
+        this.callbackMenus.rootNewFile.setOnAction(event -> this.handleCMNewFileOnRoot());
     }
 
     /**
@@ -376,6 +377,89 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         }
     }
 
+    private void handleCMNewFileOnDir()
+    {
+        try
+        {
+            // get item for which the context menu was called from
+            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
 
+            // get new file name
+            String newName = QuickDialogs.input("Enter a new directory name:", "");
+            if (newName == null) return;
+            if (! InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                return;
+            }
 
+            // find subject FolderInventoryItem
+            IFFContainer subjectContainer = (IFFContainer) this.archive.getInventory().search(selected.getValue().getUuid());
+
+            // check parent for the same name
+            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
+            if (target != null)
+            {
+                QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
+                return;
+            }
+
+            FileInventoryItem newFile = new FileInventoryItem(newName);
+            subjectContainer.getFiles().add(newFile);
+
+            // create the new tree item
+            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FOLDER);
+            TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
+            selected.getChildren().add(newItem);
+
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+    private void handleCMNewFileOnRoot()
+    {
+        try
+        {
+            // get item for which the context menu was called from
+            TreeItem<IntermedInvTreeDS> selected = this.getRoot();
+
+            // get new file name
+            String newName = QuickDialogs.input("Enter a new directory name:", "");
+            if (newName == null) return;
+            if (! InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                return;
+            }
+
+            // find subject FolderInventoryItem
+            IFFContainer subjectContainer = this.archive.getInventory();
+
+            // check parent for the same name
+            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
+            if (target != null)
+            {
+                QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
+                return;
+            }
+
+            FileInventoryItem newFile = new FileInventoryItem(newName);
+            subjectContainer.getFiles().add(newFile);
+
+            // create the new tree item
+            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FOLDER);
+            TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
+            selected.getChildren().add(newItem);
+
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
 }
