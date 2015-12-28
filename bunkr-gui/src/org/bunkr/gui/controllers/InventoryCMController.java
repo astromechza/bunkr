@@ -11,6 +11,8 @@ import org.bunkr.gui.components.IntermedInvTreeDS;
 import org.bunkr.gui.components.InventoryTreeView;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
+import java.util.Comparator;
+
 /**
  * Creator: benmeier
  * Created At: 2015-12-28
@@ -181,16 +183,24 @@ public class InventoryCMController
                 return;
             }
 
+            /** TODO this gets complicated now.. how to support directory movements..
+             *
+             * IF newName contains '/' then separate into newName and traversal component
+             * need to get IFFContainer oldParent and IFFContainer newParent
+             * need to get TreeItem oldParent and TreeItem newParent
+             *
+             */
+
             // find parent item
-            TreeItem<IntermedInvTreeDS> parent = selected.getParent();
-            IFFContainer parentContainer;
-            if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
-                parentContainer = this.inventory;
+            TreeItem<IntermedInvTreeDS> oldParentItem = selected.getParent();
+            IFFContainer oldParentContainer;
+            if (oldParentItem.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+                oldParentContainer = this.inventory;
             else
-                parentContainer = (IFFContainer) this.inventory.search(parent.getValue().getUuid());
+                oldParentContainer = (IFFContainer) this.inventory.search(oldParentItem.getValue().getUuid());
 
             // check parent for the same name
-            IFFTraversalTarget target = parentContainer.findFileOrFolder(newName);
+            IFFTraversalTarget target = oldParentContainer.findFileOrFolder(newName);
             if (target != null)
             {
                 QuickDialogs.error("Rename Error", "There is already an item named '%s' in the parent folder.", newName);
@@ -198,21 +208,21 @@ public class InventoryCMController
             }
 
             // get subject item that we can rename
-            IFFTraversalTarget subject = parentContainer.findFileOrFolder(selected.getValue().getName());
-            if (subject == null)
+            IFFTraversalTarget renameSubject = oldParentContainer.findFileOrFolder(selected.getValue().getName());
+            if (renameSubject == null)
             {
                 QuickDialogs.error("Rename Error", "Critical! no subject item.");
                 return;
             }
 
             // rename the subject
-            if (subject.isAFolder())
+            if (renameSubject.isAFolder())
             {
-                ((FolderInventoryItem) subject).setName(newName);
+                ((FolderInventoryItem) renameSubject).setName(newName);
             }
-            else if (subject.isAFile())
+            else if (renameSubject.isAFile())
             {
-                ((FileInventoryItem) subject).setName(newName);
+                ((FileInventoryItem) renameSubject).setName(newName);
             }
             else
             {
@@ -220,11 +230,34 @@ public class InventoryCMController
                 return;
             }
 
-            // rename the tree item
+            TreeItem<IntermedInvTreeDS> newParentItem = oldParentItem;
+            IFFContainer newParentContainer = oldParentContainer;
+
+            if (newParentContainer != oldParentContainer)
+            {
+                if (renameSubject.isAFolder() && renameSubject instanceof FolderInventoryItem)
+                {
+                    oldParentContainer.getFolders().remove(renameSubject);
+                    newParentContainer.getFolders().add((FolderInventoryItem) renameSubject);
+                }
+                else if (renameSubject.isAFile() && renameSubject instanceof FileInventoryItem)
+                {
+                    oldParentContainer.getFiles().remove(renameSubject);
+                    newParentContainer.getFiles().add((FileInventoryItem) renameSubject);
+                }
+            }
+            if (oldParentItem != newParentItem)
+            {
+                oldParentItem.getChildren().remove(selected);
+            }
             IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newName, selected.getValue().getType());
             selected.setValue(newValue);
-            Event.fireEvent(selected,
-                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            if (oldParentItem != newParentItem)
+            {
+                newParentItem.getChildren().add(selected);
+            }
+            newParentItem.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
         }
         catch (Exception e)
         {
@@ -266,6 +299,7 @@ public class InventoryCMController
             IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFolder.getUuid(), newFolder.getName(), IntermedInvTreeDS.Type.FOLDER);
             TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
+            selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
 
             Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
         }
@@ -309,6 +343,7 @@ public class InventoryCMController
             IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFolder.getUuid(), newFolder.getName(), IntermedInvTreeDS.Type.FOLDER);
             TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
+            selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
 
             Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
@@ -353,6 +388,7 @@ public class InventoryCMController
             IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FILE);
             TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
+            selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
 
             Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
@@ -397,6 +433,7 @@ public class InventoryCMController
             IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FILE);
             TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
+            selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
 
             Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));

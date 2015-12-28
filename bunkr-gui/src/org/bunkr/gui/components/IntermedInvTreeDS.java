@@ -9,8 +9,16 @@ import java.util.UUID;
  * Creator: benmeier
  * Created At: 2015-12-27
  */
-public class IntermedInvTreeDS
+public class IntermedInvTreeDS implements Comparable<IntermedInvTreeDS>
 {
+    @Override
+    public int compareTo(IntermedInvTreeDS o)
+    {
+        int r = this.getType().compareTo(o.getType());
+        if (r == 0) return this.getName().compareTo(o.getName());
+        return r;
+    }
+
     public enum Type {ROOT, FOLDER, FILE}
 
     private final UUID uuid;
