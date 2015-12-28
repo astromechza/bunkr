@@ -327,7 +327,7 @@ public class InventoryCMController
             TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
 
             // get new file name
-            String newName = QuickDialogs.input("Enter a new directory name:", "");
+            String newName = QuickDialogs.input("Enter a new file name:", "");
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
@@ -371,7 +371,7 @@ public class InventoryCMController
             TreeItem<IntermedInvTreeDS> selected = this.treeView.getRoot();
 
             // get new file name
-            String newName = QuickDialogs.input("Enter a new directory name:", "");
+            String newName = QuickDialogs.input("Enter a new file name:", "");
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
