@@ -3,6 +3,8 @@ package org.bunkr.gui.components;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.exceptions.BaseBunkrException;
+import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.*;
 
 /**
@@ -56,4 +58,45 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
                 folder.getUuid(), folder.getName(), IntermedInvTreeDS.Type.FOLDER)), folder
         );
     }
+
+    public String getPathForTreeItem(TreeItem<IntermedInvTreeDS> o)
+    {
+        if (o == this.getRoot()) return "/";
+        String path = "";
+        while (o != this.getRoot())
+        {
+            path = "/" + o.getValue().getName() + path;
+            o = o.getParent();
+        }
+        return path;
+    }
+
+    public TreeItem<IntermedInvTreeDS> traverseTo(String absolutePath) throws TraversalException
+    {
+        InventoryPather.assertValidPath(absolutePath);
+        if (absolutePath.equals("/")) return this.getRoot();
+        TreeItem<IntermedInvTreeDS> current = this.getRoot();
+        String[] parts = absolutePath.substring(1).split("/");
+
+        for (String part : parts)
+        {
+            boolean found = false;
+            for (TreeItem<IntermedInvTreeDS> child : current.getChildren())
+            {
+                if (child.getValue().getName().equals(part))
+                {
+                    current = child;
+                    found = true;
+                    break;
+                }
+            }
+            if (! found)
+            {
+                throw new TraversalException("Could not find item '%s' in '%s'", part, current.getValue().getName());
+            }
+        }
+
+        return current;
+    }
+
 }

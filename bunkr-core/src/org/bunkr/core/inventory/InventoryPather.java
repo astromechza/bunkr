@@ -13,6 +13,7 @@ public class InventoryPather
 {
     public static final Pattern namePattern = Pattern.compile("[0-9a-zA-Z\\-_\\.,; ]+");
     public static final Pattern pathPattern = Pattern.compile("^(?:/" + namePattern.pattern() + ")+|/$");
+    public static final Pattern relpathPattern = Pattern.compile("^(?:\\.\\.\\/)*(?:" + namePattern.pattern() + "(?:\\/" + namePattern.pattern() + ")*)?");
 
     public static boolean isValidPath(String path)
     {
@@ -22,6 +23,11 @@ public class InventoryPather
     public static boolean isValidName(String name)
     {
         return namePattern.matcher(name).matches();
+    }
+
+    public static boolean isValidRelativePath(String path)
+    {
+        return relpathPattern.matcher(path).matches();
     }
 
     public static String assertValidPath(String path)
@@ -41,6 +47,14 @@ public class InventoryPather
         return name;
     }
 
+    public static String assertValidRelativePath(String path)
+    {
+        path = path.trim();
+        if (! isValidRelativePath(path))
+            throw new IllegalPathException(String.format("Error: '%s' is not a valid relative path.", path));
+        return path;
+    }
+
     public static String[] getParts(String path)
     {
         path = assertValidPath(path);
@@ -50,7 +64,7 @@ public class InventoryPather
 
     public static String dirname(String path)
     {
-        path = assertValidPath(path);
+        path = path.trim();
         if (path.equals("/")) return "/";
         String s = path.substring(0, path.lastIndexOf("/"));
         if (s.equals("")) return "/";
@@ -59,7 +73,7 @@ public class InventoryPather
 
     public static String baseName(String path)
     {
-        path = assertValidPath(path);
+        path = path.trim();
         if (path.equals("/")) return "";
         return path.substring(path.lastIndexOf("/") + 1);
     }
@@ -98,5 +112,33 @@ public class InventoryPather
         if (t == null)
             throw new TraversalException(String.format("No such file or folder '%s' in '%s'", pathParts[pathParts.length - 1], pathSoFar));
         return t;
+    }
+
+    public static String applyRelativePath(String original, String relative)
+    {
+        assertValidPath(original);
+        assertValidRelativePath(relative);
+
+        if (relative.endsWith("..")) relative += "/";
+
+        while (relative.startsWith("../"))
+        {
+            original = InventoryPather.dirname(original);
+            relative = relative.substring(3);
+        }
+
+        if (relative.length() > 0)
+        {
+            if (original.equals("/"))
+            {
+                original = "/" + relative;
+            }
+            else
+            {
+                original = original + "/" + relative;
+            }
+        }
+
+        return original;
     }
 }

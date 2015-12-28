@@ -170,7 +170,7 @@ public class ImportFileCommand implements ICLICommand
                 System.err.println("Performing emergency metadata write for recovery");
                 MetadataWriter.write(this.context, this.prov);
             }
-            catch (CryptoException | IOException | BaseBunkrException e)
+            catch (IOException | BaseBunkrException e)
             {
                 e.printStackTrace();
             }

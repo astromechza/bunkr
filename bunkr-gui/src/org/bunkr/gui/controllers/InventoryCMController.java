@@ -11,8 +11,6 @@ import org.bunkr.gui.components.IntermedInvTreeDS;
 import org.bunkr.gui.components.InventoryTreeView;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
-import java.util.Comparator;
-
 /**
  * Creator: benmeier
  * Created At: 2015-12-28
@@ -174,23 +172,6 @@ public class InventoryCMController
             // get item for which the context menu was called from
             TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
 
-            // get new file name
-            String newName = QuickDialogs.input("Enter a new file name:", selected.getValue().getName());
-            if (newName == null) return;
-            if (! InventoryPather.isValidName(newName))
-            {
-                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
-                return;
-            }
-
-            /** TODO this gets complicated now.. how to support directory movements..
-             *
-             * IF newName contains '/' then separate into newName and traversal component
-             * need to get IFFContainer oldParent and IFFContainer newParent
-             * need to get TreeItem oldParent and TreeItem newParent
-             *
-             */
-
             // find parent item
             TreeItem<IntermedInvTreeDS> oldParentItem = selected.getParent();
             IFFContainer oldParentContainer;
@@ -199,11 +180,20 @@ public class InventoryCMController
             else
                 oldParentContainer = (IFFContainer) this.inventory.search(oldParentItem.getValue().getUuid());
 
-            // check parent for the same name
-            IFFTraversalTarget target = oldParentContainer.findFileOrFolder(newName);
-            if (target != null)
+            // get new file name
+            String userInputPath = QuickDialogs.input("Enter a new file name:", selected.getValue().getName());
+            if (userInputPath == null) return;
+
+            String traversalPathComponent = "";
+            String newNameComponent = userInputPath;
+            if (userInputPath.contains("/") && InventoryPather.isValidRelativePath(userInputPath))
             {
-                QuickDialogs.error("Rename Error", "There is already an item named '%s' in the parent folder.", newName);
+                traversalPathComponent = InventoryPather.dirname(newNameComponent);
+                newNameComponent = InventoryPather.baseName(newNameComponent);
+            }
+            else if (! InventoryPather.isValidName(newNameComponent))
+            {
+                QuickDialogs.error("Rename Error", "'%s' is an invalid file name or relative file path.", newNameComponent);
                 return;
             }
 
@@ -211,27 +201,49 @@ public class InventoryCMController
             IFFTraversalTarget renameSubject = oldParentContainer.findFileOrFolder(selected.getValue().getName());
             if (renameSubject == null)
             {
-                QuickDialogs.error("Rename Error", "Critical! no subject item.");
+                QuickDialogs.error("Rename Error", "Critical! No subject item.");
+                return;
+            }
+
+            String oldParentPathString = this.treeView.getPathForTreeItem(oldParentItem);
+            String newParentPathString = InventoryPather.applyRelativePath(oldParentPathString, traversalPathComponent);
+
+            IFFContainer newParentContainer = oldParentContainer;
+            TreeItem<IntermedInvTreeDS> newParentItem = oldParentItem;
+            if (!newParentPathString.equals(oldParentPathString))
+            {
+                IFFTraversalTarget pt = InventoryPather.traverse(this.inventory, newParentPathString);
+                if (pt.isAFile())
+                {
+                    QuickDialogs.error("Rename Error", "Cannot move folder to be a child of file '%s'.", InventoryPather.baseName(newParentPathString));
+                    return;
+                }
+                newParentContainer = (IFFContainer) pt;
+                newParentItem = this.treeView.traverseTo(newParentPathString);
+            }
+
+            // check parent for the same name
+            IFFTraversalTarget target = newParentContainer.findFileOrFolder(newNameComponent);
+            if (target != null)
+            {
+                QuickDialogs.error("Rename Error", "There is already an item named '%s' in the parent folder.", newNameComponent);
                 return;
             }
 
             // rename the subject
             if (renameSubject.isAFolder())
             {
-                ((FolderInventoryItem) renameSubject).setName(newName);
+                ((FolderInventoryItem) renameSubject).setName(newNameComponent);
             }
             else if (renameSubject.isAFile())
             {
-                ((FileInventoryItem) renameSubject).setName(newName);
+                ((FileInventoryItem) renameSubject).setName(newNameComponent);
             }
             else
             {
                 QuickDialogs.error("Rename Error", "Critical! cannot rename a root.");
                 return;
             }
-
-            TreeItem<IntermedInvTreeDS> newParentItem = oldParentItem;
-            IFFContainer newParentContainer = oldParentContainer;
 
             if (newParentContainer != oldParentContainer)
             {
@@ -250,7 +262,7 @@ public class InventoryCMController
             {
                 oldParentItem.getChildren().remove(selected);
             }
-            IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newName, selected.getValue().getType());
+            IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newNameComponent, selected.getValue().getType());
             selected.setValue(newValue);
             if (oldParentItem != newParentItem)
             {

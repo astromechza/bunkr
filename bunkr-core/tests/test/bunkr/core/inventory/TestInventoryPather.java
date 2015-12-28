@@ -206,4 +206,15 @@ public class TestInventoryPather
         catch (TraversalException ignored) {}
     }
 
+    @Test
+    public void testApplyRelativePath()
+    {
+        assertThat(InventoryPather.applyRelativePath("/", "one/two"), is(equalTo("/one/two")));
+        assertThat(InventoryPather.applyRelativePath("/three", "one/two"), is(equalTo("/three/one/two")));
+
+        assertThat(InventoryPather.applyRelativePath("/one", "../"), is(equalTo("/")));
+        assertThat(InventoryPather.applyRelativePath("/one", "../two"), is(equalTo("/two")));
+        assertThat(InventoryPather.applyRelativePath("/one/two/three", "../../lol"), is(equalTo("/one/lol")));
+    }
+
 }
