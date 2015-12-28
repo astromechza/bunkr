@@ -45,6 +45,10 @@ public class QuickDialogs
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
 
+        // Log to stdout
+        System.out.println(e.getClass().getName());
+        System.out.println(sw.toString());
+
         TextArea textArea = new TextArea(sw.toString());
         textArea.setEditable(false);
         textArea.setWrapText(true);

@@ -350,7 +350,7 @@ public class InventoryCMController
             subjectContainer.getFiles().add(newFile);
 
             // create the new tree item
-            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FOLDER);
+            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FILE);
             TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.setExpanded(true);
@@ -394,7 +394,7 @@ public class InventoryCMController
             subjectContainer.getFiles().add(newFile);
 
             // create the new tree item
-            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FOLDER);
+            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FILE);
             TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.setExpanded(true);

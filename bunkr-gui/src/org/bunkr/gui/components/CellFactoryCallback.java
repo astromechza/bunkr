@@ -2,8 +2,12 @@ package org.bunkr.gui.components;
 
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.ImageView;
 import javafx.util.Callback;
+import org.bunkr.core.Resources;
 import org.bunkr.gui.controllers.InventoryCMController;
+
+import java.io.IOException;
 
 /**
  * Creator: benmeier
@@ -11,11 +15,35 @@ import org.bunkr.gui.controllers.InventoryCMController;
  */
 public class CellFactoryCallback implements Callback<TreeView<IntermedInvTreeDS>, TreeCell<IntermedInvTreeDS>>
 {
+    private final String fileImagePath, folderImagePath;
+
     private final InventoryCMController callbackContainer;
 
     public CellFactoryCallback(InventoryCMController callbackContainer)
     {
         this.callbackContainer = callbackContainer;
+
+        String temp = null;
+        try
+        {
+            temp = Resources.getExternalPath("/resources/images/file.png");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        this.fileImagePath = temp;
+
+        temp = null;
+        try
+        {
+            temp = Resources.getExternalPath("/resources/images/folder.png");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        this.folderImagePath = temp;
     }
 
     @Override
@@ -30,19 +58,21 @@ public class CellFactoryCallback implements Callback<TreeView<IntermedInvTreeDS>
                 if (! empty)
                 {
                     setText(item != null ? item.getName() : "");
-                    // setGraphic(createImageView(item));
                     if (item != null)
                     {
                         if (item.getType().equals(IntermedInvTreeDS.Type.ROOT))
                         {
+                            setGraphic(new ImageView(folderImagePath));
                             setContextMenu(CellFactoryCallback.this.callbackContainer.rootContextMenu);
                         }
                         else if (item.getType().equals(IntermedInvTreeDS.Type.FOLDER))
                         {
+                            setGraphic(new ImageView(folderImagePath));
                             setContextMenu(CellFactoryCallback.this.callbackContainer.dirContextMenu);
                         }
                         else
                         {
+                            setGraphic(new ImageView(fileImagePath));
                             setContextMenu(CellFactoryCallback.this.callbackContainer.fileContextMenu);
                         }
                     }
