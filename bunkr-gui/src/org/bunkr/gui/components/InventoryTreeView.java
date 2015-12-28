@@ -33,8 +33,14 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
     {
         this.callbackMenus.fileDelete.setOnAction(event -> this.handleCMFileDelete());
         this.callbackMenus.dirDelete.setOnAction(event -> this.handleCMDirDelete());
+
         this.callbackMenus.fileRename.setOnAction(event -> this.handleCMRenameItem());
         this.callbackMenus.dirRename.setOnAction(event -> this.handleCMRenameItem());
+
+        this.callbackMenus.dirNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnDir());
+        this.callbackMenus.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnRoot());
+
+        
     }
 
     /**
@@ -134,8 +140,8 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         {
             TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
 
-            if (!QuickDialogs
-                    .confirm(String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
+            if (!QuickDialogs.confirm(
+                    String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
                 return;
 
             // find parent item
@@ -283,6 +289,93 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
             QuickDialogs.exception(e);
         }
     }
+
+    private void handleCMNewSubDirOnDir()
+    {
+        try
+        {
+            // get item for which the context menu was called from
+            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+
+            // get new file name
+            String newName = QuickDialogs.input("Enter a new directory name:", "");
+            if (newName == null) return;
+            if (! InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                return;
+            }
+
+            // find subject FolderInventoryItem
+            IFFContainer subjectContainer = (IFFContainer) this.archive.getInventory().search(selected.getValue().getUuid());
+
+            // check parent for the same name
+            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
+            if (target != null)
+            {
+                QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
+                return;
+            }
+
+            FolderInventoryItem newFolder = new FolderInventoryItem(newName);
+            subjectContainer.getFolders().add(newFolder);
+
+            // create the new tree item
+            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFolder.getUuid(), newFolder.getName(), IntermedInvTreeDS.Type.FOLDER);
+            TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
+            selected.getChildren().add(newItem);
+
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+    private void handleCMNewSubDirOnRoot()
+    {
+        try
+        {
+            // get item for which the context menu was called from
+            TreeItem<IntermedInvTreeDS> selected = this.getRoot();
+
+            // get new file name
+            String newName = QuickDialogs.input("Enter a new directory name:", "");
+            if (newName == null) return;
+            if (! InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                return;
+            }
+
+            // find subject FolderInventoryItem
+            IFFContainer subjectContainer = this.archive.getInventory();
+
+            // check parent for the same name
+            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
+            if (target != null)
+            {
+                QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
+                return;
+            }
+
+            FolderInventoryItem newFolder = new FolderInventoryItem(newName);
+            subjectContainer.getFolders().add(newFolder);
+
+            // create the new tree item
+            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFolder.getUuid(), newFolder.getName(), IntermedInvTreeDS.Type.FOLDER);
+            TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
+            selected.getChildren().add(newItem);
+
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
 
 
 }
