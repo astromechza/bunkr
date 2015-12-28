@@ -1,6 +1,5 @@
 package org.bunkr.gui.components;
 
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -32,142 +31,10 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
 
     private void bindEvents()
     {
-        this.callbackMenus.fileDelete.setOnAction(event -> {
-            try
-            {
-                TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
-
-                if (!QuickDialogs
-                        .confirm(String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
-                    return;
-
-                // find parent item
-                TreeItem<IntermedInvTreeDS> parent = selected.getParent();
-
-                // find inventory item
-                IFFContainer parentContainer;
-                if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
-                {
-                    parentContainer = this.archive.getInventory();
-                }
-                else
-                {
-                    parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
-                }
-
-                // just get inventory item
-                InventoryItem target = parentContainer.search(selected.getValue().getUuid());
-
-                if (target instanceof FileInventoryItem)
-                {
-                    FileInventoryItem targetFile = (FileInventoryItem) target;
-                    parentContainer.getFiles().remove(targetFile);
-                    parent.getChildren().remove(selected);
-                }
-                else
-                {
-                    throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
-                }
-            }
-            catch (Exception e)
-            {
-                QuickDialogs.exception(e);
-            }
-        });
-
-        this.callbackMenus.dirDelete.setOnAction(event -> {
-            try
-            {
-                TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
-
-                if (! QuickDialogs.confirm(
-                        String.format("Are you sure you want to delete '%s' and all of its children?",
-                                      selected.getValue().getName())))
-                    return;
-
-                // find parent item
-                TreeItem<IntermedInvTreeDS> parent = selected.getParent();
-
-                // find inventory item
-                IFFContainer parentContainer;
-                if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
-                {
-                    parentContainer = this.archive.getInventory();
-                }
-                else
-                {
-                    parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
-                }
-
-                // just get inventory item
-                InventoryItem target = parentContainer.search(selected.getValue().getUuid());
-
-                if (target instanceof FolderInventoryItem)
-                {
-                    FolderInventoryItem targetFolder = (FolderInventoryItem) target;
-                    parentContainer.getFolders().remove(targetFolder);
-                    parent.getChildren().remove(selected);
-                }
-                else
-                {
-                    throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
-                }
-            }
-            catch (Exception e)
-            {
-                QuickDialogs.exception(e);
-            }
-        });
-
-        this.callbackMenus.fileRename.setOnAction(event -> {
-            try
-            {
-                TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
-
-                String newName = QuickDialogs.input("Enter a new file name:", selected.getValue().getName());
-                if (newName == null) return;
-
-                if (! InventoryPather.isValidName(newName))
-                {
-                    QuickDialogs.error("Rename Error", "'%s' is an invalid file name.");
-                    return;
-                }
-
-                IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newName, selected.getValue().getType());
-                selected.setValue(newValue);
-                Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
-
-            }
-            catch (Exception e)
-            {
-                QuickDialogs.exception(e);
-            }
-        });
-
-        this.callbackMenus.dirRename.setOnAction(event -> {
-            try
-            {
-                TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
-
-                String newName = QuickDialogs.input("Enter a new folder name:", selected.getValue().getName());
-                if (newName == null) return;
-
-                if (! InventoryPather.isValidName(newName))
-                {
-                    QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
-                    return;
-                }
-
-                IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newName, selected.getValue().getType());
-                selected.setValue(newValue);
-                Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
-
-            }
-            catch (Exception e)
-            {
-                QuickDialogs.exception(e);
-            }
-        });
+        this.callbackMenus.fileDelete.setOnAction(event -> this.handleCMFileDelete());
+        this.callbackMenus.dirDelete.setOnAction(event -> this.handleCMDirDelete());
+        this.callbackMenus.fileRename.setOnAction(event -> this.handleCMRenameItem());
+        this.callbackMenus.dirRename.setOnAction(event -> this.handleCMRenameItem());
     }
 
     /**
@@ -257,4 +124,165 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
         throw new BaseBunkrException("No item selected");
     }
+
+
+    // ================== Context Menu handlers ====================
+
+    private void handleCMFileDelete()
+    {
+        try
+        {
+            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+
+            if (!QuickDialogs
+                    .confirm(String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
+                return;
+
+            // find parent item
+            TreeItem<IntermedInvTreeDS> parent = selected.getParent();
+
+            // find inventory item
+            IFFContainer parentContainer;
+            if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+            {
+                parentContainer = this.archive.getInventory();
+            }
+            else
+            {
+                parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
+            }
+
+            // just get inventory item
+            InventoryItem target = parentContainer.search(selected.getValue().getUuid());
+
+            if (target instanceof FileInventoryItem)
+            {
+                FileInventoryItem targetFile = (FileInventoryItem) target;
+                parentContainer.getFiles().remove(targetFile);
+                parent.getChildren().remove(selected);
+            }
+            else
+            {
+                throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
+            }
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+    private void handleCMDirDelete()
+    {
+        try
+        {
+            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+
+            if (! QuickDialogs.confirm(
+                    String.format("Are you sure you want to delete '%s' and all of its children?",
+                                  selected.getValue().getName())))
+                return;
+
+            // find parent item
+            TreeItem<IntermedInvTreeDS> parent = selected.getParent();
+
+            // find inventory item
+            IFFContainer parentContainer;
+            if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+            {
+                parentContainer = this.archive.getInventory();
+            }
+            else
+            {
+                parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
+            }
+
+            // just get inventory item
+            InventoryItem target = parentContainer.search(selected.getValue().getUuid());
+
+            if (target instanceof FolderInventoryItem)
+            {
+                FolderInventoryItem targetFolder = (FolderInventoryItem) target;
+                parentContainer.getFolders().remove(targetFolder);
+                parent.getChildren().remove(selected);
+            }
+            else
+            {
+                throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
+            }
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+    private void handleCMRenameItem()
+    {
+        try
+        {
+            // get item for which the context menu was called from
+            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+
+            // get new file name
+            String newName = QuickDialogs.input("Enter a new file name:", selected.getValue().getName());
+            if (newName == null) return;
+            if (! InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                return;
+            }
+
+            // find parent item
+            TreeItem<IntermedInvTreeDS> parent = selected.getParent();
+            IFFContainer parentContainer;
+            if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+                parentContainer = this.archive.getInventory();
+            else
+                parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
+
+            // check parent for the same name
+            IFFTraversalTarget target = parentContainer.findFileOrFolder(newName);
+            if (target != null)
+            {
+                QuickDialogs.error("Rename Error", "There is already an item named '%s' in the parent folder.", newName);
+                return;
+            }
+
+            // get subject item that we can rename
+            IFFTraversalTarget subject = parentContainer.findFileOrFolder(selected.getValue().getName());
+            if (subject == null)
+            {
+                QuickDialogs.error("Rename Error", "Critical! no subject item.");
+                return;
+            }
+
+            // rename the subject
+            if (subject.isAFolder())
+            {
+                ((FolderInventoryItem) subject).setName(newName);
+            }
+            else if (subject.isAFile())
+            {
+                ((FileInventoryItem) subject).setName(newName);
+            }
+            else
+            {
+                QuickDialogs.error("Rename Error", "Critical! cannot rename a root.");
+                return;
+            }
+
+            // rename the tree item
+            IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newName, selected.getValue().getType());
+            selected.setValue(newValue);
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+
 }
