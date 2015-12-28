@@ -3,6 +3,7 @@ package org.bunkr.gui.components;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
 import javafx.util.Callback;
+import org.bunkr.gui.controllers.InventoryCMController;
 
 /**
  * Creator: benmeier
@@ -10,11 +11,11 @@ import javafx.util.Callback;
  */
 public class CellFactoryCallback implements Callback<TreeView<IntermedInvTreeDS>, TreeCell<IntermedInvTreeDS>>
 {
-    private final ContextMenus callbackMenus;
+    private final InventoryCMController callbackContainer;
 
-    public CellFactoryCallback(ContextMenus callbackMenus)
+    public CellFactoryCallback(InventoryCMController callbackContainer)
     {
-        this.callbackMenus = callbackMenus;
+        this.callbackContainer = callbackContainer;
     }
 
     @Override
@@ -34,15 +35,15 @@ public class CellFactoryCallback implements Callback<TreeView<IntermedInvTreeDS>
                     {
                         if (item.getType().equals(IntermedInvTreeDS.Type.ROOT))
                         {
-                            setContextMenu(CellFactoryCallback.this.callbackMenus.rootContextMenu);
+                            setContextMenu(CellFactoryCallback.this.callbackContainer.rootContextMenu);
                         }
                         else if (item.getType().equals(IntermedInvTreeDS.Type.FOLDER))
                         {
-                            setContextMenu(CellFactoryCallback.this.callbackMenus.dirContextMenu);
+                            setContextMenu(CellFactoryCallback.this.callbackContainer.dirContextMenu);
                         }
                         else
                         {
-                            setContextMenu(CellFactoryCallback.this.callbackMenus.fileContextMenu);
+                            setContextMenu(CellFactoryCallback.this.callbackContainer.fileContextMenu);
                         }
                     }
                 }

@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public interface IArchiveInfoContext
 {
-    void refresh(UserSecurityProvider uic) throws IOException, CryptoException, BaseBunkrException;
+    void refresh(UserSecurityProvider uic) throws IOException, BaseBunkrException;
 
     long getBlockDataLength();
 

@@ -23,13 +23,13 @@ public class MetadataWriter
             Integer.BYTES
     );
 
-    public static void write(ArchiveInfoContext context, UserSecurityProvider uic) throws IOException, CryptoException, BaseBunkrException
+    public static void write(ArchiveInfoContext context, UserSecurityProvider uic) throws IOException, BaseBunkrException
     {
         write(context.filePath, context.getInventory(), context.getDescriptor(), uic, context.getBlockSize());
     }
 
     public static void write(File filePath, Inventory inventory, IDescriptor descriptor, UserSecurityProvider uic, int blockSize)
-            throws IOException, CryptoException, BaseBunkrException
+            throws IOException, BaseBunkrException
     {
         try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"))
         {

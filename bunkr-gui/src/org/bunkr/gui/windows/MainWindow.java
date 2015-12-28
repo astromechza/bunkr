@@ -6,6 +6,7 @@ import javafx.scene.layout.BorderPane;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
 import org.bunkr.gui.components.InventoryTreeView;
+import org.bunkr.gui.controllers.InventoryCMController;
 
 import java.io.IOException;
 
@@ -27,13 +28,16 @@ public class MainWindow extends BaseWindow
         this.archive = archive;
         this.cssPath = Resources.getExternalPath("/resources/css/main_window.css");
         this.initialise();
+
+        new InventoryCMController(this.archive.getInventory(), this.tree).bindEvents();
+
+        this.tree.refreshAll();
     }
 
     @Override
     public void initControls()
     {
         this.tree = new InventoryTreeView(this.archive);
-        this.tree.refreshAll();
     }
 
     @Override

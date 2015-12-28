@@ -18,8 +18,7 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     private int blockSize;
     private long blockDataLength;
 
-    public ArchiveInfoContext(File filePath, UserSecurityProvider uic) throws IOException, CryptoException,
-            BaseBunkrException
+    public ArchiveInfoContext(File filePath, UserSecurityProvider uic) throws IOException, BaseBunkrException
     {
         this.filePath = filePath;
         this.refresh(uic);
