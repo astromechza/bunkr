@@ -303,7 +303,7 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
-                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                QuickDialogs.error("Create Error", "'%s' is an invalid file name.", newName);
                 return;
             }
 
@@ -346,7 +346,7 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
-                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                QuickDialogs.error("Create Error", "'%s' is an invalid file name.", newName);
                 return;
             }
 
@@ -389,7 +389,7 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
-                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                QuickDialogs.error("Create Error", "'%s' is an invalid file name.", newName);
                 return;
             }
 
@@ -432,7 +432,7 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
-                QuickDialogs.error("Rename Error", "'%s' is an invalid file name.", newName);
+                QuickDialogs.error("Create Error", "'%s' is an invalid file name.", newName);
                 return;
             }
 
