@@ -6,9 +6,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.*;
-import org.bunkr.gui.components.CellFactoryCallback;
-import org.bunkr.gui.components.IntermedInvTreeDS;
-import org.bunkr.gui.components.InventoryTreeView;
+import org.bunkr.gui.components.treeview.CellFactoryCallback;
+import org.bunkr.gui.components.treeview.InventoryTreeData;
+import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 /**
@@ -70,7 +70,7 @@ public class InventoryCMController
     }
 
 
-    private TreeItem<IntermedInvTreeDS> getSelectedTreeItem() throws BaseBunkrException
+    private TreeItem<InventoryTreeData> getSelectedTreeItem() throws BaseBunkrException
     {
         if (! this.treeView.getSelectionModel().isEmpty()) return this.treeView.getSelectionModel().getSelectedItem();
         throw new BaseBunkrException("No item selected");
@@ -80,18 +80,18 @@ public class InventoryCMController
     {
         try
         {
-            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
 
             if (!QuickDialogs.confirm(
                     String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
                 return;
 
             // find parent item
-            TreeItem<IntermedInvTreeDS> parent = selected.getParent();
+            TreeItem<InventoryTreeData> parent = selected.getParent();
 
             // find inventory item
             IFFContainer parentContainer;
-            if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+            if (parent.getValue().getType().equals(InventoryTreeData.Type.ROOT))
             {
                 parentContainer = this.inventory;
             }
@@ -124,7 +124,7 @@ public class InventoryCMController
     {
         try
         {
-            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
 
             if (! QuickDialogs.confirm(
                     String.format("Are you sure you want to delete '%s' and all of its children?",
@@ -132,11 +132,11 @@ public class InventoryCMController
                 return;
 
             // find parent item
-            TreeItem<IntermedInvTreeDS> parent = selected.getParent();
+            TreeItem<InventoryTreeData> parent = selected.getParent();
 
             // find inventory item
             IFFContainer parentContainer;
-            if (parent.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+            if (parent.getValue().getType().equals(InventoryTreeData.Type.ROOT))
             {
                 parentContainer = this.inventory;
             }
@@ -170,12 +170,12 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
 
             // find parent item
-            TreeItem<IntermedInvTreeDS> oldParentItem = selected.getParent();
+            TreeItem<InventoryTreeData> oldParentItem = selected.getParent();
             IFFContainer oldParentContainer;
-            if (oldParentItem.getValue().getType().equals(IntermedInvTreeDS.Type.ROOT))
+            if (oldParentItem.getValue().getType().equals(InventoryTreeData.Type.ROOT))
                 oldParentContainer = this.inventory;
             else
                 oldParentContainer = (IFFContainer) this.inventory.search(oldParentItem.getValue().getUuid());
@@ -214,7 +214,7 @@ public class InventoryCMController
             String newParentPathString = (traversalPathComponent.startsWith("/")) ? traversalPathComponent : InventoryPather.applyRelativePath(oldParentPathString, traversalPathComponent);
 
             IFFContainer newParentContainer = oldParentContainer;
-            TreeItem<IntermedInvTreeDS> newParentItem = oldParentItem;
+            TreeItem<InventoryTreeData> newParentItem = oldParentItem;
             if (!newParentPathString.equals(oldParentPathString))
             {
                 IFFTraversalTarget pt = InventoryPather.traverse(this.inventory, newParentPathString);
@@ -267,7 +267,7 @@ public class InventoryCMController
             {
                 oldParentItem.getChildren().remove(selected);
             }
-            IntermedInvTreeDS newValue = new IntermedInvTreeDS(selected.getValue().getUuid(), newNameComponent, selected.getValue().getType());
+            InventoryTreeData newValue = new InventoryTreeData(selected.getValue().getUuid(), newNameComponent, selected.getValue().getType());
             selected.setValue(newValue);
             if (oldParentItem != newParentItem)
             {
@@ -289,7 +289,7 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
 
             // get new file name
             String newName = QuickDialogs.input("Enter a new directory name:", "");
@@ -315,8 +315,9 @@ public class InventoryCMController
             subjectContainer.getFolders().add(newFolder);
 
             // create the new tree item
-            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFolder.getUuid(), newFolder.getName(), IntermedInvTreeDS.Type.FOLDER);
-            TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
+            InventoryTreeData
+                    newValue = new InventoryTreeData(newFolder.getUuid(), newFolder.getName(), InventoryTreeData.Type.FOLDER);
+            TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
 
@@ -335,7 +336,7 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<IntermedInvTreeDS> selected = this.treeView.getRoot();
+            TreeItem<InventoryTreeData> selected = this.treeView.getRoot();
 
             // get new file name
             String newName = QuickDialogs.input("Enter a new directory name:", "");
@@ -361,8 +362,9 @@ public class InventoryCMController
             subjectContainer.getFolders().add(newFolder);
 
             // create the new tree item
-            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFolder.getUuid(), newFolder.getName(), IntermedInvTreeDS.Type.FOLDER);
-            TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
+            InventoryTreeData
+                    newValue = new InventoryTreeData(newFolder.getUuid(), newFolder.getName(), InventoryTreeData.Type.FOLDER);
+            TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
@@ -382,7 +384,7 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<IntermedInvTreeDS> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
 
             // get new file name
             String newName = QuickDialogs.input("Enter a new file name:", "");
@@ -408,8 +410,8 @@ public class InventoryCMController
             subjectContainer.getFiles().add(newFile);
 
             // create the new tree item
-            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FILE);
-            TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
+            InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);
+            TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
@@ -429,7 +431,7 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<IntermedInvTreeDS> selected = this.treeView.getRoot();
+            TreeItem<InventoryTreeData> selected = this.treeView.getRoot();
 
             // get new file name
             String newName = QuickDialogs.input("Enter a new file name:", "");
@@ -455,8 +457,8 @@ public class InventoryCMController
             subjectContainer.getFiles().add(newFile);
 
             // create the new tree item
-            IntermedInvTreeDS newValue = new IntermedInvTreeDS(newFile.getUuid(), newFile.getName(), IntermedInvTreeDS.Type.FILE);
-            TreeItem<IntermedInvTreeDS> newItem = new TreeItem<>(newValue);
+            InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);
+            TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);

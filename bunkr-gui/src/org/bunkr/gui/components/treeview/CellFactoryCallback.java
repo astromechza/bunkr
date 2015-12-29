@@ -1,4 +1,4 @@
-package org.bunkr.gui.components;
+package org.bunkr.gui.components.treeview;
 
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
@@ -13,7 +13,7 @@ import java.io.IOException;
  * Creator: benmeier
  * Created At: 2015-12-27
  */
-public class CellFactoryCallback implements Callback<TreeView<IntermedInvTreeDS>, TreeCell<IntermedInvTreeDS>>
+public class CellFactoryCallback implements Callback<TreeView<InventoryTreeData>, TreeCell<InventoryTreeData>>
 {
     private final String fileImagePath, folderImagePath;
 
@@ -47,12 +47,12 @@ public class CellFactoryCallback implements Callback<TreeView<IntermedInvTreeDS>
     }
 
     @Override
-    public TreeCell<IntermedInvTreeDS> call(TreeView<IntermedInvTreeDS> param)
+    public TreeCell<InventoryTreeData> call(TreeView<InventoryTreeData> param)
     {
-        return new TreeCell<IntermedInvTreeDS>()
+        return new TreeCell<InventoryTreeData>()
         {
             @Override
-            protected void updateItem(IntermedInvTreeDS item, boolean empty)
+            protected void updateItem(InventoryTreeData item, boolean empty)
             {
                 super.updateItem(item, empty);
                 if (! empty)
@@ -60,12 +60,12 @@ public class CellFactoryCallback implements Callback<TreeView<IntermedInvTreeDS>
                     setText(item != null ? item.getName() : "");
                     if (item != null)
                     {
-                        if (item.getType().equals(IntermedInvTreeDS.Type.ROOT))
+                        if (item.getType().equals(InventoryTreeData.Type.ROOT))
                         {
                             setGraphic(new ImageView(folderImagePath));
                             setContextMenu(CellFactoryCallback.this.callbackContainer.rootContextMenu);
                         }
-                        else if (item.getType().equals(IntermedInvTreeDS.Type.FOLDER))
+                        else if (item.getType().equals(InventoryTreeData.Type.FOLDER))
                         {
                             setGraphic(new ImageView(folderImagePath));
                             setContextMenu(CellFactoryCallback.this.callbackContainer.dirContextMenu);

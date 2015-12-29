@@ -1,4 +1,4 @@
-package org.bunkr.gui.components;
+package org.bunkr.gui.components.treeview;
 
 import java.util.UUID;
 
@@ -9,10 +9,10 @@ import java.util.UUID;
  * Creator: benmeier
  * Created At: 2015-12-27
  */
-public class IntermedInvTreeDS implements Comparable<IntermedInvTreeDS>
+public class InventoryTreeData implements Comparable<InventoryTreeData>
 {
     @Override
-    public int compareTo(IntermedInvTreeDS o)
+    public int compareTo(InventoryTreeData o)
     {
         int r = this.getType().compareTo(o.getType());
         if (r == 0) return this.getName().compareTo(o.getName());
@@ -25,7 +25,7 @@ public class IntermedInvTreeDS implements Comparable<IntermedInvTreeDS>
     private final String name;
     private final Type type;
 
-    public IntermedInvTreeDS(UUID uuid, String name, Type type)
+    public InventoryTreeData(UUID uuid, String name, Type type)
     {
         this.uuid = uuid;
         this.name = name;

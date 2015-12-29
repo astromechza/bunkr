@@ -5,7 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
-import org.bunkr.gui.components.InventoryTreeView;
+import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.InventoryCMController;
 
 import java.io.IOException;

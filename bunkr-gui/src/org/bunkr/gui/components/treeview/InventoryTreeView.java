@@ -1,9 +1,8 @@
-package org.bunkr.gui.components;
+package org.bunkr.gui.components.treeview;
 
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.*;
 
@@ -11,7 +10,7 @@ import org.bunkr.core.inventory.*;
  * Creator: benmeier
  * Created At: 2015-12-27
  */
-public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
+public class InventoryTreeView extends TreeView<InventoryTreeData>
 {
     private final ArchiveInfoContext archive;
 
@@ -26,7 +25,7 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
      */
     public void refreshAll()
     {
-        TreeItem<IntermedInvTreeDS> root = new TreeItem<>(new IntermedInvTreeDS(null, "/", IntermedInvTreeDS.Type.ROOT));
+        TreeItem<InventoryTreeData> root = new TreeItem<>(new InventoryTreeData(null, "/", InventoryTreeData.Type.ROOT));
         genFolder(root, this.archive.getInventory());
         root.setExpanded(true);
         this.setRoot(root);
@@ -35,7 +34,7 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
     /**
      * Rebuild all the nodes beneath the node 'parent' by mirroring the data held by 'mirror'
      */
-    private TreeItem<IntermedInvTreeDS> genFolder(TreeItem<IntermedInvTreeDS> parent, IFFContainer mirror)
+    private TreeItem<InventoryTreeData> genFolder(TreeItem<InventoryTreeData> parent, IFFContainer mirror)
     {
         for (FolderInventoryItem subfolder : mirror.getFolders())
         {
@@ -43,8 +42,8 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         }
         for (FileInventoryItem subfile : mirror.getFiles())
         {
-            parent.getChildren().add(new TreeItem<>(new IntermedInvTreeDS(
-                    subfile.getUuid(), subfile.getName(), IntermedInvTreeDS.Type.FILE
+            parent.getChildren().add(new TreeItem<>(new InventoryTreeData(
+                    subfile.getUuid(), subfile.getName(), InventoryTreeData.Type.FILE
             )));
         }
         return parent;
@@ -52,14 +51,14 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
     /**
      * Create the tree item that represents an inventory folder
      */
-    private TreeItem<IntermedInvTreeDS> genFolder(FolderInventoryItem folder)
+    private TreeItem<InventoryTreeData> genFolder(FolderInventoryItem folder)
     {
-        return genFolder(new TreeItem<>(new IntermedInvTreeDS(
-                folder.getUuid(), folder.getName(), IntermedInvTreeDS.Type.FOLDER)), folder
+        return genFolder(new TreeItem<>(new InventoryTreeData(
+                folder.getUuid(), folder.getName(), InventoryTreeData.Type.FOLDER)), folder
         );
     }
 
-    public String getPathForTreeItem(TreeItem<IntermedInvTreeDS> o)
+    public String getPathForTreeItem(TreeItem<InventoryTreeData> o)
     {
         if (o == this.getRoot()) return "/";
         String path = "";
@@ -71,17 +70,17 @@ public class InventoryTreeView extends TreeView<IntermedInvTreeDS>
         return path;
     }
 
-    public TreeItem<IntermedInvTreeDS> traverseTo(String absolutePath) throws TraversalException
+    public TreeItem<InventoryTreeData> traverseTo(String absolutePath) throws TraversalException
     {
         InventoryPather.assertValidPath(absolutePath);
         if (absolutePath.equals("/")) return this.getRoot();
-        TreeItem<IntermedInvTreeDS> current = this.getRoot();
+        TreeItem<InventoryTreeData> current = this.getRoot();
         String[] parts = absolutePath.substring(1).split("/");
 
         for (String part : parts)
         {
             boolean found = false;
-            for (TreeItem<IntermedInvTreeDS> child : current.getChildren())
+            for (TreeItem<InventoryTreeData> child : current.getChildren())
             {
                 if (child.getValue().getName().equals(part))
                 {
