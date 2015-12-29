@@ -269,7 +269,9 @@ public class InventoryCMController
                 newParentItem.getChildren().add(selected);
             }
             newParentItem.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            Event.fireEvent(selected,
+                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            this.treeView.getSelectionModel().select(selected);
         }
         catch (Exception e)
         {
@@ -313,7 +315,9 @@ public class InventoryCMController
             selected.getChildren().add(newItem);
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
 
-            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            Event.fireEvent(selected,
+                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            this.treeView.getSelectionModel().select(newItem);
         }
         catch (Exception e)
         {
@@ -358,7 +362,9 @@ public class InventoryCMController
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
 
-            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            Event.fireEvent(selected,
+                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            this.treeView.getSelectionModel().select(newItem);
         }
         catch (Exception e)
         {
@@ -403,7 +409,9 @@ public class InventoryCMController
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
 
-            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            Event.fireEvent(selected,
+                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            this.treeView.getSelectionModel().select(newItem);
         }
         catch (Exception e)
         {
@@ -449,6 +457,7 @@ public class InventoryCMController
             selected.setExpanded(true);
 
             Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            this.treeView.getSelectionModel().select(newItem);
         }
         catch (Exception e)
         {
