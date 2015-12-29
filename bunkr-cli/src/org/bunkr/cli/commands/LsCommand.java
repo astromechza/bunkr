@@ -1,7 +1,7 @@
 package org.bunkr.cli.commands;
 
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.cli.Formatters;
+import org.bunkr.core.utils.Formatters;
 import org.bunkr.cli.TabularLayout;
 import org.bunkr.cli.CLI;
 import net.sourceforge.argparse4j.impl.Arguments;

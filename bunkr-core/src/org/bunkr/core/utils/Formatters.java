@@ -1,4 +1,4 @@
-package org.bunkr.cli;
+package org.bunkr.core.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -48,7 +48,7 @@ public class Formatters
     {
         if (n < KILO)
         {
-            return String.format("%d", n);
+            return String.format("%dB", n);
         }
         else if (n < MEGA)
         {

@@ -9,7 +9,10 @@ import org.bunkr.core.inventory.*;
 import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
+import org.bunkr.gui.dialogs.FileInfoDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
+
+import java.io.IOException;
 
 /**
  * Creator: benmeier
@@ -21,9 +24,10 @@ public class InventoryCMController
     public static final String STR_NEW_FOLDER = "New Folder";
     public static final String STR_DELETE = "Delete";
     public static final String STR_RENAME = "Rename";
+    public static final String STR_INFO = "Info";
 
     public final ContextMenu dirContextMenu, fileContextMenu, rootContextMenu;
-    public final MenuItem rootNewFile, rootNewSubDir, dirNewFile, dirNewSubDir, dirDelete, dirRename, fileDelete, fileRename;
+    public final MenuItem rootNewFile, rootNewSubDir, dirNewFile, dirNewSubDir, dirDelete, dirRename, fileDelete, fileRename, fileInfo;
 
     private final Inventory inventory;
     private final InventoryTreeView treeView;
@@ -40,6 +44,7 @@ public class InventoryCMController
         // file
         this.fileDelete = new MenuItem(STR_DELETE);
         this.fileRename = new MenuItem(STR_RENAME);
+        this.fileInfo = new MenuItem(STR_INFO);
 
         // dir
         this.dirDelete = new MenuItem(STR_DELETE);
@@ -48,7 +53,7 @@ public class InventoryCMController
         this.dirNewSubDir = new MenuItem(STR_NEW_FOLDER);
 
         this.dirContextMenu = new ContextMenu(this.dirNewFile, this.dirNewSubDir, this.dirRename, this.dirDelete);
-        this.fileContextMenu = new ContextMenu(this.fileRename, this.fileDelete);
+        this.fileContextMenu = new ContextMenu(this.fileInfo, this.fileRename, this.fileDelete);
         this.rootContextMenu = new ContextMenu(this.rootNewFile, this.rootNewSubDir);
 
         this.treeView.setCellFactory(new CellFactoryCallback(this));
@@ -56,19 +61,18 @@ public class InventoryCMController
 
     public void bindEvents()
     {
-        this.fileDelete.setOnAction(event -> this.handleCMFileDelete());
-        this.dirDelete.setOnAction(event -> this.handleCMDirDelete());
-
         this.fileRename.setOnAction(event -> this.handleCMRenameItem());
+        this.fileDelete.setOnAction(event -> this.handleCMFileDelete());
+        this.fileInfo.setOnAction(event -> this.handleCMFileInfo());
+
+        this.dirDelete.setOnAction(event -> this.handleCMDirDelete());
         this.dirRename.setOnAction(event -> this.handleCMRenameItem());
-
-        this.dirNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnDir());
-        this.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnRoot());
-
         this.dirNewFile.setOnAction(event -> this.handleCMNewFileOnDir());
+        this.dirNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnDir());
+
+        this.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnRoot());
         this.rootNewFile.setOnAction(event -> this.handleCMNewFileOnRoot());
     }
-
 
     private TreeItem<InventoryTreeData> getSelectedTreeItem() throws BaseBunkrException
     {
@@ -468,6 +472,27 @@ public class InventoryCMController
             this.treeView.getSelectionModel().select(newItem);
         }
         catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+    private void handleCMFileInfo()
+    {
+        try
+        {
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
+            String selectedPath = this.treeView.getPathForTreeItem(selected);
+
+            IFFTraversalTarget selectedFile = InventoryPather.traverse(this.inventory, selectedPath);
+            if (selectedFile.isAFile() && selectedFile instanceof FileInventoryItem)
+            {
+                FileInventoryItem fileItem = (FileInventoryItem) selectedFile;
+                new FileInfoDialog(fileItem, selectedPath).getStage().showAndWait();
+            }
+        }
+        catch (BaseBunkrException | IOException e)
         {
             QuickDialogs.exception(e);
         }
