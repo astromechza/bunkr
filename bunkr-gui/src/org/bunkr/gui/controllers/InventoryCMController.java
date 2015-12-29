@@ -191,9 +191,14 @@ public class InventoryCMController
                 traversalPathComponent = InventoryPather.dirname(newNameComponent);
                 newNameComponent = InventoryPather.baseName(newNameComponent);
             }
+            else if (userInputPath.contains("/") && InventoryPather.isValidPath(userInputPath))
+            {
+                traversalPathComponent = InventoryPather.dirname(newNameComponent);
+                newNameComponent = InventoryPather.baseName(newNameComponent);
+            }
             else if (! InventoryPather.isValidName(newNameComponent))
             {
-                QuickDialogs.error("Rename Error", "'%s' is an invalid file name or relative file path.", newNameComponent);
+                QuickDialogs.error("Rename Error", "'%s' is an invalid file name, relative file path, or absolute file path.", newNameComponent);
                 return;
             }
 
@@ -206,7 +211,7 @@ public class InventoryCMController
             }
 
             String oldParentPathString = this.treeView.getPathForTreeItem(oldParentItem);
-            String newParentPathString = InventoryPather.applyRelativePath(oldParentPathString, traversalPathComponent);
+            String newParentPathString = (traversalPathComponent.startsWith("/")) ? traversalPathComponent : InventoryPather.applyRelativePath(oldParentPathString, traversalPathComponent);
 
             IFFContainer newParentContainer = oldParentContainer;
             TreeItem<IntermedInvTreeDS> newParentItem = oldParentItem;
@@ -456,7 +461,8 @@ public class InventoryCMController
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
 
-            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            Event.fireEvent(selected,
+                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
         }
         catch (Exception e)
