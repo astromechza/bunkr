@@ -1,8 +1,13 @@
 package org.bunkr.gui.windows;
 
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
@@ -25,6 +30,9 @@ public class MainWindow extends BaseWindow
     private final ArchiveInfoContext archive;
     private final String cssPath;
     private final UserSecurityProvider securityProvider;
+
+    private Label lblHierarchy;
+    private TabPane tabPane;
     private InventoryTreeView tree;
 
     public MainWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
@@ -54,27 +62,38 @@ public class MainWindow extends BaseWindow
     @Override
     public void initControls()
     {
+        this.lblHierarchy = new Label("File Structure");
         this.tree = new InventoryTreeView(this.archive);
+        this.tabPane = new TabPane();
     }
 
     @Override
     public Parent initLayout()
     {
-        BorderPane bp = new BorderPane();
-        bp.setCenter(this.tree);
-        return bp;
+        SplitPane sp = new SplitPane();
+        sp.setDividerPosition(0, 0.3);
+
+        VBox leftBox = new VBox(10);
+        leftBox.getChildren().add(this.lblHierarchy);
+        VBox.setVgrow(this.lblHierarchy, Priority.NEVER);
+        leftBox.getChildren().add(this.tree);
+        VBox.setVgrow(this.tree, Priority.ALWAYS);
+
+        sp.getItems().add(leftBox);
+        sp.getItems().add(this.tabPane);
+
+        return sp;
     }
 
     @Override
     public void bindEvents()
     {
-
     }
 
     @Override
     public void applyStyling()
     {
-
+        this.lblHierarchy.setAlignment(Pos.CENTER);
     }
 
     @Override

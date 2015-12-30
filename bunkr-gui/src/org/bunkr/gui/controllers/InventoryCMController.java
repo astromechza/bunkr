@@ -21,19 +21,18 @@ import java.util.function.Consumer;
  */
 public class InventoryCMController
 {
-
-
     public static final String STR_NEW_FILE = "New File";
     public static final String STR_NEW_FOLDER = "New Folder";
     public static final String STR_DELETE = "Delete";
     public static final String STR_RENAME = "Rename";
     public static final String STR_INFO = "Info";
     public static final String STR_IMPORT_FILE = "Import File";
+    public static final String STR_OPEN = "Open";
 
     public final ContextMenu dirContextMenu, fileContextMenu, rootContextMenu;
     public final MenuItem rootNewFile, rootNewSubDir, rootImportFile,
             dirNewFile, dirNewSubDir, dirImportFile, dirDelete, dirRename,
-            fileDelete, fileRename, fileInfo;
+            fileDelete, fileRename, fileInfo, fileOpen;
 
     private final Inventory inventory;
     private final InventoryTreeView treeView;
@@ -54,6 +53,7 @@ public class InventoryCMController
         this.fileDelete = new MenuItem(STR_DELETE);
         this.fileRename = new MenuItem(STR_RENAME);
         this.fileInfo = new MenuItem(STR_INFO);
+        this.fileOpen = new MenuItem(STR_OPEN);
 
         // dir
         this.dirDelete = new MenuItem(STR_DELETE);
@@ -63,7 +63,7 @@ public class InventoryCMController
         this.dirImportFile = new MenuItem(STR_IMPORT_FILE);
 
         this.dirContextMenu = new ContextMenu(this.dirNewFile, this.dirNewSubDir, this.dirRename, this.dirDelete);
-        this.fileContextMenu = new ContextMenu(this.fileInfo, this.fileRename, this.fileDelete);
+        this.fileContextMenu = new ContextMenu(this.fileOpen, this.fileInfo, this.fileRename, this.fileDelete);
         this.rootContextMenu = new ContextMenu(this.rootNewFile, this.rootNewSubDir);
 
         this.treeView.setCellFactory(new CellFactoryCallback(this));
@@ -71,6 +71,7 @@ public class InventoryCMController
 
     public void bindEvents()
     {
+        this.fileOpen.setOnAction(event -> this.handleCMFileOpen());
         this.fileRename.setOnAction(event -> this.handleCMRenameItem());
         this.fileDelete.setOnAction(event -> this.handleCMFileDelete());
         this.fileInfo.setOnAction(event -> this.handleCMFileInfo());
@@ -82,6 +83,40 @@ public class InventoryCMController
 
         this.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnRoot());
         this.rootNewFile.setOnAction(event -> this.handleCMNewFileOnRoot());
+    }
+
+    private void handleCMFileOpen()
+    {
+        try
+        {
+            // get selected tree item
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
+            // make sure it looks like a file
+            if (selected.getValue().getType() != InventoryTreeData.Type.FILE)
+            {
+                throw new BaseBunkrException("Failed to open item %s. It is not a file.", selected.getValue().getName());
+            }
+
+            // get absolute file path
+            String selectedPath = this.treeView.getPathForTreeItem(selected);
+
+            // traverse down to correct file item
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.inventory, selectedPath);
+            // double check that its a file
+            if (! selectedItem.isAFile())
+            {
+                throw new BaseBunkrException("Failed to open item %s. It is not a file.", selected.getValue().getName());
+            }
+
+            FileInventoryItem targetFile = (FileInventoryItem) selectedItem;
+
+            // TODO call new tab create with targetFile
+
+        }
+        catch (BaseBunkrException e)
+        {
+            QuickDialogs.exception(e);
+        }
     }
 
     private void handleCMFileDelete()
