@@ -81,6 +81,7 @@ public class TestImportFileCommand
         assertTrue(f.getTags().contains("tag1"));
         assertTrue(f.getTags().contains("tag2"));
         assertThat(f.getActualSize(), is(equalTo(4433L)));
+        assertThat(f.getAbsolutePath(), is(equalTo("/a.txt")));
     }
 
     @Test
@@ -88,11 +89,14 @@ public class TestImportFileCommand
     {
         File archiveFile = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
+        FolderInventoryItem subF = new FolderInventoryItem("sub");
+        context.getInventory().addFolder(subF);
+        MetadataWriter.write(context, usp);
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
-        args.put(ImportFileCommand.ARG_PATH, "/b.txt");
+        args.put(ImportFileCommand.ARG_PATH, "/sub/b.txt");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
         args.put(ImportFileCommand.ARG_TAGS, Arrays.asList("tag3", "tag4"));
 
@@ -107,13 +111,15 @@ public class TestImportFileCommand
         }
         System.setIn(null);
 
-        ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, usp);
-
-        FileInventoryItem f = context.getInventory().findFile("b.txt");
+        context = new ArchiveInfoContext(archiveFile, usp);
+        FolderInventoryItem s = (FolderInventoryItem) context.getInventory().findFolder("sub");
+        assertThat(s.getAbsolutePath(), is(equalTo("/sub")));
+        FileInventoryItem f = s.findFile("b.txt");
         assertThat(f.getTags().size(), is(equalTo(2)));
         assertTrue(f.getTags().contains("tag3"));
         assertTrue(f.getTags().contains("tag4"));
         assertThat(f.getActualSize(), is(equalTo(80L)));
+        assertThat(f.getAbsolutePath(), is(equalTo("/sub/b.txt")));
     }
 
     @Test
@@ -148,6 +154,7 @@ public class TestImportFileCommand
         assertTrue(f.getTags().contains("tag3"));
         assertTrue(f.getTags().contains("tag4"));
         assertThat(f.getActualSize(), is(equalTo(80L)));
+        assertThat(f.getAbsolutePath(), is(equalTo("/b.txt")));
     }
 
     @Test
@@ -187,7 +194,7 @@ public class TestImportFileCommand
 
         {
             FileInventoryItem fileOne = new FileInventoryItem("a.txt");
-            context.getInventory().getFiles().add(fileOne);
+            context.getInventory().addFile(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
             {
                 bwos.write(RandomMaker.get(10 * 8));
@@ -225,7 +232,7 @@ public class TestImportFileCommand
 
         {
             FileInventoryItem fileOne = new FileInventoryItem("a.txt");
-            context.getInventory().getFiles().add(fileOne);
+            context.getInventory().addFile(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
             {
                 bwos.write(RandomMaker.get(10 * 8));
@@ -250,6 +257,7 @@ public class TestImportFileCommand
             context.refresh(usp);
             FileInventoryItem fileOne = context.getInventory().findFile("a.txt");
             assertThat(fileOne.getActualSize(), is(equalTo(40L)));
+            assertThat(fileOne.getAbsolutePath(), is(equalTo("/a.txt")));
         }
     }
 
@@ -264,7 +272,7 @@ public class TestImportFileCommand
 
         {
             FolderInventoryItem folderOne = new FolderInventoryItem("folder");
-            context.getInventory().getFolders().add(folderOne);
+            context.getInventory().addFolder(folderOne);
             MetadataWriter.write(context, usp);
         }
 

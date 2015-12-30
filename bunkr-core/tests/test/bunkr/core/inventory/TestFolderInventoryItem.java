@@ -25,7 +25,7 @@ public class TestFolderInventoryItem
         FolderInventoryItem folder1 = new FolderInventoryItem("abc");
         FolderInventoryItem folder2 = new FolderInventoryItem("xyz");
         folder1.getFolders().add(folder2);
-        folder1.getFiles().add(file1);
+        folder1.addFile(file1);
 
         String asJson = FolderInventoryItemJSON.encode(folder1);
 

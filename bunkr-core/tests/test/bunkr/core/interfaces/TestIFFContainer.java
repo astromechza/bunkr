@@ -47,15 +47,15 @@ public class TestIFFContainer
         FolderInventoryItem f2 = new FolderInventoryItem("f2");
         FolderInventoryItem f3 = new FolderInventoryItem("f3");
         FolderInventoryItem f4 = new FolderInventoryItem("f4");
-        f2.getFolders().add(f4);
+        f2.addFolder(f4);
         f1.folders.add(f2);
         f1.folders.add(f3);
-        f2.getFiles().add(new FileInventoryItem("f2.1"));
-        f2.getFiles().add(new FileInventoryItem("f2.2"));
-        f3.getFiles().add(new FileInventoryItem("f3.2"));
-        f3.getFiles().add(new FileInventoryItem("f3.1"));
-        f4.getFiles().add(new FileInventoryItem("f4.2"));
-        f4.getFiles().add(new FileInventoryItem("f4.1"));
+        f2.addFile(new FileInventoryItem("f2.1"));
+        f2.addFile(new FileInventoryItem("f2.2"));
+        f3.addFile(new FileInventoryItem("f3.2"));
+        f3.addFile(new FileInventoryItem("f3.1"));
+        f4.addFile(new FileInventoryItem("f4.2"));
+        f4.addFile(new FileInventoryItem("f4.1"));
 
         Iterator<FileInventoryItem> it = f1.getIterator();
         assertThat(it.next().getName(), is(equalTo("thing1")));

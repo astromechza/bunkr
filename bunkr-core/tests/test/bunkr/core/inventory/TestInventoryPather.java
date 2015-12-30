@@ -95,18 +95,18 @@ public class TestInventoryPather
     {
         Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>(), false, false);
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
-        i.getFolders().add(d1);
+        i.addFolder(d1);
         FolderInventoryItem d2 = new FolderInventoryItem("d2");
-        i.getFolders().add(d2);
+        i.addFolder(d2);
         FolderInventoryItem d3 = new FolderInventoryItem("d2.d3");
-        d2.getFolders().add(d3);
+        d2.addFolder(d3);
 
         FileInventoryItem f1 = new FileInventoryItem("f1");
-        i.getFiles().add(f1);
+        i.addFile(f1);
         FileInventoryItem f2 = new FileInventoryItem("f2");
-        i.getFiles().add(f2);
+        i.addFile(f2);
         FileInventoryItem f3 = new FileInventoryItem("d2.f3");
-        d2.getFiles().add(f3);
+        d2.addFile(f3);
 
         return i;
     }

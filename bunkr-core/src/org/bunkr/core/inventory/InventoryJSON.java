@@ -6,7 +6,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Creator: benmeier
@@ -44,20 +43,19 @@ public class InventoryJSON
     @SuppressWarnings("unchecked")
     public static Inventory decodeO(JSONObject input)
     {
-        List<FileInventoryItem> files = new ArrayList<>();
-        List<FolderInventoryItem> folders = new ArrayList<>();
+        Inventory outputInv = new Inventory(new ArrayList<>(), new ArrayList<>(), (boolean) input.get("encrypted"), (boolean) input.get("compressed"));
 
         for (Object item : (JSONArray) input.get("files"))
         {
-            files.add(FileInventoryItemJSON.decodeO((JSONObject) item));
+            outputInv.addFile(FileInventoryItemJSON.decodeO((JSONObject) item));
         }
 
         for (Object item : (JSONArray) input.get("folders"))
         {
-            folders.add(FolderInventoryItemJSON.decodeO((JSONObject) item));
+            outputInv.addFolder(FolderInventoryItemJSON.decodeO((JSONObject) item));
         }
 
-        return new Inventory(files, folders, (boolean) input.get("encrypted"), (boolean) input.get("compressed"));
+        return outputInv;
     }
 
     public static Inventory decode(String input)

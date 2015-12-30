@@ -122,4 +122,28 @@ public interface IFFContainer
         }
         return null;
     }
+
+    default void addFile(FileInventoryItem item)
+    {
+        this.getFiles().add(item);
+        item.setParent(this);
+    }
+
+    default void removeFile(FileInventoryItem item)
+    {
+        this.getFiles().remove(item);
+        item.setParent(null);
+    }
+
+    default void addFolder(FolderInventoryItem item)
+    {
+        this.getFolders().add(item);
+        item.setParent(this);
+    }
+
+    default void removeFolder(FolderInventoryItem item)
+    {
+        this.getFolders().remove(item);
+        item.setParent(null);
+    }
 }

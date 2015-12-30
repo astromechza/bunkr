@@ -6,7 +6,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -47,25 +46,24 @@ public class FolderInventoryItemJSON
     @SuppressWarnings("unchecked")
     public static FolderInventoryItem decodeO(JSONObject input)
     {
-        List<FileInventoryItem> files = new ArrayList<>();
-        List<FolderInventoryItem> folders = new ArrayList<>();
+        FolderInventoryItem outputFolder = new FolderInventoryItem(
+                (String) input.get("name"),
+                UUID.fromString((String) input.get("uuid")),
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
 
         for (Object item : (JSONArray) input.get("files"))
         {
-            files.add(FileInventoryItemJSON.decodeO((JSONObject) item));
+            outputFolder.addFile(FileInventoryItemJSON.decodeO((JSONObject) item));
         }
 
         for (Object item : (JSONArray) input.get("folders"))
         {
-            folders.add(FolderInventoryItemJSON.decodeO((JSONObject) item));
+            outputFolder.addFolder(FolderInventoryItemJSON.decodeO((JSONObject) item));
         }
 
-        return new FolderInventoryItem(
-                (String) input.get("name"),
-                UUID.fromString((String) input.get("uuid")),
-                files,
-                folders
-        );
+        return outputFolder;
     }
 
     public static FolderInventoryItem decode(String input)

@@ -141,7 +141,7 @@ public class InventoryCMController
             if (target instanceof FileInventoryItem)
             {
                 FileInventoryItem targetFile = (FileInventoryItem) target;
-                parentContainer.getFiles().remove(targetFile);
+                parentContainer.removeFile(targetFile);
                 parent.getChildren().remove(selected);
             }
             else
@@ -291,13 +291,13 @@ public class InventoryCMController
             {
                 if (renameSubject.isAFolder() && renameSubject instanceof FolderInventoryItem)
                 {
-                    oldParentContainer.getFolders().remove(renameSubject);
-                    newParentContainer.getFolders().add((FolderInventoryItem) renameSubject);
+                    oldParentContainer.removeFolder((FolderInventoryItem) renameSubject);
+                    newParentContainer.addFolder((FolderInventoryItem) renameSubject);
                 }
                 else if (renameSubject.isAFile() && renameSubject instanceof FileInventoryItem)
                 {
-                    oldParentContainer.getFiles().remove(renameSubject);
-                    newParentContainer.getFiles().add((FileInventoryItem) renameSubject);
+                    oldParentContainer.removeFile((FileInventoryItem) renameSubject);
+                    newParentContainer.addFile((FileInventoryItem) renameSubject);
                 }
             }
             if (oldParentItem != newParentItem)
@@ -351,7 +351,7 @@ public class InventoryCMController
             }
 
             FolderInventoryItem newFolder = new FolderInventoryItem(newName);
-            subjectContainer.getFolders().add(newFolder);
+            subjectContainer.addFolder(newFolder);
 
             // create the new tree item
             InventoryTreeData
@@ -399,7 +399,7 @@ public class InventoryCMController
             }
 
             FolderInventoryItem newFolder = new FolderInventoryItem(newName);
-            subjectContainer.getFolders().add(newFolder);
+            subjectContainer.addFolder(newFolder);
 
             // create the new tree item
             InventoryTreeData
@@ -448,7 +448,7 @@ public class InventoryCMController
             }
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
-            subjectContainer.getFiles().add(newFile);
+            subjectContainer.addFile(newFile);
 
             // create the new tree item
             InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);
@@ -496,7 +496,7 @@ public class InventoryCMController
             }
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
-            subjectContainer.getFiles().add(newFile);
+            subjectContainer.addFile(newFile);
 
             // create the new tree item
             InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);

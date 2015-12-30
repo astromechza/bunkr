@@ -50,22 +50,22 @@ public class TestFindCommand
 
         FileInventoryItem ff1 = new FileInventoryItem("abc");
         ff1.addTag("tag1"); ff1.addTag("tag2");
-        context.getInventory().getFiles().add(ff1);
-        context.getInventory().getFiles().add(new FileInventoryItem("aabbcc"));
-        context.getInventory().getFiles().add(new FileInventoryItem("aaabbbccc"));
+        context.getInventory().addFile(ff1);
+        context.getInventory().addFile(new FileInventoryItem("aabbcc"));
+        context.getInventory().addFile(new FileInventoryItem("aaabbbccc"));
 
         FolderInventoryItem folderOne = new FolderInventoryItem("afolder");
 
         FileInventoryItem ff2 = new FileInventoryItem("abc");
         ff2.addTag("tag1"); ff2.addTag("tag3");
-        folderOne.getFiles().add(ff2);
-        folderOne.getFiles().add(new FileInventoryItem("aabbcc"));
-        folderOne.getFiles().add(new FileInventoryItem("aaabbbccc"));
+        folderOne.addFile(ff2);
+        folderOne.addFile(new FileInventoryItem("aabbcc"));
+        folderOne.addFile(new FileInventoryItem("aaabbbccc"));
 
         FolderInventoryItem folderTwo = new FolderInventoryItem("folderc");
-        folderTwo.getFiles().add(new FileInventoryItem("example"));
-        folderOne.getFolders().add(folderTwo);
-        context.getInventory().getFolders().add(folderOne);
+        folderTwo.addFile(new FileInventoryItem("example"));
+        folderOne.addFolder(folderTwo);
+        context.getInventory().addFolder(folderOne);
 
         MetadataWriter.write(context, usp);
 

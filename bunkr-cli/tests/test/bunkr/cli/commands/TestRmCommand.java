@@ -5,14 +5,11 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.RmCommand;
+import org.bunkr.core.inventory.*;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.exceptions.TraversalException;
-import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.FolderInventoryItem;
-import org.bunkr.core.inventory.Inventory;
-import org.bunkr.core.inventory.InventoryPather;
 import test.bunkr.core.XTemporaryFolder;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -25,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Creator: benmeier
@@ -39,18 +39,18 @@ public class TestRmCommand
     {
         Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>(), false, false);
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
-        i.getFolders().add(d1);
+        i.addFolder(d1);
 
         FolderInventoryItem d2 = new FolderInventoryItem("t2");
-        i.getFolders().add(d2);
-        d2.getFiles().add(new FileInventoryItem("file"));
+        i.addFolder(d2);
+        d2.addFile(new FileInventoryItem("file"));
 
         FolderInventoryItem d3 = new FolderInventoryItem("t3");
-        i.getFolders().add(d3);
-        d3.getFolders().add(new FolderInventoryItem("file"));
+        i.addFolder(d3);
+        d3.addFolder(new FolderInventoryItem("file"));
 
         FileInventoryItem t4 = new FileInventoryItem("t4");
-        i.getFiles().add(t4);
+        i.addFile(t4);
 
         return i;
     }
@@ -63,18 +63,18 @@ public class TestRmCommand
                 .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
 
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
-        context.getInventory().getFolders().add(d1);
+        context.getInventory().addFolder(d1);
 
         FolderInventoryItem d2 = new FolderInventoryItem("t2");
-        context.getInventory().getFolders().add(d2);
-        d2.getFiles().add(new FileInventoryItem("file"));
+        context.getInventory().addFolder(d2);
+        d2.addFile(new FileInventoryItem("file"));
 
         FolderInventoryItem d3 = new FolderInventoryItem("t3");
-        context.getInventory().getFolders().add(d3);
-        d3.getFolders().add(new FolderInventoryItem("file"));
+        context.getInventory().addFolder(d3);
+        d3.addFolder(new FolderInventoryItem("file"));
 
         FileInventoryItem t4 = new FileInventoryItem("t4");
-        context.getInventory().getFiles().add(t4);
+        context.getInventory().addFile(t4);
 
         MetadataWriter.write(context, usp);
 

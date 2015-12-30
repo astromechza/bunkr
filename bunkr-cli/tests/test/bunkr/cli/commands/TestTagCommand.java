@@ -50,10 +50,10 @@ public class TestTagCommand
         taggedFile.addTag("john");
         taggedFile.addTag("bob");
 
-        context.getInventory().getFiles().add(untaggedFile);
-        context.getInventory().getFiles().add(taggedFile);
+        context.getInventory().addFile(untaggedFile);
+        context.getInventory().addFile(taggedFile);
 
-        context.getInventory().getFolders().add(new FolderInventoryItem("some-folder"));
+        context.getInventory().addFolder(new FolderInventoryItem("some-folder"));
 
         MetadataWriter.write(context, usp);
 

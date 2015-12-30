@@ -79,7 +79,5 @@ public class TestFileInventoryItem
         }
         catch (IllegalArgumentException ignored) {}
     }
-
-
 }
 

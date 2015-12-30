@@ -5,14 +5,12 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.MvCommand;
+import org.bunkr.core.inventory.*;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.exceptions.CLIException;
 import org.bunkr.core.exceptions.TraversalException;
-import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.FolderInventoryItem;
-import org.bunkr.core.inventory.InventoryPather;
 import test.bunkr.core.XTemporaryFolder;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -23,6 +21,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -35,6 +36,11 @@ public class TestMvCommand
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
 
+    public void tPathCheck(Inventory i, String path) throws TraversalException
+    {
+        assertThat(((InventoryItem) InventoryPather.traverse(i, path)).getAbsolutePath(), is(equalTo(path)));
+    }
+
     public ArchiveInfoContext buildSampleArchive() throws Exception
     {
         File archivePath = folder.newFile();
@@ -43,18 +49,18 @@ public class TestMvCommand
                 .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
 
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
-        context.getInventory().getFolders().add(d1);
+        context.getInventory().addFolder(d1);
 
         FolderInventoryItem d2 = new FolderInventoryItem("t2");
-        context.getInventory().getFolders().add(d2);
-        d2.getFiles().add(new FileInventoryItem("file"));
+        context.getInventory().addFolder(d2);
+        d2.addFile(new FileInventoryItem("file"));
 
         FolderInventoryItem d3 = new FolderInventoryItem("t3");
-        context.getInventory().getFolders().add(d3);
-        d3.getFiles().add(new FileInventoryItem("file"));
+        context.getInventory().addFolder(d3);
+        d3.addFile(new FileInventoryItem("file"));
 
         FileInventoryItem t4 = new FileInventoryItem("t4");
-        context.getInventory().getFiles().add(t4);
+        context.getInventory().addFile(t4);
 
         MetadataWriter.write(context, usp);
 
@@ -81,6 +87,7 @@ public class TestMvCommand
         context.refresh(new UserSecurityProvider(new PasswordProvider()));
         assertTrue(context.getInventory().hasFile("x4"));
         assertFalse(context.getInventory().hasFile("t4"));
+        tPathCheck(context.getInventory(), "/x4");
     }
 
 
@@ -98,6 +105,7 @@ public class TestMvCommand
         context.refresh(new UserSecurityProvider(new PasswordProvider()));
 
         assertTrue(InventoryPather.traverse(context.getInventory(), "/t1").isAFolder());
+        tPathCheck(context.getInventory(), "/t1");
 
         try
         {
@@ -127,6 +135,7 @@ public class TestMvCommand
         catch (TraversalException ignored) { }
 
         assertTrue(InventoryPather.traverse(context.getInventory(), "/rootfile").isAFile());
+        tPathCheck(context.getInventory(), "/rootfile");
     }
 
     @Test
@@ -143,6 +152,7 @@ public class TestMvCommand
         context.refresh(new UserSecurityProvider(new PasswordProvider()));
         assertTrue(context.getInventory().hasFolder("x1"));
         assertFalse(context.getInventory().hasFolder("t1"));
+        tPathCheck(context.getInventory(), "/x1");
     }
 
 
@@ -165,6 +175,7 @@ public class TestMvCommand
         }
         catch (TraversalException ignored) { }
         assertTrue(InventoryPather.traverse(context.getInventory(), "/t2/x1").isAFolder());
+        tPathCheck(context.getInventory(), "/t2/x1");
     }
 
     @Test
@@ -187,6 +198,7 @@ public class TestMvCommand
         catch (TraversalException ignored) { }
 
         assertTrue(InventoryPather.traverse(context.getInventory(), "/t6").isAFolder());
+        tPathCheck(context.getInventory(), "/t6");
     }
 
     @Test

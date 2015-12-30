@@ -68,8 +68,8 @@ public class MvCommand implements ICLICommand
         {
             FileInventoryItem targetFile = (FileInventoryItem) targetItem;
             targetFile.setName(toPathName);
-            fromContainer.getFiles().remove(targetFile);
-            toContainer.getFiles().add(targetFile);
+            fromContainer.removeFile(targetFile);
+            toContainer.addFile(targetFile);
             MetadataWriter.write(aic, usp);
             System.out.println(String.format("Moved file '%s' to '%s'", args.getString(ARG_FROMPATH), args.getString(ARG_TOPATH)));
         }
@@ -77,8 +77,8 @@ public class MvCommand implements ICLICommand
         {
             FolderInventoryItem targetFolder = (FolderInventoryItem) targetItem;
             targetFolder.setName(toPathName);
-            fromContainer.getFolders().remove(targetFolder);
-            toContainer.getFolders().add(targetFolder);
+            fromContainer.removeFolder(targetFolder);
+            toContainer.addFolder(targetFolder);
             MetadataWriter.write(aic, usp);
             System.out.println(String.format("Moved folder '%s' to '%s'", args.getString(ARG_FROMPATH), args.getString(ARG_TOPATH)));
         }

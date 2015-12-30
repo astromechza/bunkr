@@ -74,7 +74,7 @@ public class MkdirCommand implements ICLICommand
 
                     // otherwise if it doesnt, create a new folder and current = current / part
                     FolderInventoryItem f = new FolderInventoryItem(part);
-                    current.getFolders().add(f);
+                    current.addFolder(f);
                     current = f;
                 }
             }
@@ -84,7 +84,7 @@ public class MkdirCommand implements ICLICommand
             IFFTraversalTarget parent = InventoryPather.traverse(inv, InventoryPather.dirname(targetPath));
             if (parent.isAFile())
                 throw new TraversalException("Cannot create a directory as a child of file '%s'.", ((FileInventoryItem) parent).getName());
-            ((IFFContainer) parent).getFolders().add(new FolderInventoryItem(InventoryPather.baseName(targetPath)));
+            ((IFFContainer) parent).addFolder(new FolderInventoryItem(InventoryPather.baseName(targetPath)));
         }
     }
 }

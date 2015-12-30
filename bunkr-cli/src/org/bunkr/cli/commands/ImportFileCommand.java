@@ -87,7 +87,7 @@ public class ImportFileCommand implements ICLICommand
         else
         {
             targetFile = new FileInventoryItem(InventoryPather.baseName(args.getString(ARG_PATH)));
-            ((IFFContainer) parent).getFiles().add(targetFile);
+            ((IFFContainer) parent).addFile(targetFile);
         }
 
         // if tags have been supplied, change the tags associated with the target file

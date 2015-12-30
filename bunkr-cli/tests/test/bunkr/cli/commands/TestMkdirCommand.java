@@ -5,14 +5,11 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.MkdirCommand;
+import org.bunkr.core.inventory.*;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.exceptions.TraversalException;
-import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.FolderInventoryItem;
-import org.bunkr.core.inventory.Inventory;
-import org.bunkr.core.inventory.InventoryPather;
 import test.bunkr.core.XTemporaryFolder;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -25,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Creator: benmeier
@@ -35,22 +35,27 @@ public class TestMkdirCommand
     @Rule
     public final XTemporaryFolder folder = new XTemporaryFolder();
 
+    public void tPathCheck(Inventory i, String path) throws TraversalException
+    {
+        assertThat(((InventoryItem) InventoryPather.traverse(i, path)).getAbsolutePath(), is(equalTo(path)));
+    }
+
     public Inventory makeSampleInventory()
     {
         Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>(), false, false);
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
-        i.getFolders().add(d1);
+        i.addFolder(d1);
         FolderInventoryItem d2 = new FolderInventoryItem("d2");
-        i.getFolders().add(d2);
+        i.addFolder(d2);
         FolderInventoryItem d3 = new FolderInventoryItem("d2.d3");
-        d2.getFolders().add(d3);
+        d2.addFolder(d3);
 
         FileInventoryItem f1 = new FileInventoryItem("f1");
-        i.getFiles().add(f1);
+        i.addFile(f1);
         FileInventoryItem f2 = new FileInventoryItem("f2");
-        i.getFiles().add(f2);
+        i.addFile(f2);
         FileInventoryItem f3 = new FileInventoryItem("d2.f3");
-        d2.getFiles().add(f3);
+        d2.addFile(f3);
 
         return i;
     }
@@ -62,18 +67,18 @@ public class TestMkdirCommand
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
 
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
-        context.getInventory().getFolders().add(d1);
+        context.getInventory().addFolder(d1);
         FolderInventoryItem d2 = new FolderInventoryItem("d2");
-        context.getInventory().getFolders().add(d2);
+        context.getInventory().addFolder(d2);
         FolderInventoryItem d3 = new FolderInventoryItem("d2.d3");
-        d2.getFolders().add(d3);
+        d2.addFolder(d3);
 
         FileInventoryItem f1 = new FileInventoryItem("f1");
-        context.getInventory().getFiles().add(f1);
+        context.getInventory().addFile(f1);
         FileInventoryItem f2 = new FileInventoryItem("f2");
-        context.getInventory().getFiles().add(f2);
+        context.getInventory().addFile(f2);
         FileInventoryItem f3 = new FileInventoryItem("d2.f3");
-        d2.getFiles().add(f3);
+        d2.addFile(f3);
 
         MetadataWriter.write(context, usp);
 
@@ -99,6 +104,7 @@ public class TestMkdirCommand
 
         context.refresh(new UserSecurityProvider(new PasswordProvider()));
         InventoryPather.traverse(context.getInventory(), "/d4").isAFolder();
+        tPathCheck(context.getInventory(), "/d4");
     }
 
     @Test
@@ -107,6 +113,7 @@ public class TestMkdirCommand
         Inventory inv = makeSampleInventory();
         new MkdirCommand().mkdirs(inv, "/d1/d4", false);
         InventoryPather.traverse(inv, "/d1/d4").isAFolder();
+        tPathCheck(inv, "/d1/d4");
     }
 
     @Test
@@ -115,6 +122,7 @@ public class TestMkdirCommand
         Inventory inv = makeSampleInventory();
         new MkdirCommand().mkdirs(inv, "/d2/d2.d3/d4", false);
         InventoryPather.traverse(inv, "/d2/d2.d3/d4").isAFolder();
+        tPathCheck(inv, "/d2/d2.d3/d4");
     }
 
     @Test
@@ -123,6 +131,7 @@ public class TestMkdirCommand
         Inventory inv = makeSampleInventory();
         new MkdirCommand().mkdirs(inv, "/d4/d5/d6", true);
         InventoryPather.traverse(inv, "/d4/d5/d6").isAFolder();
+        tPathCheck(inv, "/d4/d5/d6");
     }
 
     @Test
@@ -131,6 +140,7 @@ public class TestMkdirCommand
         Inventory inv = makeSampleInventory();
         new MkdirCommand().mkdirs(inv, "/d2/d4/d5", true);
         InventoryPather.traverse(inv, "/d2/d4/d5").isAFolder();
+        tPathCheck(inv, "/d2/d4/d5");
     }
 
     @Test

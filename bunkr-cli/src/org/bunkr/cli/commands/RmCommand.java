@@ -62,13 +62,13 @@ public class RmCommand implements ICLICommand
         if (folderItem != null)
         {
             if (!recursive && (folderItem.getFiles().size() > 0 || folderItem.getFolders().size() > 0)) throw new TraversalException("Folder '%s' is not empty", targetPath);
-            parentContainer.getFolders().remove(folderItem);
+            parentContainer.removeFolder(folderItem);
             return;
         }
         FileInventoryItem fileItem = parentContainer.findFile(targetName);
         if (fileItem != null)
         {
-            parentContainer.getFiles().remove(fileItem);
+            parentContainer.removeFile(fileItem);
             return;
         }
 

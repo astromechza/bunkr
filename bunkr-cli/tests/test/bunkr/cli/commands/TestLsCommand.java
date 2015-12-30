@@ -52,13 +52,13 @@ public class TestLsCommand
         taggedFile.addTag("john");
         taggedFile.addTag("bob");
 
-        context.getInventory().getFiles().add(untaggedFile);
-        context.getInventory().getFiles().add(taggedFile);
+        context.getInventory().addFile(untaggedFile);
+        context.getInventory().addFile(taggedFile);
 
         FolderInventoryItem folder = new FolderInventoryItem("some-folder");
-        folder.getFiles().add(new FileInventoryItem("subfile"));
-        folder.getFiles().add(new FileInventoryItem("subfile2"));
-        context.getInventory().getFolders().add(folder);
+        folder.addFile(new FileInventoryItem("subfile"));
+        folder.addFile(new FileInventoryItem("subfile2"));
+        context.getInventory().addFolder(folder);
 
         MetadataWriter.write(context, usp);
 

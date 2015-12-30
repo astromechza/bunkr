@@ -87,7 +87,7 @@ public class TestWriteScenarios
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, false);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
-        context.getInventory().getFiles().add(newFile);
+        context.getInventory().addFile(newFile);
         try(MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, newFile))
         {
             for (int i = 0; i < 3333; i++)
@@ -145,7 +145,7 @@ public class TestWriteScenarios
         fileOne.addTag("bob");
         fileOne.addTag("charles");
         {
-            context.getInventory().getFiles().add(fileOne);
+            context.getInventory().addFile(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
             {
                 for (int i = 0; i < 3333; i++)
@@ -159,7 +159,7 @@ public class TestWriteScenarios
         FileInventoryItem fileTwo = new FileInventoryItem("another file.txt");
         fileTwo.addTag("thing_one");
         {
-            context.getInventory().getFiles().add(fileTwo);
+            context.getInventory().addFile(fileTwo);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileTwo))
             {
                 for (int i = 0; i < 50; i++)
@@ -235,12 +235,12 @@ public class TestWriteScenarios
         FolderInventoryItem folder1 = new FolderInventoryItem("some folder");
         FolderInventoryItem folder2 = new FolderInventoryItem("another folder");
         FolderInventoryItem folder3 = new FolderInventoryItem("another folder");
-        folder1.getFolders().add(folder2);
-        context.getInventory().getFolders().add(folder1);
-        context.getInventory().getFolders().add(folder3);
+        folder1.addFolder(folder2);
+        context.getInventory().addFolder(folder1);
+        context.getInventory().addFolder(folder3);
 
         FileInventoryItem newFile = new FileInventoryItem("some file.txt");
-        folder1.getFiles().add(newFile);
+        folder1.addFile(newFile);
         MetadataWriter.write(context, usp);
 
         try(DataInputStream dis = new DataInputStream(new FileInputStream(tempfile)))
@@ -299,7 +299,7 @@ public class TestWriteScenarios
         for (int i = 0; i < 4; i++)
         {
             FileInventoryItem newFile = new FileInventoryItem("file" + (i + 1));
-            context.getInventory().getFiles().add(newFile);
+            context.getInventory().addFile(newFile);
             try(MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, newFile))
             {
                 bwos.write(RandomMaker.get(4096 * 8));
@@ -328,7 +328,7 @@ public class TestWriteScenarios
         // now remove file 3
         {
             FileInventoryItem file3 = context.getInventory().findFile("file3");
-            context.getInventory().getFiles().remove(file3);
+            context.getInventory().removeFile(file3);
         }
 
         // now write metadatas
@@ -339,7 +339,7 @@ public class TestWriteScenarios
         // now remove file 4
         {
             FileInventoryItem file4 = context.getInventory().findFile("file4");
-            context.getInventory().getFiles().remove(file4);
+            context.getInventory().removeFile(file4);
         }
 
         // now write metadatas

@@ -52,7 +52,7 @@ public class TestExportFileCommand
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
 
         FileInventoryItem fileOne = new FileInventoryItem("a.txt");
-        context.getInventory().getFiles().add(fileOne);
+        context.getInventory().addFile(fileOne);
         try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
         {
             bwos.write(RandomMaker.get(3333 * 8));
@@ -61,14 +61,14 @@ public class TestExportFileCommand
         FolderInventoryItem folderOne = new FolderInventoryItem("folder");
 
         FileInventoryItem fileTwo = new FileInventoryItem("b.txt");
-        context.getInventory().getFiles().add(fileTwo);
+        context.getInventory().addFile(fileTwo);
         try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileTwo))
         {
             bwos.write(RandomMaker.get(50 * 8));
         }
 
-        folderOne.getFiles().add(fileTwo);
-        context.getInventory().getFolders().add(folderOne);
+        folderOne.addFile(fileTwo);
+        context.getInventory().addFolder(folderOne);
 
         MetadataWriter.write(context, usp);
 
