@@ -16,7 +16,7 @@ import javafx.stage.Modality;
 import org.bunkr.core.Resources;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.utils.Formatters;
-import org.bunkr.gui.components.treeview.SelectableLabel;
+import org.bunkr.gui.components.SelectableLabel;
 import org.bunkr.gui.windows.BaseWindow;
 
 import java.io.IOException;
@@ -39,10 +39,10 @@ public class FileInfoDialog extends BaseWindow
 
     private ListView<String> tagsBox;
 
-    public FileInfoDialog(FileInventoryItem item, String filePath) throws IOException
+    public FileInfoDialog(FileInventoryItem item) throws IOException
     {
         super();
-        this.filePath = filePath;
+        this.filePath = item.getAbsolutePath();
         this.item = item;
         this.cssPath = Resources.getExternalPath("/resources/css/fileinfo_dialog.css");
         this.initialise();

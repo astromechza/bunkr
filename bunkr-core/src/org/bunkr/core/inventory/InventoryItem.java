@@ -46,7 +46,6 @@ public class InventoryItem implements Comparable<InventoryItem>
 
     public String getAbsolutePath()
     {
-        System.out.println(String.format("Getting abs path for %s parent type(%s)", this.getName(), this.getParent()));
         if (this.parent == null) throw new RuntimeException("Orphaned Inventory Item");
         IFFContainer p = this.getParent();
         if (p instanceof Inventory)

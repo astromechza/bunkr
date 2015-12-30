@@ -1,4 +1,4 @@
-package org.bunkr.gui.components.treeview;
+package org.bunkr.gui.components;
 
 import javafx.scene.control.TextField;
 

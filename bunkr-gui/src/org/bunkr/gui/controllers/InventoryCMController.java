@@ -37,7 +37,10 @@ public class InventoryCMController
     private final Inventory inventory;
     private final InventoryTreeView treeView;
 
-    private Consumer<String> onSaveRequest;
+    private Consumer<String> onSaveInventoryRequest;
+    private Consumer<FileInventoryItem> onOpenFile;
+    private Consumer<FileInventoryItem> onDeleteFile;
+    private Consumer<FileInventoryItem> onRenameFile;
 
     public InventoryCMController(Inventory inventory, InventoryTreeView treeView)
     {
@@ -108,10 +111,7 @@ public class InventoryCMController
                 throw new BaseBunkrException("Failed to open item %s. It is not a file.", selected.getValue().getName());
             }
 
-            FileInventoryItem targetFile = (FileInventoryItem) selectedItem;
-
-            // TODO call new tab create with targetFile
-
+            this.onOpenFile.accept((FileInventoryItem) selectedItem);
         }
         catch (BaseBunkrException e)
         {
@@ -143,12 +143,16 @@ public class InventoryCMController
                 FileInventoryItem targetFile = (FileInventoryItem) target;
                 parentContainer.removeFile(targetFile);
                 parent.getChildren().remove(selected);
+
+                this.onSaveInventoryRequest.accept(
+                        String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
+
+                this.onDeleteFile.accept(targetFile);
             }
             else
             {
                 throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
             }
-            this.onSaveRequest.accept(String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
         }
         catch (Exception e)
         {
@@ -194,7 +198,8 @@ public class InventoryCMController
             {
                 throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
             }
-            this.onSaveRequest.accept(String.format("Deleted directory %s from %s", selected.getValue().getName(), parent.getValue().getName()));
+            this.onSaveInventoryRequest.accept(String.format("Deleted directory %s from %s", selected.getValue().getName(),
+                                                    parent.getValue().getName()));
         }
         catch (Exception e)
         {
@@ -314,8 +319,11 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(selected);
-
-            this.onSaveRequest.accept(String.format("Renamed file %s", newNameComponent));
+            this.onSaveInventoryRequest.accept(String.format("Renamed file %s", newNameComponent));
+            if (renameSubject.isAFile() && renameSubject instanceof FileInventoryItem)
+            {
+                this.onRenameFile.accept((FileInventoryItem) renameSubject);
+            }
         }
         catch (Exception e)
         {
@@ -363,7 +371,7 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
-            this.onSaveRequest.accept(String.format("Created new directory %s", newFolder.getName()));
+            this.onSaveInventoryRequest.accept(String.format("Created new directory %s", newFolder.getName()));
         }
         catch (Exception e)
         {
@@ -412,7 +420,7 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
-            this.onSaveRequest.accept(String.format("Created new directory %s", newFolder.getName()));
+            this.onSaveInventoryRequest.accept(String.format("Created new directory %s", newFolder.getName()));
         }
         catch (Exception e)
         {
@@ -460,7 +468,7 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
-            this.onSaveRequest.accept(String.format("Created new file %s", newFile.getName()));
+            this.onSaveInventoryRequest.accept(String.format("Created new file %s", newFile.getName()));
         }
         catch (Exception e)
         {
@@ -508,7 +516,7 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
-            this.onSaveRequest.accept(String.format("Created new file %s", newFile.getName()));
+            this.onSaveInventoryRequest.accept(String.format("Created new file %s", newFile.getName()));
         }
         catch (Exception e)
         {
@@ -528,7 +536,7 @@ public class InventoryCMController
             if (selectedFile.isAFile() && selectedFile instanceof FileInventoryItem)
             {
                 FileInventoryItem fileItem = (FileInventoryItem) selectedFile;
-                new FileInfoDialog(fileItem, selectedPath).getStage().showAndWait();
+                new FileInfoDialog(fileItem).getStage().showAndWait();
             }
         }
         catch (BaseBunkrException | IOException e)
@@ -537,8 +545,23 @@ public class InventoryCMController
         }
     }
 
-    public void setOnSaveRequest(Consumer<String> eventHandler)
+    public void setOnSaveInventoryRequest(Consumer<String> eventHandler)
     {
-        this.onSaveRequest = eventHandler;
+        this.onSaveInventoryRequest = eventHandler;
+    }
+
+    public void setOnOpenFile(Consumer<FileInventoryItem> eventHandler)
+    {
+        this.onOpenFile = eventHandler;
+    }
+
+    public void setOnDeleteFile(Consumer<FileInventoryItem> onDeleteFile)
+    {
+        this.onDeleteFile = onDeleteFile;
+    }
+
+    public void setOnRenameFile(Consumer<FileInventoryItem> onRenameFile)
+    {
+        this.onRenameFile = onRenameFile;
     }
 }

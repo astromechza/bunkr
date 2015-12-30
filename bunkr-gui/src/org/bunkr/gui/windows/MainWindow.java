@@ -14,6 +14,7 @@ import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
+import org.bunkr.gui.controllers.FilesTabPaneController;
 import org.bunkr.gui.controllers.InventoryCMController;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
@@ -43,9 +44,11 @@ public class MainWindow extends BaseWindow
         this.cssPath = Resources.getExternalPath("/resources/css/main_window.css");
         this.initialise();
 
+        FilesTabPaneController tabPaneController = new FilesTabPaneController(this.archive, this.tabPane);
+
         InventoryCMController contextMenuController = new InventoryCMController(this.archive.getInventory(), this.tree);
         contextMenuController.bindEvents();
-        contextMenuController.setOnSaveRequest(s -> {
+        contextMenuController.setOnSaveInventoryRequest(s -> {
             try
             {
                 MetadataWriter.write(MainWindow.this.archive, MainWindow.this.securityProvider);
@@ -55,6 +58,9 @@ public class MainWindow extends BaseWindow
                 QuickDialogs.exception(e);
             }
         });
+        contextMenuController.setOnRenameFile(tabPaneController::notifyRename);
+        contextMenuController.setOnDeleteFile(f -> tabPaneController.requestClose(f, false));
+        contextMenuController.setOnOpenFile(tabPaneController::requestOpen);
 
         this.tree.refreshAll();
     }

@@ -15,6 +15,20 @@ import java.util.Optional;
  */
 public class QuickDialogs
 {
+    public static void info(String title, String header, String content)
+    {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    public static void info(String content)
+    {
+        info("Info", null, content);
+    }
+
     public static boolean confirm(String title, String header, String content)
     {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
