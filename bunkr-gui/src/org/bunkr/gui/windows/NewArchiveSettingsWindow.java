@@ -254,7 +254,7 @@ public class NewArchiveSettingsWindow extends BaseWindow
                         this.compressionCheckBox.isSelected()
                 );
 
-                new MainWindow(archive).getStage().show();
+                new MainWindow(archive, usp).getStage().show();
                 this.getStage().close();
             }
             catch (CryptoException | BaseBunkrException | IOException e)

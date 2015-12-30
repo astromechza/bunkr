@@ -3,6 +3,7 @@ package org.bunkr.gui.components.treeview;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.*;
 
@@ -98,4 +99,9 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
         return current;
     }
 
+    public TreeItem<InventoryTreeData> getSelectedTreeItem() throws BaseBunkrException
+    {
+        if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
+        throw new BaseBunkrException("No item selected");
+    }
 }

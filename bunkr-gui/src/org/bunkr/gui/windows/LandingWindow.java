@@ -160,7 +160,7 @@ public class LandingWindow extends BaseWindow
                     }
 
                     ArchiveInfoContext archive = new ArchiveInfoContext(selectedPath, usp);
-                    new MainWindow(archive).getStage().show();
+                    new MainWindow(archive, usp).getStage().show();
                     this.getStage().close();
                 }
                 catch (Exception e)

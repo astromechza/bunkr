@@ -13,6 +13,7 @@ import org.bunkr.gui.dialogs.FileInfoDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * Creator: benmeier
@@ -20,17 +21,24 @@ import java.io.IOException;
  */
 public class InventoryCMController
 {
+
+
     public static final String STR_NEW_FILE = "New File";
     public static final String STR_NEW_FOLDER = "New Folder";
     public static final String STR_DELETE = "Delete";
     public static final String STR_RENAME = "Rename";
     public static final String STR_INFO = "Info";
+    public static final String STR_IMPORT_FILE = "Import File";
 
     public final ContextMenu dirContextMenu, fileContextMenu, rootContextMenu;
-    public final MenuItem rootNewFile, rootNewSubDir, dirNewFile, dirNewSubDir, dirDelete, dirRename, fileDelete, fileRename, fileInfo;
+    public final MenuItem rootNewFile, rootNewSubDir, rootImportFile,
+            dirNewFile, dirNewSubDir, dirImportFile, dirDelete, dirRename,
+            fileDelete, fileRename, fileInfo;
 
     private final Inventory inventory;
     private final InventoryTreeView treeView;
+
+    private Consumer<String> onSaveRequest;
 
     public InventoryCMController(Inventory inventory, InventoryTreeView treeView)
     {
@@ -40,6 +48,7 @@ public class InventoryCMController
         // root
         this.rootNewFile = new MenuItem(STR_NEW_FILE);
         this.rootNewSubDir = new MenuItem(STR_NEW_FOLDER);
+        this.rootImportFile = new MenuItem(STR_IMPORT_FILE);
 
         // file
         this.fileDelete = new MenuItem(STR_DELETE);
@@ -51,6 +60,7 @@ public class InventoryCMController
         this.dirRename = new MenuItem(STR_RENAME);
         this.dirNewFile = new MenuItem(STR_NEW_FILE);
         this.dirNewSubDir = new MenuItem(STR_NEW_FOLDER);
+        this.dirImportFile = new MenuItem(STR_IMPORT_FILE);
 
         this.dirContextMenu = new ContextMenu(this.dirNewFile, this.dirNewSubDir, this.dirRename, this.dirDelete);
         this.fileContextMenu = new ContextMenu(this.fileInfo, this.fileRename, this.fileDelete);
@@ -74,17 +84,11 @@ public class InventoryCMController
         this.rootNewFile.setOnAction(event -> this.handleCMNewFileOnRoot());
     }
 
-    private TreeItem<InventoryTreeData> getSelectedTreeItem() throws BaseBunkrException
-    {
-        if (! this.treeView.getSelectionModel().isEmpty()) return this.treeView.getSelectionModel().getSelectedItem();
-        throw new BaseBunkrException("No item selected");
-    }
-
     private void handleCMFileDelete()
     {
         try
         {
-            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
 
             if (!QuickDialogs.confirm(
                     String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
@@ -92,21 +96,13 @@ public class InventoryCMController
 
             // find parent item
             TreeItem<InventoryTreeData> parent = selected.getParent();
+            String parentPath = this.treeView.getPathForTreeItem(parent);
 
             // find inventory item
-            IFFContainer parentContainer;
-            if (parent.getValue().getType().equals(InventoryTreeData.Type.ROOT))
-            {
-                parentContainer = this.inventory;
-            }
-            else
-            {
-                parentContainer = (IFFContainer) this.inventory.search(parent.getValue().getUuid());
-            }
+            IFFContainer parentContainer = (IFFContainer) InventoryPather.traverse(this.inventory, parentPath);
 
             // just get inventory item
-            InventoryItem target = parentContainer.search(selected.getValue().getUuid());
-
+            IFFTraversalTarget target = parentContainer.findFileOrFolder(selected.getValue().getName());
             if (target instanceof FileInventoryItem)
             {
                 FileInventoryItem targetFile = (FileInventoryItem) target;
@@ -117,6 +113,7 @@ public class InventoryCMController
             {
                 throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
             }
+            this.onSaveRequest.accept(String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
         }
         catch (Exception e)
         {
@@ -128,7 +125,7 @@ public class InventoryCMController
     {
         try
         {
-            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
 
             if (! QuickDialogs.confirm(
                     String.format("Are you sure you want to delete '%s' and all of its children?",
@@ -162,6 +159,7 @@ public class InventoryCMController
             {
                 throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
             }
+            this.onSaveRequest.accept(String.format("Deleted directory %s from %s", selected.getValue().getName(), parent.getValue().getName()));
         }
         catch (Exception e)
         {
@@ -174,7 +172,7 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
 
             // find parent item
             TreeItem<InventoryTreeData> oldParentItem = selected.getParent();
@@ -281,6 +279,8 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(selected);
+
+            this.onSaveRequest.accept(String.format("Renamed file %s", newNameComponent));
         }
         catch (Exception e)
         {
@@ -293,7 +293,7 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
 
             // get new file name
             String newName = QuickDialogs.input("Enter a new directory name:", "");
@@ -328,6 +328,7 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
+            this.onSaveRequest.accept(String.format("Created new directory %s", newFolder.getName()));
         }
         catch (Exception e)
         {
@@ -376,6 +377,7 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
+            this.onSaveRequest.accept(String.format("Created new directory %s", newFolder.getName()));
         }
         catch (Exception e)
         {
@@ -388,7 +390,7 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
 
             // get new file name
             String newName = QuickDialogs.input("Enter a new file name:", "");
@@ -423,6 +425,7 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
+            this.onSaveRequest.accept(String.format("Created new file %s", newFile.getName()));
         }
         catch (Exception e)
         {
@@ -470,6 +473,7 @@ public class InventoryCMController
             Event.fireEvent(selected,
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
+            this.onSaveRequest.accept(String.format("Created new file %s", newFile.getName()));
         }
         catch (Exception e)
         {
@@ -482,7 +486,7 @@ public class InventoryCMController
         try
         {
             // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.getSelectedTreeItem();
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
             String selectedPath = this.treeView.getPathForTreeItem(selected);
 
             IFFTraversalTarget selectedFile = InventoryPather.traverse(this.inventory, selectedPath);
@@ -496,5 +500,10 @@ public class InventoryCMController
         {
             QuickDialogs.exception(e);
         }
+    }
+
+    public void setOnSaveRequest(Consumer<String> eventHandler)
+    {
+        this.onSaveRequest = eventHandler;
     }
 }
