@@ -18,6 +18,7 @@ public class GuiEntryPoint extends Application
     @Override
     public void start(Stage primaryStage) throws Exception
     {
+        new URLRequestBlocker().install();
         new LandingWindow(primaryStage).getStage().show();
     }
 }

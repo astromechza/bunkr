@@ -4,6 +4,7 @@ import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 import org.bunkr.core.Resources;
 import org.bunkr.core.inventory.InventoryPather;
+import org.bunkr.gui.URLRequestBlocker;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,17 +52,6 @@ public class MarkdownWebViewAdapter
                 System.out.println("Adapting loaded page");
                 this.adaptLoadedPage(subject);
             }
-        });
-
-        URL.setURLStreamHandlerFactory(protocol -> {
-            if (protocol.equals("jar") || protocol.equals("file")) return null;
-            return new URLStreamHandler() {
-                @Override
-                protected URLConnection openConnection(URL u) throws IOException
-                {
-                    throw new IOException(String.format("Outgoing request to %s blocked", u));
-                }
-            };
         });
     }
 
