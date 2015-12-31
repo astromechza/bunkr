@@ -28,11 +28,12 @@ public class InventoryCMController
     public static final String STR_INFO = "Info";
     public static final String STR_IMPORT_FILE = "Import File";
     public static final String STR_OPEN = "Open";
+    public static final String STR_EXPORT = "Export File";
 
     public final ContextMenu dirContextMenu, fileContextMenu, rootContextMenu;
     public final MenuItem rootNewFile, rootNewSubDir, rootImportFile,
             dirNewFile, dirNewSubDir, dirImportFile, dirDelete, dirRename,
-            fileDelete, fileRename, fileInfo, fileOpen;
+            fileDelete, fileRename, fileInfo, fileOpen, fileExport;
 
     private final Inventory inventory;
     private final InventoryTreeView treeView;
@@ -57,6 +58,7 @@ public class InventoryCMController
         this.fileRename = new MenuItem(STR_RENAME);
         this.fileInfo = new MenuItem(STR_INFO);
         this.fileOpen = new MenuItem(STR_OPEN);
+        this.fileExport = new MenuItem(STR_EXPORT);
 
         // dir
         this.dirDelete = new MenuItem(STR_DELETE);
@@ -65,9 +67,9 @@ public class InventoryCMController
         this.dirNewSubDir = new MenuItem(STR_NEW_FOLDER);
         this.dirImportFile = new MenuItem(STR_IMPORT_FILE);
 
-        this.dirContextMenu = new ContextMenu(this.dirNewFile, this.dirNewSubDir, this.dirRename, this.dirDelete);
-        this.fileContextMenu = new ContextMenu(this.fileOpen, this.fileInfo, this.fileRename, this.fileDelete);
-        this.rootContextMenu = new ContextMenu(this.rootNewFile, this.rootNewSubDir);
+        this.dirContextMenu = new ContextMenu(this.dirNewFile, this.dirNewSubDir, this.dirRename, this.dirDelete, this.dirImportFile);
+        this.fileContextMenu = new ContextMenu(this.fileOpen, this.fileInfo, this.fileExport, this.fileRename, this.fileDelete);
+        this.rootContextMenu = new ContextMenu(this.rootNewFile, this.rootNewSubDir, this.rootImportFile);
 
         this.treeView.setCellFactory(new CellFactoryCallback(this));
     }
