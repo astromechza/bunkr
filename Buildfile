@@ -15,6 +15,7 @@ JAR_JUNIT = "junit:junit:jar:4.12"
 JAR_BC = "org.bouncycastle:bcprov-jdk15on:jar:1.53"
 JAR_JSON_SIMPLE = "com.googlecode.json-simple:json-simple:jar:1.1.1"
 JAR_ARGPARSE = "net.sourceforge.argparse4j:argparse4j:jar:0.6.0"
+JAR_MARKDOWN = "org.commonjava.googlecode.markdown4j:markdown4j:jar:2.2-cj-1.0"
 
 layout = Layout.new
 layout[:source, :main, :java] = 'src'
@@ -79,7 +80,7 @@ define PROJECT_NAME do
     define 'bunkr-gui', layout: layout do
         test.with JAR_JUNIT, project('bunkr-core').test.compile.target
         jacoco.generate_html = true
-        compile.with JAR_BC, JAR_ARGPARSE, JAR_JSON_SIMPLE, project('bunkr-core')
+        compile.with JAR_BC, JAR_MARKDOWN, JAR_JSON_SIMPLE, project('bunkr-core')
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-gui').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
         package(:jar, id: 'bunkr-gui').with(manifest: {'Main-Class' => GUI_MAIN_CLASS})

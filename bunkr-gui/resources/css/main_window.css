@@ -1,0 +1,7 @@
+.editor-area-monospaced {
+    -fx-font: normal 14px monospaced;
+}
+
+.small-button {
+    -fx-font: normal 10px sans-serif;
+}
