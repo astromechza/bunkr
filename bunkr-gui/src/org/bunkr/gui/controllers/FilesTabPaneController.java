@@ -46,6 +46,7 @@ public class FilesTabPaneController
             });
             this.pane.getTabs().add(tab);
             this.openTabs.put(file.getUuid(), tab);
+            this.pane.getSelectionModel().select(tab);
         }
     }
 
