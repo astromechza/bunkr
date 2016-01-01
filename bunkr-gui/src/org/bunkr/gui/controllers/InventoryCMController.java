@@ -1,9 +1,12 @@
 package org.bunkr.gui.controllers;
 
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.*;
 import org.bunkr.gui.components.treeview.CellFactoryCallback;
@@ -88,6 +91,13 @@ public class InventoryCMController
 
         this.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnRoot());
         this.rootNewFile.setOnAction(event -> this.handleCMNewFileOnRoot());
+
+        this.treeView.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2)
+            {
+                this.handleCMFileOpen();
+            }
+        });
     }
 
     private void handleCMFileOpen()

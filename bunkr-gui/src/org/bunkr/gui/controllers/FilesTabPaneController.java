@@ -42,8 +42,7 @@ public class FilesTabPaneController
         else
         {
             MarkdownTab tab = new MarkdownTab(file, this.archive);
-            tab.setOnCloseRequest(e -> {
-                // TODO check save prompt thing
+            tab.setOnClosed(e -> {
                 this.openTabs.remove(file.getUuid());
             });
             tab.setOnSaveInventoryRequest(s -> this.getOnSaveInventoryRequest().accept(s));

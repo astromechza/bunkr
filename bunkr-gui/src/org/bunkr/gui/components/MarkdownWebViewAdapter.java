@@ -50,13 +50,7 @@ public class MarkdownWebViewAdapter
             }
         });
 
-        subject.getEngine().setOnError(event -> {
-            QuickDialogs.exception(event.getException());
-        });
-
-        subject.getEngine().getLoadWorker().exceptionProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println(newValue.getMessage());
-        });
+        subject.getEngine().setOnError(event -> QuickDialogs.exception(event.getException()));
     }
 
     private void adaptLoadedPage(WebView subject)

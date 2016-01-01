@@ -1,7 +1,5 @@
 package org.bunkr.gui.components;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
@@ -10,7 +8,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
@@ -38,30 +35,18 @@ public class MarkdownTab extends Tab
 
     // controls
     private VBox layout;
-    private ToolBar actionBar;
     private Button saveButton;
     private Button switchModeButton;
+    private Button resetButton;
     private TextArea editorArea;
     private WebView formattedView;
-
-    public Consumer<String> getOnSaveInventoryRequest()
-    {
-        return onSaveInventoryRequest;
-    }
-
-    public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
-    {
-        this.onSaveInventoryRequest = onSaveInventoryRequest;
-    }
 
     // mode
     private enum Mode {EDITTING, VIEWING}
     private Mode currentMode = null;
 
     // contents
-    private String title;
     private String plainTextContent = null;
-    private String htmlContent = null;
     private boolean hasChanges = true;
 
     private Consumer<String> onSaveInventoryRequest;
@@ -74,9 +59,10 @@ public class MarkdownTab extends Tab
 
         this.markdownProcessor = new Markdown4jProcessor();
 
-        this.reloadContent();
 
         this.initControls();
+
+        this.reloadContent();
 
         try
         {
@@ -95,13 +81,15 @@ public class MarkdownTab extends Tab
     private void initControls()
     {
         this.setText(this.subject.getAbsolutePath());
-        this.actionBar = new ToolBar();
+        ToolBar actionBar = new ToolBar();
         this.saveButton = new Button("Save");
         this.saveButton.getStyleClass().add("small-button");
         this.switchModeButton = new Button("View");
         this.switchModeButton.getStyleClass().add("small-button");
-        this.actionBar.getItems().addAll(this.saveButton, this.switchModeButton);
-        VBox.setVgrow(this.actionBar, Priority.NEVER);
+        this.resetButton = new Button("Reset");
+        this.resetButton.getStyleClass().add("small-button");
+        actionBar.getItems().addAll(this.saveButton, this.resetButton, this.switchModeButton);
+        VBox.setVgrow(actionBar, Priority.NEVER);
 
         this.editorArea = new TextArea();
         this.editorArea.getStyleClass().add("editor-area-monospaced");
@@ -111,7 +99,7 @@ public class MarkdownTab extends Tab
         VBox.setVgrow(this.formattedView, Priority.ALWAYS);
 
         this.layout = new VBox();
-        this.layout.getChildren().addAll(this.actionBar);
+        this.layout.getChildren().addAll(actionBar);
         this.setContent(this.layout);
 
         this.getStyleClass().add("open-file-tab");
@@ -126,29 +114,49 @@ public class MarkdownTab extends Tab
             }
             else
             {
-                this.plainTextContent = this.editorArea.getText();
                 this.goToViewMode();
             }
         });
 
         this.saveButton.setOnAction(e -> {
-            try (
-                    MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, this.subject);
-                    InputStream is = new ByteArrayInputStream(this.editorArea.getText().getBytes()))
+            try
             {
-                byte[] buffer = new byte[1024 * 1024];
-                int n;
-                while ((n = is.read(buffer)) != -1)
+                try (
+                        MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, this.subject);
+                        InputStream is = new ByteArrayInputStream(this.editorArea.getText().getBytes()))
                 {
-                    bwos.write(buffer, 0, n);
+                    byte[] buffer = new byte[1024 * 1024];
+                    int n;
+                    while ((n = is.read(buffer)) != -1)
+                    {
+                        bwos.write(buffer, 0, n);
+                    }
+                    Arrays.fill(buffer, (byte) 0);
                 }
-                Arrays.fill(buffer, (byte) 0);
+                this.plainTextContent = this.editorArea.getText();
+                this.checkSaveAllowed();
+                this.onSaveInventoryRequest.accept("Wrote content to file " + this.getText());
             }
             catch (IOException exc)
             {
                 QuickDialogs.exception(exc);
             }
-            this.onSaveInventoryRequest.accept("Wrote content to file " + this.getText());
+        });
+
+        this.resetButton.setOnAction(e -> this.reloadContent());
+
+        this.editorArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            this.checkSaveAllowed();
+        });
+
+        this.setOnCloseRequest(event -> {
+            if (this.hasChanges)
+            {
+                if (! QuickDialogs.confirm("File %s has changes. Are you sure you want to close it?", this.getText()))
+                {
+                    event.consume();
+                }
+            }
         });
     }
 
@@ -159,12 +167,12 @@ public class MarkdownTab extends Tab
 
     public void reloadContent()
     {
-        StringBuilder content = new StringBuilder();
         if (this.subject.getParent() == null)
         {
             throw new RuntimeException("Orphaned file tab found");
         }
 
+        StringBuilder content = new StringBuilder();
         try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, this.subject))
         {
             ms.setCheckHashOnFinish(true);
@@ -177,6 +185,8 @@ public class MarkdownTab extends Tab
             Arrays.fill(buffer, (byte) 0);
             this.plainTextContent = content.toString();
             this.hasChanges = false;
+            this.saveButton.setDisable(true);
+            this.getStyleClass().remove("has-changes");
         }
         catch (IOException e)
         {
@@ -184,22 +194,19 @@ public class MarkdownTab extends Tab
         }
     }
 
-    private void updateMarkdownRender()
+    public void checkSaveAllowed()
     {
-        try
+        if (this.editorArea.textProperty().length().isEqualTo(this.plainTextContent.length()).get() && this.editorArea.getText().equals(this.plainTextContent))
         {
-            if (this.plainTextContent == null)
-            {
-                this.htmlContent = "";
-            }
-            else
-            {
-                this.htmlContent = this.markdownProcessor.process(this.plainTextContent);
-            }
+            this.hasChanges = false;
+            this.saveButton.setDisable(true);
+            this.getStyleClass().remove("has-changes");
         }
-        catch (IOException e)
+        else
         {
-            this.htmlContent = e.getLocalizedMessage();
+            this.hasChanges = true;
+            this.saveButton.setDisable(false);
+            if (! this.getStyleClass().contains("has-changes")) this.getStyleClass().add("has-changes");
         }
     }
 
@@ -226,13 +233,32 @@ public class MarkdownTab extends Tab
         this.currentMode = Mode.VIEWING;
         this.switchModeButton.setText("Edit");
 
-        this.updateMarkdownRender();
-
-        this.formattedView.getEngine().loadContent(this.htmlContent);
+        try
+        {
+            if (this.plainTextContent == null)
+            {
+                this.formattedView.getEngine().loadContent("");
+            }
+            else if (this.hasChanges)
+            {
+                this.formattedView.getEngine().loadContent(this.markdownProcessor.process(this.editorArea.getText()));
+            }
+            else
+            {
+                this.formattedView.getEngine().loadContent(this.markdownProcessor.process(this.plainTextContent));
+            }
+        }
+        catch (IOException e)
+        {
+            this.formattedView.getEngine().loadContent(e.getLocalizedMessage());
+        }
 
         if (this.layout.getChildren().contains(this.editorArea))this.layout.getChildren().remove(this.editorArea);
         if (!this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().add(this.formattedView);
     }
 
-
+    public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
+    {
+        this.onSaveInventoryRequest = onSaveInventoryRequest;
+    }
 }

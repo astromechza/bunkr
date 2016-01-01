@@ -9,3 +9,8 @@
 .open-file-tab {
     -fx-font: normal 10px sans-serif;
 }
+
+.open-file-tab.has-changes {
+    -fx-font-weight: bold;
+    -fx-background-color: #EEEE44;
+}
