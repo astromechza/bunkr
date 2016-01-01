@@ -47,7 +47,7 @@ public class MainWindow extends BaseWindow
         FilesTabPaneController tabPaneController = new FilesTabPaneController(this.archive, this.tabPane);
         tabPaneController.setOnSaveInventoryRequest(s -> this.saveMetadata());
 
-        InventoryCMController contextMenuController = new InventoryCMController(this.archive.getInventory(), this.tree);
+        InventoryCMController contextMenuController = new InventoryCMController(this.archive, this.tree);
         contextMenuController.bindEvents();
         contextMenuController.setOnSaveInventoryRequest(s -> this.saveMetadata());
         contextMenuController.setOnRenameFile(tabPaneController::notifyRename);

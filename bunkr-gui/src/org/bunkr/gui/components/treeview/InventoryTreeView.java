@@ -47,6 +47,8 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
                     subfile.getUuid(), subfile.getName(), InventoryTreeData.Type.FILE
             )));
         }
+
+        parent.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
         return parent;
     }
     /**

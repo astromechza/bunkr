@@ -5,15 +5,21 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseButton;
+import javafx.stage.FileChooser;
+import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.*;
+import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.dialogs.FileInfoDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
@@ -36,7 +42,7 @@ public class InventoryCMController
             dirNewFile, dirNewSubDir, dirImportFile, dirDelete, dirRename,
             fileDelete, fileRename, fileInfo, fileOpen, fileExport;
 
-    private final Inventory inventory;
+    private final ArchiveInfoContext archive;
     private final InventoryTreeView treeView;
 
     private Consumer<String> onSaveInventoryRequest;
@@ -44,9 +50,9 @@ public class InventoryCMController
     private Consumer<FileInventoryItem> onDeleteFile;
     private Consumer<FileInventoryItem> onRenameFile;
 
-    public InventoryCMController(Inventory inventory, InventoryTreeView treeView)
+    public InventoryCMController(ArchiveInfoContext archive, InventoryTreeView treeView)
     {
-        this.inventory = inventory;
+        this.archive = archive;
         this.treeView = treeView;
 
         // root
@@ -84,11 +90,13 @@ public class InventoryCMController
 
         this.dirDelete.setOnAction(event -> this.handleCMDirDelete());
         this.dirRename.setOnAction(event -> this.handleCMRenameItem());
-        this.dirNewFile.setOnAction(event -> this.handleCMNewFileOnDir());
-        this.dirNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnDir());
+        this.dirNewFile.setOnAction(event -> this.handleCMNewFile());
+        this.dirNewSubDir.setOnAction(event -> this.handleCMNewSubDir());
+        this.dirImportFile.setOnAction(event -> this.handleCMImportFile());
 
-        this.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDirOnRoot());
-        this.rootNewFile.setOnAction(event -> this.handleCMNewFileOnRoot());
+        this.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDir());
+        this.rootNewFile.setOnAction(event -> this.handleCMNewFile());
+        this.rootImportFile.setOnAction(event -> this.handleCMImportFile());
 
         this.treeView.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2)
@@ -114,7 +122,7 @@ public class InventoryCMController
             String selectedPath = this.treeView.getPathForTreeItem(selected);
 
             // traverse down to correct file item
-            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.inventory, selectedPath);
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
             // double check that its a file
             if (! selectedItem.isAFile())
             {
@@ -144,7 +152,7 @@ public class InventoryCMController
             String parentPath = this.treeView.getPathForTreeItem(parent);
 
             // find inventory item
-            IFFContainer parentContainer = (IFFContainer) InventoryPather.traverse(this.inventory, parentPath);
+            IFFContainer parentContainer = (IFFContainer) InventoryPather.traverse(this.archive.getInventory(), parentPath);
 
             // just get inventory item
             IFFTraversalTarget target = parentContainer.findFileOrFolder(selected.getValue().getName());
@@ -188,11 +196,11 @@ public class InventoryCMController
             IFFContainer parentContainer;
             if (parent.getValue().getType().equals(InventoryTreeData.Type.ROOT))
             {
-                parentContainer = this.inventory;
+                parentContainer = this.archive.getInventory();
             }
             else
             {
-                parentContainer = (IFFContainer) this.inventory.search(parent.getValue().getUuid());
+                parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
             }
 
             // just get inventory item
@@ -228,9 +236,10 @@ public class InventoryCMController
             TreeItem<InventoryTreeData> oldParentItem = selected.getParent();
             IFFContainer oldParentContainer;
             if (oldParentItem.getValue().getType().equals(InventoryTreeData.Type.ROOT))
-                oldParentContainer = this.inventory;
+                oldParentContainer = this.archive.getInventory();
             else
-                oldParentContainer = (IFFContainer) this.inventory.search(oldParentItem.getValue().getUuid());
+                oldParentContainer = (IFFContainer) this.archive.getInventory().search(
+                        oldParentItem.getValue().getUuid());
 
             // get new file name
             String userInputPath = QuickDialogs.input("Enter a new file name:", selected.getValue().getName());
@@ -269,7 +278,7 @@ public class InventoryCMController
             TreeItem<InventoryTreeData> newParentItem = oldParentItem;
             if (!newParentPathString.equals(oldParentPathString))
             {
-                IFFTraversalTarget pt = InventoryPather.traverse(this.inventory, newParentPathString);
+                IFFTraversalTarget pt = InventoryPather.traverse(this.archive.getInventory(), newParentPathString);
                 if (pt.isAFile())
                 {
                     QuickDialogs.error("Rename Error", "Cannot move folder to be a child of file '%s'.", InventoryPather.baseName(newParentPathString));
@@ -341,7 +350,7 @@ public class InventoryCMController
         }
     }
 
-    private void handleCMNewSubDirOnDir()
+    private void handleCMNewSubDir()
     {
         try
         {
@@ -358,7 +367,8 @@ public class InventoryCMController
             }
 
             // find subject FolderInventoryItem
-            IFFContainer subjectContainer = (IFFContainer) this.inventory.search(selected.getValue().getUuid());
+            IFFContainer subjectContainer = (IFFContainer) this.archive.getInventory().search(
+                    selected.getValue().getUuid());
 
             // check parent for the same name
             IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
@@ -389,56 +399,7 @@ public class InventoryCMController
         }
     }
 
-    private void handleCMNewSubDirOnRoot()
-    {
-        try
-        {
-            // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.treeView.getRoot();
-
-            // get new file name
-            String newName = QuickDialogs.input("Enter a new directory name:", "");
-            if (newName == null) return;
-            if (! InventoryPather.isValidName(newName))
-            {
-                QuickDialogs.error("Create Error", "'%s' is an invalid file name.", newName);
-                return;
-            }
-
-            // find subject FolderInventoryItem
-            IFFContainer subjectContainer = this.inventory;
-
-            // check parent for the same name
-            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
-            if (target != null)
-            {
-                QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
-                return;
-            }
-
-            FolderInventoryItem newFolder = new FolderInventoryItem(newName);
-            subjectContainer.addFolder(newFolder);
-
-            // create the new tree item
-            InventoryTreeData
-                    newValue = new InventoryTreeData(newFolder.getUuid(), newFolder.getName(), InventoryTreeData.Type.FOLDER);
-            TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
-            selected.getChildren().add(newItem);
-            selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-            selected.setExpanded(true);
-
-            Event.fireEvent(selected,
-                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
-            this.treeView.getSelectionModel().select(newItem);
-            this.onSaveInventoryRequest.accept(String.format("Created new directory %s", newFolder.getName()));
-        }
-        catch (Exception e)
-        {
-            QuickDialogs.exception(e);
-        }
-    }
-
-    private void handleCMNewFileOnDir()
+    private void handleCMNewFile()
     {
         try
         {
@@ -455,55 +416,8 @@ public class InventoryCMController
             }
 
             // find subject FolderInventoryItem
-            IFFContainer subjectContainer = (IFFContainer) this.inventory.search(selected.getValue().getUuid());
-
-            // check parent for the same name
-            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
-            if (target != null)
-            {
-                QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
-                return;
-            }
-
-            FileInventoryItem newFile = new FileInventoryItem(newName);
-            subjectContainer.addFile(newFile);
-
-            // create the new tree item
-            InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);
-            TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
-            selected.getChildren().add(newItem);
-            selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-            selected.setExpanded(true);
-
-            Event.fireEvent(selected,
-                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
-            this.treeView.getSelectionModel().select(newItem);
-            this.onSaveInventoryRequest.accept(String.format("Created new file %s", newFile.getName()));
-        }
-        catch (Exception e)
-        {
-            QuickDialogs.exception(e);
-        }
-    }
-
-    private void handleCMNewFileOnRoot()
-    {
-        try
-        {
-            // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.treeView.getRoot();
-
-            // get new file name
-            String newName = QuickDialogs.input("Enter a new file name:", "");
-            if (newName == null) return;
-            if (! InventoryPather.isValidName(newName))
-            {
-                QuickDialogs.error("Create Error", "'%s' is an invalid file name.", newName);
-                return;
-            }
-
-            // find subject FolderInventoryItem
-            IFFContainer subjectContainer = this.inventory;
+            IFFContainer subjectContainer = (IFFContainer) this.archive.getInventory().search(
+                    selected.getValue().getUuid());
 
             // check parent for the same name
             IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
@@ -542,7 +456,7 @@ public class InventoryCMController
             TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
             String selectedPath = this.treeView.getPathForTreeItem(selected);
 
-            IFFTraversalTarget selectedFile = InventoryPather.traverse(this.inventory, selectedPath);
+            IFFTraversalTarget selectedFile = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
             if (selectedFile.isAFile() && selectedFile instanceof FileInventoryItem)
             {
                 FileInventoryItem fileItem = (FileInventoryItem) selectedFile;
@@ -550,6 +464,76 @@ public class InventoryCMController
             }
         }
         catch (BaseBunkrException | IOException e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+    private void handleCMImportFile()
+    {
+        try
+        {
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
+
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select File ...");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("All Files", "*.*"));
+            File selectedPath = fileChooser.showOpenDialog(this.treeView.getScene().getWindow());
+            if (selectedPath == null) return;
+
+            // get new file name
+            String newName = QuickDialogs.input("Enter a file name:", selectedPath.getName());
+            if (newName == null) return;
+            if (! InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Import Error", "'%s' is an invalid file name.", newName);
+                return;
+            }
+
+            // find subject FolderInventoryItem
+            IFFContainer subjectContainer = this.archive.getInventory();
+
+            // check parent for the same name
+            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
+            if (target != null)
+            {
+                QuickDialogs.error("Import Error", "There is already an item named '%s' in the parent folder.", newName);
+                return;
+            }
+
+            FileInventoryItem newFile = new FileInventoryItem(newName);
+            subjectContainer.addFile(newFile);
+
+            FileChannel fc = new RandomAccessFile(selectedPath, "r").getChannel();
+            try (InputStream fis = Channels.newInputStream(fc))
+            {
+                try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, newFile))
+                {
+                    byte[] buffer = new byte[1024 * 1024];
+                    int n;
+                    while ((n = fis.read(buffer)) != -1)
+                    {
+                        bwos.write(buffer, 0, n);
+                    }
+                    Arrays.fill(buffer, (byte) 0);
+                }
+            }
+
+            // create the new tree item
+            InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);
+            TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
+            selected.getChildren().add(newItem);
+            selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+            selected.setExpanded(true);
+
+            Event.fireEvent(selected,
+                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            this.treeView.getSelectionModel().select(newItem);
+            this.onSaveInventoryRequest.accept(String.format("Imported file %s", newFile.getName()));
+        }
+        catch (Exception e)
         {
             QuickDialogs.exception(e);
         }
