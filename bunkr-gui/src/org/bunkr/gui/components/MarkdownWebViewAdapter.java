@@ -1,5 +1,7 @@
 package org.bunkr.gui.components;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 import org.bunkr.core.Resources;
@@ -52,6 +54,14 @@ public class MarkdownWebViewAdapter
                 System.out.println("Adapting loaded page");
                 this.adaptLoadedPage(subject);
             }
+        });
+
+        subject.getEngine().setOnError(event -> {
+            QuickDialogs.exception(event.getException());
+        });
+
+        subject.getEngine().getLoadWorker().exceptionProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println(newValue.getMessage());
         });
     }
 

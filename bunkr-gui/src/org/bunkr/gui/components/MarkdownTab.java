@@ -1,5 +1,7 @@
 package org.bunkr.gui.components;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
@@ -10,9 +12,13 @@ import javafx.scene.web.WebView;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
+import org.bunkr.core.streams.output.MultilayeredOutputStream;
+import org.bunkr.gui.dialogs.QuickDialogs;
 import org.markdown4j.Markdown4jProcessor;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -41,6 +47,7 @@ public class MarkdownTab extends Tab
     private Mode currentMode = null;
 
     // contents
+    private String title;
     private String plainTextContent = null;
     private String htmlContent = null;
     private boolean hasChanges = true;
@@ -93,6 +100,8 @@ public class MarkdownTab extends Tab
         this.layout = new VBox();
         this.layout.getChildren().addAll(this.actionBar);
         this.setContent(this.layout);
+
+        this.getStyleClass().add("open-file-tab");
     }
 
     private void bindEvents()
@@ -106,6 +115,25 @@ public class MarkdownTab extends Tab
             {
                 this.plainTextContent = this.editorArea.getText();
                 this.goToViewMode();
+            }
+        });
+
+        this.saveButton.setOnAction(e -> {
+            try (
+                    MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, this.subject);
+                    InputStream is = new ByteArrayInputStream(this.editorArea.getText().getBytes()))
+            {
+                byte[] buffer = new byte[1024 * 1024];
+                int n;
+                while ((n = is.read(buffer)) != -1)
+                {
+                    bwos.write(buffer, 0, n);
+                }
+                Arrays.fill(buffer, (byte) 0);
+            }
+            catch (IOException exc)
+            {
+                QuickDialogs.exception(exc);
             }
         });
     }
@@ -122,6 +150,7 @@ public class MarkdownTab extends Tab
         {
             throw new RuntimeException("Orphaned file tab found");
         }
+
         try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, this.subject))
         {
             ms.setCheckHashOnFinish(true);
@@ -132,13 +161,13 @@ public class MarkdownTab extends Tab
                 content.append(new String(buffer, 0, n));
             }
             Arrays.fill(buffer, (byte) 0);
+            this.plainTextContent = content.toString();
+            this.hasChanges = false;
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            QuickDialogs.exception(e);
         }
-        this.plainTextContent = content.toString();
-        this.hasChanges = false;
     }
 
     private void updateMarkdownRender()
