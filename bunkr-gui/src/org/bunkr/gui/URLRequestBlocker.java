@@ -1,13 +1,7 @@
 package org.bunkr.gui;
 
-import com.sun.net.httpserver.HttpHandler;
-import org.bunkr.gui.dialogs.QuickDialogs;
-
 import java.io.IOException;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
+import java.net.*;
 
 /**
  * Creator: benmeier
@@ -15,13 +9,13 @@ import java.net.URLStreamHandler;
  */
 public class URLRequestBlocker
 {
-    final String http_proxy;
-    final String https_proxy;
+    final Proxy http_proxy;
+    final Proxy https_proxy;
 
     public URLRequestBlocker()
     {
-        http_proxy = System.getenv("http_proxy");
-        https_proxy = System.getenv("https_proxy");
+        http_proxy = build_proxy(System.getenv("http_proxy"));
+        https_proxy = build_proxy(System.getenv("https_proxy"));
     }
 
     public void install()
@@ -43,6 +37,13 @@ public class URLRequestBlocker
         };
     }
 
+    private Proxy build_proxy(String input)
+    {
+        if (input == null) return Proxy.NO_PROXY;
+        URI u = URI.create(input);
+        return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(u.getHost(), u.getPort()));
+    }
+
     private class HTTPHandler extends URLStreamHandler
     {
         @Override
@@ -54,7 +55,7 @@ public class URLRequestBlocker
         @Override
         protected URLConnection openConnection(URL url) throws IOException
         {
-            return this.openConnection(url, (Proxy)null);
+            return this.openConnection(url, http_proxy);
         }
 
         @Override
@@ -75,7 +76,7 @@ public class URLRequestBlocker
         @Override
         protected URLConnection openConnection(URL url) throws IOException
         {
-            return this.openConnection(url, (Proxy)null);
+            return this.openConnection(url, https_proxy);
         }
 
         @Override
