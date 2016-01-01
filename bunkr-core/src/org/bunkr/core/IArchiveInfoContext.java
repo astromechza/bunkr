@@ -3,7 +3,6 @@ package org.bunkr.core;
 import org.bunkr.core.descriptor.IDescriptor;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.Inventory;
-import org.bouncycastle.crypto.CryptoException;
 import org.bunkr.core.usersec.UserSecurityProvider;
 
 import java.io.IOException;

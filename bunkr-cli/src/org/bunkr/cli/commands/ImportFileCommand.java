@@ -16,7 +16,6 @@ import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.bouncycastle.crypto.CryptoException;
 
 import java.io.*;
 import java.nio.channels.Channels;
