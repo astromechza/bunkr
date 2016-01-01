@@ -45,6 +45,7 @@ file_content = <<-EOF
 -injars       #{File.absolute_path(target_jar)}
 -outjars      #{File.absolute_path(final_path)}
 -libraryjars  <java.home>/lib/rt.jar
+-libraryjars  <java.home>/lib/ext/jfxrt.jar
 
 -keep public class org.bunkr.cli.CLI {
     public static void main(java.lang.String[]);
@@ -60,6 +61,9 @@ file_content = <<-EOF
 -keepattributes *Annotation*
 -keepattributes Signature
 
+-dontnote
+
+-ignorewarnings
 -dontoptimize
 -dontobfuscate
 EOF
