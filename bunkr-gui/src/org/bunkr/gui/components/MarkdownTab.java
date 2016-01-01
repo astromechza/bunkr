@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
@@ -20,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 /**
  * Creator: benmeier
@@ -42,6 +44,16 @@ public class MarkdownTab extends Tab
     private TextArea editorArea;
     private WebView formattedView;
 
+    public Consumer<String> getOnSaveInventoryRequest()
+    {
+        return onSaveInventoryRequest;
+    }
+
+    public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
+    {
+        this.onSaveInventoryRequest = onSaveInventoryRequest;
+    }
+
     // mode
     private enum Mode {EDITTING, VIEWING}
     private Mode currentMode = null;
@@ -52,6 +64,7 @@ public class MarkdownTab extends Tab
     private String htmlContent = null;
     private boolean hasChanges = true;
 
+    private Consumer<String> onSaveInventoryRequest;
 
     public MarkdownTab(FileInventoryItem file, ArchiveInfoContext archive)
     {
@@ -135,6 +148,7 @@ public class MarkdownTab extends Tab
             {
                 QuickDialogs.exception(exc);
             }
+            this.onSaveInventoryRequest.accept("Wrote content to file " + this.getText());
         });
     }
 

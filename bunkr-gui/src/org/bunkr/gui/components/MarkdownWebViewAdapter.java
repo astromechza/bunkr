@@ -1,12 +1,9 @@
 package org.bunkr.gui.components;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 import org.bunkr.core.Resources;
 import org.bunkr.core.inventory.InventoryPather;
-import org.bunkr.gui.URLRequestBlocker;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -46,12 +43,9 @@ public class MarkdownWebViewAdapter
 
         // need to bind the page load event in order to process link things
         subject.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Got load worker state update: " + newValue);
-
             // do this when the page load has finished
             if (newValue == Worker.State.SUCCEEDED)
             {
-                System.out.println("Adapting loaded page");
                 this.adaptLoadedPage(subject);
             }
         });
@@ -79,20 +73,17 @@ public class MarkdownWebViewAdapter
             Element element = (Element) nodeList.item(i);
             // remove on click
             element.setAttribute("onclick", "");
-            System.out.println("Fixing link element: " + element);
             ((EventTarget) nodeList.item(i)).addEventListener("click", listener, false);
         }
     }
 
     private void handleLinkOnClick(Event ev)
     {
-        System.out.println("Link click event: " + ev);
-
         // get the element that was clicked
         Element element = (Element) ev.getTarget();
 
-        // if the location target is not an anchor
-        if (!element.getAttribute("href").startsWith("#"))
+        // if the location target has an href
+        if (element.hasAttribute("href") && (! element.getAttribute("href").startsWith("#")))
         {
             ev.preventDefault();
             try
@@ -111,8 +102,7 @@ public class MarkdownWebViewAdapter
                 }
                 else if (ALLOWED_OUTBOUND_SCHEMA.contains(uri.getScheme().toLowerCase()))
                 {
-                    if(QuickDialogs
-                            .confirm(String.format("Outgoing link to '%s'. Do you want to open it in a browser?", uri)))
+                    if(QuickDialogs.confirm("Outgoing link to '%s'. Do you want to open it in a browser?", uri))
                     {
                         Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
                         if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE))
@@ -123,23 +113,19 @@ public class MarkdownWebViewAdapter
                             }
                             catch (Exception e)
                             {
-                                e.printStackTrace();
+                                QuickDialogs.error("Failed to open external browser.");
                             }
                         }
                     }
                 }
                 else
                 {
-                    QuickDialogs.error("Error", null,
-                                       String.format("Outgoing link '%s' is using an unknown scheme %s", uri,
-                                                     uri.getScheme()));
+                    QuickDialogs.error("Error", null, "Outgoing link '%s' is using an unknown scheme %s", uri, uri.getScheme());
                 }
             }
             catch (URISyntaxException e)
             {
-                e.printStackTrace();
-                QuickDialogs.error("Error", null, String.format("Outgoing link %s was not a valid uri",
-                                                                element.getAttribute("href")));
+                QuickDialogs.error("Error", null, "Outgoing link %s was not a valid uri", element.getAttribute("href"));
             }
         }
     }

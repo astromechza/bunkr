@@ -15,26 +15,26 @@ import java.util.Optional;
  */
 public class QuickDialogs
 {
-    public static void info(String title, String header, String content)
+    public static void info(String title, String header, String format, Object... args)
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(header);
-        alert.setContentText(content);
+        alert.setContentText(String.format(format, args));
         alert.showAndWait();
     }
 
-    public static void info(String content)
+    public static void info(String format, String... args)
     {
-        info("Info", null, content);
+        info("Info", null, format, args);
     }
 
-    public static boolean confirm(String title, String header, String content)
+    public static boolean confirm(String title, String header, String format, Object... args)
     {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
         alert.setHeaderText(header);
-        alert.setContentText(content);
+        alert.setContentText(String.format(format, args));
         ButtonType positiveButton = new ButtonType("Yes");
         ButtonType negativeButton = new ButtonType("No");
         alert.getButtonTypes().setAll(positiveButton, negativeButton);
@@ -42,9 +42,9 @@ public class QuickDialogs
         return result.get() == positiveButton;
     }
 
-    public static boolean confirm(String content)
+    public static boolean confirm(String format, Object... args)
     {
-        return confirm("Input Required", null, content);
+        return confirm("Input Required", null, format, args);
     }
 
     public static void exception(Throwable e)
@@ -70,9 +70,9 @@ public class QuickDialogs
         alert.showAndWait();
     }
 
-    public static String input(String content, String before)
+    public static String input(String content, String placeholder)
     {
-        TextInputDialog dialog = new TextInputDialog(before);
+        TextInputDialog dialog = new TextInputDialog(placeholder);
         dialog.setTitle("Input Required");
         dialog.setHeaderText(null);
         dialog.setContentText(content);
@@ -85,12 +85,17 @@ public class QuickDialogs
         return null;
     }
 
-    public static void error(String title, String message, String... args)
+    public static void error(String title, String message, Object... args)
     {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(String.format(message, args));
         alert.showAndWait();
+    }
+
+    public static void error(String format, Object... args)
+    {
+        error("Error", format, args);
     }
 }

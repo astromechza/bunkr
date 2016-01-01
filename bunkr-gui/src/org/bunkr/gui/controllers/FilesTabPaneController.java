@@ -4,11 +4,11 @@ import javafx.scene.control.TabPane;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.gui.components.MarkdownTab;
-import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Creator: benmeier
@@ -19,6 +19,8 @@ public class FilesTabPaneController
     private final ArchiveInfoContext archive;
     private final TabPane pane;
     private final Map<UUID, MarkdownTab> openTabs;
+
+    private Consumer<String> onSaveInventoryRequest;
 
     public FilesTabPaneController(ArchiveInfoContext archive, TabPane subjectPane)
     {
@@ -44,6 +46,8 @@ public class FilesTabPaneController
                 // TODO check save prompt thing
                 this.openTabs.remove(file.getUuid());
             });
+            tab.setOnSaveInventoryRequest(s -> this.getOnSaveInventoryRequest().accept(s));
+
             this.pane.getTabs().add(tab);
             this.openTabs.put(file.getUuid(), tab);
             this.pane.getSelectionModel().select(tab);
@@ -74,5 +78,15 @@ public class FilesTabPaneController
         {
             this.openTabs.get(file.getUuid()).notifyRename();
         }
+    }
+
+    public Consumer<String> getOnSaveInventoryRequest()
+    {
+        return onSaveInventoryRequest;
+    }
+
+    public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
+    {
+        this.onSaveInventoryRequest = onSaveInventoryRequest;
     }
 }

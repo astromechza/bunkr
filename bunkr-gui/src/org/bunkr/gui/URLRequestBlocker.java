@@ -82,7 +82,13 @@ public class URLRequestBlocker
         @Override
         protected URLConnection openConnection(URL url, Proxy proxy) throws IOException
         {
-            throw new IOException(String.format("Outgoing request to %s blocked", url));
+            return new URLConnection(url) {
+                @Override
+                public void connect() throws IOException
+                {
+                    new IOException(String.format("Outgoing request to %s blocked", url));
+                }
+            };
         }
     }
 }

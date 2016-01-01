@@ -45,19 +45,11 @@ public class MainWindow extends BaseWindow
         this.initialise();
 
         FilesTabPaneController tabPaneController = new FilesTabPaneController(this.archive, this.tabPane);
+        tabPaneController.setOnSaveInventoryRequest(s -> this.saveMetadata());
 
         InventoryCMController contextMenuController = new InventoryCMController(this.archive.getInventory(), this.tree);
         contextMenuController.bindEvents();
-        contextMenuController.setOnSaveInventoryRequest(s -> {
-            try
-            {
-                MetadataWriter.write(MainWindow.this.archive, MainWindow.this.securityProvider);
-            }
-            catch (IOException | BaseBunkrException e)
-            {
-                QuickDialogs.exception(e);
-            }
-        });
+        contextMenuController.setOnSaveInventoryRequest(s -> this.saveMetadata());
         contextMenuController.setOnRenameFile(tabPaneController::notifyRename);
         contextMenuController.setOnDeleteFile(f -> tabPaneController.requestClose(f, false));
         contextMenuController.setOnOpenFile(tabPaneController::requestOpen);
@@ -87,7 +79,6 @@ public class MainWindow extends BaseWindow
 
         sp.getItems().add(leftBox);
         sp.getItems().add(this.tabPane);
-
         return sp;
     }
 
@@ -111,5 +102,19 @@ public class MainWindow extends BaseWindow
         this.getStage().setScene(scene);
         this.getStage().setResizable(true);
         return scene;
+    }
+
+    private void saveMetadata()
+    {
+        try
+        {
+            System.out.println("Saving Archive Metadata");
+            MetadataWriter.write(this.archive, this.securityProvider);
+            System.out.println("Saved Archive Metadata");
+        }
+        catch (IOException | BaseBunkrException e)
+        {
+            QuickDialogs.exception(e);
+        }
     }
 }
