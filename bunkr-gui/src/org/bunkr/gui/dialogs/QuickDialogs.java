@@ -4,6 +4,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import org.bunkr.gui.Logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -60,8 +61,7 @@ public class QuickDialogs
         e.printStackTrace(pw);
 
         // Log to stdout
-        System.out.println(e.getClass().getName());
-        System.out.println(sw.toString());
+        Logging.exception(e);
 
         TextArea textArea = new TextArea(sw.toString());
         textArea.setEditable(false);

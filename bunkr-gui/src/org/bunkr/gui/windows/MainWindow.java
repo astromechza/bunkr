@@ -13,6 +13,7 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.usersec.UserSecurityProvider;
+import org.bunkr.gui.Logging;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.FilesTabPaneController;
 import org.bunkr.gui.controllers.InventoryCMController;
@@ -109,9 +110,9 @@ public class MainWindow extends BaseWindow
     {
         try
         {
-            System.out.println("Saving Archive Metadata");
+            Logging.info("Saving Archive Metadata");
             MetadataWriter.write(this.archive, this.securityProvider);
-            System.out.println("Saved Archive Metadata");
+            Logging.info("Saved Archive Metadata");
         }
         catch (IOException | BaseBunkrException e)
         {

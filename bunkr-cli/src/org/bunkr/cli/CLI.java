@@ -14,6 +14,7 @@ import org.bunkr.cli.commands.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +50,18 @@ public class CLI
         // Constructing parser and subcommands
         ArgumentParser parser = ArgumentParsers.newArgumentParser("bunkr");
 
-        parser.version(String.format("version: %s\ncommit date: %s\ncommit hash: %s", Version.versionString, Version.gitDate, Version.gitHash));
+        String entrypoint = CLI.class.getName();
+        try
+        {
+            entrypoint = new File(CLI.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getName();
+        }
+        catch (URISyntaxException ignored) { }
+
+        parser.version(String.format("%s\nversion: %s\ncommit date: %s\ncommit hash: %s",
+                                     entrypoint,
+                                     Version.versionString,
+                                     Version.gitDate,
+                                     Version.gitHash));
         parser.addArgument("--version").action(Arguments.version());
 
         parser.addArgument("archive")
