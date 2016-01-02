@@ -51,16 +51,16 @@ public class GuiEntryPoint
             Logging.info("Logging is now enabled");
         }
 
-
         MainApplication.launch(MainApplication.class);
     }
 
-    private class MainApplication extends Application
+    public static class MainApplication extends Application
     {
         @Override
         public void start(Stage primaryStage) throws Exception
         {
             new URLRequestBlocker().install();
+
             new LandingWindow(primaryStage).getStage().show();
         }
     }
