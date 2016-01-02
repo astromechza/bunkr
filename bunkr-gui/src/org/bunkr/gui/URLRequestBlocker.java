@@ -20,11 +20,13 @@ public class URLRequestBlocker
 
     public void install()
     {
+        Logging.info("Installing URLStreamHandler intercept.");
         URL.setURLStreamHandlerFactory(this::getStreamHandler);
     }
 
     public URLStreamHandler getStreamHandler(String protocol)
     {
+        // TODO. "file" should probably be blocked too
         if (protocol.equals("jar") || protocol.equals("file")) return null;
         if (protocol.equals("http")) return new HTTPHandler();
         if (protocol.equals("https")) return new HTTPSHandler();
@@ -61,6 +63,7 @@ public class URLRequestBlocker
         @Override
         protected URLConnection openConnection(URL url, Proxy proxy) throws IOException
         {
+            Logging.warn("Outgoing request to %s blocked", url);
             throw new IOException(String.format("Outgoing request to %s blocked", url));
         }
     }
@@ -86,6 +89,7 @@ public class URLRequestBlocker
                 @Override
                 public void connect() throws IOException
                 {
+                    Logging.warn("Outgoing request to %s blocked", url);
                     new IOException(String.format("Outgoing request to %s blocked", url));
                 }
             };

@@ -84,7 +84,7 @@ define PROJECT_NAME do
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-gui').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
         package(:jar, id: 'bunkr-gui').with(manifest: {'Main-Class' => GUI_MAIN_CLASS})
-        run.using main: GUI_MAIN_CLASS
+        run.using main: [GUI_MAIN_CLASS, "--logging"]
 
         build do
             write_version_file_for_project('bunkr-gui')
