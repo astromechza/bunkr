@@ -1,4 +1,4 @@
-package org.bunkr.gui.components.markdown;
+package org.bunkr.gui.components.tabs.markdown;
 
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;

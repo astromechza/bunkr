@@ -143,15 +143,9 @@ public class InventoryCMController
             {
                 QuickDialogs.error("Cannot open file of unknown type. Use Context Menu > Info to change the type.");
             }
-            else if (selectedFile.getActualSize() > 1024 * 1024)
-            {
-                if (QuickDialogs.confirm("Please Confirm", "This is a large file!",
-                        "File %s is %s in size. Are you sure you want to open it?",
-                        selectedFile.getName(),
-                        Formatters.formatBytes(selectedFile.getActualSize()))
-                ) this.onOpenFile.accept(selectedFile);
-            }
-            else
+            else if (selectedFile.getActualSize() < (1024 * 1024) || QuickDialogs.confirm(
+                    "Please Confirm", "This is a large file!", "File %s is %s in size. Are you sure you want to open it?",
+                    selectedFile.getName(), Formatters.formatBytes(selectedFile.getActualSize())))
             {
                 this.onOpenFile.accept(selectedFile);
             }
@@ -379,7 +373,6 @@ public class InventoryCMController
     {
         try
         {
-
             // get new file name
             String newName = QuickDialogs.input("Enter a new directory name:", "");
             if (newName == null) return;
@@ -513,18 +506,16 @@ public class InventoryCMController
     {
         try
         {
-            // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
-
+            // first choose file to be imported
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select File ...");
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("All Files", "*.*"));
-            File selectedPath = fileChooser.showOpenDialog(this.treeView.getScene().getWindow());
-            if (selectedPath == null) return;
+            File importedFile = fileChooser.showOpenDialog(this.treeView.getScene().getWindow());
+            if (importedFile == null) return;
 
             // get new file name
-            String newName = QuickDialogs.input("Enter a file name:", selectedPath.getName());
+            String newName = QuickDialogs.input("Enter a file name:", importedFile.getName());
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
@@ -532,11 +523,21 @@ public class InventoryCMController
                 return;
             }
 
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
+            String selectedPath = this.treeView.getPathForTreeItem(selected);
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+            if (selectedItem.isAFile())
+            {
+                QuickDialogs.error("Create Error", "'%s' is a file.", selectedPath);
+                return;
+            }
+
             // find subject FolderInventoryItem
-            IFFContainer subjectContainer = this.archive.getInventory();
+            IFFContainer selectedContainer = (IFFContainer) selectedItem;
 
             // check parent for the same name
-            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
+            IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
             if (target != null)
             {
                 QuickDialogs.error("Import Error", "There is already an item named '%s' in the parent folder.", newName);
@@ -544,9 +545,9 @@ public class InventoryCMController
             }
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
-            subjectContainer.addFile(newFile);
+            selectedContainer.addFile(newFile);
 
-            FileChannel fc = new RandomAccessFile(selectedPath, "r").getChannel();
+            FileChannel fc = new RandomAccessFile(importedFile, "r").getChannel();
             try (InputStream fis = Channels.newInputStream(fc))
             {
                 try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, newFile))

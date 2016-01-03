@@ -1,9 +1,14 @@
 package org.bunkr.gui.controllers;
 
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.gui.components.markdown.MarkdownTab;
+import org.bunkr.core.inventory.MediaType;
+import org.bunkr.gui.components.tabs.IOpenedFileTab;
+import org.bunkr.gui.components.tabs.images.ImageTab;
+import org.bunkr.gui.components.tabs.markdown.MarkdownTab;
+import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +23,7 @@ public class FilesTabPaneController
 {
     private final ArchiveInfoContext archive;
     private final TabPane pane;
-    private final Map<UUID, MarkdownTab> openTabs;
+    private final Map<UUID, IOpenedFileTab> openTabs;
 
     private Consumer<String> onSaveInventoryRequest;
 
@@ -37,17 +42,28 @@ public class FilesTabPaneController
     {
         if (openTabs.containsKey(file.getUuid()))
         {
-            this.pane.getSelectionModel().select(openTabs.get(file.getUuid()));
+            this.pane.getSelectionModel().select((Tab) openTabs.get(file.getUuid()));
         }
         else
         {
-            MarkdownTab tab = new MarkdownTab(file, this.archive);
-            tab.setOnClosed(e -> this.openTabs.remove(file.getUuid()));
-            tab.setOnSaveInventoryRequest(s -> this.getOnSaveInventoryRequest().accept(s));
-
-            this.pane.getTabs().add(tab);
+            IOpenedFileTab tab;
+            switch(file.getMediaType())
+            {
+                case MediaType.TEXT:
+                    tab = new MarkdownTab(file, this.archive);
+                    ((MarkdownTab) tab).setOnSaveInventoryRequest(s -> this.getOnSaveInventoryRequest().accept(s));
+                    break;
+                case MediaType.IMAGE:
+                    tab = new ImageTab(file, this.archive);
+                    break;
+                default:
+                    QuickDialogs.error("Cannot open file with media type: " + file.getMediaType());
+                    return;
+            }
+            ((Tab) tab).setOnClosed(e -> this.openTabs.remove(file.getUuid()));
+            this.pane.getTabs().add((Tab) tab);
             this.openTabs.put(file.getUuid(), tab);
-            this.pane.getSelectionModel().select(tab);
+            this.pane.getSelectionModel().select((Tab) tab);
         }
     }
 
@@ -60,7 +76,7 @@ public class FilesTabPaneController
     {
         if (openTabs.containsKey(file.getUuid()))
         {
-            this.pane.getTabs().remove(openTabs.get(file.getUuid()));
+            this.pane.getTabs().remove((Tab) openTabs.get(file.getUuid()));
             this.openTabs.remove(file.getUuid());
         }
     }
