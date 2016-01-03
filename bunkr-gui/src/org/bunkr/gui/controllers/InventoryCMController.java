@@ -10,6 +10,7 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
+import org.bunkr.core.utils.Formatters;
 import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
@@ -137,7 +138,23 @@ public class InventoryCMController
                 throw new BaseBunkrException("Failed to open item %s. It is not a file.", selected.getValue().getName());
             }
 
-            this.onOpenFile.accept((FileInventoryItem) selectedItem);
+            FileInventoryItem selectedFile = (FileInventoryItem) selectedItem;
+            if (! MediaType.OPENABLE_TYPES.contains(selectedFile.getMediaType()))
+            {
+                QuickDialogs.error("Cannot open file of unknown type. Use Context Menu > Info to change the type.");
+            }
+            else if (selectedFile.getActualSize() > 1024 * 1024)
+            {
+                if (QuickDialogs.confirm("Please Confirm", "This is a large file!",
+                        "File %s is %s in size. Are you sure you want to open it?",
+                        selectedFile.getName(),
+                        Formatters.formatBytes(selectedFile.getActualSize()))
+                ) this.onOpenFile.accept(selectedFile);
+            }
+            else
+            {
+                this.onOpenFile.accept(selectedFile);
+            }
         }
         catch (BaseBunkrException e)
         {
