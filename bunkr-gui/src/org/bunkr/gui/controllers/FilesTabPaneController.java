@@ -42,9 +42,7 @@ public class FilesTabPaneController
         else
         {
             MarkdownTab tab = new MarkdownTab(file, this.archive);
-            tab.setOnClosed(e -> {
-                this.openTabs.remove(file.getUuid());
-            });
+            tab.setOnClosed(e -> this.openTabs.remove(file.getUuid()));
             tab.setOnSaveInventoryRequest(s -> this.getOnSaveInventoryRequest().accept(s));
 
             this.pane.getTabs().add(tab);

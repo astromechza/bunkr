@@ -52,8 +52,7 @@ public class FileInventoryItemJSON
             out.put(KEY_INTEGRITY_HASH, null);
 
         out.put(KEY_TAGS, new ArrayList<>(input.getTags()));
-
-        out.put(KEY_MEDIA_TYPE, input.getMediaType().toString());
+        out.put(KEY_MEDIA_TYPE, input.getMediaType());
 
         return out;
     }
@@ -72,10 +71,10 @@ public class FileInventoryItemJSON
         byte[] intH = null;
         if (input.getOrDefault(KEY_INTEGRITY_HASH, null) != null) intH = DatatypeConverter.parseBase64Binary((String) input.get(KEY_INTEGRITY_HASH));
 
-        MediaType mt = MediaType.UNKNOWN;
+        String mt = MediaType.UNKNOWN;
         if (input.getOrDefault(KEY_MEDIA_TYPE, null) != null)
         {
-            mt = MediaType.parse((String) input.get(KEY_MEDIA_TYPE));
+            mt = (String) input.get(KEY_MEDIA_TYPE);
             if (! MediaType.ALL_TYPES.contains(mt))
             {
                 Logging.warn("File %s has unsupported media type %s. Converting to %s", input.get(KEY_NAME), mt, MediaType.UNKNOWN);

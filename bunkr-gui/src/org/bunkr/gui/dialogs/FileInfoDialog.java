@@ -35,9 +35,6 @@ public class FileInfoDialog extends BaseWindow
     private final FileInventoryItem item;
     private final String filePath;
 
-    // change storage
-    private MediaType mtValue;
-
     // components
     private Label lblFilePath; SelectableLabel lblFilePathValue;
     private Label lblActualSize; SelectableLabel lblActualSizeValue;
@@ -56,7 +53,6 @@ public class FileInfoDialog extends BaseWindow
         this.filePath = item.getAbsolutePath();
         this.item = item;
         this.cssPath = Resources.getExternalPath("/resources/css/fileinfo_dialog.css");
-        this.mtValue = this.item.getMediaType();
         this.initialise();
     }
 
@@ -94,7 +90,7 @@ public class FileInfoDialog extends BaseWindow
         this.lblUUIDValue = new SelectableLabel(this.item.getUuid().toString());
 
         this.lblMediaType = new Label("Media Type:");
-        this.lblMediaTypeValue = new Label(this.item.getMediaType().toString());
+        this.lblMediaTypeValue = new Label(this.item.getMediaType());
         this.changeMediaTypeButton = new Button("Change..");
 
         this.applyButton = new Button("Save Changes");
@@ -161,9 +157,9 @@ public class FileInfoDialog extends BaseWindow
         this.closeButton.setOnAction(event -> this.getStage().close());
 
         this.changeMediaTypeButton.setOnAction(event -> {
-            List<MediaType> choices = new ArrayList<>(MediaType.ALL_TYPES);
-            Collections.sort(choices, (o1, o2) -> o1.toString().compareTo(o2.toString()));
-            MediaType newMT = QuickDialogs.pick(
+            List<String> choices = new ArrayList<>(MediaType.ALL_TYPES);
+            Collections.sort(choices);
+            String newMT = QuickDialogs.pick(
                     "Choose a Media Type",
                     "Choose a new Media Type for this file. This will affect how the file is handled in this GUI and " +
                     "won't change the actual bytes of the file.",
@@ -174,14 +170,13 @@ public class FileInfoDialog extends BaseWindow
 
             if (newMT != null)
             {
-                this.mtValue = newMT;
-                this.lblMediaTypeValue.setText(newMT.toString());
+                this.lblMediaTypeValue.setText(newMT);
                 this.applyButton.setDisable(false);
             }
         });
 
         this.applyButton.setOnAction(event -> {
-            this.item.setMediaType(mtValue);
+            this.item.setMediaType(this.lblMediaTypeValue.getText());
             this.item.setTags(new HashSet<>(this.tagsBox.getItems()));
             this.onSaveInventoryRequest.accept("Modified media type for file " + this.item.getName());
             this.getStage().close();

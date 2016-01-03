@@ -20,7 +20,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     private FragmentedRange blocks;
     private long actualSize;
     private Set<String> tags;
-    private MediaType mediaType;
+    private String mediaType;
 
     public FileInventoryItem(
             String name,
@@ -32,7 +32,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
             byte[] encryptionData,
             byte[] integrityHash,
             HashSet<String> tags,
-            MediaType mediaType
+            String mediaType
     )
     {
         super(name, uuid);
@@ -138,12 +138,12 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         return this.tags;
     }
 
-    public MediaType getMediaType()
+    public String getMediaType()
     {
         return mediaType;
     }
 
-    public void setMediaType(MediaType mediaType)
+    public void setMediaType(String mediaType)
     {
         this.mediaType = mediaType;
     }
