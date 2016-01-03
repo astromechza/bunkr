@@ -1,6 +1,4 @@
-package org.bunkr.gui;
-
-import org.bunkr.core.utils.Formatters;
+package org.bunkr.core.utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

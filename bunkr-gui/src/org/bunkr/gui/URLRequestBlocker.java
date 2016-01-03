@@ -1,5 +1,7 @@
 package org.bunkr.gui;
 
+import org.bunkr.core.utils.Logging;
+
 import java.io.IOException;
 import java.net.*;
 

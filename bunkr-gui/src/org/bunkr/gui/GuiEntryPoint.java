@@ -8,6 +8,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.bunkr.core.Version;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.windows.LandingWindow;
 
 import java.io.File;

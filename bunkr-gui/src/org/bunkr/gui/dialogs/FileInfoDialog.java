@@ -33,8 +33,14 @@ public class FileInfoDialog extends BaseWindow
     private final FileInventoryItem item;
     private final String filePath;
 
-    private Label lblFilePath, lblActualSize, lblLastMod, lblTags, lblSizeOnDisk, lblUUID;
-    private SelectableLabel lblFilePathValue, lblActualSizeValue, lblLastModValue, lblSizeOnDiskValue, lblUUIDValue;
+    private Label lblFilePath; SelectableLabel lblFilePathValue;
+    private Label lblActualSize; SelectableLabel lblActualSizeValue;
+    private Label lblLastMod; SelectableLabel lblLastModValue;
+    private Label lblSizeOnDisk; SelectableLabel lblSizeOnDiskValue;
+    private Label lblUUID; SelectableLabel lblUUIDValue;
+    private Label lblTags;
+    private Label lblMediaType, lblMediaTypeValue;
+
     private Button closeButton;
 
     private ListView<String> tagsBox;
@@ -56,8 +62,9 @@ public class FileInfoDialog extends BaseWindow
         this.lblFilePathValue = new SelectableLabel(this.filePath);
 
         this.lblActualSize = new Label("Actual Size:");
-        this.lblActualSizeValue = new SelectableLabel(Formatters.formatPrettyInt(this.item.getActualSize()));
-        Tooltip.install(this.lblActualSizeValue, new Tooltip(String.format("%d Bytes", this.item.getActualSize())));
+        this.lblActualSizeValue = new SelectableLabel(String.format(
+                "%s (%s bytes)", Formatters.formatPrettyInt(this.item.getActualSize()), this.item.getActualSize()
+        ));
 
         this.lblLastMod = new Label("Last Modified:");
         this.lblLastModValue = new SelectableLabel(Formatters.formatPrettyDate(this.item.getModifiedAt()));
@@ -70,11 +77,15 @@ public class FileInfoDialog extends BaseWindow
         this.tagsBox.setItems(tagItems);
 
         this.lblSizeOnDisk = new Label("Size on Disk:");
-        this.lblSizeOnDiskValue = new SelectableLabel(Formatters.formatPrettyInt(this.item.getSizeOnDisk()));
-        Tooltip.install(this.lblSizeOnDiskValue, new Tooltip(String.format("%d Bytes", this.item.getSizeOnDisk())));
+        this.lblSizeOnDiskValue = new SelectableLabel(String.format(
+                "%s (%s bytes)", Formatters.formatPrettyInt(this.item.getSizeOnDisk()), this.item.getSizeOnDisk()
+        ));
 
         this.lblUUID = new Label("File UUID:");
         this.lblUUIDValue = new SelectableLabel(this.item.getUuid().toString());
+
+        this.lblMediaType = new Label("Media Type:");
+        this.lblMediaTypeValue = new Label(this.item.getMediaType().toString());
 
         this.closeButton = new Button("Close");
     }
@@ -97,17 +108,19 @@ public class FileInfoDialog extends BaseWindow
         rootLayout.setHgap(10);
         rootLayout.setVgap(10);
 
-        rootLayout.add(this.lblFilePath, 0, 0); rootLayout.add(this.lblFilePathValue, 1, 0);
+        rootLayout.add(this.lblFilePath, 0, 0);
+        rootLayout.add(this.lblFilePathValue, 1, 0);
         rootLayout.add(this.lblActualSize, 0, 1); rootLayout.add(this.lblActualSizeValue, 1, 1);
         rootLayout.add(this.lblLastMod, 0, 2); rootLayout.add(this.lblLastModValue, 1, 2);
         rootLayout.add(this.lblTags, 0, 3);
         rootLayout.add(this.tagsBox, 0, 4);
         GridPane.setVgrow(this.tagsBox, Priority.ALWAYS);
         GridPane.setColumnSpan(this.tagsBox, 2);
-        rootLayout.add(this.lblSizeOnDisk, 0, 5); rootLayout.add(this.lblSizeOnDiskValue, 1, 5);
+        rootLayout.add(this.lblSizeOnDisk, 0, 5);
+        rootLayout.add(this.lblSizeOnDiskValue, 1, 5);
         rootLayout.add(this.lblUUID, 0, 6); rootLayout.add(this.lblUUIDValue, 1, 6);
-
-        rootLayout.add(this.closeButton, 1, 7);
+        rootLayout.add(this.lblMediaType, 0, 7); rootLayout.add(this.lblMediaTypeValue, 1, 7);
+        rootLayout.add(this.closeButton, 1, 8);
         GridPane.setHalignment(this.closeButton, HPos.RIGHT);
 
         return rootLayout;

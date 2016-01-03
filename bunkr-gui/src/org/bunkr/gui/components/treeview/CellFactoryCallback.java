@@ -5,7 +5,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 import org.bunkr.core.Resources;
-import org.bunkr.gui.Logging;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.controllers.InventoryCMController;
 
 import java.io.IOException;

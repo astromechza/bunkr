@@ -13,7 +13,7 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.gui.Logging;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.FilesTabPaneController;
 import org.bunkr.gui.controllers.InventoryCMController;

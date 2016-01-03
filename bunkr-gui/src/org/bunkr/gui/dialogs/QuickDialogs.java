@@ -4,7 +4,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
-import org.bunkr.gui.Logging;
+import org.bunkr.core.utils.Logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

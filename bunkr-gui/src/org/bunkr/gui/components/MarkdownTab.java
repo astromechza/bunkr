@@ -11,7 +11,7 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
-import org.bunkr.gui.Logging;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.markdown4j.Markdown4jProcessor;
 

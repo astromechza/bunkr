@@ -1,7 +1,7 @@
 package org.bunkr.core.inventory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Need some basic mime type functionality for files. This is specifically an issue for binary files imported into
@@ -14,18 +14,17 @@ import java.util.List;
  */
 public class MediaType
 {
+    public static final MediaType UNKNOWN = new MediaType("application", "unknown");
     public static final MediaType TEXT_PLAIN = new MediaType("text", "plain");
     public static final MediaType TEXT_MARKDOWN = new MediaType("text", "markdown");
     public static final MediaType TEXT_HTML = new MediaType("text", "html");
-    public static final MediaType UNKNOWN = new MediaType("application", "unknown");
 
-    public static final List<MediaType> editableTypes = new ArrayList<>();
-    public static final List<MediaType> allTypes = new ArrayList<>();
+    public static final Set<MediaType> ALL_TYPES = new HashSet<>();
     static {
-        editableTypes.add(TEXT_HTML); allTypes.add(TEXT_HTML);
-        editableTypes.add(TEXT_MARKDOWN); allTypes.add(TEXT_MARKDOWN);
-        editableTypes.add(TEXT_PLAIN); allTypes.add(TEXT_PLAIN);
-        allTypes.add(UNKNOWN);
+        ALL_TYPES.add(UNKNOWN);
+        ALL_TYPES.add(TEXT_PLAIN);
+        ALL_TYPES.add(TEXT_MARKDOWN);
+        ALL_TYPES.add(TEXT_HTML);
     }
 
     private final String type;
