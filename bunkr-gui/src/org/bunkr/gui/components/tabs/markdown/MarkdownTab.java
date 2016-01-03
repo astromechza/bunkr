@@ -9,6 +9,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
+import org.bunkr.core.inventory.Inventory;
+import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Logging;
@@ -51,6 +53,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     private String plainTextContent = null;
     private boolean hasChanges = true;
 
+    private Consumer<String> onTryOpenFileItem;
     private Consumer<String> onSaveInventoryRequest;
 
     public MarkdownTab(FileInventoryItem file, ArchiveInfoContext archive)
@@ -64,7 +67,20 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
 
         try
         {
-            new MarkdownWebViewAdapter().adapt(this.formattedView);
+            MarkdownWebViewAdapter mwva = new MarkdownWebViewAdapter();
+            mwva.adapt(this.formattedView);
+            mwva.setOnTryOpenFileItem(s -> {
+                if (InventoryPather.isValidPath(s))
+                {
+                    this.onTryOpenFileItem.accept(s);
+                }
+                else if (InventoryPather.isValidRelativePath(s))
+                {
+                    String parentPath = InventoryPather.applyRelativePath(subject.getAbsolutePath(), "..");
+                    String targetPath = InventoryPather.applyRelativePath(parentPath, s);
+                    this.onTryOpenFileItem.accept(targetPath);
+                }
+            });
         }
         catch (IOException e)
         {
@@ -195,7 +211,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     public void checkChanges()
     {
         this.hasChanges = ! this.editorArea.getText().equals(this.plainTextContent);
-        this.setDisable(!this.hasChanges);
+        this.saveButton.setDisable(!this.hasChanges);
         this.getStyleClass().remove("has-changes");
         if (this.hasChanges)  this.getStyleClass().add("has-changes");
     }
@@ -235,5 +251,10 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
     {
         this.onSaveInventoryRequest = onSaveInventoryRequest;
+    }
+
+    public void setOnTryOpenFileItem(Consumer<String> onTryOpenFileItem)
+    {
+        this.onTryOpenFileItem = onTryOpenFileItem;
     }
 }

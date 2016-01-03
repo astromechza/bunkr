@@ -3,7 +3,10 @@ package org.bunkr.gui.controllers;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.FileInventoryItem;
+import org.bunkr.core.inventory.IFFTraversalTarget;
+import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.inventory.MediaType;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.components.tabs.images.ImageTab;
@@ -51,7 +54,8 @@ public class FilesTabPaneController
             {
                 case MediaType.TEXT:
                     tab = new MarkdownTab(file, this.archive);
-                    ((MarkdownTab) tab).setOnSaveInventoryRequest(s -> this.getOnSaveInventoryRequest().accept(s));
+                    ((MarkdownTab) tab).setOnSaveInventoryRequest(this.onSaveInventoryRequest::accept);
+                    ((MarkdownTab) tab).setOnTryOpenFileItem(this::tryOpenFileItem);
                     break;
                 case MediaType.IMAGE:
                     tab = new ImageTab(file, this.archive);
@@ -64,6 +68,22 @@ public class FilesTabPaneController
             this.pane.getTabs().add((Tab) tab);
             this.openTabs.put(file.getUuid(), tab);
             this.pane.getSelectionModel().select((Tab) tab);
+        }
+    }
+
+    private void tryOpenFileItem(String abspath)
+    {
+        try
+        {
+            IFFTraversalTarget t = InventoryPather.traverse(this.archive.getInventory(), abspath);
+            if (t.isAFile() && t instanceof FileInventoryItem)
+            {
+                this.requestOpen((FileInventoryItem) t);
+            }
+        }
+        catch (TraversalException e)
+        {
+            QuickDialogs.exception(e);
         }
     }
 
@@ -91,11 +111,6 @@ public class FilesTabPaneController
         {
             this.openTabs.get(file.getUuid()).notifyRename();
         }
-    }
-
-    public Consumer<String> getOnSaveInventoryRequest()
-    {
-        return onSaveInventoryRequest;
     }
 
     public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)

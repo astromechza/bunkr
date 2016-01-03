@@ -3,6 +3,7 @@ package org.bunkr.gui.components.tabs.markdown;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 import org.bunkr.core.Resources;
+import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.w3c.dom.Document;
@@ -17,6 +18,7 @@ import java.net.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Creator: benmeier
@@ -29,6 +31,8 @@ public class MarkdownWebViewAdapter
     ));
 
     private static final String githubCSSPath = "/resources/css/github_css.css";
+
+    private Consumer<String> onTryOpenFileItem;
 
     public void adapt(WebView subject) throws IOException
     {
@@ -87,11 +91,11 @@ public class MarkdownWebViewAdapter
                 {
                     if (InventoryPather.isValidPath(uri.toString()))
                     {
-                        // TODO fill these references
-//                            if (this.sourceFileStore.fileExists(uri.toString()))
-//                            {
-//                                this.parentWindow.requestOpenFile(uri.toString());
-//                            }
+                        this.onTryOpenFileItem.accept(uri.toString());
+                    }
+                    else if (InventoryPather.isValidRelativePath(uri.toString()))
+                    {
+                        this.onTryOpenFileItem.accept(uri.toString());
                     }
                 }
                 else if (ALLOWED_OUTBOUND_SCHEMA.contains(uri.getScheme().toLowerCase()))
@@ -124,5 +128,8 @@ public class MarkdownWebViewAdapter
         }
     }
 
-
+    public void setOnTryOpenFileItem(Consumer<String> onTryOpenFileItem)
+    {
+        this.onTryOpenFileItem = onTryOpenFileItem;
+    }
 }

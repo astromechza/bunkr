@@ -104,8 +104,8 @@ public class InventoryCMController
             {
                 try
                 {
-                    TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
-                    if (selected.getValue().getType() == InventoryTreeData.Type.FILE) this.handleCMFileOpen();
+                    TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItemOrNull();
+                    if (selected != null && selected.getValue().getType() == InventoryTreeData.Type.FILE) this.handleCMFileOpen();
                 }
                 catch (BaseBunkrException e)
                 {

@@ -106,4 +106,10 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
         if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
         throw new BaseBunkrException("No item selected");
     }
+
+    public TreeItem<InventoryTreeData> getSelectedTreeItemOrNull() throws BaseBunkrException
+    {
+        if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
+        return null;
+    }
 }

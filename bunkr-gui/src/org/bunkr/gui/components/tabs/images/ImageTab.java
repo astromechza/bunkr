@@ -47,8 +47,6 @@ public class ImageTab extends Tab implements IOpenedFileTab
 
     private void bindEvents()
     {
-
-
         this.zoomInButton.setOnAction(event -> {
             double Fx1 = this.imageView.getFitWidth();
             if (Fx1 == 0.0) Fx1 = this.imageView.getImage().getWidth();
@@ -119,6 +117,8 @@ public class ImageTab extends Tab implements IOpenedFileTab
         this.scrollPane.setMaxHeight(Double.MAX_VALUE);
 
         this.setContent(new VBox(new ToolBar(this.zoomInButton, this.zoomOutButton), this.scrollPane));
+
+        this.getStyleClass().add("open-file-tab");
     }
 
     private void reloadContent()
