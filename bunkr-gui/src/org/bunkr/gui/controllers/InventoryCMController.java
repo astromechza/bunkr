@@ -101,7 +101,15 @@ public class InventoryCMController
         this.treeView.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2)
             {
-                this.handleCMFileOpen();
+                try
+                {
+                    TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
+                    if (selected.getValue().getType() == InventoryTreeData.Type.FILE) this.handleCMFileOpen();
+                }
+                catch (BaseBunkrException e)
+                {
+                    QuickDialogs.exception(e);
+                }
             }
         });
     }
@@ -354,8 +362,6 @@ public class InventoryCMController
     {
         try
         {
-            // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
 
             // get new file name
             String newName = QuickDialogs.input("Enter a new directory name:", "");
@@ -366,12 +372,21 @@ public class InventoryCMController
                 return;
             }
 
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
+            String selectedPath = this.treeView.getPathForTreeItem(selected);
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+            if (selectedItem.isAFile())
+            {
+                QuickDialogs.error("Create Error", "'%s' is a file.", selectedPath);
+                return;
+            }
+
             // find subject FolderInventoryItem
-            IFFContainer subjectContainer = (IFFContainer) this.archive.getInventory().search(
-                    selected.getValue().getUuid());
+            IFFContainer selectedContainer = (IFFContainer) selectedItem;
 
             // check parent for the same name
-            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
+            IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
             if (target != null)
             {
                 QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
@@ -379,7 +394,7 @@ public class InventoryCMController
             }
 
             FolderInventoryItem newFolder = new FolderInventoryItem(newName);
-            subjectContainer.addFolder(newFolder);
+            selectedContainer.addFolder(newFolder);
 
             // create the new tree item
             InventoryTreeData
@@ -403,9 +418,6 @@ public class InventoryCMController
     {
         try
         {
-            // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
-
             // get new file name
             String newName = QuickDialogs.input("Enter a new file name:", "");
             if (newName == null) return;
@@ -415,12 +427,21 @@ public class InventoryCMController
                 return;
             }
 
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
+            String selectedPath = this.treeView.getPathForTreeItem(selected);
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+            if (selectedItem.isAFile())
+            {
+                QuickDialogs.error("Create Error", "'%s' is a file.", selectedPath);
+                return;
+            }
+
             // find subject FolderInventoryItem
-            IFFContainer subjectContainer = (IFFContainer) this.archive.getInventory().search(
-                    selected.getValue().getUuid());
+            IFFContainer selectedContainer = (IFFContainer) selectedItem;
 
             // check parent for the same name
-            IFFTraversalTarget target = subjectContainer.findFileOrFolder(newName);
+            IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
             if (target != null)
             {
                 QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
@@ -428,7 +449,7 @@ public class InventoryCMController
             }
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
-            subjectContainer.addFile(newFile);
+            selectedContainer.addFile(newFile);
 
             // create the new tree item
             InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);

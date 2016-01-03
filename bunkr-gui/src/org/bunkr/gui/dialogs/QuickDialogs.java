@@ -18,6 +18,7 @@ public class QuickDialogs
 {
     public static void info(String title, String header, String format, Object... args)
     {
+        Logging.info(format, args);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(header);
@@ -87,6 +88,7 @@ public class QuickDialogs
 
     public static void error(String title, String message, Object... args)
     {
+        Logging.error(message, args);
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);

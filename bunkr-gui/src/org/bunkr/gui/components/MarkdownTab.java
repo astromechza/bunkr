@@ -11,6 +11,7 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
+import org.bunkr.gui.Logging;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.markdown4j.Markdown4jProcessor;
 
@@ -70,7 +71,7 @@ public class MarkdownTab extends Tab
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            Logging.exception(e);
         }
 
         this.bindEvents();
@@ -86,7 +87,7 @@ public class MarkdownTab extends Tab
         this.saveButton.getStyleClass().add("small-button");
         this.switchModeButton = new Button("View");
         this.switchModeButton.getStyleClass().add("small-button");
-        this.resetButton = new Button("Reset");
+        this.resetButton = new Button("Reload");
         this.resetButton.getStyleClass().add("small-button");
         actionBar.getItems().addAll(this.saveButton, this.resetButton, this.switchModeButton);
         VBox.setVgrow(actionBar, Priority.NEVER);

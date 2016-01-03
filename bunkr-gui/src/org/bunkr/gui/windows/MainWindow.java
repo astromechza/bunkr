@@ -46,11 +46,11 @@ public class MainWindow extends BaseWindow
         this.initialise();
 
         FilesTabPaneController tabPaneController = new FilesTabPaneController(this.archive, this.tabPane);
-        tabPaneController.setOnSaveInventoryRequest(s -> this.saveMetadata());
+        tabPaneController.setOnSaveInventoryRequest(this::saveMetadata);
 
         InventoryCMController contextMenuController = new InventoryCMController(this.archive, this.tree);
         contextMenuController.bindEvents();
-        contextMenuController.setOnSaveInventoryRequest(s -> this.saveMetadata());
+        contextMenuController.setOnSaveInventoryRequest(this::saveMetadata);
         contextMenuController.setOnRenameFile(tabPaneController::notifyRename);
         contextMenuController.setOnDeleteFile(f -> tabPaneController.requestClose(f, false));
         contextMenuController.setOnOpenFile(tabPaneController::requestOpen);
@@ -106,11 +106,11 @@ public class MainWindow extends BaseWindow
         return scene;
     }
 
-    private void saveMetadata()
+    private void saveMetadata(String reason)
     {
         try
         {
-            Logging.info("Saving Archive Metadata");
+            Logging.info("Saving Archive Metadata due to %s", reason);
             MetadataWriter.write(this.archive, this.securityProvider);
             Logging.info("Saved Archive Metadata");
         }
