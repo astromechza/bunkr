@@ -2,6 +2,37 @@
     -fx-font: normal 14px monospaced;
 }
 
+.line-number-area {
+    -fx-display-caret: false;
+    -fx-background-color: grey;
+    -fx-text-fill: white;
+    -fx-highlight-fill: grey;
+    -fx-highlight-text-fill: white;
+    -fx-border-radius: 0 0 0 0;
+    -fx-background-radius: 0 0 0 0;
+    -fx-padding: 0px;
+    -fx-border-insets: 0px;
+    -fx-background-insets: 0px;
+}
+
+.line-number-area .content {
+    -fx-background-color: grey;
+}
+
+.line-number-area:focused .content {
+    -fx-background-color: grey;
+}
+
+.line-number-area .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-padding: -7;
+}
+
+.line-number-area .scroll-bar:vertical {
+    -fx-opacity: 0;
+    -fx-padding: -7;
+}
+
 .small-button {
     -fx-font: normal 10px sans-serif;
 }

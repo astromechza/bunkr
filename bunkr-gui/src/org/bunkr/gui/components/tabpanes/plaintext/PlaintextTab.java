@@ -1,9 +1,7 @@
 package org.bunkr.gui.components.tabpanes.plaintext;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.bunkr.core.ArchiveInfoContext;
@@ -31,7 +29,7 @@ public class PlaintextTab extends Tab implements IOpenedFileTab
 
     private Button saveButton;
     private Button resetButton;
-    private TextArea editorArea;
+    private TextArea editorArea, lineNumberArea;
 
     // contents
     private String plainTextContent;
@@ -67,9 +65,19 @@ public class PlaintextTab extends Tab implements IOpenedFileTab
         this.editorArea.getStyleClass().add("editor-area-monospaced");
         VBox.setVgrow(this.editorArea, Priority.ALWAYS);
 
-        this.setContent(new VBox(actionBar, this.editorArea));
+        this.lineNumberArea = new TextArea();
+        this.lineNumberArea.getStyleClass().add("editor-area-monospaced");
+        this.lineNumberArea.getStyleClass().add("line-number-area");
+        this.lineNumberArea.setEditable(false);
+        this.lineNumberArea.setMaxWidth(60);
+        HBox contentAreas = new HBox(this.lineNumberArea, this.editorArea);
+        HBox.setHgrow(this.lineNumberArea, Priority.NEVER);
+        HBox.setHgrow(this.editorArea, Priority.ALWAYS);
+        VBox.setVgrow(contentAreas, Priority.ALWAYS);
+        this.setContent(new VBox(actionBar, contentAreas));
 
         this.getStyleClass().add("open-file-tab");
+
     }
 
     private void bindEvents()
@@ -103,6 +111,7 @@ public class PlaintextTab extends Tab implements IOpenedFileTab
 
         this.editorArea.textProperty().addListener((observable, oldValue, newValue) -> {
             this.checkSaveAllowed();
+            this.ensureLineNumbers();
         });
 
         this.setOnCloseRequest(event -> {
@@ -114,6 +123,27 @@ public class PlaintextTab extends Tab implements IOpenedFileTab
                 }
             }
         });
+
+        this.lineNumberArea.scrollTopProperty().bindBidirectional(this.editorArea.scrollTopProperty());
+    }
+
+    private void ensureLineNumbers()
+    {
+        int linen = this.lineNumberArea.getParagraphs().size();
+        int diff = linen - this.editorArea.getParagraphs().size() - 1;
+        if (diff > 0)
+        {
+            this.lineNumberArea.replaceText(this.editorArea.getParagraphs().size() * 5, this.lineNumberArea.getLength(), "");
+        }
+        else if (diff < 0)
+        {
+            StringBuilder addedLines = new StringBuilder();
+            for (int i = 0; i < -diff; i++)
+            {
+                addedLines.append(String.format("%-4d\n", linen + i));
+            }
+            this.lineNumberArea.appendText(addedLines.toString());
+        }
     }
 
     public void notifyRename()
@@ -141,6 +171,7 @@ public class PlaintextTab extends Tab implements IOpenedFileTab
             Arrays.fill(buffer, (byte) 0);
             this.plainTextContent = content.toString();
             this.editorArea.setText(this.plainTextContent);
+            this.ensureLineNumbers();
             this.hasChanges = false;
             this.saveButton.setDisable(true);
             this.getStyleClass().remove("has-changes");
