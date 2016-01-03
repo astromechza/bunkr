@@ -28,4 +28,12 @@ public class MediaType
         ALL_TYPES.add(TEXT_HTML);
         ALL_TYPES.add(TEXT_CODE);
     }
+
+    public static final Set<String> OPENABLE_TYPES = new HashSet<>();
+    static {
+        OPENABLE_TYPES.add(TEXT_PLAIN);
+        OPENABLE_TYPES.add(TEXT_MARKDOWN);
+        OPENABLE_TYPES.add(TEXT_HTML);
+        OPENABLE_TYPES.add(TEXT_CODE);
+    }
 }
