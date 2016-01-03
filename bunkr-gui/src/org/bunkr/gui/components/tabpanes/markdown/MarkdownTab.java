@@ -1,4 +1,4 @@
-package org.bunkr.gui.components.markdown;
+package org.bunkr.gui.components.tabpanes.markdown;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
@@ -12,6 +12,8 @@ import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Logging;
+import org.bunkr.gui.components.tabpanes.IOpenedFileTab;
+import org.bunkr.gui.components.tabpanes.MarkdownWebViewAdapter;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.markdown4j.Markdown4jProcessor;
 
@@ -25,7 +27,7 @@ import java.util.function.Consumer;
  * Creator: benmeier
  * Created At: 2015-12-31
  */
-public class MarkdownTab extends Tab
+public class MarkdownTab extends Tab implements IOpenedFileTab
 {
     // inventory things
     private final ArchiveInfoContext archive;
@@ -59,7 +61,6 @@ public class MarkdownTab extends Tab
         this.archive = archive;
 
         this.markdownProcessor = new Markdown4jProcessor();
-
 
         this.initControls();
 

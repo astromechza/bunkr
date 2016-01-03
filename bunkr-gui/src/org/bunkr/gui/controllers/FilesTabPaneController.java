@@ -1,9 +1,13 @@
 package org.bunkr.gui.controllers;
 
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.gui.components.markdown.MarkdownTab;
+import org.bunkr.core.inventory.MediaType;
+import org.bunkr.gui.components.tabpanes.IOpenedFileTab;
+import org.bunkr.gui.components.tabpanes.markdown.MarkdownTab;
+import org.bunkr.gui.components.tabpanes.plaintext.PlaintextTab;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +22,7 @@ public class FilesTabPaneController
 {
     private final ArchiveInfoContext archive;
     private final TabPane pane;
-    private final Map<UUID, MarkdownTab> openTabs;
+    private final Map<UUID, Tab> openTabs;
 
     private Consumer<String> onSaveInventoryRequest;
 
@@ -27,6 +31,18 @@ public class FilesTabPaneController
         this.archive = archive;
         this.pane = subjectPane;
         this.openTabs = new HashMap<>();
+    }
+
+    private IOpenedFileTab openTab(FileInventoryItem file, ArchiveInfoContext archive)
+    {
+        switch (file.getMediaType())
+        {
+            case MediaType.TEXT_MARKDOWN:
+                return new MarkdownTab(file, archive);
+            case MediaType.TEXT_PLAIN:
+                return new PlaintextTab(file, archive);
+        }
+        return null;
     }
 
     /**
@@ -41,13 +57,18 @@ public class FilesTabPaneController
         }
         else
         {
-            MarkdownTab tab = new MarkdownTab(file, this.archive);
-            tab.setOnClosed(e -> this.openTabs.remove(file.getUuid()));
-            tab.setOnSaveInventoryRequest(s -> this.getOnSaveInventoryRequest().accept(s));
+            IOpenedFileTab newTab = openTab(file, this.archive);
 
-            this.pane.getTabs().add(tab);
-            this.openTabs.put(file.getUuid(), tab);
-            this.pane.getSelectionModel().select(tab);
+            if (newTab == null)
+            {
+                return;
+            }
+
+            ((Tab) newTab).setOnClosed(e -> this.openTabs.remove(file.getUuid()));
+            newTab.setOnSaveInventoryRequest(s -> this.getOnSaveInventoryRequest().accept(s));
+            this.pane.getTabs().add((Tab) newTab);
+            this.openTabs.put(file.getUuid(), (Tab) newTab);
+            this.pane.getSelectionModel().select((Tab) newTab);
         }
     }
 
@@ -73,7 +94,7 @@ public class FilesTabPaneController
     {
         if (openTabs.containsKey(file.getUuid()))
         {
-            this.openTabs.get(file.getUuid()).notifyRename();
+            ((IOpenedFileTab) this.openTabs.get(file.getUuid())).notifyRename();
         }
     }
 
