@@ -14,26 +14,17 @@ import java.util.Set;
  */
 public class MediaType
 {
-    public static final String UNKNOWN = "application/unknown";
-    public static final String TEXT_PLAIN = "text/plain";
-    public static final String TEXT_MARKDOWN = "text/markdown";
-    public static final String TEXT_HTML = "text/html";
-    public static final String TEXT_CODE = "text/code";
+    public static final String UNKNOWN = "unknown";
+    public static final String TEXT = "text";
 
     public static final Set<String> ALL_TYPES = new HashSet<>();
     static {
         ALL_TYPES.add(UNKNOWN);
-        ALL_TYPES.add(TEXT_PLAIN);
-        ALL_TYPES.add(TEXT_MARKDOWN);
-        ALL_TYPES.add(TEXT_HTML);
-        ALL_TYPES.add(TEXT_CODE);
+        ALL_TYPES.add(TEXT);
     }
 
     public static final Set<String> OPENABLE_TYPES = new HashSet<>();
     static {
-        OPENABLE_TYPES.add(TEXT_PLAIN);
-        OPENABLE_TYPES.add(TEXT_MARKDOWN);
-        OPENABLE_TYPES.add(TEXT_HTML);
-        OPENABLE_TYPES.add(TEXT_CODE);
+        OPENABLE_TYPES.add(TEXT);
     }
 }

@@ -32,7 +32,7 @@ public class MarkdownTab extends Tab
     private final FileInventoryItem subject;
 
     // tools
-    private final Markdown4jProcessor markdownProcessor;
+    private final Markdown4jProcessor markdownProcessor = new Markdown4jProcessor();
 
     // controls
     private VBox layout;
@@ -58,11 +58,7 @@ public class MarkdownTab extends Tab
         this.subject = file;
         this.archive = archive;
 
-        this.markdownProcessor = new Markdown4jProcessor();
-
-
         this.initControls();
-
         this.reloadContent();
 
         try
@@ -75,7 +71,6 @@ public class MarkdownTab extends Tab
         }
 
         this.bindEvents();
-
         this.goToViewMode();
     }
 
@@ -135,7 +130,7 @@ public class MarkdownTab extends Tab
                     Arrays.fill(buffer, (byte) 0);
                 }
                 this.plainTextContent = this.editorArea.getText();
-                this.checkSaveAllowed();
+                this.checkChanges();
                 this.onSaveInventoryRequest.accept("Wrote content to file " + this.getText());
             }
             catch (IOException exc)
@@ -147,13 +142,13 @@ public class MarkdownTab extends Tab
         this.resetButton.setOnAction(e -> this.reloadContent());
 
         this.editorArea.textProperty().addListener((observable, oldValue, newValue) -> {
-            this.checkSaveAllowed();
+            this.checkChanges();
         });
 
         this.setOnCloseRequest(event -> {
             if (this.hasChanges)
             {
-                if (! QuickDialogs.confirm("File %s has changes. Are you sure you want to close it?", this.getText()))
+                if (!QuickDialogs.confirm("File %s has changes. Are you sure you want to close it?", this.getText()))
                 {
                     event.consume();
                 }
@@ -195,36 +190,19 @@ public class MarkdownTab extends Tab
         }
     }
 
-    public void checkSaveAllowed()
+    public void checkChanges()
     {
-        if (this.editorArea.textProperty().length().isEqualTo(this.plainTextContent.length()).get() && this.editorArea.getText().equals(this.plainTextContent))
-        {
-            this.hasChanges = false;
-            this.saveButton.setDisable(true);
-            this.getStyleClass().remove("has-changes");
-        }
-        else
-        {
-            this.hasChanges = true;
-            this.saveButton.setDisable(false);
-            if (! this.getStyleClass().contains("has-changes")) this.getStyleClass().add("has-changes");
-        }
+        this.hasChanges = ! this.editorArea.getText().equals(this.plainTextContent);
+        this.setDisable(!this.hasChanges);
+        this.getStyleClass().remove("has-changes");
+        if (this.hasChanges)  this.getStyleClass().add("has-changes");
     }
 
     public void goToEditMode()
     {
         this.currentMode = Mode.EDITTING;
         this.switchModeButton.setText("View");
-
-        if (this.plainTextContent == null)
-        {
-            this.editorArea.setText("");
-        }
-        else
-        {
-            this.editorArea.setText(this.plainTextContent);
-        }
-
+        this.editorArea.setText((this.plainTextContent == null) ? "" : this.plainTextContent);
         if (this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().remove(this.formattedView);
         if (!this.layout.getChildren().contains(this.editorArea)) this.layout.getChildren().add(this.editorArea);
     }
@@ -234,25 +212,19 @@ public class MarkdownTab extends Tab
         this.currentMode = Mode.VIEWING;
         this.switchModeButton.setText("Edit");
 
-        try
+        String renderedContent = "";
+        if (this.plainTextContent != null)
         {
-            if (this.plainTextContent == null)
+            try
             {
-                this.formattedView.getEngine().loadContent("");
+                renderedContent = this.markdownProcessor.process(this.hasChanges ? this.editorArea.getText() : this.plainTextContent);
             }
-            else if (this.hasChanges)
+            catch (IOException e)
             {
-                this.formattedView.getEngine().loadContent(this.markdownProcessor.process(this.editorArea.getText()));
-            }
-            else
-            {
-                this.formattedView.getEngine().loadContent(this.markdownProcessor.process(this.plainTextContent));
+                renderedContent = e.getLocalizedMessage();
             }
         }
-        catch (IOException e)
-        {
-            this.formattedView.getEngine().loadContent(e.getLocalizedMessage());
-        }
+        this.formattedView.getEngine().loadContent(renderedContent);
 
         if (this.layout.getChildren().contains(this.editorArea))this.layout.getChildren().remove(this.editorArea);
         if (!this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().add(this.formattedView);
