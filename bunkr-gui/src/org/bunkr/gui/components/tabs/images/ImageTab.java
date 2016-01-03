@@ -27,13 +27,12 @@ public class ImageTab extends Tab implements IOpenedFileTab
     private final ArchiveInfoContext archive;
 
     // components
-    private VBox layout;
     private Button zoomInButton;
     private Button zoomOutButton;
     private ImageView imageView;
     private ScrollPane scrollPane;
 
-    private final double zoomRatio = 1.1;
+    private final double zoomRatio = 1.2;
 
     public ImageTab(FileInventoryItem file, ArchiveInfoContext archive)
     {
@@ -48,30 +47,56 @@ public class ImageTab extends Tab implements IOpenedFileTab
 
     private void bindEvents()
     {
+
+
         this.zoomInButton.setOnAction(event -> {
-            double currentFitW = this.imageView.getFitWidth();
-            if (currentFitW == 0.0) currentFitW = this.imageView.getImage().getWidth();
-            double currentFitH = this.imageView.getFitHeight();
-            if (currentFitH == 0.0) currentFitH = this.imageView.getImage().getHeight();
+            double Fx1 = this.imageView.getFitWidth();
+            if (Fx1 == 0.0) Fx1 = this.imageView.getImage().getWidth();
+            double Fy1 = this.imageView.getFitHeight();
+            if (Fy1 == 0.0) Fy1 = this.imageView.getImage().getHeight();
+            double Sx = this.scrollPane.getWidth();
+            double Sy = this.scrollPane.getHeight();
+            double Hx1 = this.scrollPane.getHvalue();
+            double Hy1 = this.scrollPane.getVvalue();
 
-            double newFitW = currentFitW * zoomRatio;
-            double newFitH = currentFitH * zoomRatio;
+            double Cx = ((Fx1 - Sx) * Hx1 + Sx / 2) / Fx1;
+            double Cy = ((Fy1 - Sy) * Hy1 + Sy / 2) / Fy1;
 
-            this.imageView.setFitWidth(newFitW);
-            this.imageView.setFitHeight(newFitH);
+            double Fx2 = Fx1 * zoomRatio;
+            double Fy2 = Fy1 * zoomRatio;
+            this.imageView.setFitWidth(Fx2);
+            this.imageView.setFitHeight(Fy2);
+
+            double Hx2 = (Cx * Fx2 - 0.5 * Sx) / (Fx2 - Sx);
+            double Hy2 = (Cy * Fy2 - 0.5 * Sy) / (Fy2 - Sy);
+
+            this.scrollPane.setHvalue(Hx2);
+            this.scrollPane.setVvalue(Hy2);
         });
 
         this.zoomOutButton.setOnAction(event -> {
-            double currentFitW = this.imageView.getFitWidth();
-            if (currentFitW == 0.0) currentFitW = this.imageView.getImage().getWidth();
-            double currentFitH = this.imageView.getFitHeight();
-            if (currentFitH == 0.0) currentFitH = this.imageView.getImage().getHeight();
+            double Fx1 = this.imageView.getFitWidth();
+            if (Fx1 == 0.0) Fx1 = this.imageView.getImage().getWidth();
+            double Fy1 = this.imageView.getFitHeight();
+            if (Fy1 == 0.0) Fy1 = this.imageView.getImage().getHeight();
+            double Sx = this.scrollPane.getWidth();
+            double Sy = this.scrollPane.getHeight();
+            double Hx1 = this.scrollPane.getHvalue();
+            double Hy1 = this.scrollPane.getVvalue();
 
-            double newFitW = currentFitW / zoomRatio;
-            double newFitH = currentFitH / zoomRatio;
+            double Cx = ((Fx1 - Sx) * Hx1 + Sx / 2) / Fx1;
+            double Cy = ((Fy1 - Sy) * Hy1 + Sy / 2) / Fy1;
 
-            this.imageView.setFitWidth(newFitW);
-            this.imageView.setFitHeight(newFitH);
+            double Fx2 = Fx1 / zoomRatio;
+            double Fy2 = Fy1 / zoomRatio;
+            this.imageView.setFitWidth(Fx2);
+            this.imageView.setFitHeight(Fy2);
+
+            double Hx2 = (Cx * Fx2 - 0.5 * Sx) / (Fx2 - Sx);
+            double Hy2 = (Cy * Fy2 - 0.5 * Sy) / (Fy2 - Sy);
+
+            this.scrollPane.setHvalue(Hx2);
+            this.scrollPane.setVvalue(Hy2);
         });
     }
 
