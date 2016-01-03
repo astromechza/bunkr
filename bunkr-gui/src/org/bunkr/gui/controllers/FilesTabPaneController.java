@@ -3,7 +3,7 @@ package org.bunkr.gui.controllers;
 import javafx.scene.control.TabPane;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.gui.components.MarkdownTab;
+import org.bunkr.gui.components.markdown.MarkdownTab;
 
 import java.util.HashMap;
 import java.util.Map;

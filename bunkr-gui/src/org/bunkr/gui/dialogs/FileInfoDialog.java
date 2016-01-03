@@ -2,7 +2,6 @@ package org.bunkr.gui.dialogs;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -15,11 +14,14 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import org.bunkr.core.Resources;
 import org.bunkr.core.inventory.FileInventoryItem;
+import org.bunkr.core.inventory.MediaType;
 import org.bunkr.core.utils.Formatters;
 import org.bunkr.gui.components.SelectableLabel;
 import org.bunkr.gui.windows.BaseWindow;
 
 import java.io.IOException;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Creator: benmeier
@@ -33,6 +35,10 @@ public class FileInfoDialog extends BaseWindow
     private final FileInventoryItem item;
     private final String filePath;
 
+    // change storage
+    private MediaType mtValue;
+
+    // components
     private Label lblFilePath; SelectableLabel lblFilePathValue;
     private Label lblActualSize; SelectableLabel lblActualSizeValue;
     private Label lblLastMod; SelectableLabel lblLastModValue;
@@ -40,10 +46,9 @@ public class FileInfoDialog extends BaseWindow
     private Label lblUUID; SelectableLabel lblUUIDValue;
     private Label lblTags;
     private Label lblMediaType, lblMediaTypeValue;
-
-    private Button closeButton;
-
+    private Button closeButton, applyButton, changeMediaTypeButton, addTagButton, removeTagButton;
     private ListView<String> tagsBox;
+    private Consumer<String> onSaveInventoryRequest;
 
     public FileInfoDialog(FileInventoryItem item) throws IOException
     {
@@ -51,6 +56,7 @@ public class FileInfoDialog extends BaseWindow
         this.filePath = item.getAbsolutePath();
         this.item = item;
         this.cssPath = Resources.getExternalPath("/resources/css/fileinfo_dialog.css");
+        this.mtValue = this.item.getMediaType();
         this.initialise();
     }
 
@@ -76,6 +82,9 @@ public class FileInfoDialog extends BaseWindow
         ObservableList<String> tagItems = FXCollections.observableArrayList(this.item.getTags());
         this.tagsBox.setItems(tagItems);
 
+        this.addTagButton = new Button("+");
+        this.removeTagButton = new Button("-");
+
         this.lblSizeOnDisk = new Label("Size on Disk:");
         this.lblSizeOnDiskValue = new SelectableLabel(String.format(
                 "%s (%s bytes)", Formatters.formatPrettyInt(this.item.getSizeOnDisk()), this.item.getSizeOnDisk()
@@ -86,7 +95,10 @@ public class FileInfoDialog extends BaseWindow
 
         this.lblMediaType = new Label("Media Type:");
         this.lblMediaTypeValue = new Label(this.item.getMediaType().toString());
+        this.changeMediaTypeButton = new Button("Change..");
 
+        this.applyButton = new Button("Save Changes");
+        this.applyButton.setDisable(true);
         this.closeButton = new Button("Close");
     }
 
@@ -108,20 +120,37 @@ public class FileInfoDialog extends BaseWindow
         rootLayout.setHgap(10);
         rootLayout.setVgap(10);
 
-        rootLayout.add(this.lblFilePath, 0, 0);
-        rootLayout.add(this.lblFilePathValue, 1, 0);
-        rootLayout.add(this.lblActualSize, 0, 1); rootLayout.add(this.lblActualSizeValue, 1, 1);
-        rootLayout.add(this.lblLastMod, 0, 2); rootLayout.add(this.lblLastModValue, 1, 2);
-        rootLayout.add(this.lblTags, 0, 3);
-        rootLayout.add(this.tagsBox, 0, 4);
+        int rowid = 0;
+
+        rootLayout.add(this.lblFilePath, 0, rowid); rootLayout.add(this.lblFilePathValue, 1, rowid); rowid++;
+
+        rootLayout.add(this.lblActualSize, 0, rowid); rootLayout.add(this.lblActualSizeValue, 1, rowid); rowid++;
+
+        rootLayout.add(this.lblLastMod, 0, rowid); rootLayout.add(this.lblLastModValue, 1, rowid); rowid++;
+
+        rootLayout.add(this.lblTags, 0, rowid); rowid++;
+        rootLayout.add(this.tagsBox, 0, rowid); rowid++;
         GridPane.setVgrow(this.tagsBox, Priority.ALWAYS);
         GridPane.setColumnSpan(this.tagsBox, 2);
-        rootLayout.add(this.lblSizeOnDisk, 0, 5);
-        rootLayout.add(this.lblSizeOnDiskValue, 1, 5);
-        rootLayout.add(this.lblUUID, 0, 6); rootLayout.add(this.lblUUIDValue, 1, 6);
-        rootLayout.add(this.lblMediaType, 0, 7); rootLayout.add(this.lblMediaTypeValue, 1, 7);
-        rootLayout.add(this.closeButton, 1, 8);
-        GridPane.setHalignment(this.closeButton, HPos.RIGHT);
+
+        HBox tagButtonBox = new HBox(5, this.addTagButton, this.removeTagButton);
+        tagButtonBox.setAlignment(Pos.CENTER_RIGHT);
+        rootLayout.add(tagButtonBox, 0, rowid); rowid++;
+        GridPane.setColumnSpan(tagButtonBox, 2);
+
+        rootLayout.add(this.lblSizeOnDisk, 0, rowid); rootLayout.add(this.lblSizeOnDiskValue, 1, rowid); rowid++;
+
+        rootLayout.add(this.lblUUID, 0, rowid); rootLayout.add(this.lblUUIDValue, 1, rowid); rowid++;
+
+        rootLayout.add(this.lblMediaType, 0, rowid);
+        HBox mediaTypeRow = new HBox(10, this.lblMediaTypeValue, this.changeMediaTypeButton);
+        mediaTypeRow.setAlignment(Pos.CENTER_RIGHT);
+        rootLayout.add(mediaTypeRow, 1, rowid); rowid++;
+
+        HBox buttonbox = new HBox(10, this.closeButton, this.applyButton);
+        buttonbox.setAlignment(Pos.CENTER_RIGHT);
+        rootLayout.add(buttonbox, 0, rowid);
+        GridPane.setColumnSpan(buttonbox, 2);
 
         return rootLayout;
     }
@@ -130,12 +159,68 @@ public class FileInfoDialog extends BaseWindow
     public void bindEvents()
     {
         this.closeButton.setOnAction(event -> this.getStage().close());
+
+        this.changeMediaTypeButton.setOnAction(event -> {
+            List<MediaType> choices = new ArrayList<>(MediaType.ALL_TYPES);
+            Collections.sort(choices, (o1, o2) -> o1.toString().compareTo(o2.toString()));
+            MediaType newMT = QuickDialogs.pick(
+                    "Choose a Media Type",
+                    "Choose a new Media Type for this file. This will affect how the file is handled in this GUI and " +
+                    "won't change the actual bytes of the file.",
+                    null,
+                    choices,
+                    this.item.getMediaType()
+            );
+
+            if (newMT != null)
+            {
+                this.mtValue = newMT;
+                this.lblMediaTypeValue.setText(newMT.toString());
+                this.applyButton.setDisable(false);
+            }
+        });
+
+        this.applyButton.setOnAction(event -> {
+            this.item.setMediaType(mtValue);
+            this.item.setTags(new HashSet<>(this.tagsBox.getItems()));
+            this.onSaveInventoryRequest.accept("Modified media type for file " + this.item.getName());
+            this.getStage().close();
+        });
+
+        this.addTagButton.setOnAction(event -> {
+            String tag = QuickDialogs.input("Enter a new tag", "");
+            if (tag != null)
+            {
+                try
+                {
+                    this.item.validateTag(tag);
+                    this.tagsBox.getItems().add(tag);
+                    this.applyButton.setDisable(false);
+                }
+                catch (IllegalArgumentException e)
+                {
+                    QuickDialogs.error("Tag %s is not a valid tag: '%s'", tag, e.getLocalizedMessage());
+                }
+            }
+        });
+
+        this.removeTagButton.setOnAction(event -> {
+            // get selected item
+            String tag = this.tagsBox.getSelectionModel().getSelectedItem();
+            if (tag != null)
+            {
+                this.tagsBox.getItems().remove(tag);
+                this.applyButton.setDisable(false);
+            }
+        });
     }
 
     @Override
     public void applyStyling()
     {
-
+        this.changeMediaTypeButton.getStyleClass().add("small-button");
+        this.addTagButton.getStyleClass().add("small-button");
+        this.removeTagButton.getStyleClass().add("small-button");
     }
 
     @Override
@@ -147,8 +232,13 @@ public class FileInfoDialog extends BaseWindow
         this.getStage().setScene(scene);
         this.getStage().initModality(Modality.APPLICATION_MODAL);
         this.getStage().setWidth(500);
-        this.getStage().setHeight(330);
+        this.getStage().setHeight(400);
         this.getStage().setResizable(false);
         return scene;
+    }
+
+    public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
+    {
+        this.onSaveInventoryRequest = onSaveInventoryRequest;
     }
 }

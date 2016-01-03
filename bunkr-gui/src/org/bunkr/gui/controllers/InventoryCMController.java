@@ -481,7 +481,9 @@ public class InventoryCMController
             if (selectedFile.isAFile() && selectedFile instanceof FileInventoryItem)
             {
                 FileInventoryItem fileItem = (FileInventoryItem) selectedFile;
-                new FileInfoDialog(fileItem).getStage().showAndWait();
+                FileInfoDialog popup = new FileInfoDialog(fileItem);
+                popup.setOnSaveInventoryRequest(this.onSaveInventoryRequest);
+                popup.getStage().showAndWait();
             }
         }
         catch (BaseBunkrException | IOException e)

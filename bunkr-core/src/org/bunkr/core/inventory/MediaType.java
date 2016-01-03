@@ -18,6 +18,7 @@ public class MediaType
     public static final MediaType TEXT_PLAIN = new MediaType("text", "plain");
     public static final MediaType TEXT_MARKDOWN = new MediaType("text", "markdown");
     public static final MediaType TEXT_HTML = new MediaType("text", "html");
+    public static final MediaType TEXT_CODE = new MediaType("text", "code");
 
     public static final Set<MediaType> ALL_TYPES = new HashSet<>();
     static {
@@ -25,6 +26,7 @@ public class MediaType
         ALL_TYPES.add(TEXT_PLAIN);
         ALL_TYPES.add(TEXT_MARKDOWN);
         ALL_TYPES.add(TEXT_HTML);
+        ALL_TYPES.add(TEXT_CODE);
     }
 
     private final String type;

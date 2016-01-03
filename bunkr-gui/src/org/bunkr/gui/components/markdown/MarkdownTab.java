@@ -1,4 +1,4 @@
-package org.bunkr.gui.components;
+package org.bunkr.gui.components.markdown;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;

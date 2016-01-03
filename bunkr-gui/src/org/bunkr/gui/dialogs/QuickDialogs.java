@@ -1,13 +1,12 @@
 package org.bunkr.gui.dialogs;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
+import org.bunkr.core.utils.Formatters;
 import org.bunkr.core.utils.Logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -99,5 +98,26 @@ public class QuickDialogs
     public static void error(String format, Object... args)
     {
         error("Error", format, args);
+    }
+
+    public static <T> T pick(String title, String heading, String content, List<T> items, T initial)
+    {
+        heading = Formatters.wrap(heading, 60);
+        content = Formatters.wrap(content, 60);
+
+        ChoiceDialog<T> dialog = new ChoiceDialog<>(initial, items);
+        dialog.setTitle(title);
+        dialog.setHeaderText(heading);
+        dialog.setContentText(content);
+        Optional<T> result = dialog.showAndWait();
+        if (result.isPresent()){
+            return result.get();
+        }
+        return null;
+    }
+
+    public static <T> T pick(String content, List<T> items, T initial)
+    {
+        return pick("Select a choice", null, content, items, initial);
     }
 }

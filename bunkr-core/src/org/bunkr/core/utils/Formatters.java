@@ -83,4 +83,15 @@ public class Formatters
     {
         return formateDate(milliseconds, "MMM dd HH:mm");
     }
+
+    public static String wrap(String input, int linewidth)
+    {
+        if (input == null) return null;
+        StringBuilder sb = new StringBuilder(input);
+        int i = 0;
+        while (i + linewidth < sb.length() && (i = sb.lastIndexOf(" ", i + linewidth)) != -1) {
+            sb.replace(i, i + 1, "\n");
+        }
+        return sb.toString();
+    }
 }
