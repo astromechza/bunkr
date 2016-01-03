@@ -1,12 +1,14 @@
 package org.bunkr.gui.components.tabs.images;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
@@ -25,10 +27,13 @@ public class ImageTab extends Tab implements IOpenedFileTab
     private final ArchiveInfoContext archive;
 
     // components
+    private VBox layout;
+    private Button zoomInButton;
+    private Button zoomOutButton;
     private ImageView imageView;
     private ScrollPane scrollPane;
 
-    private final DoubleProperty zoomProperty = new SimpleDoubleProperty(200);
+    private final double zoomRatio = 1.1;
 
     public ImageTab(FileInventoryItem file, ArchiveInfoContext archive)
     {
@@ -43,28 +48,52 @@ public class ImageTab extends Tab implements IOpenedFileTab
 
     private void bindEvents()
     {
-        zoomProperty.addListener(arg0 -> {
-            imageView.setFitWidth(zoomProperty.get() * 4);
-            imageView.setFitHeight(zoomProperty.get() * 3);
+        this.zoomInButton.setOnAction(event -> {
+            double currentFitW = this.imageView.getFitWidth();
+            if (currentFitW == 0.0) currentFitW = this.imageView.getImage().getWidth();
+            double currentFitH = this.imageView.getFitHeight();
+            if (currentFitH == 0.0) currentFitH = this.imageView.getImage().getHeight();
+
+            double newFitW = currentFitW * zoomRatio;
+            double newFitH = currentFitH * zoomRatio;
+
+            this.imageView.setFitWidth(newFitW);
+            this.imageView.setFitHeight(newFitH);
         });
 
-        scrollPane.addEventFilter(ScrollEvent.ANY, event -> {
-            if (event.getDeltaY() > 0) {
-                zoomProperty.set(zoomProperty.get() * 1.1);
-            } else if (event.getDeltaY() < 0) {
-                zoomProperty.set(zoomProperty.get() / 1.1);
-            }
+        this.zoomOutButton.setOnAction(event -> {
+            double currentFitW = this.imageView.getFitWidth();
+            if (currentFitW == 0.0) currentFitW = this.imageView.getImage().getWidth();
+            double currentFitH = this.imageView.getFitHeight();
+            if (currentFitH == 0.0) currentFitH = this.imageView.getImage().getHeight();
+
+            double newFitW = currentFitW / zoomRatio;
+            double newFitH = currentFitH / zoomRatio;
+
+            this.imageView.setFitWidth(newFitW);
+            this.imageView.setFitHeight(newFitH);
         });
     }
 
     private void initControls()
     {
         this.setText(this.file.getAbsolutePath());
+
+        this.zoomInButton = new Button("+");
+        this.zoomOutButton = new Button("-");
+
         this.imageView = new ImageView();
         this.imageView.preserveRatioProperty().set(true);
+        this.imageView.setCursor(Cursor.HAND);
+        this.imageView.setSmooth(false);
+
         this.scrollPane = new ScrollPane();
         this.scrollPane.setContent(this.imageView);
-        this.setContent(this.scrollPane);
+        VBox.setVgrow(this.scrollPane, Priority.ALWAYS);
+        this.scrollPane.setMaxWidth(Double.MAX_VALUE);
+        this.scrollPane.setMaxHeight(Double.MAX_VALUE);
+
+        this.setContent(new VBox(new ToolBar(this.zoomInButton, this.zoomOutButton), this.scrollPane));
     }
 
     private void reloadContent()
