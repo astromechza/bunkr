@@ -3,7 +3,6 @@ package org.bunkr.gui.components.tabs.markdown;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 import org.bunkr.core.Resources;
-import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.w3c.dom.Document;
@@ -89,13 +88,15 @@ public class MarkdownWebViewAdapter
                 URI uri = new URI(element.getAttribute("href"));
                 if (uri.getScheme() == null)
                 {
-                    if (InventoryPather.isValidPath(uri.toString()))
+
+                    String decodedPath = uri.getPath();
+                    if (InventoryPather.isValidPath(decodedPath))
                     {
-                        this.onTryOpenFileItem.accept(uri.toString());
+                        this.onTryOpenFileItem.accept(decodedPath);
                     }
-                    else if (InventoryPather.isValidRelativePath(uri.toString()))
+                    else if (InventoryPather.isValidRelativePath(decodedPath))
                     {
-                        this.onTryOpenFileItem.accept(uri.toString());
+                        this.onTryOpenFileItem.accept(decodedPath);
                     }
                 }
                 else if (ALLOWED_OUTBOUND_SCHEMA.contains(uri.getScheme().toLowerCase()))

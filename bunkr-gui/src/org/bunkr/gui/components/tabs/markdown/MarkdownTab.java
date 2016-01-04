@@ -9,7 +9,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
