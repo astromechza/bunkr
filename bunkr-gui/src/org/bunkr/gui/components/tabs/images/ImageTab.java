@@ -95,8 +95,8 @@ public class ImageTab extends Tab implements IOpenedFileTab
             this.scrollPane.setVvalue(Hy2);
         });
 
-        this.imageView.imageProperty().isNotNull().addListener((observable, oldValue, newValue) -> {
-            if (newValue)
+        this.imageView.imageProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null)
             {
                 this.resolutionLabel.setText(String.format(
                         "%dpx x %dpx",
@@ -105,6 +105,14 @@ public class ImageTab extends Tab implements IOpenedFileTab
                 ));
                 this.scrollPane.setHvalue(0.5);
                 this.scrollPane.setVvalue(0.5);
+            }
+        });
+
+        this.scrollPane.widthProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue.intValue() == 0 && newValue.intValue() > 10)
+            {
+                this.imageView.setFitWidth(this.scrollPane.getWidth() - 2);
+                this.imageView.setFitHeight(this.scrollPane.getHeight() - 2);
             }
         });
     }

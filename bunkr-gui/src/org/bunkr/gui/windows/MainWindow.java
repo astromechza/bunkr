@@ -93,7 +93,7 @@ public class MainWindow extends BaseWindow
     @Override
     public void applyStyling()
     {
-
+        this.lblHierarchy.getStyleClass().add("hierarchy-label");
         this.lblHierarchy.setAlignment(Pos.CENTER);
     }
 

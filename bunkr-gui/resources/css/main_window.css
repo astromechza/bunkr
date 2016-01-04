@@ -45,3 +45,8 @@
     -fx-font-weight: bold;
     -fx-background-color: #EEEE44;
 }
+
+.hierarchy-label {
+    -fx-padding: 5px 5px 5px 5px;
+    -fx-text-alignment: center;
+}
