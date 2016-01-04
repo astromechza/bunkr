@@ -72,9 +72,10 @@ public class MainWindow extends BaseWindow
         SplitPane sp = new SplitPane();
         sp.setDividerPosition(0, 0.3);
 
-        VBox leftBox = new VBox(10);
+        VBox leftBox = new VBox(0);
         leftBox.getChildren().add(this.lblHierarchy);
         VBox.setVgrow(this.lblHierarchy, Priority.NEVER);
+        this.lblHierarchy.setAlignment(Pos.CENTER);
         leftBox.getChildren().add(this.tree);
         VBox.setVgrow(this.tree, Priority.ALWAYS);
 
@@ -92,6 +93,7 @@ public class MainWindow extends BaseWindow
     @Override
     public void applyStyling()
     {
+
         this.lblHierarchy.setAlignment(Pos.CENTER);
     }
 

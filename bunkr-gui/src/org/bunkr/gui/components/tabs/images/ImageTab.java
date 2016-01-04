@@ -1,10 +1,7 @@
 package org.bunkr.gui.components.tabs.images;
 
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Priority;
@@ -29,6 +26,7 @@ public class ImageTab extends Tab implements IOpenedFileTab
     // components
     private Button zoomInButton;
     private Button zoomOutButton;
+    private Label resolutionLabel;
     private ImageView imageView;
     private ScrollPane scrollPane;
 
@@ -96,6 +94,19 @@ public class ImageTab extends Tab implements IOpenedFileTab
             this.scrollPane.setHvalue(Hx2);
             this.scrollPane.setVvalue(Hy2);
         });
+
+        this.imageView.imageProperty().isNotNull().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+            {
+                this.resolutionLabel.setText(String.format(
+                        "%dpx x %dpx",
+                        (int) this.imageView.getImage().getWidth(),
+                        (int) this.imageView.getImage().getHeight()
+                ));
+                this.scrollPane.setHvalue(0.5);
+                this.scrollPane.setVvalue(0.5);
+            }
+        });
     }
 
     private void initControls()
@@ -110,13 +121,15 @@ public class ImageTab extends Tab implements IOpenedFileTab
         this.imageView.setCursor(Cursor.HAND);
         this.imageView.setSmooth(false);
 
+        this.resolutionLabel = new Label();
+
         this.scrollPane = new ScrollPane();
         this.scrollPane.setContent(this.imageView);
         VBox.setVgrow(this.scrollPane, Priority.ALWAYS);
         this.scrollPane.setMaxWidth(Double.MAX_VALUE);
         this.scrollPane.setMaxHeight(Double.MAX_VALUE);
 
-        this.setContent(new VBox(new ToolBar(this.zoomInButton, this.zoomOutButton), this.scrollPane));
+        this.setContent(new VBox(new ToolBar(this.zoomInButton, this.zoomOutButton, this.resolutionLabel), this.scrollPane));
 
         this.getStyleClass().add("open-file-tab");
     }

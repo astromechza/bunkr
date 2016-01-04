@@ -28,10 +28,10 @@ public class URLRequestBlocker
 
     public URLStreamHandler getStreamHandler(String protocol)
     {
-        // TODO. "file" should probably be blocked too
         if (protocol.equals("jar") || protocol.equals("file")) return null;
         if (protocol.equals("http")) return new HTTPHandler();
         if (protocol.equals("https")) return new HTTPSHandler();
+        Logging.warn("Blocking request using '%s' protocol.", protocol);
         return new URLStreamHandler() {
             @Override
             protected URLConnection openConnection(URL u) throws IOException
