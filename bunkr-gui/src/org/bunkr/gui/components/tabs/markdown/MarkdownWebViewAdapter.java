@@ -58,19 +58,51 @@ public class MarkdownWebViewAdapter
 
     private void adaptLoadedPage(WebView subject)
     {
-        // create a new event listener for link elements
-        EventListener listener = this::handleLinkOnClick;
-
         // get the document
         Document doc = subject.getEngine().getDocument();
+
         // loop through all link tags
-        NodeList nodeList = doc.getElementsByTagName("a");
-        for (int i = 0; i < nodeList.getLength(); i++)
+        NodeList linkNodes = doc.getElementsByTagName("a");
+        for (int i = 0; i < linkNodes.getLength(); i++)
         {
-            Element element = (Element) nodeList.item(i);
+            Element element = (Element) linkNodes.item(i);
             // remove on click
             element.setAttribute("onclick", "");
-            ((EventTarget) nodeList.item(i)).addEventListener("click", listener, false);
+            ((EventTarget) element).addEventListener("click", this::handleLinkOnClick, false);
+        }
+
+        // loop through all link tags
+        NodeList imgNodes = doc.getElementsByTagName("img");
+        for (int i = 0; i < imgNodes.getLength(); i++)
+        {
+            Element element = (Element) imgNodes.item(i);
+            ((EventTarget) element).addEventListener("click", this::handleImgOnClick, false);
+        }
+    }
+
+    private void handleImgOnClick(Event event)
+    {
+        // get the element that was clicked
+        Element element = (Element) event.getTarget();
+
+        // if the location target has an href
+        if (element.hasAttribute("src"))
+        {
+            if(QuickDialogs.confirm("Outgoing image link to '%s'. Do you want to open it in a browser?", element.getAttribute("src")))
+            {
+                Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+                if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE))
+                {
+                    try
+                    {
+                        desktop.browse(new URI(element.getAttribute("src")));
+                    }
+                    catch (Exception e)
+                    {
+                        QuickDialogs.error("Failed to open external browser: %s", e);
+                    }
+                }
+            }
         }
     }
 
