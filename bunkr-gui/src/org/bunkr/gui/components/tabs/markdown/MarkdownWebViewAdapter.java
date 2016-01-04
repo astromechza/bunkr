@@ -68,7 +68,7 @@ public class MarkdownWebViewAdapter
             Element element = (Element) linkNodes.item(i);
             // remove on click
             element.setAttribute("onclick", "");
-            ((EventTarget) element).addEventListener("click", this::handleLinkOnClick, false);
+            ((EventTarget) element).addEventListener("click", evt -> this.handleElementLinkAttributeClick(evt, "href"), false);
         }
 
         // loop through all link tags
@@ -76,51 +76,24 @@ public class MarkdownWebViewAdapter
         for (int i = 0; i < imgNodes.getLength(); i++)
         {
             Element element = (Element) imgNodes.item(i);
-            ((EventTarget) element).addEventListener("click", this::handleImgOnClick, false);
+            ((EventTarget) element).addEventListener("click", evt -> this.handleElementLinkAttributeClick(evt, "src"), false);
         }
     }
 
-    private void handleImgOnClick(Event event)
+    private void handleElementLinkAttributeClick(Event event, String attribute)
     {
         // get the element that was clicked
         Element element = (Element) event.getTarget();
 
         // if the location target has an href
-        if (element.hasAttribute("src"))
+        if (element.hasAttribute(attribute) && ! element.getAttribute(attribute).startsWith("#"))
         {
-            if(QuickDialogs.confirm("Outgoing image link to '%s'. Do you want to open it in a browser?", element.getAttribute("src")))
-            {
-                Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-                if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE))
-                {
-                    try
-                    {
-                        desktop.browse(new URI(element.getAttribute("src")));
-                    }
-                    catch (Exception e)
-                    {
-                        QuickDialogs.error("Failed to open external browser: %s", e);
-                    }
-                }
-            }
-        }
-    }
-
-    private void handleLinkOnClick(Event ev)
-    {
-        // get the element that was clicked
-        Element element = (Element) ev.getTarget();
-
-        // if the location target has an href
-        if (element.hasAttribute("href") && (! element.getAttribute("href").startsWith("#")))
-        {
-            ev.preventDefault();
+            event.preventDefault();
             try
             {
-                URI uri = new URI(element.getAttribute("href"));
+                URI uri = new URI(element.getAttribute(attribute));
                 if (uri.getScheme() == null)
                 {
-
                     String decodedPath = uri.getPath();
                     if (InventoryPather.isValidPath(decodedPath))
                     {
@@ -151,12 +124,12 @@ public class MarkdownWebViewAdapter
                 }
                 else
                 {
-                    QuickDialogs.error("Error", null, "Outgoing link '%s' is using an unknown scheme %s", uri, uri.getScheme());
+                    QuickDialogs.error("Error", null, "Outgoing link '%s' is using an unsupported protocol %s", uri, uri.getScheme());
                 }
             }
             catch (URISyntaxException e)
             {
-                QuickDialogs.error("Error", null, "Outgoing link %s was not a valid uri", element.getAttribute("href"));
+                QuickDialogs.error("Error", null, "Outgoing link %s was not a valid uri", element.getAttribute(attribute));
             }
         }
     }
