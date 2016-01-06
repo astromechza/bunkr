@@ -76,6 +76,13 @@ public class MarkdownWebViewAdapter
         for (int i = 0; i < imgNodes.getLength(); i++)
         {
             Element element = (Element) imgNodes.item(i);
+
+            String existing_css = element.hasAttribute("style") ? element.getAttribute("style") : "";
+            String new_css = existing_css + "; cursor: pointer;";
+            element.setAttribute("style", new_css);
+            element.setAttribute("alt", String.format("Open Image: %s", element.getAttribute("src")));
+            element.setAttribute("title", String.format("Open Image: %s", element.getAttribute("src")));
+
             ((EventTarget) element).addEventListener("click", evt -> this.handleElementLinkAttributeClick(evt, "src"), false);
         }
     }

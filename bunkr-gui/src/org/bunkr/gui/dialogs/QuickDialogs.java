@@ -85,12 +85,12 @@ public class QuickDialogs
         return null;
     }
 
-    public static void error(String title, String message, Object... args)
+    public static void error(String title, String heading, String message, Object... args)
     {
         Logging.error(message, args);
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
-        alert.setHeaderText(null);
+        alert.setHeaderText(heading);
         alert.setContentText(String.format(message, args));
         alert.showAndWait();
     }

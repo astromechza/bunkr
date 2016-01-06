@@ -3,6 +3,7 @@ package org.bunkr.gui.windows;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
@@ -36,6 +37,7 @@ public class MainWindow extends BaseWindow
     private Label lblHierarchy;
     private TabPane tabPane;
     private InventoryTreeView tree;
+    private Button encryptionSettingsButton;
 
     public MainWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
     {
@@ -64,6 +66,7 @@ public class MainWindow extends BaseWindow
         this.lblHierarchy = new Label("File Structure");
         this.tree = new InventoryTreeView(this.archive);
         this.tabPane = new TabPane();
+        this.encryptionSettingsButton = new Button("Archive Security");
     }
 
     @Override
@@ -72,12 +75,12 @@ public class MainWindow extends BaseWindow
         SplitPane sp = new SplitPane();
         sp.setDividerPosition(0, 0.3);
 
-        VBox leftBox = new VBox(0);
-        leftBox.getChildren().add(this.lblHierarchy);
+        VBox leftBox = new VBox(0, this.lblHierarchy, this.tree, this.encryptionSettingsButton);
         VBox.setVgrow(this.lblHierarchy, Priority.NEVER);
         this.lblHierarchy.setAlignment(Pos.CENTER);
-        leftBox.getChildren().add(this.tree);
         VBox.setVgrow(this.tree, Priority.ALWAYS);
+        VBox.setVgrow(this.encryptionSettingsButton, Priority.NEVER);
+        this.encryptionSettingsButton.setMaxWidth(Double.MAX_VALUE);
 
         sp.getItems().add(leftBox);
         sp.getItems().add(this.tabPane);
