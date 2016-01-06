@@ -9,6 +9,7 @@ import org.bunkr.core.inventory.IFFTraversalTarget;
 import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.inventory.MediaType;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
+import org.bunkr.gui.components.tabs.TabLoadError;
 import org.bunkr.gui.components.tabs.images.ImageTab;
 import org.bunkr.gui.components.tabs.markdown.MarkdownTab;
 import org.bunkr.gui.dialogs.QuickDialogs;
@@ -49,25 +50,32 @@ public class FilesTabPaneController
         }
         else
         {
-            IOpenedFileTab tab;
-            switch(file.getMediaType())
+            try
             {
-                case MediaType.TEXT:
-                    tab = new MarkdownTab(file, this.archive);
-                    ((MarkdownTab) tab).setOnSaveInventoryRequest(this.onSaveInventoryRequest::accept);
-                    ((MarkdownTab) tab).setOnTryOpenFileItem(this::tryOpenFileItem);
-                    break;
-                case MediaType.IMAGE:
-                    tab = new ImageTab(file, this.archive);
-                    break;
-                default:
-                    QuickDialogs.error("Cannot open file with media type: " + file.getMediaType());
-                    return;
+                IOpenedFileTab tab;
+                switch (file.getMediaType())
+                {
+                    case MediaType.TEXT:
+                        tab = new MarkdownTab(file, this.archive);
+                        ((MarkdownTab) tab).setOnSaveInventoryRequest(this.onSaveInventoryRequest::accept);
+                        ((MarkdownTab) tab).setOnTryOpenFileItem(this::tryOpenFileItem);
+                        break;
+                    case MediaType.IMAGE:
+                        tab = new ImageTab(file, this.archive);
+                        break;
+                    default:
+                        QuickDialogs.error("Cannot open file with media type: " + file.getMediaType());
+                        return;
+                }
+                ((Tab) tab).setOnClosed(e -> this.openTabs.remove(file.getUuid()));
+                this.pane.getTabs().add((Tab) tab);
+                this.openTabs.put(file.getUuid(), tab);
+                this.pane.getSelectionModel().select((Tab) tab);
             }
-            ((Tab) tab).setOnClosed(e -> this.openTabs.remove(file.getUuid()));
-            this.pane.getTabs().add((Tab) tab);
-            this.openTabs.put(file.getUuid(), tab);
-            this.pane.getSelectionModel().select((Tab) tab);
+            catch (TabLoadError tabLoadError)
+            {
+                QuickDialogs.error("Tab Load Error", "An error occured while building the new tab", tabLoadError.getMessage());
+            }
         }
     }
 
