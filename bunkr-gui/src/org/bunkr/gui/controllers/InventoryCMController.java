@@ -347,15 +347,13 @@ public class InventoryCMController
             {
                 oldParentItem.getChildren().remove(selected);
             }
-            InventoryTreeData newValue = new InventoryTreeData(selected.getValue().getUuid(), newNameComponent, selected.getValue().getType());
-            selected.setValue(newValue);
+            selected.getValue().setName(newNameComponent);
             if (oldParentItem != newParentItem)
             {
                 newParentItem.getChildren().add(selected);
             }
             newParentItem.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-            Event.fireEvent(selected,
-                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, selected.getValue()));
             this.treeView.getSelectionModel().select(selected);
             this.onSaveInventoryRequest.accept(String.format("Renamed file %s", newNameComponent));
             if (renameSubject.isAFile() && renameSubject instanceof FileInventoryItem)
@@ -407,14 +405,12 @@ public class InventoryCMController
             selectedContainer.addFolder(newFolder);
 
             // create the new tree item
-            InventoryTreeData
-                    newValue = new InventoryTreeData(newFolder.getUuid(), newFolder.getName(), InventoryTreeData.Type.FOLDER);
+            InventoryTreeData newValue = new InventoryTreeData(newFolder);
             TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
 
-            Event.fireEvent(selected,
-                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
             this.onSaveInventoryRequest.accept(String.format("Created new directory %s", newFolder.getName()));
         }
@@ -462,7 +458,7 @@ public class InventoryCMController
             selectedContainer.addFile(newFile);
 
             // create the new tree item
-            InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);
+            InventoryTreeData newValue = new InventoryTreeData(newFile);
             TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
@@ -563,7 +559,7 @@ public class InventoryCMController
             }
 
             // create the new tree item
-            InventoryTreeData newValue = new InventoryTreeData(newFile.getUuid(), newFile.getName(), InventoryTreeData.Type.FILE);
+            InventoryTreeData newValue = new InventoryTreeData(newFile);
             TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
             selected.getChildren().add(newItem);
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));

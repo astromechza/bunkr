@@ -43,9 +43,7 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
         }
         for (FileInventoryItem subfile : mirror.getFiles())
         {
-            parent.getChildren().add(new TreeItem<>(new InventoryTreeData(
-                    subfile.getUuid(), subfile.getName(), InventoryTreeData.Type.FILE
-            )));
+            parent.getChildren().add(new TreeItem<>(new InventoryTreeData(subfile)));
         }
 
         parent.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
@@ -56,9 +54,7 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
      */
     private TreeItem<InventoryTreeData> genFolder(FolderInventoryItem folder)
     {
-        return genFolder(new TreeItem<>(new InventoryTreeData(
-                folder.getUuid(), folder.getName(), InventoryTreeData.Type.FOLDER)), folder
-        );
+        return genFolder(new TreeItem<>(new InventoryTreeData(folder)), folder);
     }
 
     public String getPathForTreeItem(TreeItem<InventoryTreeData> o)

@@ -1,5 +1,8 @@
 package org.bunkr.gui.components.treeview;
 
+import org.bunkr.core.inventory.FileInventoryItem;
+import org.bunkr.core.inventory.FolderInventoryItem;
+
 import java.util.UUID;
 
 /**
@@ -15,15 +18,29 @@ public class InventoryTreeData implements Comparable<InventoryTreeData>
     public int compareTo(InventoryTreeData o)
     {
         int r = this.getType().compareTo(o.getType());
-        if (r == 0) return this.getName().compareTo(o.getName());
+        if (r == 0) return this.getName().toLowerCase().compareTo(o.getName().toLowerCase());
         return r;
     }
 
     public enum Type {ROOT, FOLDER, FILE}
 
     private final UUID uuid;
-    private final String name;
     private final Type type;
+    private String name;
+
+    public InventoryTreeData(FileInventoryItem file)
+    {
+        this.uuid = file.getUuid();
+        this.name = file.getName();
+        this.type = Type.FILE;
+    }
+
+    public InventoryTreeData(FolderInventoryItem folder)
+    {
+        this.uuid = folder.getUuid();
+        this.name = folder.getName();
+        this.type = Type.FOLDER;
+    }
 
     public InventoryTreeData(UUID uuid, String name, Type type)
     {
@@ -45,5 +62,10 @@ public class InventoryTreeData implements Comparable<InventoryTreeData>
     public Type getType()
     {
         return type;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 }
