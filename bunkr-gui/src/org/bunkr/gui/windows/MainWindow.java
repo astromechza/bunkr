@@ -1,7 +1,5 @@
 package org.bunkr.gui.windows;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -73,7 +71,7 @@ public class MainWindow extends BaseWindow
         this.encryptionSettingsButton.setOnAction(event -> {
             try
             {
-                ArchiveSecurityWindow popup = new ArchiveSecurityWindow(this.archive);
+                ArchiveSecurityWindow popup = new ArchiveSecurityWindow(this.archive, this.securityProvider);
                 popup.setOnSaveDescriptorRequest(this::saveMetadata);
                 popup.getStage().showAndWait();
             }

@@ -20,6 +20,16 @@ public class UserSecurityProvider
         this.passwordProvider = passwordProvider;
     }
 
+    public PasswordProvider getProvider()
+    {
+        return passwordProvider;
+    }
+
+    public void setProvider(PasswordProvider passwordProvider)
+    {
+        this.passwordProvider = passwordProvider;
+    }
+
     public byte[] getHashedPassword() throws IllegalPasswordException
     {
         return this.passwordProvider.getHashedArchivePassword();

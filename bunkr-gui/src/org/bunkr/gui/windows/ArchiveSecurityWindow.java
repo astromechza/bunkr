@@ -14,7 +14,10 @@ import org.bunkr.core.Resources;
 import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.exceptions.IllegalPasswordException;
+import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.PasswordRequirements;
+import org.bunkr.core.usersec.UserSecurityProvider;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
@@ -40,6 +43,7 @@ public class ArchiveSecurityWindow extends BaseWindow
     private static final String PW_NOTE_CLASS_NOT_OK = "pw-note-failure";
 
     private final ArchiveInfoContext archive;
+    private final UserSecurityProvider securityProvider;
     private final String cssPath;
 
     private Consumer<String> onSaveDescriptorRequest;
@@ -52,14 +56,26 @@ public class ArchiveSecurityWindow extends BaseWindow
     private PasswordField pbkdf2_confirmPasswordField;
     private Label pbkdf2_passwordNote;
 
-    public ArchiveSecurityWindow(ArchiveInfoContext archive) throws IOException
+    public ArchiveSecurityWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
     {
         super();
         this.archive = archive;
+        this.securityProvider = securityProvider;
         this.cssPath = Resources.getExternalPath("/resources/css/archive_settings_window.css");
         this.initialise();
 
-        this.modelBox.getSelectionModel().select(0);
+        if (this.archive.getDescriptor() instanceof PlaintextDescriptor)
+        {
+            this.modelBox.getSelectionModel().select(0);
+        }
+        else if (this.archive.getDescriptor() instanceof PBKDF2Descriptor)
+        {
+            this.modelBox.getSelectionModel().select(1);
+        }
+        else
+        {
+            QuickDialogs.error("Cannot handle security model: %s", this.archive.getDescriptor().getClass().getName());
+        }
     }
 
     @Override
@@ -131,6 +147,10 @@ public class ArchiveSecurityWindow extends BaseWindow
 
         this.btnApply.setOnAction(event -> {
 
+            if (! QuickDialogs.confirm(
+                    "By switching security model, you will be modifying the security of the definitions. \nAre you sure you want to continue?"
+            )) return;
+
             // first confirm that the user does want to change the encryption type
 
             switch (this.modelBox.getSelectionModel().getSelectedItem())
@@ -142,7 +162,16 @@ public class ArchiveSecurityWindow extends BaseWindow
                     return;
                 case SM_PBKDF2:
                     this.archive.setDescriptor(PBKDF2Descriptor.makeDefaults());
-                    // TODO how to do this... need to somehow set the UserSecurityProvider to the new password and perform the save
+                    try
+                    {
+                        this.securityProvider.setProvider(new PasswordProvider());
+                        this.securityProvider.getProvider().setArchivePassword(this.pbkdf2_passwordField.getText().getBytes());
+                    }
+                    catch (IllegalPasswordException e)
+                    {
+                        QuickDialogs.error("Invalid Password", "The password you provided does not meet the requirements", e.getMessage());
+                        return;
+                    }
                     this.onSaveDescriptorRequest.accept("Switched to PBKDF2Descriptor.");
                     this.getStage().close();
                     return;
