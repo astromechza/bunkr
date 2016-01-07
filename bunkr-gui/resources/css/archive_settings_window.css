@@ -1,0 +1,31 @@
+.background {
+    -fx-background-color: linear-gradient(to bottom, #BBBBBB, #FFFFFF);
+}
+
+#pw-note-field {
+    -fx-font-size: 8pt;
+}
+
+.pw-note-success {
+    -fx-text-fill: #00DD00;
+}
+
+.pw-note-failure {
+    -fx-text-fill: #DD0000;
+}
+
+.center-pane {
+    -fx-padding: 10px 10px 10px 10px;
+    -fx-border-radius: 3px;
+    -fx-border-insets: 0;
+    -fx-border-width: 2px;
+    -fx-border-style: solid;
+    -fx-border-color: darkgray lightgray lightgray darkgray;
+    -fx-margin: 10px 10px 10px 10px;
+
+}
+
+.small-button {
+    -fx-font: normal 10px sans-serif;
+}
+

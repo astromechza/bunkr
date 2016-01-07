@@ -26,7 +26,7 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
      */
     public void refreshAll()
     {
-        TreeItem<InventoryTreeData> root = new TreeItem<>(new InventoryTreeData(null, "/", InventoryTreeData.Type.ROOT));
+        TreeItem<InventoryTreeData> root = new TreeItem<>(InventoryTreeData.makeRoot());
         genFolder(root, this.archive.getInventory());
         root.setExpanded(true);
         this.setRoot(root);

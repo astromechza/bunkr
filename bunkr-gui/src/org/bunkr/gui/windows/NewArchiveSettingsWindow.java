@@ -58,7 +58,7 @@ public class NewArchiveSettingsWindow extends BaseWindow
     {
         super();
         this.previousWindow = previousWindow;
-        this.cssPath = Resources.getExternalPath("/resources/css/new_archive_settings_window.css");
+        this.cssPath = Resources.getExternalPath("/resources/css/archive_settings_window.css");
         this.initialise();
     }
 

@@ -21,5 +21,7 @@ public interface IArchiveInfoContext
 
     IDescriptor getDescriptor();
 
+    void setDescriptor(IDescriptor descriptor);
+
     Inventory getInventory();
 }

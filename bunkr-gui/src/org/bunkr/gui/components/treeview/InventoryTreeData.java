@@ -42,7 +42,7 @@ public class InventoryTreeData implements Comparable<InventoryTreeData>
         this.type = Type.FOLDER;
     }
 
-    public InventoryTreeData(UUID uuid, String name, Type type)
+    private InventoryTreeData(UUID uuid, String name, Type type)
     {
         this.uuid = uuid;
         this.name = name;
@@ -67,5 +67,10 @@ public class InventoryTreeData implements Comparable<InventoryTreeData>
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public static InventoryTreeData makeRoot()
+    {
+        return new InventoryTreeData(null, "/", Type.ROOT);
     }
 }

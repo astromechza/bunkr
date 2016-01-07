@@ -1,5 +1,7 @@
 package org.bunkr.gui.windows;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -67,6 +69,19 @@ public class MainWindow extends BaseWindow
         this.tree = new InventoryTreeView(this.archive);
         this.tabPane = new TabPane();
         this.encryptionSettingsButton = new Button("Archive Security");
+
+        this.encryptionSettingsButton.setOnAction(event -> {
+            try
+            {
+                ArchiveSecurityWindow popup = new ArchiveSecurityWindow(this.archive);
+                popup.setOnSaveDescriptorRequest(this::saveMetadata);
+                popup.getStage().showAndWait();
+            }
+            catch (IOException e)
+            {
+                QuickDialogs.exception(e);
+            }
+        });
     }
 
     @Override

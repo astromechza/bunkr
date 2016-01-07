@@ -55,6 +55,12 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     }
 
     @Override
+    public void setDescriptor(IDescriptor descriptor)
+    {
+        this.descriptor = descriptor;
+    }
+
+    @Override
     public Inventory getInventory()
     {
         return inventory;
