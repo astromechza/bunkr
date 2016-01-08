@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'tmpdir'
-require './docbuilder'
+require_relative './docbuilder'
 
 # first get target jar argument
 target_jar = ARGV[0]
