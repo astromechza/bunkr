@@ -17,11 +17,9 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.PasswordRequirements;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
@@ -259,6 +257,7 @@ public class ArchiveSecurityWindow extends BaseWindow
         });
 
         VBox vbox = new VBox(10, this.pbkdf2_passwordField, this.pbkdf2_confirmPasswordField, this.pbkdf2_passwordNote);
+        vbox.setAlignment(Pos.TOP_RIGHT);
         centerPane.setCenter(vbox);
     }
 }
