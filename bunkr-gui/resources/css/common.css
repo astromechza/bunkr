@@ -1,0 +1,20 @@
+.btnbar-middle {
+    -fx-background-radius: 0;
+}
+
+.btnbar-left {
+    -fx-background-radius: 5 0 0 5, 3 0 0 3, 3 0 0 3;
+}
+
+.btnbar-right {
+    -fx-background-radius: 0 5 5 0, 0 3 3 0, 0 3 3 0;
+}
+
+.small-button {
+    -fx-font: normal 10px sans-serif;
+}
+
+.icons {
+    -fx-font-family: FontAwesome;
+    -fx-text-fill: #000000;
+}

@@ -9,12 +9,14 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Logging;
+import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.FilesTabPaneController;
 import org.bunkr.gui.controllers.InventoryCMController;
@@ -42,6 +44,7 @@ public class MainWindow extends BaseWindow
     public MainWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
     {
         super();
+
         this.archive = archive;
         this.securityProvider = securityProvider;
         this.cssPath = Resources.getExternalPath("/resources/css/main_window.css");
@@ -66,8 +69,7 @@ public class MainWindow extends BaseWindow
         this.lblHierarchy = new Label("File Structure");
         this.tree = new InventoryTreeView(this.archive);
         this.tabPane = new TabPane();
-        this.encryptionSettingsButton = new Button("Archive Security");
-
+        this.encryptionSettingsButton = Icons.buildIconButton("Security Settings", Icons.ICON_SETTINGS);
         this.encryptionSettingsButton.setOnAction(event -> {
             try
             {
@@ -117,6 +119,7 @@ public class MainWindow extends BaseWindow
     public Scene initScene()
     {
         Scene scene = new Scene(this.getRootLayout(), WINDOW_WIDTH, WINDOW_HEIGHT);
+        scene.getStylesheets().add(this.cssCommon);
         scene.getStylesheets().add(this.cssPath);
         this.getStage().setTitle(String.format("Bunkr - %s", this.archive.filePath.getAbsolutePath()));
         this.getStage().setScene(scene);

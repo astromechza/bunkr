@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
+import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.components.tabs.TabLoadError;
 import org.bunkr.gui.dialogs.QuickDialogs;
@@ -126,13 +127,13 @@ public class ImageTab extends Tab implements IOpenedFileTab
     {
         this.setText(this.file.getAbsolutePath());
 
-        this.zoomInButton = new Button("+");
+        this.zoomInButton = Icons.buildIconButton("", Icons.ICON_MAGNIFY_PLUS);
         this.zoomInButton.getStyleClass().add("btnbar-left");
         this.zoomInButton.setFocusTraversable(false);
-        this.zoomResetButton = new Button(".");
+        this.zoomResetButton = Icons.buildIconButton("", Icons.ICON_MAGNIFY);
         this.zoomResetButton.getStyleClass().add("btnbar-middle");
         this.zoomResetButton.setFocusTraversable(false);
-        this.zoomOutButton = new Button("-");
+        this.zoomOutButton = Icons.buildIconButton("", Icons.ICON_MAGNIFY_MINUS);
         this.zoomOutButton.getStyleClass().add("btnbar-right");
         this.zoomOutButton.setFocusTraversable(false);
 

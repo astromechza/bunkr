@@ -280,6 +280,7 @@ public class NewArchiveSettingsWindow extends BaseWindow
     public Scene initScene()
     {
         Scene scene = new Scene(this.getRootLayout());
+        scene.getStylesheets().add(this.cssCommon);
         scene.getStylesheets().add(this.cssPath);
         this.getStage().setTitle("Bunkr - New Archive");
         this.getStage().setScene(scene);

@@ -1,4 +1,4 @@
-package org.bunkr.gui.dialogs;
+package org.bunkr.gui.windows;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,7 +16,9 @@ import org.bunkr.core.Resources;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.inventory.MediaType;
 import org.bunkr.core.utils.Formatters;
+import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.SelectableLabel;
+import org.bunkr.gui.dialogs.QuickDialogs;
 import org.bunkr.gui.windows.BaseWindow;
 
 import java.io.IOException;
@@ -27,7 +29,7 @@ import java.util.function.Consumer;
  * Creator: benmeier
  * Created At: 2015-12-29
  */
-public class FileInfoDialog extends BaseWindow
+public class FileInfoWindow extends BaseWindow
 {
     private static final int WINDOW_WIDTH = 400;
 
@@ -47,7 +49,7 @@ public class FileInfoDialog extends BaseWindow
     private ListView<String> tagsBox;
     private Consumer<String> onSaveInventoryRequest;
 
-    public FileInfoDialog(FileInventoryItem item) throws IOException
+    public FileInfoWindow(FileInventoryItem item) throws IOException
     {
         super();
         this.filePath = item.getAbsolutePath();
@@ -78,8 +80,8 @@ public class FileInfoDialog extends BaseWindow
         ObservableList<String> tagItems = FXCollections.observableArrayList(this.item.getTags());
         this.tagsBox.setItems(tagItems);
 
-        this.addTagButton = new Button("+");
-        this.removeTagButton = new Button("-");
+        this.addTagButton = Icons.buildIconButton("", Icons.ICON_PLUS);
+        this.removeTagButton = Icons.buildIconButton("", Icons.ICON_MINUS);
 
         this.lblSizeOnDisk = new Label("Size on Disk:");
         this.lblSizeOnDiskValue = new SelectableLabel(String.format(
@@ -93,9 +95,9 @@ public class FileInfoDialog extends BaseWindow
         this.lblMediaTypeValue = new Label(this.item.getMediaType());
         this.changeMediaTypeButton = new Button("Change..");
 
-        this.applyButton = new Button("Save Changes");
+        this.applyButton = Icons.buildIconButton("Save Changes", Icons.ICON_SAVE);
         this.applyButton.setDisable(true);
-        this.closeButton = new Button("Close");
+        this.closeButton = Icons.buildIconButton("Close", Icons.ICON_CROSS);
     }
 
     @Override
@@ -129,7 +131,7 @@ public class FileInfoDialog extends BaseWindow
         GridPane.setVgrow(this.tagsBox, Priority.ALWAYS);
         GridPane.setColumnSpan(this.tagsBox, 2);
 
-        HBox tagButtonBox = new HBox(5, this.addTagButton, this.removeTagButton);
+        HBox tagButtonBox = new HBox(this.addTagButton, this.removeTagButton);
         tagButtonBox.setAlignment(Pos.CENTER_RIGHT);
         rootLayout.add(tagButtonBox, 0, rowid); rowid++;
         GridPane.setColumnSpan(tagButtonBox, 2);
@@ -162,7 +164,7 @@ public class FileInfoDialog extends BaseWindow
             String newMT = QuickDialogs.pick(
                     "Choose a Media Type",
                     "Choose a new Media Type for this file. This will affect how the file is handled in this GUI and " +
-                    "won't change the actual bytes of the file.",
+                            "won't change the actual bytes of the file.",
                     null,
                     choices,
                     this.item.getMediaType()
@@ -215,13 +217,16 @@ public class FileInfoDialog extends BaseWindow
     {
         this.changeMediaTypeButton.getStyleClass().add("small-button");
         this.addTagButton.getStyleClass().add("small-button");
+        this.addTagButton.getStyleClass().add("btnbar-left");
         this.removeTagButton.getStyleClass().add("small-button");
+        this.removeTagButton.getStyleClass().add("btnbar-right");
     }
 
     @Override
     public Scene initScene()
     {
         Scene scene = new Scene(this.getRootLayout());
+        scene.getStylesheets().add(this.cssCommon);
         scene.getStylesheets().add(this.cssPath);
         this.getStage().setTitle("Bunkr - File Info");
         this.getStage().setScene(scene);

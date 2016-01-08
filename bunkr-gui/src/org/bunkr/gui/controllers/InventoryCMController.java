@@ -14,7 +14,7 @@ import org.bunkr.core.utils.Formatters;
 import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
-import org.bunkr.gui.dialogs.FileInfoDialog;
+import org.bunkr.gui.windows.FileInfoWindow;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.*;
@@ -487,7 +487,7 @@ public class InventoryCMController
             if (selectedFile.isAFile() && selectedFile instanceof FileInventoryItem)
             {
                 FileInventoryItem fileItem = (FileInventoryItem) selectedFile;
-                FileInfoDialog popup = new FileInfoDialog(fileItem);
+                FileInfoWindow popup = new FileInfoWindow(fileItem);
                 popup.setOnSaveInventoryRequest(this.onSaveInventoryRequest);
                 popup.getStage().showAndWait();
             }

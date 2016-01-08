@@ -33,10 +33,6 @@
     -fx-padding: -7;
 }
 
-.small-button {
-    -fx-font: normal 10px sans-serif;
-}
-
 .open-file-tab {
     -fx-font: normal 10px sans-serif;
 }
@@ -51,14 +47,3 @@
     -fx-text-alignment: center;
 }
 
-.btnbar-middle {
-    -fx-background-radius: 0;
-}
-
-.btnbar-left {
-    -fx-background-radius: 5 0 0 5, 3 0 0 3, 3 0 0 3;
-}
-
-.btnbar-right {
-    -fx-background-radius: 0 5 5 0, 0 3 3 0, 0 3 3 0;
-}

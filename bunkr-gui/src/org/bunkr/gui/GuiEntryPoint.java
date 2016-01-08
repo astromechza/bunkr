@@ -1,12 +1,14 @@
 package org.bunkr.gui;
 
 import javafx.application.Application;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import org.bunkr.core.Resources;
 import org.bunkr.core.Version;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.windows.LandingWindow;
@@ -60,8 +62,8 @@ public class GuiEntryPoint
         @Override
         public void start(Stage primaryStage) throws Exception
         {
+            Font.loadFont(Resources.getExternalPath("/resources/fonts/fontawesome.ttf"), 12);
             new URLRequestBlocker().install();
-
             new LandingWindow(primaryStage).getStage().show();
         }
     }

@@ -21,6 +21,7 @@ import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.UserSecurityProvider;
+import org.bunkr.gui.Icons;
 import org.bunkr.gui.dialogs.PasswordDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
@@ -51,8 +52,8 @@ public class LandingWindow extends BaseWindow
     @Override
     public void initControls()
     {
-        this.newArchiveButton = new Button("New Archive");
-        this.openArchiveButton = new Button("Open Archive");
+        this.newArchiveButton = Icons.buildIconButton("New Archive", Icons.ICON_NEW);
+        this.openArchiveButton = Icons.buildIconButton("Open Archive", Icons.ICON_OPEN);
         this.versionLabel = new Label(String.format("Version: %s (%s %s)",
                                                     Version.versionString,
                                                     Version.gitDate,
@@ -183,6 +184,7 @@ public class LandingWindow extends BaseWindow
     public Scene initScene()
     {
         Scene scene = new Scene(this.getRootLayout(), WINDOW_WIDTH, WINDOW_HEIGHT);
+        scene.getStylesheets().add(this.cssCommon);
         scene.getStylesheets().add(this.cssPath);
         this.getStage().setTitle("Bunkr");
         this.getStage().setScene(scene);

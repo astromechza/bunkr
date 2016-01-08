@@ -22,10 +22,4 @@
     -fx-border-style: solid;
     -fx-border-color: darkgray lightgray lightgray darkgray;
     -fx-margin: 10px 10px 10px 10px;
-
 }
-
-.small-button {
-    -fx-font: normal 10px sans-serif;
-}
-

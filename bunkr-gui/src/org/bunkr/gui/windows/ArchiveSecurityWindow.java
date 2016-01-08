@@ -17,6 +17,7 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.PasswordRequirements;
 import org.bunkr.core.usersec.UserSecurityProvider;
+import org.bunkr.gui.Icons;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class ArchiveSecurityWindow extends BaseWindow
 {
     private static final int WINDOW_WIDTH = 600, WINDOW_HEIGHT = 300;
 
-    private static final String SM_PLAINTEXT = "none (plaintext)";
+    private static final String SM_PLAINTEXT = "No Encryption";
     private static final String SM_PBKDF2 = "PBKDF2 / AES256";
 
     private static final String PW_NOTE_DEFAULT = "Please enter a password";
@@ -81,8 +82,8 @@ public class ArchiveSecurityWindow extends BaseWindow
     {
         this.centerPane = new BorderPane();
         this.centerPane.getStyleClass().add("center-pane");
-        this.btnCancel = new Button("Cancel");
-        this.btnApply = new Button("Apply");
+        this.btnCancel = Icons.buildIconButton("Cancel", Icons.ICON_CROSS);
+        this.btnApply = Icons.buildIconButton("Apply", Icons.ICON_SAVE);
         this.btnApply.setDisable(true);
 
         this.modelBox = new ComboBox<String>();
@@ -189,6 +190,7 @@ public class ArchiveSecurityWindow extends BaseWindow
     public Scene initScene()
     {
         Scene scene = new Scene(this.getRootLayout(), WINDOW_WIDTH, WINDOW_HEIGHT);
+        scene.getStylesheets().add(this.cssCommon);
         scene.getStylesheets().add(this.cssPath);
         this.getStage().setTitle("Bunkr - Archive Security");
         this.getStage().setScene(scene);

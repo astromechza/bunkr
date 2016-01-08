@@ -13,6 +13,7 @@ import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Logging;
+import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.markdown4j.Markdown4jProcessor;
@@ -94,11 +95,11 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     {
         this.setText(this.subject.getAbsolutePath());
         ToolBar actionBar = new ToolBar();
-        this.saveButton = new Button("Save");
+        this.saveButton = Icons.buildIconButton("Save", Icons.ICON_SAVE);
         this.saveButton.getStyleClass().add("small-button");
         this.switchModeButton = new Button("View");
         this.switchModeButton.getStyleClass().add("small-button");
-        this.resetButton = new Button("Reload");
+        this.resetButton = Icons.buildIconButton("Reload", Icons.ICON_RELOAD);
         this.resetButton.getStyleClass().add("small-button");
         actionBar.getItems().addAll(this.saveButton, this.resetButton, this.switchModeButton);
         VBox.setVgrow(actionBar, Priority.NEVER);
@@ -219,6 +220,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     {
         this.currentMode = Mode.EDITTING;
         this.switchModeButton.setText("View");
+        this.switchModeButton.setGraphic(Icons.buildIconLabel(Icons.ICON_VIEW));
         this.editorArea.setText((this.plainTextContent == null) ? "" : this.plainTextContent);
         if (this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().remove(this.formattedView);
         if (!this.layout.getChildren().contains(this.editorArea)) this.layout.getChildren().add(this.editorArea);
@@ -228,6 +230,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     {
         this.currentMode = Mode.VIEWING;
         this.switchModeButton.setText("Edit");
+        this.switchModeButton.setGraphic(Icons.buildIconLabel(Icons.ICON_EDIT));
 
         String renderedContent = "";
         if (this.plainTextContent != null)

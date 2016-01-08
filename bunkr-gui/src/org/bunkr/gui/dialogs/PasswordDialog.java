@@ -12,6 +12,7 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import org.bunkr.core.Resources;
+import org.bunkr.gui.Icons;
 import org.bunkr.gui.windows.BaseWindow;
 
 import java.io.File;
@@ -49,9 +50,9 @@ public class PasswordDialog extends BaseWindow
         this.passwordFileLabel = new Label("Password File:");
         this.passwordField = new PasswordField();
         this.passwordFilePathBox = new TextField();
-        this.pickPasswordFileButton = new Button("Select");
-        this.cancelButton = new Button("Cancel");
-        this.continueButton = new Button("Continue");
+        this.pickPasswordFileButton = Icons.buildIconButton("Select", Icons.ICON_ELLIPSIS);
+        this.cancelButton = Icons.buildIconButton("Cancel", Icons.ICON_CROSS);
+        this.continueButton = Icons.buildIconButton("Continue", Icons.ICON_TICK);
         this.continueButton.setDisable(true);
     }
 
@@ -154,6 +155,7 @@ public class PasswordDialog extends BaseWindow
     public Scene initScene()
     {
         Scene scene = new Scene(this.getRootLayout());
+        scene.getStylesheets().add(this.cssCommon);
         scene.getStylesheets().add(this.cssPath);
         this.getStage().setTitle("Bunkr - Provide a Password");
         this.getStage().setScene(scene);
@@ -181,15 +183,5 @@ public class PasswordDialog extends BaseWindow
     public byte[] getPassword()
     {
         return this.passwordField.getText().getBytes();
-    }
-
-    /**
-     * Have no idea if this is actually helping.. For all I know the password fields fill the heap with old passwords
-     * as you change the text. I'm just going to do this as best-effort for now.
-     */
-    public void clean()
-    {
-        Arrays.fill(this.passwordFilePathBox.getText().getBytes(), (byte) 0);
-        Arrays.fill(this.passwordField.getText().getBytes(), (byte) 0);
     }
 }

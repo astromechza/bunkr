@@ -3,6 +3,9 @@ package org.bunkr.gui.windows;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.bunkr.core.Resources;
+
+import java.io.IOException;
 
 /**
  * Creator: benmeier
@@ -10,16 +13,19 @@ import javafx.stage.Stage;
  */
 public abstract class BaseWindow
 {
+    protected final String cssCommon;
+
     private final Stage stage;
     private Scene scene;
     private Parent rootLayout;
 
-    public BaseWindow(Stage container)
+    public BaseWindow(Stage container) throws IOException
     {
         this.stage = container;
+        this.cssCommon = Resources.getExternalPath("/resources/css/common.css");
     }
 
-    public BaseWindow()
+    public BaseWindow() throws IOException
     {
         this(new Stage());
     }
