@@ -97,7 +97,7 @@ public class QuickDialogs
 
     public static void error(String format, Object... args)
     {
-        error("Error", format, args);
+        error("Error", "An Error occured", format, args);
     }
 
     public static <T> T pick(String title, String heading, String content, List<T> items, T initial)
