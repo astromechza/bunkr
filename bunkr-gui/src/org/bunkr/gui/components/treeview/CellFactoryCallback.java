@@ -33,19 +33,17 @@ public class CellFactoryCallback implements Callback<TreeView<InventoryTreeData>
                     setText(item != null ? item.getName() : "");
                     if (item != null)
                     {
+                        setGraphic(Icons.buildIconLabel(item.getIcon()));
                         if (item.getType().equals(InventoryTreeData.Type.ROOT))
                         {
-                            setGraphic(Icons.buildIconLabel(Icons.ICON_FOLDER));
                             setContextMenu(CellFactoryCallback.this.callbackContainer.rootContextMenu);
                         }
                         else if (item.getType().equals(InventoryTreeData.Type.FOLDER))
                         {
-                            setGraphic(Icons.buildIconLabel(Icons.ICON_FOLDER));
                             setContextMenu(CellFactoryCallback.this.callbackContainer.dirContextMenu);
                         }
                         else
                         {
-                            setGraphic(Icons.buildIconLabel(Icons.ICON_FILE));
                             setContextMenu(CellFactoryCallback.this.callbackContainer.fileContextMenu);
                         }
                     }

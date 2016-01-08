@@ -2,6 +2,8 @@ package org.bunkr.gui.components.treeview;
 
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.inventory.FolderInventoryItem;
+import org.bunkr.core.inventory.MediaType;
+import org.bunkr.gui.Icons;
 
 import java.util.UUID;
 
@@ -27,12 +29,14 @@ public class InventoryTreeData implements Comparable<InventoryTreeData>
     private final UUID uuid;
     private final Type type;
     private String name;
+    private String icon;
 
     public InventoryTreeData(FileInventoryItem file)
     {
         this.uuid = file.getUuid();
         this.name = file.getName();
         this.type = Type.FILE;
+        this.icon = getIconForMediaType(file.getMediaType());
     }
 
     public InventoryTreeData(FolderInventoryItem folder)
@@ -40,13 +44,15 @@ public class InventoryTreeData implements Comparable<InventoryTreeData>
         this.uuid = folder.getUuid();
         this.name = folder.getName();
         this.type = Type.FOLDER;
+        this.icon = Icons.ICON_FOLDER;
     }
 
-    private InventoryTreeData(UUID uuid, String name, Type type)
+    private InventoryTreeData(UUID uuid, String name, Type type, String icon)
     {
         this.uuid = uuid;
         this.name = name;
         this.type = type;
+        this.icon = icon;
     }
 
     public String getName()
@@ -69,8 +75,25 @@ public class InventoryTreeData implements Comparable<InventoryTreeData>
         this.name = name;
     }
 
+    public String getIcon()
+    {
+        return icon;
+    }
+
+    public void setIcon(String icon)
+    {
+        this.icon = icon;
+    }
+
     public static InventoryTreeData makeRoot()
     {
-        return new InventoryTreeData(null, "/", Type.ROOT);
+        return new InventoryTreeData(null, "/", Type.ROOT, Icons.ICON_FOLDER);
+    }
+
+    public static String getIconForMediaType(String m)
+    {
+        if (m.equals(MediaType.IMAGE)) return Icons.ICON_FILE_IMAGE;
+        if (m.equals(MediaType.TEXT)) return Icons.ICON_FILE_TEXT;
+        return Icons.ICON_FILE;
     }
 }
