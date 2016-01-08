@@ -10,22 +10,29 @@ import javafx.scene.control.Label;
 public class Icons
 {
     public static final String ICON_SETTINGS = "\uf013";
-    public static final String ICON_MAGNIFY = "\uf002";
-    public static final String ICON_MAGNIFY_PLUS = "\uf00e";
-    public static final String ICON_MAGNIFY_MINUS = "\uf010";
-    public static final String ICON_TICK = "\uf00c";
-    public static final String ICON_CROSS = "\uf00d";
-    public static final String ICON_SAVE = "\uf0c7";
     public static final String ICON_RELOAD = "\uf021";
     public static final String ICON_EDIT = "\uf044";
     public static final String ICON_VIEW = "\uf06e";
+    public static final String ICON_ELLIPSIS = "\uf141";
+
+    public static final String ICON_MAGNIFY = "\uf002";
+    public static final String ICON_MAGNIFY_PLUS = "\uf00e";
+    public static final String ICON_MAGNIFY_MINUS = "\uf010";
+
+    public static final String ICON_TICK = "\uf00c";
+    public static final String ICON_CROSS = "\uf00d";
+
     public static final String ICON_PLUS = "\uf067";
     public static final String ICON_MINUS = "\uf068";
-    public static final String ICON_ELLIPSIS = "\uf141";
+
     public static final String ICON_OPEN = "\uf07c";
     public static final String ICON_NEW = "\uf187";
+    public static final String ICON_SAVE = "\uf0c7";
+
     public static final String ICON_FOLDER = "\uf114";
     public static final String ICON_FILE = "\uf016";
+    public static final String ICON_FILE_IMAGE = "\uf1c5";
+    public static final String ICON_FILE_TEXT = "\uf0f6";
 
     public static Button buildIconButton(String text, String icon, int size)
     {
