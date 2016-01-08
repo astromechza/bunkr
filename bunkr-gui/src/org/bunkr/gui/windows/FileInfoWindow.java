@@ -19,7 +19,6 @@ import org.bunkr.core.utils.Formatters;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.SelectableLabel;
 import org.bunkr.gui.dialogs.QuickDialogs;
-import org.bunkr.gui.windows.BaseWindow;
 
 import java.io.IOException;
 import java.util.*;
@@ -47,7 +46,9 @@ public class FileInfoWindow extends BaseWindow
     private Label lblMediaType, lblMediaTypeValue;
     private Button closeButton, applyButton, changeMediaTypeButton, addTagButton, removeTagButton;
     private ListView<String> tagsBox;
+
     private Consumer<String> onSaveInventoryRequest;
+    private Consumer<FileInventoryItem> onRefreshTreeItem;
 
     public FileInfoWindow(FileInventoryItem item) throws IOException
     {
@@ -180,6 +181,7 @@ public class FileInfoWindow extends BaseWindow
         this.applyButton.setOnAction(event -> {
             this.item.setMediaType(this.lblMediaTypeValue.getText());
             this.item.setTags(new HashSet<>(this.tagsBox.getItems()));
+            this.onRefreshTreeItem.accept(this.item);
             this.onSaveInventoryRequest.accept("Modified media type for file " + this.item.getName());
             this.getStage().close();
         });
@@ -240,5 +242,10 @@ public class FileInfoWindow extends BaseWindow
     public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
     {
         this.onSaveInventoryRequest = onSaveInventoryRequest;
+    }
+
+    public void setOnRefreshTreeItem(Consumer<FileInventoryItem> onRefreshTreeItem)
+    {
+        this.onRefreshTreeItem = onRefreshTreeItem;
     }
 }

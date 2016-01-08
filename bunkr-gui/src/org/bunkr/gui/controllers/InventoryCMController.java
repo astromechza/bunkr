@@ -488,6 +488,9 @@ public class InventoryCMController
             {
                 FileInventoryItem fileItem = (FileInventoryItem) selectedFile;
                 FileInfoWindow popup = new FileInfoWindow(fileItem);
+                popup.setOnRefreshTreeItem(e -> {
+                    selected.setValue(new InventoryTreeData(fileItem));
+                });
                 popup.setOnSaveInventoryRequest(this.onSaveInventoryRequest);
                 popup.getStage().showAndWait();
             }
