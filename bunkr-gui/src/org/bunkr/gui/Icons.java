@@ -24,6 +24,8 @@ public class Icons
     public static final String ICON_ELLIPSIS = "\uf141";
     public static final String ICON_OPEN = "\uf07c";
     public static final String ICON_NEW = "\uf187";
+    public static final String ICON_FOLDER = "\uf07b";
+    public static final String ICON_FILE = "\uf15b";
 
     public static Button buildIconButton(String text, String icon, int size)
     {
