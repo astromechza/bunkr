@@ -14,10 +14,7 @@ import javafx.stage.Stage;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
 import org.bunkr.core.Version;
-import org.bunkr.core.descriptor.DescriptorBuilder;
-import org.bunkr.core.descriptor.IDescriptor;
-import org.bunkr.core.descriptor.PBKDF2Descriptor;
-import org.bunkr.core.descriptor.PlaintextDescriptor;
+import org.bunkr.core.descriptor.*;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.UserSecurityProvider;
@@ -135,7 +132,7 @@ public class LandingWindow extends BaseWindow
                     {
                         usp = new UserSecurityProvider();
                     }
-                    else if (descriptor instanceof PBKDF2Descriptor)
+                    else if (descriptor instanceof PBKDF2Descriptor || descriptor instanceof ScryptDescriptor)
                     {
                         PasswordProvider passProv = new PasswordProvider();
                         PasswordDialog dialog = new PasswordDialog();

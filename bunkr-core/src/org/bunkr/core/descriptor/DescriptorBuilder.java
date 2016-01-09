@@ -30,6 +30,7 @@ public class DescriptorBuilder
         // put security descriptors here
         if (name.equals(PlaintextDescriptor.IDENTIFIER)) return new PlaintextDescriptor();
         if (name.equals(PBKDF2Descriptor.IDENTIFIER)) return new PBKDF2Descriptor(params);
+        if (name.equals(ScryptDescriptor.IDENTIFIER)) return new ScryptDescriptor(params);
 
         throw new IllegalArgumentException("Could not identify SecurityDescriptor type " + name);
     }

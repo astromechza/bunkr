@@ -13,6 +13,7 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
 import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
+import org.bunkr.core.descriptor.ScryptDescriptor;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.PasswordRequirements;
@@ -33,6 +34,7 @@ public class ArchiveSecurityWindow extends BaseWindow
 
     private static final String SM_PLAINTEXT = "No Encryption";
     private static final String SM_PBKDF2 = "PBKDF2 / AES256";
+    private static final String SM_SCRYPT = "SCRYPT / AES256";
 
     private static final String PW_NOTE_DEFAULT = "Please enter a password";
     private static final String PW_NOTE_CONFIRM = "Please confirm password";
@@ -54,6 +56,9 @@ public class ArchiveSecurityWindow extends BaseWindow
     private PasswordField pbkdf2_passwordField;
     private PasswordField pbkdf2_confirmPasswordField;
     private Label pbkdf2_passwordNote;
+    private PasswordField scrypt_passwordField;
+    private PasswordField scrypt_confirmPasswordField;
+    private Label scrypt_passwordNote;
 
     public ArchiveSecurityWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
     {
@@ -71,6 +76,10 @@ public class ArchiveSecurityWindow extends BaseWindow
         {
             this.modelBox.getSelectionModel().select(1);
         }
+        else if (this.archive.getDescriptor() instanceof ScryptDescriptor)
+        {
+            this.modelBox.getSelectionModel().select(2);
+        }
         else
         {
             QuickDialogs.error("Cannot handle security model: %s", this.archive.getDescriptor().getClass().getName());
@@ -87,7 +96,7 @@ public class ArchiveSecurityWindow extends BaseWindow
         this.btnApply.setDisable(true);
 
         this.modelBox = new ComboBox<String>();
-        this.modelBox.getItems().addAll(SM_PLAINTEXT, SM_PBKDF2);
+        this.modelBox.getItems().addAll(SM_PLAINTEXT, SM_PBKDF2, SM_SCRYPT);
     }
 
     @Override
@@ -138,6 +147,10 @@ public class ArchiveSecurityWindow extends BaseWindow
                     // build form
                     this.build_pbkdf2_form();
                     break;
+                case SM_SCRYPT:
+                    // build form
+                    this.build_scrypt_form();
+                    break;
                 default:
                     QuickDialogs.error("Cannot handle security model: %s", newValue);
                     break;
@@ -165,6 +178,21 @@ public class ArchiveSecurityWindow extends BaseWindow
                     {
                         this.securityProvider.setProvider(new PasswordProvider());
                         this.securityProvider.getProvider().setArchivePassword(this.pbkdf2_passwordField.getText().getBytes());
+                    }
+                    catch (IllegalPasswordException e)
+                    {
+                        QuickDialogs.error("Invalid Password", "The password you provided does not meet the requirements", e.getMessage());
+                        return;
+                    }
+                    this.onSaveDescriptorRequest.accept("Switched to PBKDF2Descriptor.");
+                    this.getStage().close();
+                    return;
+                case SM_SCRYPT:
+                    this.archive.setDescriptor(ScryptDescriptor.makeDefaults());
+                    try
+                    {
+                        this.securityProvider.setProvider(new PasswordProvider());
+                        this.securityProvider.getProvider().setArchivePassword(this.scrypt_passwordField.getText().getBytes());
                     }
                     catch (IllegalPasswordException e)
                     {
@@ -259,6 +287,66 @@ public class ArchiveSecurityWindow extends BaseWindow
         });
 
         VBox vbox = new VBox(10, this.pbkdf2_passwordField, this.pbkdf2_confirmPasswordField, this.pbkdf2_passwordNote);
+        vbox.setAlignment(Pos.TOP_RIGHT);
+        centerPane.setCenter(vbox);
+    }
+
+    private void build_scrypt_form()
+    {
+        this.scrypt_passwordField = new PasswordField();
+        this.scrypt_passwordField.setPromptText("Enter a password");
+        this.scrypt_confirmPasswordField = new PasswordField();
+        this.scrypt_confirmPasswordField.setPromptText("Confirm the password");
+        this.scrypt_confirmPasswordField.setDisable(true);
+        this.scrypt_passwordNote = new Label(PW_NOTE_DEFAULT);
+
+        this.scrypt_passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            this.scrypt_confirmPasswordField.setText("");
+            this.scrypt_confirmPasswordField.setDisable(true);
+            btnApply.setDisable(true);
+            this.scrypt_passwordNote.getStyleClass().clear();
+
+            if (this.scrypt_passwordField.getText().equals(""))
+            {
+                this.scrypt_passwordNote.setText(PW_NOTE_DEFAULT);
+            }
+            else
+            {
+                try
+                {
+                    PasswordRequirements.checkPasses(this.scrypt_passwordField.getText().getBytes());
+                    this.scrypt_confirmPasswordField.setDisable(false);
+                    this.scrypt_passwordNote.setText(PW_NOTE_CONFIRM);
+                }
+                catch (IllegalPasswordException e)
+                {
+                    this.scrypt_passwordNote.setText(e.getMessage());
+                }
+                this.scrypt_passwordNote.getStyleClass().add(PW_NOTE_CLASS_NOT_OK);
+            }
+        });
+
+        this.scrypt_confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            this.scrypt_passwordNote.getStyleClass().clear();
+            btnApply.setDisable(true);
+            if (this.scrypt_confirmPasswordField.getText().equals(this.scrypt_passwordField.getText()))
+            {
+                this.scrypt_passwordNote.setText(PW_NOTE_MATCH);
+                this.scrypt_passwordNote.getStyleClass().add(PW_NOTE_CLASS_OK);
+                btnApply.setDisable(false);
+            }
+            else if (this.scrypt_confirmPasswordField.getText().equals(""))
+            {
+                this.scrypt_passwordNote.setText(PW_NOTE_CONFIRM);
+            }
+            else
+            {
+                this.scrypt_passwordNote.setText(PW_NOTE_NO_MATCH);
+                this.scrypt_passwordNote.getStyleClass().add(PW_NOTE_CLASS_NOT_OK);
+            }
+        });
+
+        VBox vbox = new VBox(10, this.scrypt_passwordField, this.scrypt_confirmPasswordField, this.scrypt_passwordNote);
         vbox.setAlignment(Pos.TOP_RIGHT);
         centerPane.setCenter(vbox);
     }
