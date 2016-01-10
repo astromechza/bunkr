@@ -26,8 +26,8 @@
     As mentioned in the README, you'll need to download Proguard from sourceforge.
 
     ```
-    ./tools/jarsquasher/jarquasher.rb ./bunkr-gui/target/bunkr-cli-0.5.0.jar ~/Downloads/proguard5.2.1/bin/proguard.sh
-    ./tools/jarsquasher/jarquasher.rb ./bunkr-gui/target/bunkr-gui-0.5.0.jar ~/Downloads/proguard5.2.1/bin/proguard.sh
+    ./tools/jarsquasher/jarquasher.rb ./bunkr-cli/target/bunkr-cli-X.X.X.jar ~/Downloads/proguard5.2.1/bin/proguard.sh
+    ./tools/jarsquasher/jarquasher.rb ./bunkr-gui/target/bunkr-gui-X.X.X.jar ~/Downloads/proguard5.2.1/bin/proguard.sh
     ```
 
 6. (Optional) Generate new Demo file:
