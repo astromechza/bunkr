@@ -71,7 +71,7 @@ public class CLI
 
         parser.addArgument("-p", "--password-file")
                 .dest(ARG_PASSWORD_FILE)
-                .type(Arguments.fileType().verifyExists().verifyCanRead())
+                .type(Arguments.fileType().verifyExists().verifyCanRead().acceptSystemIn())
                 .setDefault(new File("-"))
                 .help("read the archive password from the given file");
 
