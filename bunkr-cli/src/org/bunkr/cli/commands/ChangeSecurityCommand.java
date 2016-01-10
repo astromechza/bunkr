@@ -22,7 +22,7 @@ import java.io.File;
 public class ChangeSecurityCommand implements ICLICommand
 {
     public static final String ARG_ARCHIVE_SECURITY = "algorithm";
-    public static final String ARG_NEW_PASSWORD_FILE = "new-password-file";
+    public static final String ARG_NEW_PASSWORD_FILE = "newpasswordfile";
     public static final String ARG_FILE_SECURITY = "filesecurity";
 
     @Override
@@ -34,7 +34,8 @@ public class ChangeSecurityCommand implements ICLICommand
         securityType.addParser(PlaintextDescriptor.IDENTIFIER.toLowerCase());
 
         Subparser p1 = securityType.addParser(PBKDF2Descriptor.IDENTIFIER.toLowerCase());
-        p1.addArgument(ARG_NEW_PASSWORD_FILE)
+        p1.addArgument("new-password-file")
+                .dest(ARG_NEW_PASSWORD_FILE)
                 .type(Arguments.fileType().verifyExists().verifyCanRead().acceptSystemIn())
                 .help("read the new archive password from the given file or '-' for stdin");
         p1.addArgument("file-security")

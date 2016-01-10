@@ -11,6 +11,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparsers;
 import org.bouncycastle.crypto.CryptoException;
 import org.bunkr.cli.commands.*;
+import org.bunkr.core.utils.Logging;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.util.Map;
 public class CLI
 {
     public static final String ARG_ARCHIVE_PATH = "archive";
-    public static final String ARG_PASSWORD_FILE = "password-file";
+    public static final String ARG_PASSWORD_FILE = "passwordfile";
     public static final String ARG_SUB_COMMAND = "subcommand";
 
     public static final Map<String, ICLICommand> commands = new HashMap<>();
@@ -64,6 +65,12 @@ public class CLI
                                      Version.gitHash));
         parser.addArgument("--version").action(Arguments.version());
 
+        parser.addArgument("--logging")
+                .action(Arguments.storeTrue())
+                .type(Boolean.class)
+                .setDefault(false)
+                .help("Enable debug logging. This may be a security issue due to information leakage.");
+
         parser.addArgument("archive")
                 .dest(ARG_ARCHIVE_PATH)
                 .type(Arguments.fileType())
@@ -84,6 +91,13 @@ public class CLI
         {
             // parse arguments from args array
             Namespace namespace = parser.parseArgs(args);
+            if (namespace.getBoolean("logging"))
+            {
+                Logging.setEnabled(true);
+                Logging.info("Logging is now enabled");
+            }
+
+            Logging.info("Args: %s", namespace);
 
             // perform sub command and pass in args
             commands.get(namespace.getString(ARG_SUB_COMMAND)).handle(namespace);
