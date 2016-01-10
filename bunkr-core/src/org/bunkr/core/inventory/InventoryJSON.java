@@ -30,7 +30,7 @@ public class InventoryJSON
             folders.add(FolderInventoryItemJSON.encodeO(item));
         }
         out.put("folders", folders);
-        out.put("defaultEncryption", input.getDefaultEncryption().toString());
+        out.put("defaultEncryptionAlgorithm", input.getDefaultEncryption().toString());
         return out;
     }
 
@@ -45,7 +45,7 @@ public class InventoryJSON
         Inventory outputInv = new Inventory(
                 new ArrayList<>(),
                 new ArrayList<>(),
-                Algorithms.Encryption.valueOf((String) input.get("defaultEncryption"))
+                Algorithms.Encryption.valueOf((String) input.get("defaultEncryptionAlgorithm"))
         );
 
         for (Object item : (JSONArray) input.get("files"))
