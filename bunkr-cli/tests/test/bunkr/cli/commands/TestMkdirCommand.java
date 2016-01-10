@@ -42,7 +42,11 @@ public class TestMkdirCommand
 
     public Inventory makeSampleInventory()
     {
-        Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>(), false, false);
+        Inventory i = new Inventory(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                Algorithms.Encryption.NONE
+        );
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         i.addFolder(d1);
         FolderInventoryItem d2 = new FolderInventoryItem("d2");
@@ -64,7 +68,7 @@ public class TestMkdirCommand
     {
         File archivePath = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp);
 
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         context.getInventory().addFolder(d1);

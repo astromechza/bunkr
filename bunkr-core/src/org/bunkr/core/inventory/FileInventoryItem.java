@@ -16,6 +16,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     private long sizeOnDisk;
     private long modifiedAt;
     private byte[] encryptionData;
+    private Algorithms.Encryption encryptionAlgorithm;
     private byte[] integrityHash;
     private FragmentedRange blocks;
     private long actualSize;
@@ -30,6 +31,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
             long actualSize,
             long modifiedAt,
             byte[] encryptionData,
+            Algorithms.Encryption encryptionAlgorithm,
             byte[] integrityHash,
             HashSet<String> tags,
             String mediaType
@@ -37,6 +39,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     {
         super(name, uuid);
         this.encryptionData = encryptionData;
+        this.encryptionAlgorithm = encryptionAlgorithm;
         this.integrityHash = integrityHash;
         this.sizeOnDisk = sizeOnDisk;
         this.actualSize = actualSize;
@@ -53,6 +56,7 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         this.blocks = new FragmentedRange();
         this.modifiedAt = System.currentTimeMillis();
         this.encryptionData = null;
+        this.encryptionAlgorithm = Algorithms.Encryption.NONE;
         this.integrityHash = null;
         this.tags = new HashSet<>();
         this.mediaType = MediaType.UNKNOWN;
@@ -73,9 +77,19 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         return encryptionData;
     }
 
-    public void setencryptionData(byte[] encryptionData)
+    public void setEncryptionData(byte[] encryptionData)
     {
         this.encryptionData = encryptionData;
+    }
+
+    public Algorithms.Encryption getEncryptionAlgorithm()
+    {
+        return encryptionAlgorithm;
+    }
+
+    public void setEncryptionAlgorithm(Algorithms.Encryption encryptionAlgorithm)
+    {
+        this.encryptionAlgorithm = encryptionAlgorithm;
     }
 
     public byte[] getIntegrityHash()

@@ -18,13 +18,17 @@ public interface ICLICommand
     void buildParser(Subparser target);
     void handle(Namespace args) throws Exception;
 
-    default PasswordProvider makePasswordProvider(File pwFile) throws IOException, BaseBunkrException
+    default PasswordProvider makeCLIPasswordProvider(File pwFile, String prompt) throws IOException, BaseBunkrException
+    {
+        PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt(prompt));
+        if (pwFile != null && ! pwFile.getPath().equals("-")) passProv.setArchivePassword(pwFile);
+        return passProv;
+    }
+
+    default PasswordProvider makeCLIPasswordProvider(File pwFile) throws IOException, BaseBunkrException
     {
         PasswordProvider passProv = new PasswordProvider(new CLIPasswordPrompt());
-        if (pwFile != null && ! pwFile.getPath().equals("-"))
-        {
-            passProv.setArchivePassword(pwFile);
-        }
+        if (pwFile != null && ! pwFile.getPath().equals("-")) passProv.setArchivePassword(pwFile);
         return passProv;
     }
 }

@@ -2,6 +2,7 @@ package org.bunkr.core.streams.output;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.BlockAllocationManager;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.utils.RandomMaker;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -39,12 +40,14 @@ public class MultilayeredOutputStream extends OutputStream
                     new BlockAllocationManager(context.getInventory(), target.getBlocks())
         );
 
-        if (context.getInventory().areFilesEncrypted())
+        target.setEncryptionAlgorithm(context.getInventory().getDefaultEncryption());
+
+        if (target.getEncryptionAlgorithm().equals(Algorithms.Encryption.AES256_CTR))
         {
             byte[] edata = target.getEncryptionData();
             if (edata == null) edata = new byte[2 * 256 / 8];
             RandomMaker.fill(edata);
-            target.setencryptionData(edata);
+            target.setEncryptionData(edata);
 
             byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
             byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
@@ -55,10 +58,7 @@ public class MultilayeredOutputStream extends OutputStream
             this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
         }
 
-        if (context.getInventory().areFilesCompressed())
-        {
-            this.topstream = new DeflaterOutputStream(this.topstream, new Deflater(Deflater.BEST_SPEED));
-        }
+        this.topstream = new DeflaterOutputStream(this.topstream, new Deflater(Deflater.BEST_SPEED));
     }
 
     @Override

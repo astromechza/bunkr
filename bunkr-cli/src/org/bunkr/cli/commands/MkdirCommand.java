@@ -37,7 +37,7 @@ public class MkdirCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        UserSecurityProvider usp = new UserSecurityProvider(makeCLIPasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
         ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
         mkdirs(aic.getInventory(), args.getString(ARG_PATH), args.getBoolean(ARG_RECURSIVE));
         MetadataWriter.write(aic, usp);

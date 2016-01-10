@@ -2,6 +2,7 @@ package org.bunkr.core;
 
 import org.bunkr.core.descriptor.IDescriptor;
 import org.bunkr.core.exceptions.BaseBunkrException;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
 import org.bunkr.core.usersec.UserSecurityProvider;
@@ -18,10 +19,14 @@ public class ArchiveBuilder
     public static final byte[] FORMAT_SIG = "BUNKR".getBytes();
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
-    public static ArchiveInfoContext createNewEmptyArchive(File path, IDescriptor descriptor, UserSecurityProvider uic, boolean compressed)
+    public static ArchiveInfoContext createNewEmptyArchive(File path, IDescriptor descriptor, UserSecurityProvider uic)
             throws IOException, CryptoException, BaseBunkrException
     {
-        Inventory blankInventory = new Inventory(new ArrayList<>(), new ArrayList<>(), descriptor.mustEncryptFiles(), compressed);
+        Inventory blankInventory = new Inventory(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                Algorithms.Encryption.NONE
+        );
 
         try(FileOutputStream fos = new FileOutputStream(path))
         {

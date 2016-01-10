@@ -10,6 +10,18 @@ import java.io.Console;
  */
 public class CLIPasswordPrompt implements IPasswordPrompter
 {
+    private final String prompt;
+
+    public CLIPasswordPrompt(String prompt)
+    {
+        this.prompt = prompt;
+    }
+
+    public CLIPasswordPrompt()
+    {
+        this("Enter password:");
+    }
+
     @Override
     public byte[] getPassword()
     {
@@ -24,6 +36,6 @@ public class CLIPasswordPrompt implements IPasswordPrompter
             );
             System.exit(1);
         }
-        return new String(console.readPassword("Enter password for archive: ")).getBytes();
+        return new String(console.readPassword(this.prompt)).getBytes();
     }
 }

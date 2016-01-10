@@ -54,8 +54,7 @@ public class TestCheckPasswordCommand
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
                 PBKDF2Descriptor.makeDefaults(),
-                usp,
-                true
+                usp
         );
 
         File pwFile = PasswordFile.genPasswordFile(folder.newFilePath(), password.getBytes());
@@ -78,8 +77,7 @@ public class TestCheckPasswordCommand
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
                 PBKDF2Descriptor.makeDefaults(),
-                usp,
-                true
+                usp
         );
 
         File pwFile = PasswordFile.genPasswordFile(folder.newFilePath(), "this is definitely not the password".getBytes());
@@ -106,8 +104,7 @@ public class TestCheckPasswordCommand
         ArchiveBuilder.createNewEmptyArchive(
                 archiveFile,
                 new PlaintextDescriptor(),
-                new UserSecurityProvider(new PasswordProvider()),
-                true
+                new UserSecurityProvider(new PasswordProvider())
         );
 
         Map<String, Object> args = new HashMap<>();

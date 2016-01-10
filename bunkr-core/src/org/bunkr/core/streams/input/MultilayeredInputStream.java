@@ -1,6 +1,7 @@
 package org.bunkr.core.streams.input;
 
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -33,7 +34,7 @@ public class MultilayeredInputStream extends InputStream
             this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
             this.topstream = this.baseStream;
 
-            if (context.getInventory().areFilesEncrypted())
+            if (target.getEncryptionAlgorithm().equals(Algorithms.Encryption.AES256_CTR))
             {
                 byte[] edata = target.getEncryptionData();
                 byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
@@ -44,10 +45,7 @@ public class MultilayeredInputStream extends InputStream
                 this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
             }
 
-            if (context.getInventory().areFilesCompressed())
-            {
-                this.topstream = new InflaterInputStream(this.topstream);
-            }
+            this.topstream = new InflaterInputStream(this.topstream);
         }
     }
 

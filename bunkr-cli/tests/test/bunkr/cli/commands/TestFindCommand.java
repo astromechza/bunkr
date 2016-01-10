@@ -45,7 +45,7 @@ public class TestFindCommand
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
                 archivePath,
                 new PlaintextDescriptor(),
-                usp, false
+                usp
         );
 
         FileInventoryItem ff1 = new FileInventoryItem("abc");

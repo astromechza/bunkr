@@ -46,7 +46,7 @@ public class TestMvCommand
         File archivePath = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
+                .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp);
 
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
         context.getInventory().addFolder(d1);

@@ -25,6 +25,7 @@ public class FileInventoryItemJSON
     public static final String KEY_ACTUAL_SIZE = "actualSize";
     public static final String KEY_MODIFIED_AT = "modifiedAt";
     public static final String KEY_ENCRYPTION_DATA = "encryptionData";
+    public static final String KEY_ENCRYPTION_ALGORITHM = "encryptionAlgorithm";
     public static final String KEY_INTEGRITY_HASH = "integrityHash";
     public static final String KEY_TAGS = "tags";
     public static final String KEY_MEDIA_TYPE = "mediaType";
@@ -40,6 +41,7 @@ public class FileInventoryItemJSON
         out.put(KEY_SIZE_ON_DISK, input.getSizeOnDisk());
         out.put(KEY_ACTUAL_SIZE, input.getActualSize());
         out.put(KEY_MODIFIED_AT, input.getModifiedAt());
+        out.put(KEY_ENCRYPTION_ALGORITHM, input.getEncryptionAlgorithm().toString());
 
         if (input.getEncryptionData() != null)
             out.put(KEY_ENCRYPTION_DATA, DatatypeConverter.printBase64Binary(input.getEncryptionData()));
@@ -71,6 +73,9 @@ public class FileInventoryItemJSON
         byte[] intH = null;
         if (input.getOrDefault(KEY_INTEGRITY_HASH, null) != null) intH = DatatypeConverter.parseBase64Binary((String) input.get(KEY_INTEGRITY_HASH));
 
+        Algorithms.Encryption encA = Algorithms.Encryption.NONE;
+        if (input.getOrDefault(KEY_ENCRYPTION_ALGORITHM, null) != null) encA = Algorithms.Encryption.valueOf((String) input.get(KEY_ENCRYPTION_ALGORITHM));
+
         String mt = MediaType.UNKNOWN;
         if (input.getOrDefault(KEY_MEDIA_TYPE, null) != null)
         {
@@ -90,6 +95,7 @@ public class FileInventoryItemJSON
                 (Long) input.get(KEY_ACTUAL_SIZE),
                 (Long) input.get(KEY_MODIFIED_AT),
                 encD,
+                encA,
                 intH,
                 new HashSet<>((JSONArray) input.get(KEY_TAGS)),
                 mt

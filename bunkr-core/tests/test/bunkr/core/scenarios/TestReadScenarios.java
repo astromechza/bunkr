@@ -2,6 +2,7 @@ package test.bunkr.core.scenarios;
 
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
@@ -101,21 +102,7 @@ public class TestReadScenarios
         UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, false);
-
-        runThreeFileTestOnContext(context, usp);
-    }
-
-    @Test
-    public void testReadingWithCompression() throws Exception
-    {
-        File tempfile = folder.newPrefixedFile("withcompres");
-        PasswordProvider prov = new PasswordProvider();
-        prov.setArchivePassword("HunterTwo".getBytes());
-        UserSecurityProvider usp = new UserSecurityProvider(prov);
-
-        // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp, true);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp);
 
         runThreeFileTestOnContext(context, usp);
     }
@@ -129,21 +116,8 @@ public class TestReadScenarios
         UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp, false);
-
-        runThreeFileTestOnContext(context, usp);
-    }
-
-    @Test
-    public void testReadingWithCompressionAndEncryption() throws Exception
-    {
-        File tempfile = folder.newPrefixedFile("withboth");
-        PasswordProvider prov = new PasswordProvider();
-        prov.setArchivePassword("HunterTwo".getBytes());
-        UserSecurityProvider usp = new UserSecurityProvider(prov);
-
-        // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp, true);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
+        context.getInventory().setDefaultEncryption(Algorithms.Encryption.AES256_CTR);
 
         runThreeFileTestOnContext(context, usp);
     }

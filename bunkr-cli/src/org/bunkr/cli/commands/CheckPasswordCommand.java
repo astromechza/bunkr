@@ -21,7 +21,7 @@ public class CheckPasswordCommand implements ICLICommand
     @Override
     public void handle(Namespace args) throws Exception
     {
-        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        UserSecurityProvider usp = new UserSecurityProvider(makeCLIPasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
         new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
         System.out.println("Decryption Succeeded");
     }

@@ -105,6 +105,9 @@ public class LandingWindow extends BaseWindow
             try
             {
                 new NewArchiveSettingsWindow(this.getStage()).getStage().show();
+
+
+
                 this.getStage().hide();
             }
             catch (IOException e)

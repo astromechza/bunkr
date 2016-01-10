@@ -2,6 +2,7 @@ package test.bunkr.core;
 
 import org.bunkr.core.BlockAllocationManager;
 import org.bunkr.core.fragmented_range.FragmentedRange;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.inventory.Inventory;
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class TestBlockAllocationManager
         FileInventoryItem file = new FileInventoryItem("something");
         file.setBlocks(new FragmentedRange(10, 8));
         files.add(file);
-        return new Inventory(files, new ArrayList<>(), false, false);
+        return new Inventory(files, new ArrayList<>(), Algorithms.Encryption.NONE);
     }
 
     @Test
@@ -56,7 +57,9 @@ public class TestBlockAllocationManager
         }
         catch(Exception ignored) {}
 
-        bam = new BlockAllocationManager(new Inventory(new ArrayList<>(), new ArrayList<>(), false, false), new FragmentedRange());
+        bam = new BlockAllocationManager(new Inventory(
+                new ArrayList<>(), new ArrayList<>(), Algorithms.Encryption.NONE
+        ), new FragmentedRange());
 
         try
         {

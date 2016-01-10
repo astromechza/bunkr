@@ -34,7 +34,11 @@ public class TestRmCommand
 
     public Inventory makeSampleInventory()
     {
-        Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>(), false, false);
+        Inventory i = new Inventory(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                Algorithms.Encryption.NONE
+        );
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
         i.addFolder(d1);
 
@@ -57,7 +61,7 @@ public class TestRmCommand
         File archivePath = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder
-                .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp, false);
+                .createNewEmptyArchive(archivePath, new PlaintextDescriptor(), usp);
 
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
         context.getInventory().addFolder(d1);

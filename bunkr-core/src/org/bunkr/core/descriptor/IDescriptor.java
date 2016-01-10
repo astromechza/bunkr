@@ -19,6 +19,4 @@ public interface IDescriptor
     Inventory readInventoryFromBytes(byte[] source, UserSecurityProvider usp) throws BaseBunkrException;
 
     byte[] writeInventoryToBytes(Inventory source, UserSecurityProvider usp) throws BaseBunkrException;
-
-    boolean mustEncryptFiles();
 }

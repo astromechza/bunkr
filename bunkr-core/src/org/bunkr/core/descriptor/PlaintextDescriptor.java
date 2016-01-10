@@ -41,10 +41,4 @@ public class PlaintextDescriptor implements IDescriptor
     {
         return InventoryJSON.encode(source).getBytes();
     }
-
-    @Override
-    public boolean mustEncryptFiles()
-    {
-        return false;
-    }
 }

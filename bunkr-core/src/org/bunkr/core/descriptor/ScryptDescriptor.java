@@ -127,12 +127,6 @@ public class ScryptDescriptor implements IDescriptor
         }
     }
 
-    @Override
-    public boolean mustEncryptFiles()
-    {
-        return true;
-    }
-
     public static IDescriptor makeDefaults()
     {
         return new ScryptDescriptor(256, 2 << 15, RandomMaker.get(128), 8, 1);

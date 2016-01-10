@@ -1,10 +1,7 @@
 package test.bunkr.core.inventory;
 
 import org.bunkr.core.exceptions.TraversalException;
-import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.FolderInventoryItem;
-import org.bunkr.core.inventory.Inventory;
-import org.bunkr.core.inventory.InventoryPather;
+import org.bunkr.core.inventory.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -93,7 +90,11 @@ public class TestInventoryPather
 
     private static Inventory buildFakeInventory()
     {
-        Inventory i = new Inventory(new ArrayList<>(), new ArrayList<>(), false, false);
+        Inventory i = new Inventory(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                Algorithms.Encryption.NONE
+        );
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         i.addFolder(d1);
         FolderInventoryItem d2 = new FolderInventoryItem("d2");

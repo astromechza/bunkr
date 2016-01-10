@@ -127,12 +127,6 @@ public class PBKDF2Descriptor implements IDescriptor
         }
     }
 
-    @Override
-    public boolean mustEncryptFiles()
-    {
-        return true;
-    }
-
     public static IDescriptor makeDefaults()
     {
         return new PBKDF2Descriptor(256, 10000, RandomMaker.get(128));

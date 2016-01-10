@@ -56,7 +56,7 @@ public class TestImportFileCommand
         File archiveFile = folder.newFile();
 
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp);
 
         File fileToImport = folder.newFile();
         try(FileOutputStream fos = new FileOutputStream(fileToImport))
@@ -89,7 +89,7 @@ public class TestImportFileCommand
     {
         File archiveFile = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp);
         FolderInventoryItem subF = new FolderInventoryItem("sub");
         context.getInventory().addFolder(subF);
         MetadataWriter.write(context, usp);
@@ -127,7 +127,7 @@ public class TestImportFileCommand
     {
         File archiveFile = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp);
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
@@ -162,7 +162,7 @@ public class TestImportFileCommand
     {
         File archiveFile = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
-        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp, false);
+        ArchiveBuilder.createNewEmptyArchive(archiveFile, new PlaintextDescriptor(), usp);
 
         Map<String, Object> args = new HashMap<>();
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
@@ -189,7 +189,7 @@ public class TestImportFileCommand
         File archiveFile = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new PlaintextDescriptor(), usp, false
+                archiveFile, new PlaintextDescriptor(), usp
         );
 
         {
@@ -227,7 +227,7 @@ public class TestImportFileCommand
         File archiveFile = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new PlaintextDescriptor(), usp, false
+                archiveFile, new PlaintextDescriptor(), usp
         );
 
         {
@@ -267,7 +267,7 @@ public class TestImportFileCommand
         File archiveFile = folder.newFile();
         UserSecurityProvider usp = new UserSecurityProvider(new PasswordProvider());
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(
-                archiveFile, new PlaintextDescriptor(), usp, false
+                archiveFile, new PlaintextDescriptor(), usp
         );
 
         {

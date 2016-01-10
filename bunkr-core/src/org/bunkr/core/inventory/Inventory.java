@@ -8,17 +8,13 @@ import java.util.List;
  */
 public class Inventory implements IFFContainer, IFFTraversalTarget
 {
-    private final boolean filesCompressed;
-    private final boolean filesEncrypted;
+    private Algorithms.Encryption defaultEncryption;
     private final FFContainer ffcontainer;
 
-    public Inventory(List<FileInventoryItem> files, List<FolderInventoryItem> folders,
-                     boolean encrypted, boolean compressed
-    )
+    public Inventory(List<FileInventoryItem> files, List<FolderInventoryItem> folders, Algorithms.Encryption encrypted)
     {
         this.ffcontainer = new FFContainer(files, folders);
-        this.filesCompressed = compressed;
-        this.filesEncrypted = encrypted;
+        this.defaultEncryption = encrypted;
     }
 
     public List<FolderInventoryItem> getFolders()
@@ -43,13 +39,18 @@ public class Inventory implements IFFContainer, IFFTraversalTarget
         return true;
     }
 
-    public boolean areFilesCompressed()
-    {
-        return filesCompressed;
-    }
-
     public boolean areFilesEncrypted()
     {
-        return filesEncrypted;
+        return defaultEncryption != null && defaultEncryption != Algorithms.Encryption.NONE;
+    }
+
+    public Algorithms.Encryption getDefaultEncryption()
+    {
+        return defaultEncryption;
+    }
+
+    public void setDefaultEncryption(Algorithms.Encryption defaultEncryption)
+    {
+        this.defaultEncryption = defaultEncryption;
     }
 }

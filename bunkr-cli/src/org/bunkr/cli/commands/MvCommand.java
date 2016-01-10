@@ -46,7 +46,7 @@ public class MvCommand implements ICLICommand
         String toPathName = InventoryPather.baseName(args.getString(ARG_TOPATH));
 
         // load up the archive
-        UserSecurityProvider usp = new UserSecurityProvider(makePasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
+        UserSecurityProvider usp = new UserSecurityProvider(makeCLIPasswordProvider(args.get(CLI.ARG_PASSWORD_FILE)));
         ArchiveInfoContext aic = new ArchiveInfoContext(args.get(CLI.ARG_ARCHIVE_PATH), usp);
 
         // find the container that has the source item

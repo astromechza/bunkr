@@ -32,7 +32,7 @@ public class CLI
     static
     {
         commands.put("check-password", new CheckPasswordCommand());
-        commands.put("change-password", new ChangePasswordCommand());
+        commands.put("change-security", new ChangeSecurityCommand());
         commands.put("create", new CreateCommand());
         commands.put("mkdir", new MkdirCommand());
         commands.put("rm", new RmCommand());

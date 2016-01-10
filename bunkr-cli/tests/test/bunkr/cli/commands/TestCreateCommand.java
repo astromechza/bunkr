@@ -45,8 +45,6 @@ public class TestCreateCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(CLI.ARG_PASSWORD_FILE, pwFile);
         args.put(CreateCommand.ARG_OVERWRITE, false);
-        args.put(CreateCommand.ARG_NOCOMPRESSION, false);
-        args.put(CreateCommand.ARG_NOENCRYPTION, false);
         new CreateCommand().handle(new Namespace(args));
 
         PasswordProvider prov = new PasswordProvider();
@@ -66,8 +64,6 @@ public class TestCreateCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(CLI.ARG_PASSWORD_FILE, pwFile);
         args.put(CreateCommand.ARG_OVERWRITE, false);
-        args.put(CreateCommand.ARG_NOCOMPRESSION, false);
-        args.put(CreateCommand.ARG_NOENCRYPTION, false);
         try
         {
             new CreateCommand().handle(new Namespace(args));
@@ -88,52 +84,11 @@ public class TestCreateCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(CLI.ARG_PASSWORD_FILE, pwFile);
         args.put(CreateCommand.ARG_OVERWRITE, true);
-        args.put(CreateCommand.ARG_NOCOMPRESSION, false);
-        args.put(CreateCommand.ARG_NOENCRYPTION, false);
         new CreateCommand().handle(new Namespace(args));
 
         PasswordProvider prov = new PasswordProvider();
         prov.setArchivePassword(pwFile);
         UserSecurityProvider usp = new UserSecurityProvider(prov);
         new ArchiveInfoContext(archiveFile, usp);
-    }
-
-    @Test
-    public void createNewArchiveWithoutEncryption() throws Exception
-    {
-        File pwFile = PasswordFile.genPasswordFile(folder.newFilePath());
-        File archiveFile = folder.newFilePath();
-
-        Map<String, Object> args = new HashMap<>();
-        args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
-        args.put(CLI.ARG_PASSWORD_FILE, pwFile);
-        args.put(CreateCommand.ARG_OVERWRITE, false);
-        args.put(CreateCommand.ARG_NOCOMPRESSION, false);
-        args.put(CreateCommand.ARG_NOENCRYPTION, true);
-        new CreateCommand().handle(new Namespace(args));
-
-        ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, new UserSecurityProvider(new PasswordProvider()));
-        assertFalse(c.getDescriptor().mustEncryptFiles());
-    }
-
-    @Test
-    public void createNewArchiveWithoutCompression() throws Exception
-    {
-        File pwFile = PasswordFile.genPasswordFile(folder.newFilePath());
-        File archiveFile = folder.newFilePath();
-
-        Map<String, Object> args = new HashMap<>();
-        args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
-        args.put(CLI.ARG_PASSWORD_FILE, pwFile);
-        args.put(CreateCommand.ARG_OVERWRITE, false);
-        args.put(CreateCommand.ARG_NOCOMPRESSION, true);
-        args.put(CreateCommand.ARG_NOENCRYPTION, false);
-        new CreateCommand().handle(new Namespace(args));
-
-        PasswordProvider prov = new PasswordProvider();
-        prov.setArchivePassword(pwFile);
-        UserSecurityProvider usp = new UserSecurityProvider(prov);
-        ArchiveInfoContext c = new ArchiveInfoContext(archiveFile, usp);
-        assertTrue(c.getDescriptor().mustEncryptFiles());
     }
 }

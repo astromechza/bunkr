@@ -30,8 +30,7 @@ public class InventoryJSON
             folders.add(FolderInventoryItemJSON.encodeO(item));
         }
         out.put("folders", folders);
-        out.put("encrypted", input.areFilesEncrypted());
-        out.put("compressed", input.areFilesCompressed());
+        out.put("defaultEncryption", input.getDefaultEncryption().toString());
         return out;
     }
 
@@ -43,7 +42,11 @@ public class InventoryJSON
     @SuppressWarnings("unchecked")
     public static Inventory decodeO(JSONObject input)
     {
-        Inventory outputInv = new Inventory(new ArrayList<>(), new ArrayList<>(), (boolean) input.get("encrypted"), (boolean) input.get("compressed"));
+        Inventory outputInv = new Inventory(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                Algorithms.Encryption.valueOf((String) input.get("defaultEncryption"))
+        );
 
         for (Object item : (JSONArray) input.get("files"))
         {
