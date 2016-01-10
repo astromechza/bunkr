@@ -20,6 +20,7 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
@@ -488,9 +489,7 @@ public class InventoryCMController
             {
                 FileInventoryItem fileItem = (FileInventoryItem) selectedFile;
                 FileInfoWindow popup = new FileInfoWindow(fileItem);
-                popup.setOnRefreshTreeItem(e -> {
-                    selected.setValue(new InventoryTreeData(fileItem));
-                });
+                popup.setOnRefreshTreeItem(e -> selected.setValue(new InventoryTreeData(fileItem)));
                 popup.setOnSaveInventoryRequest(this.onSaveInventoryRequest);
                 popup.getStage().showAndWait();
             }
@@ -508,8 +507,7 @@ public class InventoryCMController
             // first choose file to be imported
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select File ...");
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("All Files", "*.*"));
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"));
             File importedFile = fileChooser.showOpenDialog(this.treeView.getScene().getWindow());
             if (importedFile == null) return;
 
@@ -561,6 +559,14 @@ public class InventoryCMController
                 }
             }
 
+            // pick the media type
+            newFile.setMediaType(QuickDialogs.pick(
+                    "Import File",
+                    null,
+                    "Pick a Media Type for the new file:",
+                    new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
+            );
+
             // create the new tree item
             InventoryTreeData newValue = new InventoryTreeData(newFile);
             TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
@@ -568,8 +574,7 @@ public class InventoryCMController
             selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
             selected.setExpanded(true);
 
-            Event.fireEvent(selected,
-                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+            Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
             this.onSaveInventoryRequest.accept(String.format("Imported file %s", newFile.getName()));
         }
