@@ -106,6 +106,10 @@ public class PBKDF2Descriptor implements IDescriptor
         try
         {
             byte[] inventoryJsonBytes = InventoryJSON.encode(source).getBytes();
+
+            // first refresh the salt
+            RandomMaker.fill(this.pbkdf2Salt);
+            
             PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
             g.init(usp.getHashedPassword(), this.pbkdf2Salt, this.pbkdf2Iterations);
             ParametersWithIV kp =
