@@ -36,7 +36,6 @@ public class ChangeSecurityCommand implements ICLICommand
         Subparser p1 = securityType.addParser(PBKDF2Descriptor.IDENTIFIER.toLowerCase());
         p1.addArgument(ARG_NEW_PASSWORD_FILE)
                 .type(Arguments.fileType().verifyExists().verifyCanRead().acceptSystemIn())
-                .setDefault(new File("-"))
                 .help("read the new archive password from the given file or '-' for stdin");
         p1.addArgument("file-security")
                 .dest(ARG_FILE_SECURITY)
@@ -46,7 +45,6 @@ public class ChangeSecurityCommand implements ICLICommand
         Subparser p2 = securityType.addParser(ScryptDescriptor.IDENTIFIER.toLowerCase());
         p2.addArgument(ARG_NEW_PASSWORD_FILE)
                 .type(Arguments.fileType().verifyExists().verifyCanRead().acceptSystemIn())
-                .setDefault(new File("-"))
                 .help("read the new archive password from the given file or '-' for stdin");
         p2.addArgument("file-security")
                 .dest(ARG_FILE_SECURITY)
