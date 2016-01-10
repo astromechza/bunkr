@@ -55,6 +55,11 @@ file_content = <<-EOF
     public static void main(java.lang.String[]);
 }
 
+-keepclassmembers,allowoptimization enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
 -dontwarn javax.**
 -dontwarn javafx.**
 -dontwarn org.bouncycastle.jcajce.provider.asymmetric.util.BaseCipherSpi
