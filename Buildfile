@@ -3,8 +3,8 @@ require 'buildr/jacoco'
 
 PROJECT_NAME = 'bunkr'
 PROJECT_GROUP = "org.#{PROJECT_NAME}"
-PROJECT_VERSION = '0.7.0'
-COMPATIBLE_PROJECT_VERSION = '0.7.0'
+PROJECT_VERSION = '0.8.0'
+COMPATIBLE_PROJECT_VERSION = '0.8.0'
 
 # where to pull maven dependencies from
 repositories.remote << 'https://repo.maven.apache.org/maven2'
