@@ -3,6 +3,7 @@ package org.bunkr.gui.windows;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,6 +12,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.bouncycastle.crypto.CryptoException;
+import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
 import org.bunkr.core.Version;
@@ -104,16 +107,36 @@ public class LandingWindow extends BaseWindow
         this.newArchiveButton.setOnAction(event -> {
             try
             {
-                new NewArchiveSettingsWindow(this.getStage()).getStage().show();
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save Archive ...");
+                fileChooser.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("Bunkr Archives", "*.bunkr", "*.bnkr"),
+                        new FileChooser.ExtensionFilter("All Files", "*.*"));
+                File selectedPath = fileChooser.showSaveDialog(this.getStage());
+                if (selectedPath == null) return;
 
+                this.getStage().getScene().setCursor(Cursor.WAIT);
 
+                PasswordProvider passProv = new PasswordProvider();
+                UserSecurityProvider usp = new UserSecurityProvider(passProv);
 
-                this.getStage().hide();
+                ArchiveInfoContext archive = ArchiveBuilder.createNewEmptyArchive(
+                        selectedPath,
+                        new PlaintextDescriptor(),
+                        usp
+                );
+
+                new MainWindow(archive, usp).getStage().show();
+                this.getStage().close();
             }
-            catch (IOException e)
+            catch (CryptoException | BaseBunkrException | IOException e)
             {
+                // TODO probably some exceptions we can display with a better message instead of defaulting to ExceptionDialog
                 QuickDialogs.exception(e);
-                this.getStage().show();
+            }
+            finally
+            {
+                this.getStage().getScene().setCursor(Cursor.DEFAULT);
             }
         });
 
