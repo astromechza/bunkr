@@ -11,6 +11,7 @@ import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Formatters;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
@@ -89,6 +90,7 @@ public class InventoryCMController
         this.fileRename.setOnAction(event -> this.handleCMRenameItem());
         this.fileDelete.setOnAction(event -> this.handleCMFileDelete());
         this.fileInfo.setOnAction(event -> this.handleCMFileInfo());
+        this.fileExport.setOnAction(event -> this.handleCMFileExport());
 
         this.dirDelete.setOnAction(event -> this.handleCMDirDelete());
         this.dirRename.setOnAction(event -> this.handleCMRenameItem());
@@ -106,7 +108,8 @@ public class InventoryCMController
                 try
                 {
                     TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItemOrNull();
-                    if (selected != null && selected.getValue().getType() == InventoryTreeData.Type.FILE) this.handleCMFileOpen();
+                    if (selected != null && selected.getValue().getType() == InventoryTreeData.Type.FILE)
+                        this.handleCMFileOpen();
                 }
                 catch (BaseBunkrException e)
                 {
@@ -577,6 +580,56 @@ public class InventoryCMController
             Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.treeView.getSelectionModel().select(newItem);
             this.onSaveInventoryRequest.accept(String.format("Imported file %s", newFile.getName()));
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+    private void handleCMFileExport()
+    {
+        try
+        {
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
+            String selectedPath = this.treeView.getPathForTreeItem(selected);
+
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+
+            // fail if not a file
+            if (! (selectedItem instanceof FileInventoryItem))
+            {
+                QuickDialogs.error("%s is not a file inventory item.", selectedPath);
+                return;
+            }
+
+            FileInventoryItem selectedFile = (FileInventoryItem) selectedItem;
+
+            // choose file to be exported
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select Export Location ...");
+            fileChooser.setInitialFileName(selectedFile.getName());
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All Files", "*.*"));
+
+            if (selectedFile.getName().contains(".") && selectedFile.getName().lastIndexOf('.') > 0)
+            {
+                String foundExtension = selectedFile.getName().substring(selectedFile.getName().lastIndexOf('.'));
+                if (foundExtension.length() > 0)
+                {
+                    FileChooser.ExtensionFilter o = new FileChooser.ExtensionFilter("Original Extension", String.format("*.%s", foundExtension));
+                    fileChooser.getExtensionFilters().add(o);
+                    fileChooser.setSelectedExtensionFilter(o);
+                }
+            }
+
+            File exportedFile = fileChooser.showSaveDialog(this.treeView.getScene().getWindow());
+            if (exportedFile == null) return;
+
+            Logging.info("%s", exportedFile.getAbsolutePath());
+
+
+
         }
         catch (Exception e)
         {
