@@ -15,6 +15,7 @@ import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.descriptor.ScryptDescriptor;
 import org.bunkr.core.exceptions.IllegalPasswordException;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.PasswordRequirements;
 import org.bunkr.core.usersec.UserSecurityProvider;
@@ -56,9 +57,11 @@ public class ArchiveSecurityWindow extends BaseWindow
     private PasswordField pbkdf2_passwordField;
     private PasswordField pbkdf2_confirmPasswordField;
     private Label pbkdf2_passwordNote;
+    private ComboBox<Algorithms.Encryption> pbkdf2_fileSecBox;
     private PasswordField scrypt_passwordField;
     private PasswordField scrypt_confirmPasswordField;
     private Label scrypt_passwordNote;
+    private ComboBox<Algorithms.Encryption> scrypt_fileSecBox;
 
     public ArchiveSecurityWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
     {
@@ -169,11 +172,11 @@ public class ArchiveSecurityWindow extends BaseWindow
             {
                 case SM_PLAINTEXT:
                     this.archive.setDescriptor(new PlaintextDescriptor());
+                    this.archive.getInventory().setDefaultEncryption(Algorithms.Encryption.NONE);
                     this.onSaveDescriptorRequest.accept("Switched to PlaintextDescriptor.");
                     this.getStage().close();
                     return;
                 case SM_PBKDF2:
-                    this.archive.setDescriptor(PBKDF2Descriptor.makeDefaults());
                     try
                     {
                         this.securityProvider.setProvider(new PasswordProvider());
@@ -184,11 +187,12 @@ public class ArchiveSecurityWindow extends BaseWindow
                         QuickDialogs.error("Invalid Password", "The password you provided does not meet the requirements", e.getMessage());
                         return;
                     }
+                    this.archive.setDescriptor(PBKDF2Descriptor.makeDefaults());
+                    this.archive.getInventory().setDefaultEncryption(this.pbkdf2_fileSecBox.getSelectionModel().getSelectedItem());
                     this.onSaveDescriptorRequest.accept("Switched to PBKDF2Descriptor.");
                     this.getStage().close();
                     return;
                 case SM_SCRYPT:
-                    this.archive.setDescriptor(ScryptDescriptor.makeDefaults());
                     try
                     {
                         this.securityProvider.setProvider(new PasswordProvider());
@@ -199,6 +203,9 @@ public class ArchiveSecurityWindow extends BaseWindow
                         QuickDialogs.error("Invalid Password", "The password you provided does not meet the requirements", e.getMessage());
                         return;
                     }
+                    this.archive.setDescriptor(ScryptDescriptor.makeDefaults());
+                    this.archive.getInventory().setDefaultEncryption(
+                            this.scrypt_fileSecBox.getSelectionModel().getSelectedItem());
                     this.onSaveDescriptorRequest.accept("Switched to PBKDF2Descriptor.");
                     this.getStage().close();
                     return;
@@ -286,7 +293,21 @@ public class ArchiveSecurityWindow extends BaseWindow
             }
         });
 
-        VBox vbox = new VBox(10, this.pbkdf2_passwordField, this.pbkdf2_confirmPasswordField, this.pbkdf2_passwordNote);
+        this.pbkdf2_fileSecBox = new ComboBox<>();
+        this.pbkdf2_fileSecBox.getItems().add(Algorithms.Encryption.AES256_CTR);
+        this.pbkdf2_fileSecBox.getSelectionModel().select(0);
+        this.pbkdf2_fileSecBox.getStyleClass().add("small-combobox");
+
+        Label lblFileSec =  new Label("File Security: ");
+        lblFileSec.setAlignment(Pos.CENTER_LEFT);
+        HBox fileSecRow = new HBox(10, lblFileSec, this.pbkdf2_fileSecBox);
+
+        VBox vbox = new VBox(10,
+                             this.pbkdf2_passwordField,
+                             this.pbkdf2_confirmPasswordField,
+                             this.pbkdf2_passwordNote,
+                             fileSecRow
+        );
         vbox.setAlignment(Pos.TOP_RIGHT);
         centerPane.setCenter(vbox);
     }
@@ -346,7 +367,21 @@ public class ArchiveSecurityWindow extends BaseWindow
             }
         });
 
-        VBox vbox = new VBox(10, this.scrypt_passwordField, this.scrypt_confirmPasswordField, this.scrypt_passwordNote);
+        this.scrypt_fileSecBox = new ComboBox<>();
+        this.scrypt_fileSecBox.getItems().add(Algorithms.Encryption.AES256_CTR);
+        this.scrypt_fileSecBox.getSelectionModel().select(0);
+        this.scrypt_fileSecBox.getStyleClass().add("small-combobox");
+
+        Label lblFileSec =  new Label("File Security: ");
+        lblFileSec.setAlignment(Pos.CENTER_LEFT);
+        HBox fileSecRow = new HBox(10, lblFileSec, this.scrypt_fileSecBox);
+
+        VBox vbox = new VBox(10,
+                             this.scrypt_passwordField,
+                             this.scrypt_confirmPasswordField,
+                             this.scrypt_passwordNote,
+                             fileSecRow
+        );
         vbox.setAlignment(Pos.TOP_RIGHT);
         centerPane.setCenter(vbox);
     }
