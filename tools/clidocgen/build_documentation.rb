@@ -45,7 +45,7 @@ d.add_command "java -jar #{target_jar} --help", allow_fail: true
 d.add_documentation '## 3. Create a new archive'
 d.add_command "java -jar #{target_jar} #{archive_path} create"
 d.add_command "echo DemoPassword > #{password_path} && chmod 600 #{password_path}", no_output: true
-d.add_command "java -jar #{target_jar} #{archive_path} change-security scrypt #{password_path} aes256_ctr"
+d.add_command "java -jar #{target_jar} #{archive_path} change-security scrypt #{password_path}"
 
 d.add_documentation '## 4. Add some content from a file'
 file_one = File.join(working_dir, 'file1.txt')

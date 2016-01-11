@@ -38,8 +38,9 @@ public class ChangeSecurityCommand implements ICLICommand
                 .dest(ARG_NEW_PASSWORD_FILE)
                 .type(Arguments.fileType().verifyExists().verifyCanRead().acceptSystemIn())
                 .help("read the new archive password from the given file or '-' for stdin");
-        p1.addArgument("file-security")
+        p1.addArgument("--file-security")
                 .dest(ARG_FILE_SECURITY)
+                .setDefault(Algorithms.Encryption.AES256_CTR.toString().toLowerCase())
                 .choices(Algorithms.Encryption.AES256_CTR.toString().toLowerCase())
                 .help("set the encryption used on files");
 
@@ -47,8 +48,9 @@ public class ChangeSecurityCommand implements ICLICommand
         p2.addArgument(ARG_NEW_PASSWORD_FILE)
                 .type(Arguments.fileType().verifyExists().verifyCanRead().acceptSystemIn())
                 .help("read the new archive password from the given file or '-' for stdin");
-        p2.addArgument("file-security")
+        p2.addArgument("--file-security")
                 .dest(ARG_FILE_SECURITY)
+                .setDefault(Algorithms.Encryption.AES256_CTR.toString().toLowerCase())
                 .choices(Algorithms.Encryption.AES256_CTR.toString().toLowerCase())
                 .help("set the encryption used on files");
     }
