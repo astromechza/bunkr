@@ -20,14 +20,17 @@ import java.util.function.Consumer;
  */
 public class ProgressDialog extends BaseWindow
 {
+    private long total;
+    private long n;
     private Label statusLabel;
     private ProgressBar progressBar;
-
     private Consumer<String> onTryCancelRequest = null;
 
-    public ProgressDialog() throws IOException
+    public ProgressDialog(long total) throws IOException
     {
         super();
+        this.total = total;
+        this.n = 0;
         this.initialise();
     }
 
@@ -77,9 +80,15 @@ public class ProgressDialog extends BaseWindow
         return scene;
     }
 
-    public void setProgress(float p)
+    public void tick(long p)
     {
-        this.progressBar.setProgress(p);
+        this.n = p;
+        this.progressBar.setProgress(Math.max(Math.min(1, (double) this.n / this.total), 0));
+    }
+
+    public void inc(long i)
+    {
+        this.tick(this.n + i);
     }
 
     public void setStatus(String s)
