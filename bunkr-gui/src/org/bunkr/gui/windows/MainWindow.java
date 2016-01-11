@@ -636,6 +636,7 @@ public class MainWindow extends BaseWindow
             FileInventoryItem newFile = new FileInventoryItem(newName);
             selectedContainer.addFile(newFile);
 
+            // TODO, do the rest on another thread
             FileChannel fc = new RandomAccessFile(importedFile, "r").getChannel();
             try (InputStream fis = Channels.newInputStream(fc))
             {
@@ -650,6 +651,7 @@ public class MainWindow extends BaseWindow
                     Arrays.fill(buffer, (byte) 0);
                 }
             }
+            // TODO. on fail - error out and return. on success - continue
 
             // pick the media type
             newFile.setMediaType(QuickDialogs.pick(
@@ -722,6 +724,7 @@ public class MainWindow extends BaseWindow
             }
             FileChannel fc = new RandomAccessFile(exportedFile, "rw").getChannel();
 
+            // TODO, do the rest on another thread
             try (OutputStream contentOutputStream = Channels.newOutputStream(fc))
             {
                 try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, selectedFile))
@@ -735,6 +738,7 @@ public class MainWindow extends BaseWindow
                     Arrays.fill(buffer, (byte) 0);
                 }
             }
+            // TODO. on fail - error out and return. on success - continue
             QuickDialogs.info("File successfully exported to %s", exportedFile.getAbsolutePath());
         }
         catch (Exception e)

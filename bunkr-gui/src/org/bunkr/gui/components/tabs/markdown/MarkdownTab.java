@@ -124,13 +124,9 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     {
         this.switchModeButton.setOnAction(e -> {
             if (this.currentMode == Mode.VIEWING)
-            {
                 this.goToEditMode();
-            }
             else
-            {
                 this.goToViewMode();
-            }
         });
 
         this.saveButton.setOnAction(e -> {
@@ -183,11 +179,10 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
 
     public void reloadContent()
     {
-        if (this.subject.getParent() == null)
-        {
-            throw new RuntimeException("Orphaned file tab found");
-        }
+        // first make sure we can get the absolute path
+        if (this.subject.getParent() == null) throw new RuntimeException("Orphaned file tab found");
 
+        // TODO, this part should be done on a separate thread
         StringBuilder content = new StringBuilder();
         try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, this.subject))
         {
@@ -199,15 +194,18 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
                 content.append(new String(buffer, 0, n));
             }
             Arrays.fill(buffer, (byte) 0);
-            this.plainTextContent = content.toString();
-            this.hasChanges = false;
-            this.saveButton.setDisable(true);
-            this.getStyleClass().remove("has-changes");
         }
         catch (IOException e)
         {
             QuickDialogs.exception(e);
+            return;
         }
+        // TODO, then return to the UI thread. on failure - show error and close the tab. on success, set the content
+
+        this.plainTextContent = content.toString();
+        this.hasChanges = false;
+        this.saveButton.setDisable(true);
+        this.getStyleClass().remove("has-changes");
     }
 
     public void checkChanges()
