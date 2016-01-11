@@ -8,12 +8,10 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.FileChooser;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.exceptions.BaseBunkrException;
-import org.bunkr.core.exceptions.CLIException;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Formatters;
-import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
@@ -31,7 +29,7 @@ import java.util.function.Consumer;
  * Creator: benmeier
  * Created At: 2015-12-28
  */
-public class InventoryCMController
+public class MainWindowActionsController
 {
     public static final String STR_NEW_FILE = "New File";
     public static final String STR_NEW_FOLDER = "New Folder";
@@ -55,7 +53,7 @@ public class InventoryCMController
     private Consumer<FileInventoryItem> onDeleteFile;
     private Consumer<FileInventoryItem> onRenameFile;
 
-    public InventoryCMController(ArchiveInfoContext archive, InventoryTreeView treeView)
+    public MainWindowActionsController(ArchiveInfoContext archive, InventoryTreeView treeView)
     {
         this.archive = archive;
         this.treeView = treeView;

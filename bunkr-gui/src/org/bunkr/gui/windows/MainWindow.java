@@ -23,7 +23,7 @@ import org.bunkr.gui.components.tabs.TabLoadError;
 import org.bunkr.gui.components.tabs.images.ImageTab;
 import org.bunkr.gui.components.tabs.markdown.MarkdownTab;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
-import org.bunkr.gui.controllers.InventoryCMController;
+import org.bunkr.gui.controllers.MainWindowActionsController;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class MainWindow extends BaseWindow
         this.openTabs = new HashMap<>();
         this.initialise();
 
-        InventoryCMController contextMenuController = new InventoryCMController(this.archive, this.tree);
+        MainWindowActionsController contextMenuController = new MainWindowActionsController(this.archive, this.tree);
         contextMenuController.bindEvents();
         contextMenuController.setOnSaveInventoryRequest(this::saveMetadata);
         contextMenuController.setOnRenameFile(this::notifyRename);
