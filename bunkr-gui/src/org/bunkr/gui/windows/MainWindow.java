@@ -3,26 +3,33 @@ package org.bunkr.gui.windows;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.BaseBunkrException;
+import org.bunkr.core.exceptions.TraversalException;
+import org.bunkr.core.inventory.FileInventoryItem;
+import org.bunkr.core.inventory.IFFTraversalTarget;
+import org.bunkr.core.inventory.InventoryPather;
+import org.bunkr.core.inventory.MediaType;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.Icons;
+import org.bunkr.gui.components.tabs.IOpenedFileTab;
+import org.bunkr.gui.components.tabs.TabLoadError;
+import org.bunkr.gui.components.tabs.images.ImageTab;
+import org.bunkr.gui.components.tabs.markdown.MarkdownTab;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
-import org.bunkr.gui.controllers.FilesTabPaneController;
 import org.bunkr.gui.controllers.InventoryCMController;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Creator: benmeier
@@ -41,6 +48,8 @@ public class MainWindow extends BaseWindow
     private InventoryTreeView tree;
     private Button encryptionSettingsButton;
 
+    private final Map<UUID, IOpenedFileTab> openTabs;
+
     public MainWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
     {
         super();
@@ -48,17 +57,15 @@ public class MainWindow extends BaseWindow
         this.archive = archive;
         this.securityProvider = securityProvider;
         this.cssPath = Resources.getExternalPath("/resources/css/main_window.css");
+        this.openTabs = new HashMap<>();
         this.initialise();
-
-        FilesTabPaneController tabPaneController = new FilesTabPaneController(this.archive, this.tabPane);
-        tabPaneController.setOnSaveInventoryRequest(this::saveMetadata);
 
         InventoryCMController contextMenuController = new InventoryCMController(this.archive, this.tree);
         contextMenuController.bindEvents();
         contextMenuController.setOnSaveInventoryRequest(this::saveMetadata);
-        contextMenuController.setOnRenameFile(tabPaneController::notifyRename);
-        contextMenuController.setOnDeleteFile(f -> tabPaneController.requestClose(f, false));
-        contextMenuController.setOnOpenFile(tabPaneController::requestOpen);
+        contextMenuController.setOnRenameFile(this::notifyRename);
+        contextMenuController.setOnDeleteFile(this::requestClose);
+        contextMenuController.setOnOpenFile(this::requestOpen);
 
         this.tree.refreshAll();
     }
@@ -138,6 +145,89 @@ public class MainWindow extends BaseWindow
         catch (IOException | BaseBunkrException e)
         {
             QuickDialogs.exception(e);
+        }
+    }
+
+    /**
+     * requestOpen
+     * Open the given file in a tab. If it is already open in another tab, switch to it.
+     */
+    public void requestOpen(FileInventoryItem file)
+    {
+        if (openTabs.containsKey(file.getUuid()))
+        {
+            this.tabPane.getSelectionModel().select((Tab) openTabs.get(file.getUuid()));
+        }
+        else
+        {
+            try
+            {
+                IOpenedFileTab tab;
+                switch (file.getMediaType())
+                {
+                    case MediaType.TEXT:
+                        tab = new MarkdownTab(file, this.archive);
+                        ((MarkdownTab) tab).setOnSaveInventoryRequest(this::saveMetadata);
+                        ((MarkdownTab) tab).setOnTryOpenFileItem(this::tryOpenFileItem);
+                        break;
+                    case MediaType.IMAGE:
+                        tab = new ImageTab(file, this.archive);
+                        break;
+                    default:
+                        QuickDialogs.error("Cannot open file with media type: " + file.getMediaType());
+                        return;
+                }
+                ((Tab) tab).setOnClosed(e -> this.openTabs.remove(file.getUuid()));
+                this.tabPane.getTabs().add((Tab) tab);
+                this.openTabs.put(file.getUuid(), tab);
+                this.tabPane.getSelectionModel().select((Tab) tab);
+            }
+            catch (TabLoadError tabLoadError)
+            {
+                QuickDialogs.error("Tab Load Error", "An error occured while building the new tab", tabLoadError.getMessage());
+            }
+        }
+    }
+
+    private void tryOpenFileItem(String abspath)
+    {
+        try
+        {
+            IFFTraversalTarget t = InventoryPather.traverse(this.archive.getInventory(), abspath);
+            if (t.isAFile() && t instanceof FileInventoryItem)
+            {
+                this.requestOpen((FileInventoryItem) t);
+            }
+        }
+        catch (TraversalException e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
+    /**
+     * requestClose
+     * Close the given file tab if it is open. If it isn't open, dont bother. If the file has pending changes, allow
+     * them to be saved if necessary before resuming the close.
+     */
+    public void requestClose(FileInventoryItem file)
+    {
+        if (openTabs.containsKey(file.getUuid()))
+        {
+            this.tabPane.getTabs().remove((Tab) openTabs.get(file.getUuid()));
+            this.openTabs.remove(file.getUuid());
+        }
+    }
+
+    /**
+     * notifyRename
+     * Notify that a file has been renamed or moved. This may mean updating GUI fields on the tab if the file is open.
+     */
+    public void notifyRename(FileInventoryItem file)
+    {
+        if (openTabs.containsKey(file.getUuid()))
+        {
+            this.openTabs.get(file.getUuid()).notifyRename();
         }
     }
 }
