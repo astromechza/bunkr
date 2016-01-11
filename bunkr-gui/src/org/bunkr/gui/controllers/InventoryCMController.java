@@ -8,7 +8,9 @@ import javafx.scene.input.MouseButton;
 import javafx.stage.FileChooser;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.exceptions.BaseBunkrException;
+import org.bunkr.core.exceptions.CLIException;
 import org.bunkr.core.inventory.*;
+import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Formatters;
 import org.bunkr.core.utils.Logging;
@@ -166,8 +168,7 @@ public class InventoryCMController
         {
             TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItem();
 
-            if (!QuickDialogs.confirm(
-                    String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
+            if (!QuickDialogs.confirm(String.format("Are you sure you want to delete '%s'?", selected.getValue().getName())))
                 return;
 
             // find parent item
@@ -187,7 +188,6 @@ public class InventoryCMController
 
                 this.onSaveInventoryRequest.accept(
                         String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
-
                 this.onDeleteFile.accept(targetFile);
             }
             else
@@ -625,11 +625,27 @@ public class InventoryCMController
 
             File exportedFile = fileChooser.showSaveDialog(this.treeView.getScene().getWindow());
             if (exportedFile == null) return;
+            if (exportedFile.exists())
+            {
+                QuickDialogs.error("File %s already exists.", exportedFile.getAbsolutePath());
+                return;
+            }
+            FileChannel fc = new RandomAccessFile(exportedFile, "rw").getChannel();
 
-            Logging.info("%s", exportedFile.getAbsolutePath());
-
-
-
+            try (OutputStream contentOutputStream = Channels.newOutputStream(fc))
+            {
+                try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, selectedFile))
+                {
+                    byte[] buffer = new byte[1024 * 1024];
+                    int n;
+                    while ((n = ms.read(buffer)) != -1)
+                    {
+                        contentOutputStream.write(buffer, 0, n);
+                    }
+                    Arrays.fill(buffer, (byte) 0);
+                }
+            }
+            QuickDialogs.info("File successfully exported to %s", exportedFile.getAbsolutePath());
         }
         catch (Exception e)
         {
