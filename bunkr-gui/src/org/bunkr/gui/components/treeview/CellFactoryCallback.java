@@ -4,7 +4,7 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
 import javafx.util.Callback;
 import org.bunkr.gui.Icons;
-import org.bunkr.gui.controllers.MainWindowActionsController;
+import org.bunkr.gui.controllers.ContextMenus;
 
 /**
  * Creator: benmeier
@@ -12,9 +12,9 @@ import org.bunkr.gui.controllers.MainWindowActionsController;
  */
 public class CellFactoryCallback implements Callback<TreeView<InventoryTreeData>, TreeCell<InventoryTreeData>>
 {
-    private final MainWindowActionsController callbackContainer;
+    private final ContextMenus callbackContainer;
 
-    public CellFactoryCallback(MainWindowActionsController callbackContainer)
+    public CellFactoryCallback(ContextMenus callbackContainer)
     {
         this.callbackContainer = callbackContainer;
     }

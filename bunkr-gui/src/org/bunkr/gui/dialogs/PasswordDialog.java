@@ -17,7 +17,6 @@ import org.bunkr.gui.windows.BaseWindow;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Creator: benmeier

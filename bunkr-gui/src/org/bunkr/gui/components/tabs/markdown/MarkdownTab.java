@@ -8,7 +8,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.FileInventoryItem;
+import org.bunkr.core.inventory.IFFTraversalTarget;
 import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
@@ -53,7 +55,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     private String plainTextContent = null;
     private boolean hasChanges = true;
 
-    private Consumer<String> onTryOpenFileItem;
+    private Consumer<FileInventoryItem> onRequestOpen;
     private Consumer<String> onSaveInventoryRequest;
 
     public MarkdownTab(FileInventoryItem file, ArchiveInfoContext archive)
@@ -72,13 +74,13 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
             mwva.setOnTryOpenFileItem(s -> {
                 if (InventoryPather.isValidPath(s))
                 {
-                    this.onTryOpenFileItem.accept(s);
+                    this.requestOpenTab(s);
                 }
                 else if (InventoryPather.isValidRelativePath(s))
                 {
                     String parentPath = InventoryPather.applyRelativePath(subject.getAbsolutePath(), "..");
                     String targetPath = InventoryPather.applyRelativePath(parentPath, s);
-                    this.onTryOpenFileItem.accept(targetPath);
+                    this.requestOpenTab(targetPath);
                 }
             });
         }
@@ -250,13 +252,27 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         if (!this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().add(this.formattedView);
     }
 
+    public void requestOpenTab(String absolutePath)
+    {
+        try
+        {
+            IFFTraversalTarget t = InventoryPather.traverse(this.archive.getInventory(), absolutePath);
+            if (t instanceof FileInventoryItem) this.onRequestOpen.accept((FileInventoryItem) t);
+            QuickDialogs.error("Item %s is not a file.", absolutePath);
+        }
+        catch (TraversalException e)
+        {
+            QuickDialogs.exception(e);
+        }
+    }
+
     public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
     {
         this.onSaveInventoryRequest = onSaveInventoryRequest;
     }
 
-    public void setOnTryOpenFileItem(Consumer<String> onTryOpenFileItem)
+    public void setOnRequestOpen(Consumer<FileInventoryItem> onRequestOpen)
     {
-        this.onTryOpenFileItem = onTryOpenFileItem;
+        this.onRequestOpen = onRequestOpen;
     }
 }

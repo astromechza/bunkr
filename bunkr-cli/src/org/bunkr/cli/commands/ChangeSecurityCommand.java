@@ -13,8 +13,6 @@ import org.bunkr.core.descriptor.ScryptDescriptor;
 import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.usersec.UserSecurityProvider;
 
-import java.io.File;
-
 /**
  * Creator: benmeier
  * Created At: 2016-01-10
