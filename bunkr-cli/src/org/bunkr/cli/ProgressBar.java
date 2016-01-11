@@ -67,7 +67,7 @@ public class ProgressBar
     {
         if (enabled)
         {
-            if (n > lastPrintN)
+            if (n >= lastPrintN)
             {
                 long elapsed = System.currentTimeMillis() - this.startTime;
                 System.out.print('\r');
