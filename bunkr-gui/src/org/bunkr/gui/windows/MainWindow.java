@@ -200,32 +200,6 @@ public class MainWindow extends BaseWindow
         }
     }
 
-    /**
-     * requestClose
-     * Close the given file tab if it is open. If it isn't open, dont bother. If the file has pending changes, allow
-     * them to be saved if necessary before resuming the close.
-     */
-    public void requestClose(FileInventoryItem file)
-    {
-        if (openTabs.containsKey(file.getUuid()))
-        {
-            this.tabPane.getTabs().remove((Tab) openTabs.get(file.getUuid()));
-            this.openTabs.remove(file.getUuid());
-        }
-    }
-
-    /**
-     * notifyRename
-     * Notify that a file has been renamed or moved. This may mean updating GUI fields on the tab if the file is open.
-     */
-    public void requestRename(FileInventoryItem file)
-    {
-        if (openTabs.containsKey(file.getUuid()))
-        {
-            this.openTabs.get(file.getUuid()).notifyRename();
-        }
-    }
-
     private void handleCMFileOpen()
     {
         try
@@ -291,9 +265,13 @@ public class MainWindow extends BaseWindow
                 parentContainer.removeFile(targetFile);
                 parent.getChildren().remove(selected);
 
-                this.requestMetadataSave(
-                        String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
-                this.requestClose(targetFile);
+                this.requestMetadataSave(String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
+
+                if (openTabs.containsKey(targetFile.getUuid()))
+                {
+                    this.tabPane.getTabs().remove((Tab) openTabs.get(targetFile.getUuid()));
+                    this.openTabs.remove(targetFile.getUuid());
+                }
             }
             else
             {
@@ -468,7 +446,11 @@ public class MainWindow extends BaseWindow
             this.requestMetadataSave(String.format("Renamed file %s", newNameComponent));
             if (renameSubject.isAFile() && renameSubject instanceof FileInventoryItem)
             {
-                this.requestRename((FileInventoryItem) renameSubject);
+                FileInventoryItem renameFile = (FileInventoryItem) renameSubject;
+                if (openTabs.containsKey(renameFile.getUuid()))
+                {
+                    this.openTabs.get(renameFile.getUuid()).notifyRename();
+                }
             }
         }
         catch (Exception e)
