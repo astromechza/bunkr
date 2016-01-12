@@ -748,23 +748,43 @@ public class MainWindow extends BaseWindow
                 return;
             }
 
-            // TODO, do the rest on another thread
-            FileChannel fc = new RandomAccessFile(exportedFile, "rw").getChannel();
-            try (OutputStream contentOutputStream = Channels.newOutputStream(fc))
+            Task<Void> progressTask = new Task<Void>()
             {
-                try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, selectedFile))
+                @Override
+                protected Void call() throws Exception
                 {
-                    byte[] buffer = new byte[1024 * 1024];
-                    int n;
-                    while ((n = ms.read(buffer)) != -1)
+                    this.updateMessage("Opening file.");
+                    FileChannel fc = new RandomAccessFile(exportedFile, "rw").getChannel();
+                    long bytesTotal = selectedFile.getActualSize();
+                    long bytesDone = 0;
+                    try (OutputStream contentOutputStream = Channels.newOutputStream(fc))
                     {
-                        contentOutputStream.write(buffer, 0, n);
+                        try (MultilayeredInputStream ms = new MultilayeredInputStream(archive, selectedFile))
+                        {
+                            this.updateMessage("Exporting bytes...");
+                            byte[] buffer = new byte[1024 * 1024];
+                            int n;
+                            while ((n = ms.read(buffer)) != -1)
+                            {
+                                contentOutputStream.write(buffer, 0, n);
+                                bytesDone += n;
+                                this.updateProgress(bytesDone, bytesTotal);
+                            }
+                            Arrays.fill(buffer, (byte) 0);
+                            this.updateMessage("Finished.");
+                        }
                     }
-                    Arrays.fill(buffer, (byte) 0);
+                    return null;
                 }
-            }
-            // TODO. on fail - error out and return. on success - continue
-            QuickDialogs.info("File successfully exported to %s", exportedFile.getAbsolutePath());
+            };
+
+            progressTask.setOnFailed(event -> QuickDialogs.exception(progressTask.getException()));
+
+            progressTask.setOnSucceeded(event -> QuickDialogs.info("File successfully exported to %s", exportedFile.getAbsolutePath()));
+
+            ProgressDialog pd = new ProgressDialog(progressTask);
+            pd.setHeaderText(String.format("Exporting file %s ...", exportedFile.getName()));
+            new Thread(progressTask).start();
         }
         catch (Exception e)
         {
