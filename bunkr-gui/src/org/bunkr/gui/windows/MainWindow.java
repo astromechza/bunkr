@@ -1,5 +1,6 @@
 package org.bunkr.gui.windows;
 
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -27,6 +28,7 @@ import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.ContextMenus;
 import org.bunkr.gui.dialogs.QuickDialogs;
+import org.controlsfx.dialog.ProgressDialog;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -265,7 +267,8 @@ public class MainWindow extends BaseWindow
                 parentContainer.removeFile(targetFile);
                 parent.getChildren().remove(selected);
 
-                this.requestMetadataSave(String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
+                this.requestMetadataSave(
+                        String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
 
                 if (openTabs.containsKey(targetFile.getUuid()))
                 {
@@ -608,7 +611,7 @@ public class MainWindow extends BaseWindow
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
-                QuickDialogs.error("Import Error", "'%s' is an invalid file name.", newName);
+                QuickDialogs.error("Import Error", null, "'%s' is an invalid file name.", newName);
                 return;
             }
 
@@ -618,7 +621,7 @@ public class MainWindow extends BaseWindow
             IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
             if (selectedItem.isAFile())
             {
-                QuickDialogs.error("Create Error", "'%s' is a file.", selectedPath);
+                QuickDialogs.error("Create Error", null, "'%s' is a file.", selectedPath);
                 return;
             }
 
@@ -629,49 +632,71 @@ public class MainWindow extends BaseWindow
             IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
             if (target != null)
             {
-                QuickDialogs.error("Import Error", "There is already an item named '%s' in the parent folder.", newName);
+                QuickDialogs.error("Import Error", null, "There is already an item named '%s' in the parent folder.", newName);
                 return;
             }
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
-            selectedContainer.addFile(newFile);
 
-            // TODO, do the rest on another thread
-            FileChannel fc = new RandomAccessFile(importedFile, "r").getChannel();
-            try (InputStream fis = Channels.newInputStream(fc))
-            {
-                try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, newFile))
+            Task<Void> progressTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception
                 {
-                    byte[] buffer = new byte[1024 * 1024];
-                    int n;
-                    while ((n = fis.read(buffer)) != -1)
+                    this.updateMessage("Opening file.");
+                    FileChannel fc = new RandomAccessFile(importedFile, "r").getChannel();
+                    long bytesTotal = fc.size();
+                    long bytesDone = 0;
+                    try (InputStream fis = Channels.newInputStream(fc))
                     {
-                        bwos.write(buffer, 0, n);
+                        try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(archive, newFile))
+                        {
+                            this.updateMessage("Importing bytes...");
+                            byte[] buffer = new byte[1024 * 1024];
+                            int n;
+                            while ((n = fis.read(buffer)) != -1)
+                            {
+                                bwos.write(buffer, 0, n);
+                                bytesDone += n;
+                                this.updateProgress(bytesDone, bytesTotal);
+                            }
+                            Arrays.fill(buffer, (byte) 0);
+                            this.updateMessage("Finished.");
+                        }
                     }
-                    Arrays.fill(buffer, (byte) 0);
+                    return null;
                 }
-            }
-            // TODO. on fail - error out and return. on success - continue
+            };
 
-            // pick the media type
-            newFile.setMediaType(QuickDialogs.pick(
-                                         "Import File",
-                                         null,
-                                         "Pick a Media Type for the new file:",
-                                         new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
-            );
+            progressTask.setOnFailed(event -> QuickDialogs.exception(progressTask.getException()));
 
-            // create the new tree item
-            InventoryTreeData newValue = new InventoryTreeData(newFile);
-            TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
-            selected.getChildren().add(newItem);
-            selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-            selected.setExpanded(true);
+            progressTask.setOnSucceeded(event -> {
+                // add to the container
+                selectedContainer.addFile(newFile);
 
-            Event.fireEvent(selected,
-                            new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
-            this.tree.getSelectionModel().select(newItem);
-            this.requestMetadataSave(String.format("Imported file %s", newFile.getName()));
+                // pick the media type
+                newFile.setMediaType(QuickDialogs.pick(
+                                             "Import File",
+                                             null,
+                                             "Pick a Media Type for the new file:",
+                                             new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
+                );
+
+                // create the new tree item
+                InventoryTreeData newValue = new InventoryTreeData(newFile);
+                TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
+                selected.getChildren().add(newItem);
+                selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+                selected.setExpanded(true);
+
+                Event.fireEvent(selected,
+                                new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+                this.tree.getSelectionModel().select(newItem);
+                this.requestMetadataSave(String.format("Imported file %s", newFile.getName()));
+            });
+
+            ProgressDialog pd = new ProgressDialog(progressTask);
+            pd.setHeaderText(String.format("Importing file %s ...", newFile.getName()));
+            new Thread(progressTask).start();
         }
         catch (Exception e)
         {
@@ -722,9 +747,9 @@ public class MainWindow extends BaseWindow
                 QuickDialogs.error("File %s already exists.", exportedFile.getAbsolutePath());
                 return;
             }
-            FileChannel fc = new RandomAccessFile(exportedFile, "rw").getChannel();
 
             // TODO, do the rest on another thread
+            FileChannel fc = new RandomAccessFile(exportedFile, "rw").getChannel();
             try (OutputStream contentOutputStream = Channels.newOutputStream(fc))
             {
                 try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, selectedFile))

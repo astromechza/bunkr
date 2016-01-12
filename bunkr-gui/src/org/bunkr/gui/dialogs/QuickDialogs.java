@@ -113,7 +113,7 @@ public class QuickDialogs
         if (result.isPresent()){
             return result.get();
         }
-        return null;
+        return initial;
     }
 
     public static <T> T pick(String content, List<T> items, T initial)
