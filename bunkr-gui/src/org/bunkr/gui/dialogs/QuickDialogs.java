@@ -132,7 +132,8 @@ public class QuickDialogs
         dialog.setHeaderText(heading);
         dialog.setContentText(content);
         Optional<T> result = dialog.showAndWait();
-        if (result.isPresent()){
+        if (result.isPresent())
+        {
             return result.get();
         }
         return initial;

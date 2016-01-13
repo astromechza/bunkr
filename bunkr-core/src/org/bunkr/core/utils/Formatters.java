@@ -24,7 +24,9 @@ package org.bunkr.core.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Creator: benmeier
@@ -41,6 +43,12 @@ public class Formatters
     public static final long MEGA = KILO * KILO;
     public static final long GIGA = KILO * MEGA;
     public static final long TERA = KILO * GIGA;
+
+    public static final long MILLISECOND = 1;
+    public static final long SECOND = 1000 * MILLISECOND;
+    public static final long MINUTE = 60 * SECOND;
+    public static final long HOUR = 60 * MINUTE;
+    public static final long DAY = 24 * HOUR;
 
     public static String formatBytes(long numBytes)
     {
@@ -104,6 +112,17 @@ public class Formatters
     public static String formatPrettyDate(long milliseconds)
     {
         return formateDate(milliseconds, "MMM dd HH:mm");
+    }
+
+    public static String formatPrettyElapsed(long milliseconds)
+    {
+        if (milliseconds == 0) return "0";
+        if (milliseconds < 0) return "Unknown";
+        if (milliseconds > DAY) return String.format("%.1f Days", milliseconds / (double) DAY);
+        if (milliseconds > HOUR) return String.format("%.1f Hours", milliseconds / (double) HOUR);
+        if (milliseconds > MINUTE) return String.format("%.1f Minutes", milliseconds / (double) MINUTE);
+        if (milliseconds > SECOND) return String.format("%.1f Seconds", milliseconds / (double) SECOND);
+        return String.format("%d Milliseconds", milliseconds);
     }
 
     public static String wrap(String input, int linewidth)

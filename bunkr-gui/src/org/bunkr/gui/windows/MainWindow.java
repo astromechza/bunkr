@@ -695,9 +695,18 @@ public class MainWindow extends BaseWindow
                 @Override
                 protected void updateProgress(long done, long total)
                 {
-                    long elapsed = System.currentTimeMillis() - this.startTime;
-                    this.updateMessage(String.format("Importing bytes... (%s/s)", Formatters.formatPrettyInt(1000 * done / elapsed)));
-                    super.updateProgress(done, total);
+                    if (done > 0)
+                    {
+                        long elapsed = System.currentTimeMillis() - this.startTime;
+                        long eta = elapsed * (total - done) / done;
+                        this.updateMessage(String.format(
+                                                   "Importing bytes... (%s/s ETA: %s)",
+                                                   Formatters.formatPrettyInt(1000 * done / elapsed),
+                                                   Formatters.formatPrettyElapsed(eta)
+                                           )
+                        );
+                        super.updateProgress(done, total);
+                    }
                 }
 
                 @Override
@@ -782,11 +791,6 @@ public class MainWindow extends BaseWindow
 
             File exportedFile = fileChooser.showSaveDialog(this.tree.getScene().getWindow());
             if (exportedFile == null) return;
-            if (exportedFile.exists())
-            {
-                QuickDialogs.error("File %s already exists.", exportedFile.getAbsolutePath());
-                return;
-            }
 
             Task<Void> progressTask = new Task<Void>()
             {
@@ -822,9 +826,18 @@ public class MainWindow extends BaseWindow
                 @Override
                 protected void updateProgress(long done, long total)
                 {
-                    long elapsed = System.currentTimeMillis() - this.startTime;
-                    this.updateMessage(String.format("Exporting bytes... (%s/s)", Formatters.formatPrettyInt(1000 * done / elapsed)));
-                    super.updateProgress(done, total);
+                    if (done > 0)
+                    {
+                        long elapsed = System.currentTimeMillis() - this.startTime;
+                        long eta = elapsed * (total - done) / done;
+                        this.updateMessage(String.format(
+                                "Exporting bytes... (%s/s ETA: %s)",
+                                Formatters.formatPrettyInt(1000 * done / elapsed),
+                                Formatters.formatPrettyElapsed(eta)
+                                )
+                        );
+                        super.updateProgress(done, total);
+                    }
                 }
 
                 @Override
