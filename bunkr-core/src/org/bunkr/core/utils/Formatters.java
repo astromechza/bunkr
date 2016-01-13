@@ -114,7 +114,7 @@ public class Formatters
         return formateDate(milliseconds, "MMM dd HH:mm");
     }
 
-    public static String formatPrettyElapsed(long milliseconds)
+    public static String formatPrettyElapsed(double milliseconds)
     {
         if (milliseconds == 0) return "0";
         if (milliseconds < 0) return "Unknown";
@@ -122,7 +122,7 @@ public class Formatters
         if (milliseconds > HOUR) return String.format("%.1f Hours", milliseconds / (double) HOUR);
         if (milliseconds > MINUTE) return String.format("%.1f Minutes", milliseconds / (double) MINUTE);
         if (milliseconds > SECOND) return String.format("%.1f Seconds", milliseconds / (double) SECOND);
-        return String.format("%d Milliseconds", milliseconds);
+        return String.format("%d Milliseconds", (long) milliseconds);
     }
 
     public static String wrap(String input, int linewidth)

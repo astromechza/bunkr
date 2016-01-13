@@ -42,6 +42,7 @@ import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Formatters;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.Icons;
+import org.bunkr.gui.ProgressTask;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.components.tabs.TabLoadError;
 import org.bunkr.gui.components.tabs.images.ImageTab;
@@ -660,14 +661,11 @@ public class MainWindow extends BaseWindow
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
 
-            Task<Void> progressTask = new Task<Void>()
+            ProgressTask<Void> progressTask = new ProgressTask<Void>()
             {
-                public long startTime;
-
                 @Override
-                protected Void call() throws Exception
+                protected Void innerCall() throws Exception
                 {
-                    this.startTime = System.currentTimeMillis();
                     this.updateMessage("Opening file.");
                     FileChannel fc = new RandomAccessFile(importedFile, "r").getChannel();
                     long bytesTotal = fc.size();
@@ -690,23 +688,6 @@ public class MainWindow extends BaseWindow
                         }
                     }
                     return null;
-                }
-
-                @Override
-                protected void updateProgress(long done, long total)
-                {
-                    if (done > 0)
-                    {
-                        long elapsed = System.currentTimeMillis() - this.startTime;
-                        long eta = elapsed * (total - done) / done;
-                        this.updateMessage(String.format(
-                                                   "Importing bytes... (%s/s ETA: %s)",
-                                                   Formatters.formatPrettyInt(1000 * done / elapsed),
-                                                   Formatters.formatPrettyElapsed(eta)
-                                           )
-                        );
-                        super.updateProgress(done, total);
-                    }
                 }
 
                 @Override
@@ -792,13 +773,11 @@ public class MainWindow extends BaseWindow
             File exportedFile = fileChooser.showSaveDialog(this.tree.getScene().getWindow());
             if (exportedFile == null) return;
 
-            Task<Void> progressTask = new Task<Void>()
+            ProgressTask<Void> progressTask = new ProgressTask<Void>()
             {
-                public long startTime;
                 @Override
-                protected Void call() throws Exception
+                protected Void innerCall() throws Exception
                 {
-                    this.startTime = System.currentTimeMillis();
                     this.updateMessage("Opening file.");
                     FileChannel fc = new RandomAccessFile(exportedFile, "rw").getChannel();
                     long bytesTotal = selectedFile.getActualSize();
@@ -821,23 +800,6 @@ public class MainWindow extends BaseWindow
                         }
                     }
                     return null;
-                }
-
-                @Override
-                protected void updateProgress(long done, long total)
-                {
-                    if (done > 0)
-                    {
-                        long elapsed = System.currentTimeMillis() - this.startTime;
-                        long eta = elapsed * (total - done) / done;
-                        this.updateMessage(String.format(
-                                "Exporting bytes... (%s/s ETA: %s)",
-                                Formatters.formatPrettyInt(1000 * done / elapsed),
-                                Formatters.formatPrettyElapsed(eta)
-                                )
-                        );
-                        super.updateProgress(done, total);
-                    }
                 }
 
                 @Override
