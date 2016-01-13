@@ -22,6 +22,7 @@
 
 package org.bunkr.cli.commands;
 
+import org.bunkr.cli.ProgressBar;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.cli.CLI;
 import org.bunkr.core.usersec.UserSecurityProvider;
@@ -49,6 +50,7 @@ public class ExportFileCommand implements ICLICommand
     public static final String ARG_PATH = "path";
     public static final String ARG_DESTINATION_FILE = "destination";
     public static final String ARG_IGNORE_INTEGRITY_CHECK = "ignoreintegrity";
+    public static final String ARG_NO_PROGRESS = "noprogress";
 
     @Override
     public void buildParser(Subparser target)
@@ -67,6 +69,12 @@ public class ExportFileCommand implements ICLICommand
                 .type(Boolean.class)
                 .action(Arguments.storeTrue())
                 .help("ignore integrity check error caused by data corruption");
+        target.addArgument("--no-progress")
+                .dest(ARG_NO_PROGRESS)
+                .action(Arguments.storeTrue())
+                .setDefault(false)
+                .type(Boolean.class)
+                .help("don't display a progress bar while importing the file");
     }
 
     @Override
@@ -84,18 +92,18 @@ public class ExportFileCommand implements ICLICommand
 
             File inputFile = args.get(ARG_DESTINATION_FILE);
             boolean checkHash = (!args.getBoolean(ARG_IGNORE_INTEGRITY_CHECK));
+            boolean noProgress = (Boolean) getOrDefault(args.get(ARG_NO_PROGRESS), false);
             if (inputFile.getPath().equals("-"))
             {
-                writeBlockFileToStream(aic, targetFile, System.out, checkHash);
+                writeBlockFileToStream(aic, targetFile, System.out, checkHash, false);
             }
             else
             {
-                if (inputFile.exists())
-                    throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
+                if (inputFile.exists()) throw new CLIException("'%s' already exists. Will not overwrite.", inputFile.getCanonicalPath());
                 FileChannel fc = new RandomAccessFile(inputFile, "rw").getChannel();
                 try (OutputStream contentOutputStream = Channels.newOutputStream(fc))
                 {
-                    writeBlockFileToStream(aic, targetFile, contentOutputStream, checkHash);
+                    writeBlockFileToStream(aic, targetFile, contentOutputStream, checkHash, !noProgress);
                 }
             }
         }
@@ -105,9 +113,12 @@ public class ExportFileCommand implements ICLICommand
         }
     }
 
-    private void writeBlockFileToStream(ArchiveInfoContext ctxt, FileInventoryItem targetFile, OutputStream os, boolean checkHash)
+    private void writeBlockFileToStream(ArchiveInfoContext ctxt, FileInventoryItem targetFile, OutputStream os, boolean checkHash, boolean showProgress)
             throws IOException
     {
+        ProgressBar pb = new ProgressBar(120, targetFile.getActualSize(), "Exporting file: ", showProgress);
+        pb.startFresh();
+
         try (MultilayeredInputStream ms = new MultilayeredInputStream(ctxt, targetFile))
         {
             ms.setCheckHashOnFinish(checkHash);
@@ -116,8 +127,17 @@ public class ExportFileCommand implements ICLICommand
             while ((n = ms.read(buffer)) != -1)
             {
                 os.write(buffer, 0, n);
+                pb.inc(n);
             }
             Arrays.fill(buffer, (byte) 0);
         }
+
+        pb.finish();
+    }
+
+    private Object getOrDefault(Object v, Object d)
+    {
+        if (v == null) return d;
+        return v;
     }
 }
