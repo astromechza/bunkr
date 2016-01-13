@@ -6,9 +6,7 @@ PROJECT_ROOT = File.join(THIS_DIR, '..', '..')
 LICENSE = File.read(File.join(THIS_DIR, 'license.template')).strip()
 
 TOP_COMMENT_REGEX = /\A\s*\/\*\*([\s\S]*?)\*\//
-
-COMMENTED_LICENSE = LICENSE.gsub(/^/, ' * ')
-COMMENTED_LICENSE = "/**\n" + COMMENTED_LICENSE.gsub(/\s+$/, '') + "\n */\n"
+COMMENTED_LICENSE = "/**\n" + LICENSE.gsub(/^/, ' * ').gsub(/\s+$/, '') + "\n */\n"
 
 def fix_license_in(path)
     Dir.glob(File.join(path, '**/*.java')).each do |f|

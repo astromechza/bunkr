@@ -49,8 +49,8 @@ import org.bunkr.gui.components.tabs.markdown.MarkdownTab;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.ContextMenus;
+import org.bunkr.gui.dialogs.ProgressDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
-import org.controlsfx.dialog.ProgressDialog;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -687,34 +687,40 @@ public class MainWindow extends BaseWindow
                     }
                     return null;
                 }
+
+                @Override
+                protected void failed()
+                {
+                    QuickDialogs.exception(this.getException());
+                }
+
+                @Override
+                protected void succeeded()
+                {
+                    // add to the container
+                    selectedContainer.addFile(newFile);
+
+                    // pick the media type
+                    newFile.setMediaType(QuickDialogs.pick(
+                                                 "Import File",
+                                                 null,
+                                                 "Pick a Media Type for the new file:",
+                                                 new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
+                    );
+
+                    // create the new tree item
+                    InventoryTreeData newValue = new InventoryTreeData(newFile);
+                    TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
+                    selected.getChildren().add(newItem);
+                    selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+                    selected.setExpanded(true);
+
+                    Event.fireEvent(selected,
+                                    new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+                    tree.getSelectionModel().select(newItem);
+                    requestMetadataSave(String.format("Imported file %s", newFile.getName()));
+                }
             };
-
-            progressTask.setOnFailed(event -> QuickDialogs.exception(progressTask.getException()));
-
-            progressTask.setOnSucceeded(event -> {
-                // add to the container
-                selectedContainer.addFile(newFile);
-
-                // pick the media type
-                newFile.setMediaType(QuickDialogs.pick(
-                                             "Import File",
-                                             null,
-                                             "Pick a Media Type for the new file:",
-                                             new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
-                );
-
-                // create the new tree item
-                InventoryTreeData newValue = new InventoryTreeData(newFile);
-                TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
-                selected.getChildren().add(newItem);
-                selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-                selected.setExpanded(true);
-
-                Event.fireEvent(selected,
-                                new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
-                this.tree.getSelectionModel().select(newItem);
-                this.requestMetadataSave(String.format("Imported file %s", newFile.getName()));
-            });
 
             ProgressDialog pd = new ProgressDialog(progressTask);
             pd.setHeaderText(String.format("Importing file %s ...", newFile.getName()));
@@ -798,11 +804,19 @@ public class MainWindow extends BaseWindow
                     }
                     return null;
                 }
+
+                @Override
+                protected void succeeded()
+                {
+                    QuickDialogs.info("File successfully exported to %s", exportedFile.getAbsolutePath());
+                }
+
+                @Override
+                protected void failed()
+                {
+                    QuickDialogs.exception(this.getException());
+                }
             };
-
-            progressTask.setOnFailed(event -> QuickDialogs.exception(progressTask.getException()));
-
-            progressTask.setOnSucceeded(event -> QuickDialogs.info("File successfully exported to %s", exportedFile.getAbsolutePath()));
 
             ProgressDialog pd = new ProgressDialog(progressTask);
             pd.setHeaderText(String.format("Exporting file %s ...", exportedFile.getName()));
