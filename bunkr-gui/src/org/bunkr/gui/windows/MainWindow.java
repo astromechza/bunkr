@@ -660,10 +660,14 @@ public class MainWindow extends BaseWindow
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
 
-            Task<Void> progressTask = new Task<Void>() {
+            Task<Void> progressTask = new Task<Void>()
+            {
+                public long startTime;
+
                 @Override
                 protected Void call() throws Exception
                 {
+                    this.startTime = System.currentTimeMillis();
                     this.updateMessage("Opening file.");
                     FileChannel fc = new RandomAccessFile(importedFile, "r").getChannel();
                     long bytesTotal = fc.size();
@@ -686,6 +690,14 @@ public class MainWindow extends BaseWindow
                         }
                     }
                     return null;
+                }
+
+                @Override
+                protected void updateProgress(long done, long total)
+                {
+                    long elapsed = System.currentTimeMillis() - this.startTime;
+                    this.updateMessage(String.format("Importing bytes... (%s/s)", Formatters.formatPrettyInt(1000 * done / elapsed)));
+                    super.updateProgress(done, total);
                 }
 
                 @Override
@@ -778,9 +790,11 @@ public class MainWindow extends BaseWindow
 
             Task<Void> progressTask = new Task<Void>()
             {
+                public long startTime;
                 @Override
                 protected Void call() throws Exception
                 {
+                    this.startTime = System.currentTimeMillis();
                     this.updateMessage("Opening file.");
                     FileChannel fc = new RandomAccessFile(exportedFile, "rw").getChannel();
                     long bytesTotal = selectedFile.getActualSize();
@@ -803,6 +817,14 @@ public class MainWindow extends BaseWindow
                         }
                     }
                     return null;
+                }
+
+                @Override
+                protected void updateProgress(long done, long total)
+                {
+                    long elapsed = System.currentTimeMillis() - this.startTime;
+                    this.updateMessage(String.format("Exporting bytes... (%s/s)", Formatters.formatPrettyInt(1000 * done / elapsed)));
+                    super.updateProgress(done, total);
                 }
 
                 @Override

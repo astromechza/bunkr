@@ -32,8 +32,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
- * This progress dialog takes inspiration from the one provided by ControlsFX. The ControlsFX one is great but lacks
- * certain features we need and it seems silly bringing in a large dependency just for one class.
+ * This progress dialog is pretty much the same as the one provided by ControlsFX. We need to add speed and ETA
+ * calculations.
  *
  * Creator: benmeier
  * Created At: 2016-01-13
