@@ -13,33 +13,23 @@
     git tag -a vX.X.X
     ```
 
-4. Compile into Jars:
+4. Compile into release jars:
 
     ```
     bundle exec buildr bunkr:bunkr-core:package
-    bundle exec buildr bunkr:bunkr-cli:package
-    bundle exec buildr bunkr:bunkr-gui:package
+    bundle exec buildr bunkr:bunkr-cli:build_release
+    bundle exec buildr bunkr:bunkr-gui:build_release
     ```
 
-5. Optimise jars for release:
-
-    As mentioned in the README, you'll need to download Proguard from sourceforge.
+5. (Optional) Generate new Demo file:
 
     ```
-    ./tools/jarsquasher/jarquasher.rb ./bunkr-cli/target/bunkr-cli-X.X.X.jar ~/Downloads/proguard5.2.1/bin/proguard.sh
-    ./tools/jarsquasher/jarquasher.rb ./bunkr-gui/target/bunkr-gui-X.X.X.jar ~/Downloads/proguard5.2.1/bin/proguard.sh
+    bundle exec buildr bunkr:bunkr-cli:generate_demo
     ```
 
-6. (Optional) Generate new Demo file:
+6. (Optional) Commit new Demo file
 
-    ```
-    # Substitue your new version number
-    ./tools/clidocgen/build_documentation.rb ./bunkr-cli/target/bunkr-cli-X.X.X.jar DEMO.md
-    ```
-
-7. (Optional) Commit new Demo file
-
-8. Push commits and tags. Also upload new Github release.
+7. Push commits and tags. Also upload new Github release.
 
     ```
     git push --tags

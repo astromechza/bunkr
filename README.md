@@ -1,6 +1,6 @@
 # Bunkr
 
-See [DEMO.md](DEMO.md) for usage examples.
+See [CLI_DEMO.md](CLI_DEMO.md) for usage examples.
 
 ## Development
 
@@ -11,7 +11,6 @@ The project has been organised into 3 parts:
 - ```bunkr-gui``` a graphical interface for browsing and managing content of archives (this is the focus of this project once the core and cli are stable).
 
 This project uses Apache Buildr for managing compilation and packaging. Each part can be compiled, tested, and packaged individually.
-
 
 #### Examples
 
@@ -30,13 +29,5 @@ $ bundle exec buildr bunkr:bunkr-core:package
 
 ```
 $ bundle exec buildr idea
-$ bundle exec buildr bunkr:pulllibs
+$ bundle exec buildr bunkr:pull_libs
 ```
-
-### To produce a compacted release version
-
-See [jarsquasher tool](tools/jarsquasher/README.md)
-
-### To regenerate the DEMO.md from a packages jar
-
-See [clidocgen tool](tools/clidocgen/README.md)
