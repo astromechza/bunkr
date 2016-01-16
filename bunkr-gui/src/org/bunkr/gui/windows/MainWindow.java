@@ -58,6 +58,7 @@ import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Creator: benmeier
@@ -721,27 +722,12 @@ public class MainWindow extends BaseWindow
                                                  new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
                     );
 
-                    TreeItem<InventoryTreeData> newItem;
-                    if (target == null)
+                    TreeItem<InventoryTreeData> newItem = new TreeItem<>(new InventoryTreeData(newFile));
+                    if (target != null)
                     {
-                        // create the new tree item
-                        newItem = new TreeItem<>(new InventoryTreeData(newFile));
-                        selected.getChildren().add(newItem);
+                        selected.getChildren().removeIf(i -> i.getValue().getName().equals(newName));
                     }
-                    else
-                    {
-                        try
-                        {
-                            newItem = tree.traverseTo(newFile.getAbsolutePath());
-                            newItem.setValue(new InventoryTreeData(newFile));
-                        }
-                        catch (TraversalException e)
-                        {
-                            QuickDialogs.exception(e);
-                            return;
-                        }
-                    }
-
+                    selected.getChildren().add(newItem);
                     selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
                     selected.setExpanded(true);
                     Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newItem.getValue()));
