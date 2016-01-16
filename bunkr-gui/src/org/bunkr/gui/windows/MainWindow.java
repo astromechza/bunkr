@@ -44,6 +44,7 @@ import org.bunkr.gui.Icons;
 import org.bunkr.gui.ProgressTask;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.components.tabs.TabLoadError;
+import org.bunkr.gui.components.tabs.html.HtmlTab;
 import org.bunkr.gui.components.tabs.images.ImageTab;
 import org.bunkr.gui.components.tabs.markdown.MarkdownTab;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
@@ -203,6 +204,10 @@ public class MainWindow extends BaseWindow
                         tab = new MarkdownTab(file, this.archive);
                         ((MarkdownTab) tab).setOnSaveInventoryRequest(this::requestMetadataSave);
                         ((MarkdownTab) tab).setOnRequestOpen(this::requestOpen);
+                        break;
+                    case MediaType.HTML:
+                        tab = new HtmlTab(file, this.archive);
+                        ((HtmlTab) tab).setOnSaveInventoryRequest(this::requestMetadataSave);
                         break;
                     case MediaType.IMAGE:
                         tab = new ImageTab(file, this.archive);

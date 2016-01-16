@@ -116,6 +116,7 @@ public class InventoryTreeData implements Comparable<InventoryTreeData>
     {
         if (m.equals(MediaType.IMAGE)) return Icons.ICON_FILE_IMAGE;
         if (m.equals(MediaType.TEXT)) return Icons.ICON_FILE_TEXT;
+        if (m.equals(MediaType.HTML)) return Icons.ICON_FILE_HTML;
         return Icons.ICON_FILE;
     }
 }

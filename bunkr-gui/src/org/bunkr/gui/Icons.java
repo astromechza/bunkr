@@ -55,6 +55,7 @@ public class Icons
     public static final String ICON_FILE = "\uf016";
     public static final String ICON_FILE_IMAGE = "\uf1c5";
     public static final String ICON_FILE_TEXT = "\uf0f6";
+    public static final String ICON_FILE_HTML = "\uf0ac";
 
     public static Button buildIconButton(String text, String icon, int size)
     {

@@ -103,7 +103,4 @@ module ExampleBuilder
           end
         end
     end
-
-
-
 end
