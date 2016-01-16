@@ -657,13 +657,19 @@ public class MainWindow extends BaseWindow
 
             // check parent for the same name
             IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
+            FileInventoryItem newFile;
             if (target != null)
             {
-                QuickDialogs.error("Import Error", null, "There is already an item named '%s' in the parent folder.", newName);
-                return;
+                if (! QuickDialogs.confirm("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
+                {
+                    return;
+                }
+                newFile = (FileInventoryItem) target;
             }
-
-            FileInventoryItem newFile = new FileInventoryItem(newName);
+            else
+            {
+                newFile = new FileInventoryItem(newName);
+            }
 
             ProgressTask<Void> progressTask = new ProgressTask<Void>()
             {
