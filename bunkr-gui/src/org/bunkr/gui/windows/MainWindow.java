@@ -22,7 +22,6 @@
 
 package org.bunkr.gui.windows;
 
-import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;

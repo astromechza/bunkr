@@ -47,7 +47,7 @@ public class QuickDialogs
         alert.showAndWait();
     }
 
-    public static void info(String format, String... args)
+    public static void info(String format, Object... args)
     {
         info("Info", null, format, args);
     }
