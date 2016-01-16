@@ -4,6 +4,7 @@ require 'buildr/jacoco'
 require_relative './build_scripts/utils'
 require_relative './build_scripts/licenser'
 require_relative './build_scripts/build_cli_demo'
+require_relative './build_scripts/examplebuilder'
 
 PROJECT_NAME = 'bunkr'
 PROJECT_GROUP = "org.#{PROJECT_NAME}"
@@ -121,5 +122,14 @@ define PROJECT_NAME do
         puts 'Applying license to gui source files...'
         fix_license_in project.path_to('bunkr-gui')
         puts 'Done'
+    end
+
+    # Task to build a nice demo archive
+    task generate_example_archive: ['bunkr-cli:package'] do
+        target_archive = project.path_to('example.bunkr')
+        jarfile = project('bunkr-cli').path_to('target', "bunkr-cli-#{project.version}.jar")
+        puts "Generating example archive for testing with.."
+
+        ExampleBuilder.run jarfile, target_archive
     end
 end
