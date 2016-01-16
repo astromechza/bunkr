@@ -42,9 +42,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
 /**
  * Creator: benmeier
@@ -54,7 +52,6 @@ public class ImportFileCommand implements ICLICommand
 {
     public static final String ARG_PATH = "path";
     public static final String ARG_SOURCE_FILE = "source";
-    public static final String ARG_TAGS = "tags";
     public static final String ARG_NO_PROGRESS = "noprogress";
 
 
@@ -70,12 +67,6 @@ public class ImportFileCommand implements ICLICommand
                 .dest(ARG_SOURCE_FILE)
                 .type(Arguments.fileType().acceptSystemIn().verifyExists().verifyCanRead())
                 .help("file to import or - for stdin");
-        target.addArgument("-t", "--tags")
-                .dest(ARG_TAGS)
-                .nargs("*")
-                .setDefault(new ArrayList<>())
-                .type(String.class)
-                .help("a list of tags to associate with this file");
         target.addArgument("--no-progress")
                 .dest(ARG_NO_PROGRESS)
                 .action(Arguments.storeTrue())
@@ -110,9 +101,6 @@ public class ImportFileCommand implements ICLICommand
             targetFile = new FileInventoryItem(InventoryPather.baseName(args.getString(ARG_PATH)));
             ((IFFContainer) parent).addFile(targetFile);
         }
-
-        // if tags have been supplied, change the tags associated with the target file
-        if (args.getList(ARG_TAGS).size() > 0) targetFile.setCheckTags(new HashSet<>(args.getList(ARG_TAGS)));
 
         File inputFile = args.get(ARG_SOURCE_FILE);
 

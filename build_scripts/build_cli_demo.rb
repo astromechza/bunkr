@@ -38,7 +38,7 @@ module CLIDemoBuilder
     d.add_documentation '## 4. Add some content from a file'
     file_one = File.join(working_dir, 'file1.txt')
     d.add_command "echo 'The quick brown fox jumped over the lazy dog' > #{file_one}", no_output: true
-    d.add_command "java -jar #{jar_file} #{archive_path} -p #{password_path} write /file_one #{file_one} -t demo-tag --no-progress"
+    d.add_command "java -jar #{jar_file} #{archive_path} -p #{password_path} write /file_one #{file_one} --no-progress"
     d.add_command "java -jar #{jar_file} #{archive_path} -p #{password_path} ls /"
 
     d.add_documentation '## 5. Check integrity'

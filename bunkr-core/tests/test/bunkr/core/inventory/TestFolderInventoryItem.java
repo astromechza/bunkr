@@ -65,6 +65,5 @@ public class TestFolderInventoryItem
         assertThat(outFile1.getSizeOnDisk(), is(equalTo(file1.getSizeOnDisk())));
         assertThat(outFile1.getActualSize(), is(equalTo(file1.getActualSize())));
         assertThat(outFile1.getEncryptionData(), is(equalTo(file1.getEncryptionData())));
-        assertThat(outFile1.getTags(), is(equalTo(file1.getTags())));
     }
 }

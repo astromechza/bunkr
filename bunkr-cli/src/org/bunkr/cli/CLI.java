@@ -62,7 +62,6 @@ public class CLI
         commands.put("ls", new LsCommand());
         commands.put("read", new ExportFileCommand());
         commands.put("write", new ImportFileCommand());
-        commands.put("tags", new TagCommand());
         commands.put("mv", new MvCommand());
         commands.put("find", new FindCommand());
         commands.put("hash", new HashCommand());

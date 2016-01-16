@@ -90,7 +90,6 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/a.txt");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, fileToImport);
-        args.put(ImportFileCommand.ARG_TAGS, Arrays.asList("tag1", "tag2"));
 
         try (OutputCapture ignored = new OutputCapture())
         {
@@ -99,9 +98,6 @@ public class TestImportFileCommand
         ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, usp);
 
         FileInventoryItem f = context.getInventory().findFile("a.txt");
-        assertThat(f.getTags().size(), is(equalTo(2)));
-        assertTrue(f.getTags().contains("tag1"));
-        assertTrue(f.getTags().contains("tag2"));
         assertThat(f.getActualSize(), is(equalTo(4433L)));
         assertThat(f.getAbsolutePath(), is(equalTo("/a.txt")));
     }
@@ -120,7 +116,6 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/sub/b.txt");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
-        args.put(ImportFileCommand.ARG_TAGS, Arrays.asList("tag3", "tag4"));
 
         ByteArrayInputStream bais = new ByteArrayInputStream(
                 "01234567890123456789012345678901234567890123456789012345678901234567890123456789".getBytes());
@@ -137,9 +132,6 @@ public class TestImportFileCommand
         FolderInventoryItem s = (FolderInventoryItem) context.getInventory().findFolder("sub");
         assertThat(s.getAbsolutePath(), is(equalTo("/sub")));
         FileInventoryItem f = s.findFile("b.txt");
-        assertThat(f.getTags().size(), is(equalTo(2)));
-        assertTrue(f.getTags().contains("tag3"));
-        assertTrue(f.getTags().contains("tag4"));
         assertThat(f.getActualSize(), is(equalTo(80L)));
         assertThat(f.getAbsolutePath(), is(equalTo("/sub/b.txt")));
     }
@@ -155,7 +147,6 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/b.txt");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
-        args.put(ImportFileCommand.ARG_TAGS, Arrays.asList("tag3", "tag4"));
         args.put(ImportFileCommand.ARG_NO_PROGRESS, true);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(
@@ -172,9 +163,6 @@ public class TestImportFileCommand
         ArchiveInfoContext context = new ArchiveInfoContext(archiveFile, usp);
 
         FileInventoryItem f = context.getInventory().findFile("b.txt");
-        assertThat(f.getTags().size(), is(equalTo(2)));
-        assertTrue(f.getTags().contains("tag3"));
-        assertTrue(f.getTags().contains("tag4"));
         assertThat(f.getActualSize(), is(equalTo(80L)));
         assertThat(f.getAbsolutePath(), is(equalTo("/b.txt")));
     }
@@ -190,7 +178,6 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
-        args.put(ImportFileCommand.ARG_TAGS, Arrays.asList("tag3", "tag4"));
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try
@@ -228,7 +215,6 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/a.txt/something");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
-        args.put(ImportFileCommand.ARG_TAGS, Arrays.asList("tag3", "tag4"));
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try
@@ -266,7 +252,6 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/a.txt");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
-        args.put(ImportFileCommand.ARG_TAGS, Collections.emptyList());
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try (OutputCapture ignored = new OutputCapture())
@@ -302,7 +287,6 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/folder");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
-        args.put(ImportFileCommand.ARG_TAGS, Collections.emptyList());
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try (OutputCapture ignored = new OutputCapture())

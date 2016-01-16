@@ -71,7 +71,6 @@ public class TestFindCommand
         );
 
         FileInventoryItem ff1 = new FileInventoryItem("abc");
-        ff1.addTag("tag1"); ff1.addTag("tag2");
         context.getInventory().addFile(ff1);
         context.getInventory().addFile(new FileInventoryItem("aabbcc"));
         context.getInventory().addFile(new FileInventoryItem("aaabbbccc"));
@@ -79,7 +78,6 @@ public class TestFindCommand
         FolderInventoryItem folderOne = new FolderInventoryItem("afolder");
 
         FileInventoryItem ff2 = new FileInventoryItem("abc");
-        ff2.addTag("tag1"); ff2.addTag("tag3");
         folderOne.addFile(ff2);
         folderOne.addFile(new FileInventoryItem("aabbcc"));
         folderOne.addFile(new FileInventoryItem("aaabbbccc"));
@@ -245,24 +243,6 @@ public class TestFindCommand
             assertThat(lines.get(1), is(equalTo("/aabbcc")));
             assertThat(lines.get(2), is(equalTo("/abc")));
             assertThat(lines.get(3), is(equalTo("/afolder/")));
-        }
-    }
-
-    @Test
-    public void testFindAllTags() throws Exception
-    {
-        ArchiveInfoContext c = buildSampleArchive();
-
-        Map<String, Object> args = new HashMap<>();
-        args.put(CLI.ARG_ARCHIVE_PATH, c.filePath);
-        args.put(FindCommand.ARG_PATH, "/");
-        args.put(FindCommand.ARG_TAG, "tag1");
-        try(OutputCapture oc = new OutputCapture())
-        {
-            new FindCommand().handle(new Namespace(args));
-            List<String> lines = oc.getLines();
-            assertThat(lines.get(0), is(equalTo("/abc")));
-            assertThat(lines.get(1), is(equalTo("/afolder/abc")));
         }
     }
 

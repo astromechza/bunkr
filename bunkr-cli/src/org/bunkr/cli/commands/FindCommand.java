@@ -44,7 +44,6 @@ public class FindCommand implements ICLICommand
     public static final String ARG_PREFIX = "prefix";
     public static final String ARG_SUFFIX = "suffix";
     public static final String ARG_TYPE = "type";
-    public static final String ARG_TAG = "tag";
     public static final String ARG_DEPTH = "depth";
 
 
@@ -69,10 +68,6 @@ public class FindCommand implements ICLICommand
                 .choices(ARG_TYPE_FILE, ARG_TYPE_FOLDER)
                 .type(String.class)
                 .help("select only items of this type");
-        target.addArgument("--tag")
-                .dest(ARG_TAG)
-                .type(String.class)
-                .help("select only items that have the following tag");
         target.addArgument("--depth")
                 .dest(ARG_DEPTH)
                 .type(Integer.class)
@@ -97,18 +92,18 @@ public class FindCommand implements ICLICommand
             if (args.get(ARG_DEPTH) != null) maxDepth = args.getInt(ARG_DEPTH);
             printBreadthFirstFindTree(c, args.get(ARG_PATH), args.get(ARG_PREFIX),
                                       args.get(ARG_SUFFIX),
-                                      args.get(ARG_TYPE), args.get(ARG_TAG), maxDepth);
+                                      args.get(ARG_TYPE), maxDepth);
         }
     }
 
-    private void printBreadthFirstFindTree(IFFContainer root, String pathPrefix, String prefix, String suffix, String type, String tag, Integer depth)
+    private void printBreadthFirstFindTree(IFFContainer root, String pathPrefix, String prefix, String suffix, String type, Integer depth)
     {
         List<InventoryItem> itemsToSort = new ArrayList<>();
         if (type == null || type.equals(ARG_TYPE_FILE))
         {
             for (FileInventoryItem item : root.getFiles())
             {
-                if ((prefix == null || item.getName().startsWith(prefix)) && (suffix == null || item.getName().endsWith(suffix)) && (tag == null || item.hasTag(tag)))
+                if ((prefix == null || item.getName().startsWith(prefix)) && (suffix == null || item.getName().endsWith(suffix)))
                 {
                     itemsToSort.add(item);
                 }
@@ -125,11 +120,11 @@ public class FindCommand implements ICLICommand
             }
             else
             {
-                if ((tag == null) && (type == null || type.equals(ARG_TYPE_FOLDER)) && (prefix == null || i.getName().startsWith(prefix)) && (suffix == null || i.getName().endsWith(suffix)))
+                if ((type == null || type.equals(ARG_TYPE_FOLDER)) && (prefix == null || i.getName().startsWith(prefix)) && (suffix == null || i.getName().endsWith(suffix)))
                 {
                     System.out.println(InventoryPather.simpleJoin(pathPrefix, i.getName()) + "/");
                 }
-                if (depth > 0) printBreadthFirstFindTree((FolderInventoryItem) i, InventoryPather.simpleJoin(pathPrefix, i.getName()), prefix, suffix, type, tag, depth - 1);
+                if (depth > 0) printBreadthFirstFindTree((FolderInventoryItem) i, InventoryPather.simpleJoin(pathPrefix, i.getName()), prefix, suffix, type, depth - 1);
             }
         }
     }

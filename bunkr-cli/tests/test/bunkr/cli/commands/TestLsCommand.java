@@ -71,8 +71,6 @@ public class TestLsCommand
         FileInventoryItem untaggedFile = new FileInventoryItem("untagged-file");
 
         FileInventoryItem taggedFile = new FileInventoryItem("tagged-file");
-        taggedFile.addTag("john");
-        taggedFile.addTag("bob");
 
         context.getInventory().addFile(untaggedFile);
         context.getInventory().addFile(taggedFile);
@@ -110,10 +108,10 @@ public class TestLsCommand
             String output = oc.getContent();
             output = output.replace("\r", "");
             List<String> lines = Arrays.asList(output.split("\n"));
-            assertThat(lines.get(0).trim(), is(equalTo("SIZE  MODIFIED      NAME           TAGS")));
+            assertThat(lines.get(0).trim(), is(equalTo("SIZE  MODIFIED      NAME")));
             assertThat(lines.get(1).trim(), is(equalTo("some-folder/")));
             assertTrue(lines.get(2).trim().startsWith("0B"));
-            assertTrue(lines.get(2).trim().endsWith("tagged-file    bob john"));
+            assertTrue(lines.get(2).trim().endsWith("tagged-file"));
             assertTrue(lines.get(3).trim().startsWith("0B"));
             assertTrue(lines.get(3).trim().endsWith("untagged-file"));
         }
@@ -138,7 +136,7 @@ public class TestLsCommand
             List<String> lines = Arrays.asList(output.split("\n"));
             assertThat(lines.get(0).trim(), is(equalTo("some-folder/")));
             assertTrue(lines.get(1).trim().startsWith("0"));
-            assertTrue(lines.get(1).trim().endsWith("tagged-file    bob john"));
+            assertTrue(lines.get(1).trim().endsWith("tagged-file"));
             assertTrue(lines.get(2).trim().startsWith("0"));
             assertTrue(lines.get(2).trim().endsWith("untagged-file"));
         }
@@ -161,9 +159,9 @@ public class TestLsCommand
             String output = oc.getContent();
             output = output.replace("\r", "");
             List<String> lines = Arrays.asList(output.split("\n"));
-            assertThat(lines.get(0).trim(), is(equalTo("SIZE  MODIFIED      NAME         TAGS")));
+            assertThat(lines.get(0).trim(), is(equalTo("SIZE  MODIFIED      NAME")));
             assertTrue(lines.get(1).trim().startsWith("0B"));
-            assertTrue(lines.get(1).trim().endsWith("tagged-file  bob john"));
+            assertTrue(lines.get(1).trim().endsWith("tagged-file"));
         }
     }
 

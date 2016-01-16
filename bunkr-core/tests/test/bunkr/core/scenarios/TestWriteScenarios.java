@@ -55,16 +55,6 @@ public class TestWriteScenarios
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
 
-    public long updiv(long n, long d)
-    {
-        return (long) Math.ceil(n / (float) d);
-    }
-
-    public long upround(long n, long d)
-    {
-        return updiv(n, d) * d;
-    }
-
     @Test
     public void testEmptyArchive() throws Exception
     {
@@ -158,8 +148,6 @@ public class TestWriteScenarios
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, new PlaintextDescriptor(), usp);
 
         FileInventoryItem fileOne = new FileInventoryItem("some file.txt");
-        fileOne.addTag("bob");
-        fileOne.addTag("charles");
         {
             context.getInventory().addFile(fileOne);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileOne))
@@ -173,7 +161,6 @@ public class TestWriteScenarios
         }
 
         FileInventoryItem fileTwo = new FileInventoryItem("another file.txt");
-        fileTwo.addTag("thing_one");
         {
             context.getInventory().addFile(fileTwo);
             try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, fileTwo))
@@ -208,9 +195,6 @@ public class TestWriteScenarios
             assertEquals(inventory.getFolders().size(), 0);
 
             assertEquals(inventory.getFiles().get(0).getName(), fileOne.getName());
-            assertTrue(inventory.getFiles().get(0).hasTag("bob"));
-            assertTrue(inventory.getFiles().get(0).hasTag("charles"));
-            assertFalse(inventory.getFiles().get(0).hasTag("john"));
             assertEquals(inventory.getFiles().get(0).getBlocks().toString(), fileOne.getBlocks().toString());
             assertEquals(inventory.getFiles().get(0).getUuid(), fileOne.getUuid());
             assertEquals(inventory.getFiles().get(0).getSizeOnDisk(), fileOne.getSizeOnDisk());
@@ -218,8 +202,6 @@ public class TestWriteScenarios
             assertArrayEquals(inventory.getFiles().get(0).getEncryptionData(), fileOne.getEncryptionData());
 
             assertEquals(inventory.getFiles().get(1).getName(), fileTwo.getName());
-            assertTrue(inventory.getFiles().get(1).hasTag("thing_one"));
-            assertFalse(inventory.getFiles().get(1).hasTag("charles"));
             assertEquals(inventory.getFiles().get(1).getBlocks().toString(), fileTwo.getBlocks().toString());
             assertEquals(inventory.getFiles().get(1).getUuid(), fileTwo.getUuid());
             assertEquals(inventory.getFiles().get(1).getSizeOnDisk(), fileTwo.getSizeOnDisk());

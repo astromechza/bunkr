@@ -22,15 +22,12 @@
 
 package org.bunkr.gui.windows;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
@@ -52,7 +49,7 @@ import java.util.function.Consumer;
  */
 public class FileInfoWindow extends BaseWindow
 {
-    private static final int WINDOW_WIDTH = 400;
+    private static final int WINDOW_WIDTH = 600;
 
     private final String cssPath;
     private final FileInventoryItem item;
@@ -64,10 +61,8 @@ public class FileInfoWindow extends BaseWindow
     private Label lblLastMod; SelectableLabel lblLastModValue;
     private Label lblSizeOnDisk; SelectableLabel lblSizeOnDiskValue;
     private Label lblUUID; SelectableLabel lblUUIDValue;
-    private Label lblTags;
     private Label lblMediaType, lblMediaTypeValue;
-    private Button closeButton, applyButton, changeMediaTypeButton, addTagButton, removeTagButton;
-    private ListView<String> tagsBox;
+    private Button closeButton, applyButton, changeMediaTypeButton;
 
     private Consumer<String> onSaveInventoryRequest;
     private Consumer<FileInventoryItem> onRefreshTreeItem;
@@ -97,15 +92,6 @@ public class FileInfoWindow extends BaseWindow
         this.lblLastModValue = new SelectableLabel(Formatters.formatPrettyDate(this.item.getModifiedAt()));
         Tooltip.install(this.lblLastModValue, new Tooltip(Formatters.formatIso8601utc(this.item.getModifiedAt())));
 
-        this.lblTags = new Label("Tags:");
-        this.tagsBox = new ListView<>();
-        this.tagsBox.setPlaceholder(new Label("< No Tags >"));
-        ObservableList<String> tagItems = FXCollections.observableArrayList(this.item.getTags());
-        this.tagsBox.setItems(tagItems);
-
-        this.addTagButton = Icons.buildIconButton("", Icons.ICON_PLUS);
-        this.removeTagButton = Icons.buildIconButton("", Icons.ICON_MINUS);
-
         this.lblSizeOnDisk = new Label("Size on Disk:");
         this.lblSizeOnDiskValue = new SelectableLabel(String.format(
                 "%s (%s bytes)", Formatters.formatPrettyInt(this.item.getSizeOnDisk()), this.item.getSizeOnDisk()
@@ -128,16 +114,17 @@ public class FileInfoWindow extends BaseWindow
     {
         GridPane rootLayout = new GridPane();
         rootLayout.setMinWidth(WINDOW_WIDTH);
+        rootLayout.setMaxHeight(Double.MAX_VALUE);
 
-        ColumnConstraints leftColum = new ColumnConstraints();
-        leftColum.setHgrow(Priority.ALWAYS);
+        ColumnConstraints leftColumn = new ColumnConstraints();
+        leftColumn.setHgrow(Priority.SOMETIMES);
 
-        ColumnConstraints rightColum = new ColumnConstraints();
-        rightColum.setHgrow(Priority.ALWAYS);
+        ColumnConstraints rightColumn = new ColumnConstraints();
+        rightColumn.setHgrow(Priority.ALWAYS);
 
-        rootLayout.getColumnConstraints().addAll(leftColum, rightColum);
+        rootLayout.getColumnConstraints().addAll(leftColumn, rightColumn);
         rootLayout.setPadding(new Insets(10));
-        rootLayout.setAlignment(Pos.CENTER);
+        rootLayout.setAlignment(Pos.TOP_CENTER);
         rootLayout.setHgap(10);
         rootLayout.setVgap(10);
 
@@ -149,27 +136,18 @@ public class FileInfoWindow extends BaseWindow
 
         rootLayout.add(this.lblLastMod, 0, rowid); rootLayout.add(this.lblLastModValue, 1, rowid); rowid++;
 
-        rootLayout.add(this.lblTags, 0, rowid); rowid++;
-        rootLayout.add(this.tagsBox, 0, rowid); rowid++;
-        GridPane.setVgrow(this.tagsBox, Priority.ALWAYS);
-        GridPane.setColumnSpan(this.tagsBox, 2);
-
-        HBox tagButtonBox = new HBox(this.addTagButton, this.removeTagButton);
-        tagButtonBox.setAlignment(Pos.CENTER_RIGHT);
-        rootLayout.add(tagButtonBox, 0, rowid); rowid++;
-        GridPane.setColumnSpan(tagButtonBox, 2);
-
         rootLayout.add(this.lblSizeOnDisk, 0, rowid); rootLayout.add(this.lblSizeOnDiskValue, 1, rowid); rowid++;
 
         rootLayout.add(this.lblUUID, 0, rowid); rootLayout.add(this.lblUUIDValue, 1, rowid); rowid++;
 
         rootLayout.add(this.lblMediaType, 0, rowid);
         HBox mediaTypeRow = new HBox(10, this.lblMediaTypeValue, this.changeMediaTypeButton);
-        mediaTypeRow.setAlignment(Pos.CENTER_RIGHT);
+        mediaTypeRow.setMaxWidth(Double.MAX_VALUE);
+        this.changeMediaTypeButton.setAlignment(Pos.CENTER_RIGHT);
         rootLayout.add(mediaTypeRow, 1, rowid); rowid++;
 
         HBox buttonbox = new HBox(10, this.closeButton, this.applyButton);
-        buttonbox.setAlignment(Pos.CENTER_RIGHT);
+        buttonbox.setAlignment(Pos.BOTTOM_RIGHT);
         rootLayout.add(buttonbox, 0, rowid);
         GridPane.setColumnSpan(buttonbox, 2);
 
@@ -202,37 +180,9 @@ public class FileInfoWindow extends BaseWindow
 
         this.applyButton.setOnAction(event -> {
             this.item.setMediaType(this.lblMediaTypeValue.getText());
-            this.item.setTags(new HashSet<>(this.tagsBox.getItems()));
             this.onRefreshTreeItem.accept(this.item);
             this.onSaveInventoryRequest.accept("Modified media type for file " + this.item.getName());
             this.getStage().close();
-        });
-
-        this.addTagButton.setOnAction(event -> {
-            String tag = QuickDialogs.input("Enter a new tag", "");
-            if (tag != null)
-            {
-                try
-                {
-                    this.item.validateTag(tag);
-                    this.tagsBox.getItems().add(tag);
-                    this.applyButton.setDisable(false);
-                }
-                catch (IllegalArgumentException e)
-                {
-                    QuickDialogs.error("Tag %s is not a valid tag: '%s'", tag, e.getLocalizedMessage());
-                }
-            }
-        });
-
-        this.removeTagButton.setOnAction(event -> {
-            // get selected item
-            String tag = this.tagsBox.getSelectionModel().getSelectedItem();
-            if (tag != null)
-            {
-                this.tagsBox.getItems().remove(tag);
-                this.applyButton.setDisable(false);
-            }
         });
     }
 
@@ -240,10 +190,6 @@ public class FileInfoWindow extends BaseWindow
     public void applyStyling()
     {
         this.changeMediaTypeButton.getStyleClass().add("small-button");
-        this.addTagButton.getStyleClass().add("small-button");
-        this.addTagButton.getStyleClass().add("btnbar-left");
-        this.removeTagButton.getStyleClass().add("small-button");
-        this.removeTagButton.getStyleClass().add("btnbar-right");
     }
 
     @Override
@@ -255,8 +201,7 @@ public class FileInfoWindow extends BaseWindow
         this.getStage().setTitle("Bunkr - File Info");
         this.getStage().setScene(scene);
         this.getStage().initModality(Modality.APPLICATION_MODAL);
-        this.getStage().setWidth(500);
-        this.getStage().setHeight(400);
+        this.getStage().sizeToScene();
         this.getStage().setResizable(false);
         return scene;
     }

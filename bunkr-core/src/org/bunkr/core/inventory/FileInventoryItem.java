@@ -25,15 +25,13 @@ package org.bunkr.core.inventory;
 import org.bunkr.core.fragmented_range.FragmentedRange;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
  * Creator: benmeier
  * Created At: 2015-11-08
  */
-public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTraversalTarget
+public class FileInventoryItem extends InventoryItem implements IFFTraversalTarget
 {
     private long sizeOnDisk;
     private long modifiedAt;
@@ -42,7 +40,6 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     private byte[] integrityHash;
     private FragmentedRange blocks;
     private long actualSize;
-    private Set<String> tags;
     private String mediaType;
 
     public FileInventoryItem(
@@ -55,7 +52,6 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
             byte[] encryptionData,
             Algorithms.Encryption encryptionAlgorithm,
             byte[] integrityHash,
-            HashSet<String> tags,
             String mediaType
     )
     {
@@ -67,7 +63,6 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         this.actualSize = actualSize;
         this.modifiedAt = modifiedAt;
         this.blocks = blocks;
-        this.tags = tags;
         this.mediaType = mediaType;
     }
 
@@ -80,7 +75,6 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
         this.encryptionData = null;
         this.encryptionAlgorithm = Algorithms.Encryption.NONE;
         this.integrityHash = null;
-        this.tags = new HashSet<>();
         this.mediaType = MediaType.UNKNOWN;
     }
 
@@ -160,18 +154,6 @@ public class FileInventoryItem extends InventoryItem implements ITaggable, IFFTr
     public long getActualSize()
     {
         return this.actualSize;
-    }
-
-    @Override
-    public void setTags(Set<String> tags)
-    {
-        this.tags = tags;
-    }
-
-    @Override
-    public Set<String> getTags()
-    {
-        return this.tags;
     }
 
     public String getMediaType()

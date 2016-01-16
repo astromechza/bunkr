@@ -54,7 +54,6 @@ public class TestFileInventoryItem
         assertThat(out.getSizeOnDisk(), is(equalTo(fii.getSizeOnDisk())));
         assertThat(out.getActualSize(), is(equalTo(fii.getActualSize())));
         assertThat(out.getEncryptionData(), is(equalTo(fii.getEncryptionData())));
-        assertThat(out.getTags(), is(equalTo(fii.getTags())));
     }
 
     @Test

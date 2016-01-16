@@ -30,8 +30,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import javax.xml.bind.DatatypeConverter;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -49,7 +47,6 @@ public class FileInventoryItemJSON
     public static final String KEY_ENCRYPTION_DATA = "encryptionData";
     public static final String KEY_ENCRYPTION_ALGORITHM = "encryptionAlgorithm";
     public static final String KEY_INTEGRITY_HASH = "integrityHash";
-    public static final String KEY_TAGS = "tags";
     public static final String KEY_MEDIA_TYPE = "mediaType";
 
     @SuppressWarnings("unchecked")
@@ -75,7 +72,6 @@ public class FileInventoryItemJSON
         else
             out.put(KEY_INTEGRITY_HASH, null);
 
-        out.put(KEY_TAGS, new ArrayList<>(input.getTags()));
         out.put(KEY_MEDIA_TYPE, input.getMediaType());
 
         return out;
@@ -119,7 +115,6 @@ public class FileInventoryItemJSON
                 encD,
                 encA,
                 intH,
-                new HashSet<>((JSONArray) input.get(KEY_TAGS)),
                 mt
         );
     }
