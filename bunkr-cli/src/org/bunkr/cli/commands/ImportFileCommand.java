@@ -22,6 +22,7 @@
 
 package org.bunkr.cli.commands;
 
+import org.bunkr.core.inventory.*;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.AbortableShutdownHook;
 import org.bunkr.core.ArchiveInfoContext;
@@ -30,10 +31,6 @@ import org.bunkr.cli.CLI;
 import org.bunkr.cli.ProgressBar;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.CLIException;
-import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.IFFContainer;
-import org.bunkr.core.inventory.IFFTraversalTarget;
-import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -52,6 +49,7 @@ public class ImportFileCommand implements ICLICommand
 {
     public static final String ARG_PATH = "path";
     public static final String ARG_SOURCE_FILE = "source";
+    public static final String ARG_MEDIA_TYPE = "mediatype";
     public static final String ARG_NO_PROGRESS = "noprogress";
 
 
@@ -73,6 +71,11 @@ public class ImportFileCommand implements ICLICommand
                 .setDefault(false)
                 .type(Boolean.class)
                 .help("don't display a progress bar while importing the file");
+        target.addArgument("-t", "--mediatype")
+                .dest(ARG_MEDIA_TYPE)
+                .choices(MediaType.ALL_TYPES)
+                .type(String.class)
+                .help("pick a media type");
     }
 
     @Override
@@ -99,8 +102,9 @@ public class ImportFileCommand implements ICLICommand
         else
         {
             targetFile = new FileInventoryItem(InventoryPather.baseName(args.getString(ARG_PATH)));
-            ((IFFContainer) parent).addFile(targetFile);
+            container.addFile(targetFile);
         }
+        targetFile.setMediaType(args.getString(ARG_MEDIA_TYPE));
 
         File inputFile = args.get(ARG_SOURCE_FILE);
 
