@@ -25,6 +25,7 @@ package org.bunkr.gui.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseButton;
@@ -48,10 +49,11 @@ public class ContextMenus
     private static final String STR_IMPORT_FILE = "Import File";
     private static final String STR_OPEN = "Open";
     private static final String STR_EXPORT = "Export File";
+    private static final String STR_SEARCH = "Search";
 
     public final ContextMenu dirContextMenu, fileContextMenu, rootContextMenu;
-    public final MenuItem rootNewFile, rootNewSubDir, rootImportFile,
-            dirNewFile, dirNewSubDir, dirImportFile, dirDelete, dirRename,
+    public final MenuItem rootNewFile, rootNewSubDir, rootImportFile, rootSearch,
+            dirNewFile, dirNewSubDir, dirImportFile, dirDelete, dirRename, dirSearch,
             fileDelete, fileRename, fileInfo, fileOpen, fileExport;
 
     private final InventoryTreeView treeView;
@@ -64,6 +66,7 @@ public class ContextMenus
         this.rootNewFile = new MenuItem(STR_NEW_FILE);
         this.rootNewSubDir = new MenuItem(STR_NEW_FOLDER);
         this.rootImportFile = new MenuItem(STR_IMPORT_FILE);
+        this.rootSearch = new MenuItem(STR_SEARCH);
 
         // file
         this.fileDelete = new MenuItem(STR_DELETE);
@@ -78,10 +81,11 @@ public class ContextMenus
         this.dirNewFile = new MenuItem(STR_NEW_FILE);
         this.dirNewSubDir = new MenuItem(STR_NEW_FOLDER);
         this.dirImportFile = new MenuItem(STR_IMPORT_FILE);
+        this.dirSearch = new MenuItem(STR_SEARCH);
 
-        this.dirContextMenu = new ContextMenu(this.dirNewFile, this.dirNewSubDir, this.dirRename, this.dirDelete, this.dirImportFile);
+        this.rootContextMenu = new ContextMenu(this.rootNewFile, this.rootNewSubDir, this.rootImportFile, this.rootSearch);
+        this.dirContextMenu = new ContextMenu(this.dirNewFile, this.dirNewSubDir, this.dirRename, this.dirDelete, this.dirImportFile, this.dirSearch);
         this.fileContextMenu = new ContextMenu(this.fileOpen, this.fileInfo, this.fileExport, this.fileRename, this.fileDelete);
-        this.rootContextMenu = new ContextMenu(this.rootNewFile, this.rootNewSubDir, this.rootImportFile);
 
         this.treeView.setCellFactory(new CellFactoryCallback(this));
 
