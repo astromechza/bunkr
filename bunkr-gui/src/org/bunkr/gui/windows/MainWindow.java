@@ -34,6 +34,7 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.BaseBunkrException;
+import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
@@ -710,7 +711,7 @@ public class MainWindow extends BaseWindow
                 protected void succeeded()
                 {
                     // add to the container
-                    selectedContainer.addFile(newFile);
+                    if (target == null) selectedContainer.addFile(newFile);
 
                     // pick the media type
                     newFile.setMediaType(QuickDialogs.pick(
@@ -720,15 +721,30 @@ public class MainWindow extends BaseWindow
                                                  new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
                     );
 
-                    // create the new tree item
-                    InventoryTreeData newValue = new InventoryTreeData(newFile);
-                    TreeItem<InventoryTreeData> newItem = new TreeItem<>(newValue);
-                    selected.getChildren().add(newItem);
+                    TreeItem<InventoryTreeData> newItem;
+                    if (target == null)
+                    {
+                        // create the new tree item
+                        newItem = new TreeItem<>(new InventoryTreeData(newFile));
+                        selected.getChildren().add(newItem);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            newItem = tree.traverseTo(newFile.getAbsolutePath());
+                            newItem.setValue(new InventoryTreeData(newFile));
+                        }
+                        catch (TraversalException e)
+                        {
+                            QuickDialogs.exception(e);
+                            return;
+                        }
+                    }
+
                     selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
                     selected.setExpanded(true);
-
-                    Event.fireEvent(selected,
-                                    new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
+                    Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newItem.getValue()));
                     tree.getSelectionModel().select(newItem);
                     requestMetadataSave(String.format("Imported file %s", newFile.getName()));
                 }
