@@ -1,6 +1,10 @@
 require 'fileutils'
 require 'buildr/jacoco'
 
+require_relative './build_scripts/utils'
+require_relative './build_scripts/licenser'
+require_relative './build_scripts/build_cli_demo'
+
 PROJECT_NAME = 'bunkr'
 PROJECT_GROUP = "org.#{PROJECT_NAME}"
 PROJECT_VERSION = '0.8.0'
@@ -11,36 +15,19 @@ repositories.remote << 'https://repo.maven.apache.org/maven2'
 repositories.remote << 'https://repo1.maven.org/maven2'
 
 # dependencies
-JAR_JUNIT = "junit:junit:jar:4.12"
-JAR_BC = "org.bouncycastle:bcprov-jdk15on:jar:1.53"
-JAR_JSON_SIMPLE = "com.googlecode.json-simple:json-simple:jar:1.1.1"
-JAR_ARGPARSE = "net.sourceforge.argparse4j:argparse4j:jar:0.6.0"
-JAR_MARKDOWN = "org.commonjava.googlecode.markdown4j:markdown4j:jar:2.2-cj-1.0"
+JAR_JUNIT = 'junit:junit:jar:4.12'
+JAR_BC = 'org.bouncycastle:bcprov-jdk15on:jar:1.53'
+JAR_JSON_SIMPLE = 'com.googlecode.json-simple:json-simple:jar:1.1.1'
+JAR_ARGPARSE = 'net.sourceforge.argparse4j:argparse4j:jar:0.6.0'
+JAR_MARKDOWN = 'org.commonjava.googlecode.markdown4j:markdown4j:jar:2.2-cj-1.0'
+JAR_PROGUARD = 'net.sf.proguard:proguard-base:jar:5.2.1'
 
 layout = Layout.new
 layout[:source, :main, :java] = 'src'
 layout[:source, :test, :java] = 'tests'
 
-CLI_MAIN_CLASS = "org.bunkr.cli.CLI"
-GUI_MAIN_CLASS = "org.bunkr.gui.GuiEntryPoint"
-
-def write_version_file_for_project(project_name)
-    version_dat_file = project(project_name)._('target/main/classes/version.dat')
-    puts 'Writing ' + version_dat_file
-    git_hash = `git rev-parse HEAD`
-    git_date = `git --no-pager log -n 1 --date=iso-strict --format="%cd"`
-    File.open(version_dat_file, 'w') do |f|
-        f.puts PROJECT_VERSION
-        f.puts COMPATIBLE_PROJECT_VERSION
-        f.puts git_date
-        f.puts git_hash
-    end
-end
-
-def write_resources_for_project(project_name)
-    puts "Copying GUI resources to target for #{project_name}..."
-    FileUtils.cp_r project(project_name)._('resources/.'), project(project_name)._('target/main/classes'), verbose: true
-end
+CLI_MAIN_CLASS = 'org.bunkr.cli.CLI'
+GUI_MAIN_CLASS = 'org.bunkr.gui.GuiEntryPoint'
 
 # define main project
 define PROJECT_NAME do
@@ -75,6 +62,17 @@ define PROJECT_NAME do
         build do
             write_version_file_for_project('bunkr-cli')
         end
+
+        task generate_demo: ['bunkr-cli:package'] do
+            target_file = project.path_to('..', 'CLI_DEMO.md')
+            jarfile = project('bunkr-cli').path_to('target', "bunkr-cli-#{project.version}.jar")
+            puts "Regenerating #{target_file}"
+            CLIDemoBuilder.run jarfile, target_file
+        end
+
+        task build_release: [:package] do
+            proguard_wrap('bunkr-cli')
+        end
     end
 
     define 'bunkr-gui', layout: layout do
@@ -84,43 +82,44 @@ define PROJECT_NAME do
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-gui').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
         package(:jar, id: 'bunkr-gui').with(manifest: {'Main-Class' => GUI_MAIN_CLASS})
-        run.using main: [GUI_MAIN_CLASS, "--logging"]
+        run.using main: [GUI_MAIN_CLASS, '--logging']
 
         build do
             write_version_file_for_project('bunkr-gui')
             write_resources_for_project('bunkr-gui')
         end
+
+        task build_release: [:package] do
+            proguard_wrap('bunkr-gui')
+        end
     end
 
     # ----------------------------------------------------------------------------------------
 
-    def lib_copy(project_name)
-        project(project_name).compile.dependencies.each do |t|
-            if t.to_s.match(/\.jar$/) then
-                unless File.exists? File.join(project.path_to('lib'), File.basename(t.to_s))
-                    puts "Copying #{t} to 'lib' directory"
-                    cp t.to_s, project.path_to('lib')
-                end
-            end
-        end
-        project(project_name).test.dependencies.each do |t|
-            if t.to_s.match(/\.jar$/) then
-                unless File.exists? File.join(project.path_to('lib'), File.basename(t.to_s))
-                    puts "Copying #{t} to 'lib' directory"
-                    cp t.to_s, project.path_to('lib')
-                end
-            end
-        end
-    end
-
-    task :pulllibs do
+    # Task to copy dependency jars from maven source to lib folder so that IntelliJ can index them.
+    task pull_libs: [:artifacts] do
+        puts 'Copying dependency artifacts to lib directory..'
         unless Dir.exists? project.path_to('lib')
-            puts "Creating 'lib' directory"
+            puts 'Creating lib directory'
             Dir.mkdir project.path_to('lib')
         end
-        lib_copy('bunkr-core')
-        lib_copy('bunkr-cli')
-        lib_copy('bunkr-gui')
+        lib_copy 'bunkr-core'
+        lib_copy 'bunkr-cli'
+        lib_copy 'bunkr-gui'
+        puts '-----'
+        puts Dir.entries(project.path_to('lib')).select {|f| !File.directory? f}
+        puts '-----'
+        puts 'Done'
     end
 
+    # Task to apply license text to all source files
+    task :apply_license do
+        puts 'Applying license to core source files...'
+        fix_license_in project.path_to('bunkr-core')
+        puts 'Applying license to cli source files...'
+        fix_license_in project.path_to('bunkr-cli')
+        puts 'Applying license to gui source files...'
+        fix_license_in project.path_to('bunkr-gui')
+        puts 'Done'
+    end
 end

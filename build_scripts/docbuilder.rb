@@ -1,4 +1,3 @@
-
 class DocumentationBuilder
 
   def initialize
@@ -34,7 +33,7 @@ class DocumentationBuilder
   end
 
   def get_all
-    return @content
+    @content
   end
 
   def generated_at

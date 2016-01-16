@@ -1,0 +1,21 @@
+-libraryjars  <java.home>/lib/rt.jar
+
+-keep public class org.bunkr.cli.CLI {
+    public static void main(java.lang.String[]);
+}
+
+-keepclassmembers,allowoptimization enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-dontwarn javax.**
+-dontwarn org.bouncycastle.jcajce.provider.asymmetric.util.BaseCipherSpi
+-keepattributes *Annotation*
+-keepattributes Signature
+
+-dontnote
+
+-ignorewarnings
+-dontoptimize
+-dontobfuscate

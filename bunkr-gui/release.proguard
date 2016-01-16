@@ -1,0 +1,23 @@
+-libraryjars  <java.home>/lib/rt.jar
+-libraryjars  <java.home>/lib/ext/jfxrt.jar
+
+-keep public class org.bunkr.gui.GuiEntryPoint {
+    public static void main(java.lang.String[]);
+}
+
+-keepclassmembers,allowoptimization enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-dontwarn javax.**
+-dontwarn javafx.**
+-dontwarn org.bouncycastle.jcajce.provider.asymmetric.util.BaseCipherSpi
+-keepattributes *Annotation*
+-keepattributes Signature
+
+-dontnote
+
+-ignorewarnings
+-dontoptimize
+-dontobfuscate
