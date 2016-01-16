@@ -97,11 +97,9 @@ public class MainWindow extends BaseWindow
         contextMenuController.dirNewFile.setOnAction(event -> this.handleCMNewFile());
         contextMenuController.dirNewSubDir.setOnAction(event -> this.handleCMNewSubDir());
         contextMenuController.dirImportFile.setOnAction(event -> this.handleCMImportFile());
-        contextMenuController.dirSearch.setOnAction(event -> this.handleCMSearch());
         contextMenuController.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDir());
         contextMenuController.rootNewFile.setOnAction(event -> this.handleCMNewFile());
         contextMenuController.rootImportFile.setOnAction(event -> this.handleCMImportFile());
-        contextMenuController.rootSearch.setOnAction(event -> this.handleCMSearch());
 
         this.tree.refreshAll();
     }
@@ -819,28 +817,6 @@ public class MainWindow extends BaseWindow
             ProgressDialog pd = new ProgressDialog(progressTask);
             pd.setHeaderText(String.format("Exporting file %s ...", exportedFile.getName()));
             new Thread(progressTask).start();
-        }
-        catch (Exception e)
-        {
-            QuickDialogs.exception(e);
-        }
-    }
-
-    private void handleCMSearch()
-    {
-        try
-        {
-            // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItem();
-            String selectedPath = this.tree.getPathForTreeItem(selected);
-            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
-            if (selectedItem.isAFile())
-            {
-                QuickDialogs.error("Search Error", "'%s' is a file.", selectedPath);
-                return;
-            }
-
-            new SearchWindow().getStage().showAndWait();
         }
         catch (Exception e)
         {
