@@ -8,16 +8,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.IFFTraversalTarget;
-import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
-import org.bunkr.gui.components.tabs.markdown.MarkdownWebViewAdapter;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.ByteArrayInputStream;
@@ -52,7 +48,6 @@ public class HtmlTab extends Tab implements IOpenedFileTab
     private String plainTextContent = null;
     private boolean hasChanges = true;
 
-    private Consumer<FileInventoryItem> onRequestOpen;
     private Consumer<String> onSaveInventoryRequest;
 
     public HtmlTab(FileInventoryItem file, ArchiveInfoContext archive)
@@ -167,7 +162,6 @@ public class HtmlTab extends Tab implements IOpenedFileTab
         // first make sure we can get the absolute path
         if (this.subject.getParent() == null) throw new RuntimeException("Orphaned file tab found");
 
-        // TODO, this part should be done on a separate thread
         StringBuilder content = new StringBuilder();
         try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, this.subject))
         {
@@ -185,7 +179,6 @@ public class HtmlTab extends Tab implements IOpenedFileTab
             QuickDialogs.exception(e);
             return;
         }
-        // TODO, then return to the UI thread. on failure - show error and close the tab. on success, set the content
 
         this.plainTextContent = content.toString();
         this.hasChanges = false;
@@ -228,27 +221,8 @@ public class HtmlTab extends Tab implements IOpenedFileTab
         if (!this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().add(this.formattedView);
     }
 
-    public void requestOpenTab(String absolutePath)
-    {
-        try
-        {
-            IFFTraversalTarget t = InventoryPather.traverse(this.archive.getInventory(), absolutePath);
-            if (t instanceof FileInventoryItem) this.onRequestOpen.accept((FileInventoryItem) t);
-            QuickDialogs.error("Item %s is not a file.", absolutePath);
-        }
-        catch (TraversalException e)
-        {
-            QuickDialogs.exception(e);
-        }
-    }
-
     public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
     {
         this.onSaveInventoryRequest = onSaveInventoryRequest;
-    }
-
-    public void setOnRequestOpen(Consumer<FileInventoryItem> onRequestOpen)
-    {
-        this.onRequestOpen = onRequestOpen;
     }
 }
