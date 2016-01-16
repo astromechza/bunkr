@@ -131,6 +131,7 @@ public class PasswordDialog extends BaseWindow
                     this.passwordField.clear();
                     this.passwordFilePathBox.setText(selectedPath.getAbsolutePath());
                     this.continueButton.setDisable(false);
+                    this.continueButton.requestFocus();
                 }
                 disabledStateListeners = false;
             }
