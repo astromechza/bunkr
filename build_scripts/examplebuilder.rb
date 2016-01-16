@@ -12,8 +12,11 @@ module ExampleBuilder
 
     module_function
     def run(cli_jar, output_archive)
+        archive_password = 'HunterTwo'
+
         puts "CLI jar: #{cli_jar}"
         puts "Output: #{output_archive}"
+        puts "Password: #{archive_password}"
 
         useful_image = File.join(File.dirname(File.dirname(File.expand_path __FILE__)), 'bunkr-gui', 'resources', 'images', 'bunkr-logo-200x200.png')
 
@@ -28,7 +31,7 @@ module ExampleBuilder
 
         cmd = "java -jar #{cli_jar} #{output_archive}"
         run_command "#{cmd} create"
-        run_command "echo HunterTwo > #{password_path} && chmod 600 #{password_path}"
+        run_command "echo #{archive_password} > #{password_path} && chmod 600 #{password_path}"
         run_command "#{cmd} change-security scrypt #{password_path}"
         cmd = "#{cmd} -p #{password_path}"
 
@@ -90,8 +93,6 @@ module ExampleBuilder
         else
           formatted_cmdline = cmdline
         end
-
-        puts "Executing #{formatted_cmdline}"
 
         IO.popen(cmdline, 'r', err: [:child, :out]) do |io|
           all_output = io.read.strip
