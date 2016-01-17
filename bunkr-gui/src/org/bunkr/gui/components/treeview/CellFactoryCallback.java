@@ -30,7 +30,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 import javafx.util.Pair;
-import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.controllers.ContextMenus;
 

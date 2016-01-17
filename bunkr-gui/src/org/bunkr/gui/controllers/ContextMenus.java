@@ -25,15 +25,11 @@ package org.bunkr.gui.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseButton;
-import org.bunkr.core.exceptions.BaseBunkrException;
-import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
-import org.bunkr.gui.dialogs.QuickDialogs;
 
 /**
  * Creator: benmeier

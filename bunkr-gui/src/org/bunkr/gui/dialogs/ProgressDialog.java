@@ -24,7 +24,6 @@ package org.bunkr.gui.dialogs;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.geometry.Insets;
