@@ -58,11 +58,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -709,11 +706,6 @@ public class MainWindow extends BaseWindow
                     return null;
                 }
 
-                @Override
-                protected void failed()
-                {
-                    QuickDialogs.exception(this.getException());
-                }
 
                 @Override
                 protected void succeeded()
@@ -740,6 +732,19 @@ public class MainWindow extends BaseWindow
                     Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newItem.getValue()));
                     tree.getSelectionModel().select(newItem);
                     requestMetadataSave(String.format("Imported file %s", newFile.getName()));
+                }
+
+                @Override
+                protected void cancelled()
+                {
+                    requestMetadataSave("Cancelled file import");
+                }
+
+                @Override
+                protected void failed()
+                {
+                    requestMetadataSave("Failed file import");
+                    QuickDialogs.exception(this.getException());
                 }
             };
 
@@ -954,7 +959,7 @@ public class MainWindow extends BaseWindow
                 @Override
                 protected void succeeded()
                 {
-                    // add to the container
+                    // add to the container if this is a new item
                     if (target == null) selectedContainer.addFile(newFile);
 
                     // pick the media type
@@ -966,10 +971,7 @@ public class MainWindow extends BaseWindow
                     );
 
                     TreeItem<InventoryTreeData> newItem = new TreeItem<>(new InventoryTreeData(newFile));
-                    if (target != null)
-                    {
-                        selected.getChildren().removeIf(i -> i.getValue().getName().equals(newName));
-                    }
+                    if (target != null) selected.getChildren().removeIf(i -> i.getValue().getName().equals(newName));
                     selected.getChildren().add(newItem);
                     selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
                     selected.setExpanded(true);
@@ -981,7 +983,14 @@ public class MainWindow extends BaseWindow
                 @Override
                 protected void failed()
                 {
+                    requestMetadataSave("Failed file import");
                     QuickDialogs.exception(this.getException());
+                }
+
+                @Override
+                protected void cancelled()
+                {
+                    requestMetadataSave("Cancelled file import");
                 }
             };
 
