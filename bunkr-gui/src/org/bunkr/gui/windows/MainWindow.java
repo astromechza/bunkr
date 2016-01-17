@@ -30,6 +30,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.util.Pair;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
@@ -48,6 +49,7 @@ import org.bunkr.gui.components.tabs.TabLoadError;
 import org.bunkr.gui.components.tabs.html.HtmlTab;
 import org.bunkr.gui.components.tabs.images.ImageTab;
 import org.bunkr.gui.components.tabs.markdown.MarkdownTab;
+import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.ContextMenus;
@@ -107,6 +109,10 @@ public class MainWindow extends BaseWindow
         contextMenuController.rootNewFile.setOnAction(event -> this.handleCMNewFile());
         contextMenuController.rootImportFile.setOnAction(event -> this.handleCMImportFile());
         contextMenuController.rootImportWeb.setOnAction(event -> this.handleCMImportWeb());
+
+        CellFactoryCallback cellFactory = new CellFactoryCallback(contextMenuController);
+        cellFactory.setFileDragImportHandler(this::handleDragImportFile);
+        this.tree.setCellFactory(cellFactory);
 
         this.tree.refreshAll();
     }
@@ -333,21 +339,13 @@ public class MainWindow extends BaseWindow
 
             // find parent item
             TreeItem<InventoryTreeData> parent = selected.getParent();
+            String parentPath = this.tree.getPathForTreeItem(parent);
 
             // find inventory item
-            IFFContainer parentContainer;
-            if (parent.getValue().getType().equals(InventoryTreeData.Type.ROOT))
-            {
-                parentContainer = this.archive.getInventory();
-            }
-            else
-            {
-                parentContainer = (IFFContainer) this.archive.getInventory().search(parent.getValue().getUuid());
-            }
+            IFFContainer parentContainer = (IFFContainer) InventoryPather.traverse(this.archive.getInventory(), parentPath);
 
             // just get inventory item
-            InventoryItem target = parentContainer.search(selected.getValue().getUuid());
-
+            IFFTraversalTarget target = parentContainer.findFileOrFolder(selected.getValue().getName());
             if (target instanceof FolderInventoryItem)
             {
                 FolderInventoryItem targetFolder = (FolderInventoryItem) target;
@@ -376,12 +374,8 @@ public class MainWindow extends BaseWindow
 
             // find parent item
             TreeItem<InventoryTreeData> oldParentItem = selected.getParent();
-            IFFContainer oldParentContainer;
-            if (oldParentItem.getValue().getType().equals(InventoryTreeData.Type.ROOT))
-                oldParentContainer = this.archive.getInventory();
-            else
-                oldParentContainer = (IFFContainer) this.archive.getInventory().search(
-                        oldParentItem.getValue().getUuid());
+            String parentPath = this.tree.getPathForTreeItem(oldParentItem);
+            IFFContainer oldParentContainer = (IFFContainer) InventoryPather.traverse(this.archive.getInventory(), parentPath);
 
             // get new file name
             String userInputPath = QuickDialogs.input("Enter a new file name:", selected.getValue().getName());
@@ -1002,6 +996,127 @@ public class MainWindow extends BaseWindow
         {
             QuickDialogs.exception(e);
             URLRequestBlocker.instance().setEnabled(true);
+        }
+    }
+
+    private void handleDragImportFile(Pair<UUID, File> input)
+    {
+        try
+        {
+            TreeItem<InventoryTreeData> selected = this.tree.search(input.getKey());
+            String selectedPath = this.tree.getPathForTreeItem(selected);
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+            if (selectedItem.isAFile())
+            {
+                QuickDialogs.error("Create Error", null, "'%s' is a file.", selectedPath);
+                return;
+            }
+
+            // find subject FolderInventoryItem
+            IFFContainer selectedContainer = (IFFContainer) selectedItem;
+
+            // get new file name
+            String newName = QuickDialogs.input("Enter a file name:", input.getValue().getName());
+            if (newName == null) return;
+            if (!InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Import Error", null, "'%s' is an invalid file name.", newName);
+                return;
+            }
+
+            // check parent for the same name
+            IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
+            FileInventoryItem newFile;
+            if (target != null)
+            {
+                if (! QuickDialogs.confirm("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
+                {
+                    return;
+                }
+                newFile = (FileInventoryItem) target;
+            }
+            else
+            {
+                newFile = new FileInventoryItem(newName);
+            }
+
+            ProgressTask<Void> progressTask = new ProgressTask<Void>()
+            {
+                @Override
+                protected Void innerCall() throws Exception
+                {
+                    this.updateMessage("Opening file.");
+                    FileChannel fc = new RandomAccessFile(input.getValue(), "r").getChannel();
+                    long bytesTotal = fc.size();
+                    long bytesDone = 0;
+                    try (InputStream fis = Channels.newInputStream(fc))
+                    {
+                        try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(archive, newFile))
+                        {
+                            this.updateMessage("Importing bytes...");
+                            byte[] buffer = new byte[1024 * 1024];
+                            int n;
+                            while ((n = fis.read(buffer)) != -1)
+                            {
+                                bwos.write(buffer, 0, n);
+                                bytesDone += n;
+                                this.updateProgress(bytesDone, bytesTotal);
+                            }
+                            Arrays.fill(buffer, (byte) 0);
+                            this.updateMessage("Finished.");
+                        }
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void succeeded()
+                {
+                    // add to the container
+                    if (target == null) selectedContainer.addFile(newFile);
+
+                    // pick the media type
+                    newFile.setMediaType(QuickDialogs.pick(
+                                                 "Import File",
+                                                 null,
+                                                 "Pick a Media Type for the new file:",
+                                                 new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
+                    );
+
+                    TreeItem<InventoryTreeData> newItem = new TreeItem<>(new InventoryTreeData(newFile));
+                    if (target != null)
+                    {
+                        selected.getChildren().removeIf(i -> i.getValue().getName().equals(newName));
+                    }
+                    selected.getChildren().add(newItem);
+                    selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+                    selected.setExpanded(true);
+                    Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newItem.getValue()));
+                    tree.getSelectionModel().select(newItem);
+                    requestMetadataSave(String.format("Imported file %s", newFile.getName()));
+                }
+
+                @Override
+                protected void cancelled()
+                {
+                    requestMetadataSave("Cancelled file import");
+                }
+
+                @Override
+                protected void failed()
+                {
+                    requestMetadataSave("Failed file import");
+                    QuickDialogs.exception(this.getException());
+                }
+            };
+
+            ProgressDialog pd = new ProgressDialog(progressTask);
+            pd.setHeaderText(String.format("Importing file %s ...", newFile.getName()));
+            new Thread(progressTask).start();
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
         }
     }
 }

@@ -22,11 +22,21 @@
 
 package org.bunkr.gui.components.treeview;
 
+import javafx.event.EventHandler;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
+import javafx.util.Pair;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.controllers.ContextMenus;
+
+import java.io.File;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Creator: benmeier
@@ -35,10 +45,24 @@ import org.bunkr.gui.controllers.ContextMenus;
 public class CellFactoryCallback implements Callback<TreeView<InventoryTreeData>, TreeCell<InventoryTreeData>>
 {
     private final ContextMenus callbackContainer;
+    private final EventHandler<DragEvent> dragOverHandler;
+    private Consumer<Pair<UUID, File>> fileDragImportHandler;
 
     public CellFactoryCallback(ContextMenus callbackContainer)
     {
         this.callbackContainer = callbackContainer;
+
+        this.dragOverHandler = event -> {
+            Dragboard db = event.getDragboard();
+            if (db.hasFiles() && db.getFiles().size() == 1)
+            {
+                event.acceptTransferModes(TransferMode.COPY);
+            }
+            else
+            {
+                event.consume();
+            }
+        };
     }
 
     @Override
@@ -58,15 +82,21 @@ public class CellFactoryCallback implements Callback<TreeView<InventoryTreeData>
                         setGraphic(Icons.buildIconLabel(item.getIcon()));
                         if (item.getType().equals(InventoryTreeData.Type.ROOT))
                         {
-                            setContextMenu(CellFactoryCallback.this.callbackContainer.rootContextMenu);
+                            setContextMenu(callbackContainer.rootContextMenu);
+                            setOnDragOver(dragOverHandler);
+                            setOnDragDropped(new DragDropEventHandler(item.getUuid()));
                         }
                         else if (item.getType().equals(InventoryTreeData.Type.FOLDER))
                         {
-                            setContextMenu(CellFactoryCallback.this.callbackContainer.dirContextMenu);
+                            setContextMenu(callbackContainer.dirContextMenu);
+                            setOnDragOver(dragOverHandler);
+                            setOnDragDropped(new DragDropEventHandler(item.getUuid()));
                         }
                         else
                         {
-                            setContextMenu(CellFactoryCallback.this.callbackContainer.fileContextMenu);
+                            setContextMenu(callbackContainer.fileContextMenu);
+                            setOnDragOver(null);
+                            setOnDragDropped(null);
                         }
                     }
                 }
@@ -75,8 +105,35 @@ public class CellFactoryCallback implements Callback<TreeView<InventoryTreeData>
                     setText(null);
                     setGraphic(null);
                     setContextMenu(null);
+                    setOnDragOver(null);
                 }
             }
         };
+    }
+
+    public void setFileDragImportHandler(Consumer<Pair<UUID, File>> fileDragImportHandler)
+    {
+        this.fileDragImportHandler = fileDragImportHandler;
+    }
+
+    private class DragDropEventHandler implements EventHandler<DragEvent>
+    {
+        private final UUID uuid;
+
+        public DragDropEventHandler(UUID uuid)
+        {
+            this.uuid = uuid;
+        }
+
+        @Override
+        public void handle(DragEvent event)
+        {
+            Dragboard db = event.getDragboard();
+            if (! db.hasFiles()) return;
+            if (db.getFiles().size() != 1) return;
+            File fileToImport = db.getFiles().get(0);
+            fileDragImportHandler.accept(new Pair<>(uuid, fileToImport));
+            event.consume();
+        }
     }
 }

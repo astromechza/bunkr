@@ -29,6 +29,10 @@ import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.*;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.UUID;
+
 /**
  * Creator: benmeier
  * Created At: 2015-12-27
@@ -119,13 +123,28 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
         return current;
     }
 
+    public TreeItem<InventoryTreeData> search(UUID uuid) throws TraversalException
+    {
+        if (uuid == null) return getRoot();
+        final Queue<TreeItem<InventoryTreeData>> queue = new ArrayDeque<>();
+        queue.add(this.getRoot());
+
+        while (! queue.isEmpty())
+        {
+            TreeItem<InventoryTreeData> item = queue.poll();
+            if (item.getValue().getUuid() == uuid) return item;
+            queue.addAll(item.getChildren());
+        }
+        throw new TraversalException(String.format("Could not find TreeItem with uuid: %s", uuid));
+    }
+
     public TreeItem<InventoryTreeData> getSelectedTreeItem() throws BaseBunkrException
     {
         if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
         throw new BaseBunkrException("No item selected");
     }
 
-    public TreeItem<InventoryTreeData> getSelectedTreeItemOrNull() throws BaseBunkrException
+    public TreeItem<InventoryTreeData> getSelectedTreeItemOrNull()
     {
         if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
         return null;

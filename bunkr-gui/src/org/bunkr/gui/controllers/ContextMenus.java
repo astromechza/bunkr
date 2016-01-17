@@ -87,21 +87,13 @@ public class ContextMenus
         this.fileContextMenu = new ContextMenu(this.fileOpen, this.fileInfo, this.fileExport, this.fileRename, this.fileDelete);
         this.rootContextMenu = new ContextMenu(this.rootNewFile, this.rootNewSubDir, this.rootImportFile, this.rootImportWeb);
 
-        this.treeView.setCellFactory(new CellFactoryCallback(this));
 
         this.treeView.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2)
             {
-                try
-                {
-                    TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItemOrNull();
-                    if (selected != null && selected.getValue().getType() == InventoryTreeData.Type.FILE)
-                        this.fileOpen.getOnAction().handle(new ActionEvent());
-                }
-                catch (BaseBunkrException e)
-                {
-                    QuickDialogs.exception(e);
-                }
+                TreeItem<InventoryTreeData> selected = this.treeView.getSelectedTreeItemOrNull();
+                if (selected != null && selected.getValue().getType() == InventoryTreeData.Type.FILE)
+                    this.fileOpen.getOnAction().handle(new ActionEvent());
             }
         });
     }
