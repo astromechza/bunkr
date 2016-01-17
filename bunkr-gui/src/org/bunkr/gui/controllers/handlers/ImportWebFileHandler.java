@@ -1,0 +1,224 @@
+/**
+ * Copyright (c) 2016 Bunkr
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.bunkr.gui.controllers.handlers;
+
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.control.TreeItem;
+import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.inventory.*;
+import org.bunkr.core.streams.output.MultilayeredOutputStream;
+import org.bunkr.core.utils.Logging;
+import org.bunkr.gui.ProgressTask;
+import org.bunkr.gui.URLRequestBlocker;
+import org.bunkr.gui.components.treeview.InventoryTreeData;
+import org.bunkr.gui.components.treeview.InventoryTreeView;
+import org.bunkr.gui.dialogs.ProgressDialog;
+import org.bunkr.gui.dialogs.QuickDialogs;
+import org.bunkr.gui.windows.MainWindow;
+
+import java.io.File;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+/**
+ * Creator: benmeier
+ * Created At: 2016-01-17
+ */
+public class ImportWebFileHandler implements EventHandler<ActionEvent>
+{
+    private final ArchiveInfoContext archive;
+    private final InventoryTreeView tree;
+    private final MainWindow mainWindow;
+
+    public ImportWebFileHandler(ArchiveInfoContext archive, InventoryTreeView tree, MainWindow mainWindow)
+    {
+        this.archive = archive;
+        this.tree = tree;
+        this.mainWindow = mainWindow;
+    }
+
+    @Override
+    public void handle(ActionEvent event)
+    {
+        try
+        {
+            // get input url
+            String url = QuickDialogs.input("Please enter URL:", null);
+            if (url == null) return;
+
+            // get new file name
+            String placeholderName = new File(new URI(url).getPath()).getName();
+            String newName = QuickDialogs.input("Enter a file name:", placeholderName);
+            if (newName == null) return;
+            if (! InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Import Error", null, "'%s' is an invalid file name.", newName);
+                return;
+            }
+
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItem();
+            String selectedPath = this.tree.getPathForTreeItem(selected);
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+            if (selectedItem.isAFile())
+            {
+                QuickDialogs.error("Create Error", null, "'%s' is a file.", selectedPath);
+                return;
+            }
+
+            // find subject FolderInventoryItem
+            IFFContainer selectedContainer = (IFFContainer) selectedItem;
+
+            // check parent for the same name
+            IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
+            FileInventoryItem newFile;
+            if (target != null)
+            {
+                if (! QuickDialogs.confirm("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
+                {
+                    return;
+                }
+                newFile = (FileInventoryItem) target;
+            }
+            else
+            {
+                newFile = new FileInventoryItem(newName);
+            }
+
+            // unblock requests
+            URLRequestBlocker.instance().setEnabled(false);
+
+            ProgressTask<Void> progressTask = new ProgressTask<Void>()
+            {
+                @Override
+                protected Void innerCall() throws Exception
+                {
+                    URL realUrl = new URL(url);
+                    this.updateMessage("Opening connection..");
+                    HttpURLConnection connection = (HttpURLConnection) realUrl.openConnection();
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+                    int code = connection.getResponseCode();
+                    int redirectCount = 0;
+                    while (code == 301 || code == 302 || code == 303)
+                    {
+                        redirectCount++;
+                        if (redirectCount > 16)
+                        {
+                            throw new Exception("Received too many redirects.");
+                        }
+                        String newUrl = connection.getHeaderField("Location");
+                        String cookies = connection.getHeaderField("Set-Cookie");
+                        Logging.info("Received redirect to %s", newUrl);
+                        this.updateMessage("Following redirect..");
+                        realUrl = new URL(newUrl);
+                        connection = (HttpURLConnection) realUrl.openConnection();
+                        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+                        connection.addRequestProperty("Cookie", cookies);
+                        code = connection.getResponseCode();
+                    }
+                    if (code != 200)
+                    {
+                        throw new Exception("Request returned code " + code);
+                    }
+
+                    try(InputStream connInputStream = connection.getInputStream())
+                    {
+                        try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(archive, newFile))
+                        {
+                            this.updateMessage("Reading from stream..");
+                            long total = 0;
+                            long bytesRead = 0;
+                            if (connection.getContentLengthLong() > -1) total = connection.getContentLengthLong();
+                            byte[] buffer = new byte[1024 * 1024];
+                            int n;
+                            while ((n = connInputStream.read(buffer)) > -1)
+                            {
+                                bwos.write(buffer, 0, n);
+                                bytesRead += n;
+                                this.updateProgress(bytesRead, total);
+                            }
+                            Arrays.fill(buffer, (byte) 0);
+                            this.updateMessage("Finished.");
+                        }
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void succeeded()
+                {
+                    // add to the container if this is a new item
+                    if (target == null) selectedContainer.addFile(newFile);
+
+                    // pick the media type
+                    newFile.setMediaType(QuickDialogs.pick(
+                                                 "Import File",
+                                                 null,
+                                                 "Pick a Media Type for the new file:",
+                                                 new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
+                    );
+
+                    TreeItem<InventoryTreeData> newItem = new TreeItem<>(new InventoryTreeData(newFile));
+                    if (target != null) selected.getChildren().removeIf(i -> i.getValue().getName().equals(newName));
+                    selected.getChildren().add(newItem);
+                    selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+                    selected.setExpanded(true);
+                    Event.fireEvent(selected,
+                                    new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected,
+                                                                         newItem.getValue()));
+                    tree.getSelectionModel().select(newItem);
+                    mainWindow.requestMetadataSave(String.format("Imported file %s", newFile.getName()));
+                }
+
+                @Override
+                protected void failed()
+                {
+                    mainWindow.requestMetadataSave("Failed file import");
+                    QuickDialogs.exception(this.getException());
+                }
+
+                @Override
+                protected void cancelled()
+                {
+                    mainWindow.requestMetadataSave("Cancelled file import");
+                }
+            };
+
+            ProgressDialog pd = new ProgressDialog(progressTask);
+            pd.setContentText(String.format("Reading url: %s", url));
+            new Thread(progressTask).start();
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+            URLRequestBlocker.instance().setEnabled(true);
+        }
+    }
+}
