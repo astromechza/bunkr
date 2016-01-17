@@ -17,3 +17,11 @@ I'm still not sure how to quite handle bundling dependencies in the release jars
 - Markdown4j
     + https://code.google.com/p/markdown4j/
     + New BSD License
+
+- OkIO
+    + https://github.com/square/okio
+    + Apache License 2.0
+
+- OkHTTP
+    + https://github.com/square/okhttp
+    + Apache License 2.0
