@@ -24,22 +24,30 @@ package org.bunkr.gui.dialogs;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
- * This progress dialog is pretty much the same as the one provided by ControlsFX. We need to add speed and ETA
- * calculations.
+ * This progress dialog takes inspiration from the one provided by ControlsFX.
  *
  * Creator: benmeier
  * Created At: 2016-01-13
  */
 public class ProgressDialog extends Dialog<Void>
 {
+    Worker<?> worker;
+    Label progressMessage, contentText;
+    Button cancelButton;
+    WorkerProgressPane progressPane;
+
     public ProgressDialog(final Worker<?> worker)
     {
         if (worker == null) return;
@@ -47,50 +55,77 @@ public class ProgressDialog extends Dialog<Void>
         {
             return;
         }
+        this.worker = worker;
+
         setResultConverter(dialogButton -> null);
 
-        final DialogPane dialogPane = getDialogPane();
-
         setTitle("Progress");
-        dialogPane.setHeaderText("Operation in Progress");
+        getDialogPane().setHeaderText("Operation in Progress");
 
-        final Label progressMessage = new Label();
-        progressMessage.textProperty().bind(worker.messageProperty());
-
-        final WorkerProgressPane content = new WorkerProgressPane(this);
-        content.setMaxWidth(Double.MAX_VALUE);
-        content.setWorker(worker);
-
-        VBox vbox = new VBox(10, progressMessage, content);
-        vbox.setMaxWidth(Double.MAX_VALUE);
-        vbox.setPrefSize(300, 100);
-        /**
-         * The content Text cannot be set before the constructor and since we
-         * set a Content Node, the contentText will not be shown. If we want to
-         * let the user display a content text, we must recreate it.
-         */
-        Label contentText = new Label();
-        contentText.setWrapText(true);
-        vbox.getChildren().add(0, contentText);
-        contentText.textProperty().bind(dialogPane.contentTextProperty());
-        dialogPane.setContent(vbox);
+        createControls();
+        createLayout();
+        setStyle();
+        bindEvents();
     }
 
-    /**
-     * The WorkerProgressPane takes a {@link Dialog} and a {@link Worker}
-     * and links them together so the dialog is shown or hidden depending
-     * on the state of the worker.  The WorkerProgressPane also includes
-     * a progress bar that is automatically bound to the progress property
-     * of the worker.  The way in which the WorkerProgressPane shows and
-     * hides its worker's dialog is consistent with the expected behavior
-     * for showWorkerProgress(Worker).
-     */
+    private void createControls()
+    {
+        contentText = new Label();
+        contentText.setWrapText(true);
+        contentText.setManaged(false);
+        contentText.setVisible(false);
+        progressMessage = new Label();
+        progressPane = new WorkerProgressPane(this);
+        progressPane.setWorker(worker);
+        cancelButton = new Button("Cancel");
+    }
+
+    private void createLayout()
+    {
+        this.getDialogPane().setPrefWidth(480);
+        progressPane.setMaxWidth(Double.MAX_VALUE);
+        HBox buttonBox = new HBox(10, cancelButton);
+        buttonBox.setAlignment(Pos.BOTTOM_RIGHT);
+        VBox vbox = new VBox(10, contentText, progressMessage, progressPane, buttonBox);
+        vbox.setPadding(new Insets(10, 10, 0, 10));
+        vbox.setMaxWidth(Double.MAX_VALUE);
+        vbox.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(buttonBox, Priority.ALWAYS);
+        getDialogPane().setContent(vbox);
+    }
+
+    private void setStyle()
+    {
+    }
+
+    private void bindEvents()
+    {
+        progressMessage.textProperty().bind(worker.messageProperty());
+        contentText.textProperty().bind(getDialogPane().contentTextProperty());
+        cancelButton.setOnAction(event -> worker.cancel());
+
+        contentText.textProperty().addListener((observable, oldValue, newValue) -> {
+            contentText.setManaged(true);
+            contentText.setVisible(true);
+        });
+    }
+
     private static class WorkerProgressPane extends Region
     {
+        private final ProgressDialog dialog;
+        private final ProgressBar progressBar;
         private Worker<?> worker;
-
         private boolean dialogVisible = false;
         private boolean cancelDialogShow = false;
+
+        public WorkerProgressPane(ProgressDialog dialog)
+        {
+            this.dialog = dialog;
+
+            this.progressBar = new ProgressBar();
+            progressBar.setMaxWidth(Double.MAX_VALUE);
+            getChildren().add(progressBar);
+        }
 
         private ChangeListener<Worker.State> stateListener = (observable, old, value) ->
         {
@@ -137,23 +172,6 @@ public class ProgressDialog extends Dialog<Void>
                         begin();
                     }
                 }
-            }
-        }
-
-        private final ProgressDialog dialog;
-        private final ProgressBar progressBar;
-
-        public WorkerProgressPane(ProgressDialog dialog)
-        {
-            this.dialog = dialog;
-
-            this.progressBar = new ProgressBar();
-            progressBar.setMaxWidth(Double.MAX_VALUE);
-            getChildren().add(progressBar);
-
-            if (worker != null)
-            {
-                progressBar.progressProperty().bind(worker.progressProperty());
             }
         }
 
