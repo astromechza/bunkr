@@ -12,6 +12,8 @@
 
 -dontwarn javax.**
 -dontwarn javafx.**
+-dontwarn android.util.Log
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn org.bouncycastle.jcajce.provider.asymmetric.util.BaseCipherSpi
 -keepattributes *Annotation*
 -keepattributes Signature

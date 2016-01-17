@@ -74,6 +74,8 @@ define PROJECT_NAME do
         end
 
         task build_release: [:package] do
+            # first clean target folder
+            system("rm -rf '#{project('bunkr-cli').path_to('target', 'main')}'")
             proguard_wrap('bunkr-cli')
         end
     end
@@ -93,6 +95,8 @@ define PROJECT_NAME do
         end
 
         task build_release: [:package] do
+            # first clean target folder
+            system("rm -rf '#{project('bunkr-gui').path_to('target', 'main')}'")
             proguard_wrap('bunkr-gui')
         end
     end
