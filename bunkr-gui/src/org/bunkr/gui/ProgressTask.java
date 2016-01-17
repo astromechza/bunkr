@@ -44,16 +44,15 @@ public abstract class ProgressTask<V> extends Task<V>
     protected abstract V innerCall() throws Exception;
 
     @Override
-    protected void updateMessage(String message)
+    public void updateMessage(String message)
     {
         this.currentStateMessage = message;
         super.updateMessage(message);
     }
 
     @Override
-    protected void updateProgress(double done, double total)
+    public void updateProgress(double done, double total)
     {
-        if (total < done) total = done;
         if (done > 0)
         {
             long elapsed = System.currentTimeMillis() - this.startTime;

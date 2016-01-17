@@ -40,18 +40,6 @@ public class URLRequestBlocker
         return instance;
     }
 
-    private boolean enabled;
-
-    public URLRequestBlocker()
-    {
-        enabled = true;
-    }
-
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
     public void install()
     {
         Logging.info("Installing URLStreamHandler intercept.");
@@ -60,67 +48,14 @@ public class URLRequestBlocker
 
     public URLStreamHandler getStreamHandler(String protocol)
     {
-        if (! enabled) return null;
         if (protocol.equals("jar") || protocol.equals("file")) return null;
-        if (protocol.equals("http")) return new HTTPHandler();
-        if (protocol.equals("https")) return new HTTPSHandler();
-        Logging.warn("Blocking request using '%s' protocol.", protocol);
-        return new URLStreamHandler() {
+        return new URLStreamHandler()
+        {
             @Override
             protected URLConnection openConnection(URL u) throws IOException
             {
-                throw new IOException(String.format("Outgoing request to %s blocked", u));
+                throw new ConnectException(String.format("Outgoing request to %s blocked.", u));
             }
         };
-    }
-
-    private class HTTPHandler extends URLStreamHandler
-    {
-        @Override
-        protected int getDefaultPort()
-        {
-            return 80;
-        }
-
-        @Override
-        protected URLConnection openConnection(URL url) throws IOException
-        {
-            return this.openConnection(url, null);
-        }
-
-        @Override
-        protected URLConnection openConnection(URL url, Proxy proxy) throws IOException
-        {
-            Logging.warn("Outgoing request to %s blocked", url);
-            throw new IOException(String.format("Outgoing request to %s blocked", url));
-        }
-    }
-
-    private class HTTPSHandler extends URLStreamHandler
-    {
-        @Override
-        protected int getDefaultPort()
-        {
-            return 80;
-        }
-
-        @Override
-        protected URLConnection openConnection(URL url) throws IOException
-        {
-            return this.openConnection(url, null);
-        }
-
-        @Override
-        protected URLConnection openConnection(URL url, Proxy proxy) throws IOException
-        {
-            return new URLConnection(url) {
-                @Override
-                public void connect() throws IOException
-                {
-                    Logging.warn("Outgoing request to %s blocked", url);
-                    new IOException(String.format("Outgoing request to %s blocked", url));
-                }
-            };
-        }
     }
 }

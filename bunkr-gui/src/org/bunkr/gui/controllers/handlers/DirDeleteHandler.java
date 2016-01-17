@@ -60,18 +60,14 @@ public class DirDeleteHandler implements EventHandler<ActionEvent>
         {
             TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItem();
 
-            if (! QuickDialogs.confirm(
-                    String.format("Are you sure you want to delete '%s' and all of its children?",
-                                  selected.getValue().getName())))
-                return;
+            if (! QuickDialogs.confirm("Are you sure you want to delete '%s' and all of its children?", selected.getValue().getName())) return;
 
             // find parent item
             TreeItem<InventoryTreeData> parent = selected.getParent();
             String parentPath = this.tree.getPathForTreeItem(parent);
 
             // find inventory item
-            IFFContainer
-                    parentContainer = (IFFContainer) InventoryPather.traverse(this.archive.getInventory(), parentPath);
+            IFFContainer parentContainer = (IFFContainer) InventoryPather.traverse(this.archive.getInventory(), parentPath);
 
             // just get inventory item
             IFFTraversalTarget target = parentContainer.findFileOrFolder(selected.getValue().getName());
@@ -80,13 +76,13 @@ public class DirDeleteHandler implements EventHandler<ActionEvent>
                 FolderInventoryItem targetFolder = (FolderInventoryItem) target;
                 parentContainer.getFolders().remove(targetFolder);
                 parent.getChildren().remove(selected);
+                mainWindow.requestMetadataSave(String.format("Deleted directory %s from %s", selected.getValue().getName(),
+                                                             parent.getValue().getName()));
             }
             else
             {
                 throw new BaseBunkrException("Attempted to delete a file but selected was a folder?");
             }
-            mainWindow.requestMetadataSave(String.format("Deleted directory %s from %s", selected.getValue().getName(),
-                                                         parent.getValue().getName()));
         }
         catch (Exception e)
         {

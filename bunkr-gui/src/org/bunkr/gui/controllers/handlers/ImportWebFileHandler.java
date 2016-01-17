@@ -26,12 +26,13 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
-import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.ProgressTask;
-import org.bunkr.gui.URLRequestBlocker;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.dialogs.ProgressDialog;
@@ -39,10 +40,9 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 import org.bunkr.gui.windows.MainWindow;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -111,63 +111,12 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
                 newFile = new FileInventoryItem(newName);
             }
 
-            // unblock requests
-            URLRequestBlocker.instance().setEnabled(false);
-
             ProgressTask<Void> progressTask = new ProgressTask<Void>()
             {
                 @Override
                 protected Void innerCall() throws Exception
                 {
-                    URL realUrl = new URL(url);
-                    this.updateMessage("Opening connection..");
-                    HttpURLConnection connection = (HttpURLConnection) realUrl.openConnection();
-                    connection.setRequestProperty("User-Agent", "Mozilla/5.0");
-
-                    int code = connection.getResponseCode();
-                    int redirectCount = 0;
-                    while (code == 301 || code == 302 || code == 303)
-                    {
-                        redirectCount++;
-                        if (redirectCount > 16)
-                        {
-                            throw new Exception("Received too many redirects.");
-                        }
-                        String newUrl = connection.getHeaderField("Location");
-                        String cookies = connection.getHeaderField("Set-Cookie");
-                        Logging.info("Received redirect to %s", newUrl);
-                        this.updateMessage("Following redirect..");
-                        realUrl = new URL(newUrl);
-                        connection = (HttpURLConnection) realUrl.openConnection();
-                        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
-                        connection.addRequestProperty("Cookie", cookies);
-                        code = connection.getResponseCode();
-                    }
-                    if (code != 200)
-                    {
-                        throw new Exception("Request returned code " + code);
-                    }
-
-                    try(InputStream connInputStream = connection.getInputStream())
-                    {
-                        try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(archive, newFile))
-                        {
-                            this.updateMessage("Reading from stream..");
-                            long total = 0;
-                            long bytesRead = 0;
-                            if (connection.getContentLengthLong() > -1) total = connection.getContentLengthLong();
-                            byte[] buffer = new byte[1024 * 1024];
-                            int n;
-                            while ((n = connInputStream.read(buffer)) > -1)
-                            {
-                                bwos.write(buffer, 0, n);
-                                bytesRead += n;
-                                this.updateProgress(bytesRead, total);
-                            }
-                            Arrays.fill(buffer, (byte) 0);
-                            this.updateMessage("Finished.");
-                        }
-                    }
+                    downloadContent(url, newFile, this);
                     return null;
                 }
 
@@ -218,7 +167,34 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
         catch (Exception e)
         {
             QuickDialogs.exception(e);
-            URLRequestBlocker.instance().setEnabled(true);
+        }
+    }
+
+    private void downloadContent(String url, FileInventoryItem destination, ProgressTask<Void> task) throws IOException
+    {
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        Request request = new Request.Builder().url(url).build();
+        task.updateMessage("Beginning Connection..");
+        Response response = client.newCall(request).execute();
+        if (! response.isSuccessful()) throw new IOException("Request returned code " + response.code());
+        try (InputStream connInputStream = response.body().byteStream())
+        {
+            try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(archive, destination))
+            {
+                task.updateMessage("Reading from stream..");
+                long total = response.body().contentLength();
+                long bytesRead = 0;
+                byte[] buffer = new byte[1024 * 32];
+                int n;
+                while ((n = connInputStream.read(buffer)) > -1)
+                {
+                    bwos.write(buffer, 0, n);
+                    bytesRead += n;
+                    task.updateProgress(bytesRead, total);
+                }
+                Arrays.fill(buffer, (byte) 0);
+                task.updateMessage("Finished.");
+            }
         }
     }
 }

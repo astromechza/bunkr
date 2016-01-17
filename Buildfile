@@ -22,6 +22,8 @@ JAR_JSON_SIMPLE = 'com.googlecode.json-simple:json-simple:jar:1.1.1'
 JAR_ARGPARSE = 'net.sourceforge.argparse4j:argparse4j:jar:0.6.0'
 JAR_MARKDOWN = 'org.commonjava.googlecode.markdown4j:markdown4j:jar:2.2-cj-1.0'
 JAR_PROGUARD = 'net.sf.proguard:proguard-base:jar:5.2.1'
+JAR_OKIO = 'com.squareup.okio:okio:jar:1.6.0'
+JAR_OKHTTP = 'com.squareup.okhttp3:okhttp:jar:3.0.1'
 
 layout = Layout.new
 layout[:source, :main, :java] = 'src'
@@ -79,7 +81,7 @@ define PROJECT_NAME do
     define 'bunkr-gui', layout: layout do
         test.with JAR_JUNIT, project('bunkr-core').test.compile.target
         jacoco.generate_html = true
-        compile.with JAR_BC, JAR_ARGPARSE, JAR_MARKDOWN, JAR_JSON_SIMPLE, project('bunkr-core')
+        compile.with JAR_BC, JAR_ARGPARSE, JAR_MARKDOWN, JAR_JSON_SIMPLE, JAR_OKIO, JAR_OKHTTP, project('bunkr-core')
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-gui').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
         package(:jar, id: 'bunkr-gui').with(manifest: {'Main-Class' => GUI_MAIN_CLASS})

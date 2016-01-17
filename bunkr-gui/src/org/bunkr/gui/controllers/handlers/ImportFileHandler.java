@@ -23,27 +23,17 @@
 package org.bunkr.gui.controllers.handlers;
 
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
+import javafx.util.Pair;
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.inventory.*;
-import org.bunkr.core.streams.output.MultilayeredOutputStream;
-import org.bunkr.gui.ProgressTask;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
-import org.bunkr.gui.dialogs.ProgressDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.bunkr.gui.windows.MainWindow;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Creator: benmeier
@@ -51,15 +41,13 @@ import java.util.Arrays;
  */
 public class ImportFileHandler implements EventHandler<ActionEvent>
 {
-    private final ArchiveInfoContext archive;
     private final InventoryTreeView tree;
-    private final MainWindow mainWindow;
+    private final DragFileImportHandler subHandler;
 
     public ImportFileHandler(ArchiveInfoContext archive, InventoryTreeView tree, MainWindow mainWindow)
     {
-        this.archive = archive;
         this.tree = tree;
-        this.mainWindow = mainWindow;
+        this.subHandler = new DragFileImportHandler(archive, tree, mainWindow);
     }
 
     @Override
@@ -74,120 +62,9 @@ public class ImportFileHandler implements EventHandler<ActionEvent>
             File importedFile = fileChooser.showOpenDialog(this.tree.getScene().getWindow());
             if (importedFile == null) return;
 
-            // get new file name
-            String newName = QuickDialogs.input("Enter a file name:", importedFile.getName());
-            if (newName == null) return;
-            if (! InventoryPather.isValidName(newName))
-            {
-                QuickDialogs.error("Import Error", null, "'%s' is an invalid file name.", newName);
-                return;
-            }
-
             // get item for which the context menu was called from
             TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItem();
-            String selectedPath = this.tree.getPathForTreeItem(selected);
-            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
-            if (selectedItem.isAFile())
-            {
-                QuickDialogs.error("Create Error", null, "'%s' is a file.", selectedPath);
-                return;
-            }
-
-            // find subject FolderInventoryItem
-            IFFContainer selectedContainer = (IFFContainer) selectedItem;
-
-            // check parent for the same name
-            IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
-            FileInventoryItem newFile;
-            if (target != null)
-            {
-                if (! QuickDialogs.confirm("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
-                {
-                    return;
-                }
-                newFile = (FileInventoryItem) target;
-            }
-            else
-            {
-                newFile = new FileInventoryItem(newName);
-            }
-
-            ProgressTask<Void> progressTask = new ProgressTask<Void>()
-            {
-                @Override
-                protected Void innerCall() throws Exception
-                {
-                    this.updateMessage("Opening file.");
-                    FileChannel fc = new RandomAccessFile(importedFile, "r").getChannel();
-                    long bytesTotal = fc.size();
-                    long bytesDone = 0;
-                    try (InputStream fis = Channels.newInputStream(fc))
-                    {
-                        try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(archive, newFile))
-                        {
-                            this.updateMessage("Importing bytes...");
-                            byte[] buffer = new byte[1024 * 1024];
-                            int n;
-                            while ((n = fis.read(buffer)) != -1)
-                            {
-                                bwos.write(buffer, 0, n);
-                                bytesDone += n;
-                                this.updateProgress(bytesDone, bytesTotal);
-                            }
-                            Arrays.fill(buffer, (byte) 0);
-                            this.updateMessage("Finished.");
-                        }
-                    }
-                    return null;
-                }
-
-
-                @Override
-                protected void succeeded()
-                {
-                    // add to the container
-                    if (target == null) selectedContainer.addFile(newFile);
-
-                    // pick the media type
-                    newFile.setMediaType(QuickDialogs.pick(
-                                                 "Import File",
-                                                 null,
-                                                 "Pick a Media Type for the new file:",
-                                                 new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
-                    );
-
-                    TreeItem<InventoryTreeData> newItem = new TreeItem<>(new InventoryTreeData(newFile));
-                    if (target != null)
-                    {
-                        selected.getChildren().removeIf(i -> i.getValue().getName().equals(newName));
-                    }
-                    selected.getChildren().add(newItem);
-                    selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
-                    selected.setExpanded(true);
-                    Event.fireEvent(selected,
-                                    new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected,
-                                                                         newItem.getValue()));
-                    tree.getSelectionModel().select(newItem);
-                    mainWindow.requestMetadataSave(String.format("Imported file %s", newFile.getName()));
-                }
-
-                @Override
-                protected void cancelled()
-                {
-                    mainWindow.requestMetadataSave("Cancelled file import");
-                }
-
-                @Override
-                protected void failed()
-                {
-                    mainWindow.requestMetadataSave("Failed file import");
-                    QuickDialogs.exception(this.getException());
-                }
-            };
-
-            ProgressDialog pd = new ProgressDialog(progressTask);
-            pd.setHeaderText(String.format("Importing file %s ...", newFile.getName()));
-            new Thread(progressTask).start();
+            subHandler.accept(new Pair<>(selected.getValue().getUuid(), importedFile));
         }
         catch (Exception e)
         {

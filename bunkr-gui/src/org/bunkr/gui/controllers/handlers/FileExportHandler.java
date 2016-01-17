@@ -36,7 +36,6 @@ import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.dialogs.ProgressDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
-import org.bunkr.gui.windows.MainWindow;
 
 import java.io.File;
 import java.io.OutputStream;
