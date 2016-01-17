@@ -56,11 +56,13 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -850,6 +852,45 @@ public class MainWindow extends BaseWindow
             String url = QuickDialogs.input("Please enter URL:", null);
             if (url == null) return;
 
+            // get new file name
+            String placeholderName = new File(new URI(url).getPath()).getName();
+            String newName = QuickDialogs.input("Enter a file name:", placeholderName);
+            if (newName == null) return;
+            if (! InventoryPather.isValidName(newName))
+            {
+                QuickDialogs.error("Import Error", null, "'%s' is an invalid file name.", newName);
+                return;
+            }
+
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItem();
+            String selectedPath = this.tree.getPathForTreeItem(selected);
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+            if (selectedItem.isAFile())
+            {
+                QuickDialogs.error("Create Error", null, "'%s' is a file.", selectedPath);
+                return;
+            }
+
+            // find subject FolderInventoryItem
+            IFFContainer selectedContainer = (IFFContainer) selectedItem;
+
+            // check parent for the same name
+            IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
+            FileInventoryItem newFile;
+            if (target != null)
+            {
+                if (! QuickDialogs.confirm("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
+                {
+                    return;
+                }
+                newFile = (FileInventoryItem) target;
+            }
+            else
+            {
+                newFile = new FileInventoryItem(newName);
+            }
+
             // unblock requests
             URLRequestBlocker.instance().setEnabled(false);
 
@@ -887,11 +928,11 @@ public class MainWindow extends BaseWindow
                         throw new Exception("Request returned code " + code);
                     }
 
-                    this.updateMessage("Reading from stream..");
-                    try(BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("information.html")))
+                    try(InputStream connInputStream = connection.getInputStream())
                     {
-                        try(InputStream connInputStream = connection.getInputStream())
+                        try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(archive, newFile))
                         {
+                            this.updateMessage("Reading from stream..");
                             long total = 0;
                             long bytesRead = 0;
                             if (connection.getContentLengthLong() > -1) total = connection.getContentLengthLong();
@@ -899,27 +940,48 @@ public class MainWindow extends BaseWindow
                             int n;
                             while ((n = connInputStream.read(buffer)) > -1)
                             {
-                                bos.write(buffer, 0, n);
+                                bwos.write(buffer, 0, n);
                                 bytesRead += n;
                                 this.updateProgress(bytesRead, total);
                             }
+                            Arrays.fill(buffer, (byte) 0);
+                            this.updateMessage("Finished.");
                         }
                     }
-                    this.updateMessage("Done.");
-
                     return null;
                 }
 
                 @Override
                 protected void succeeded()
                 {
-                    super.succeeded();
+                    // add to the container
+                    if (target == null) selectedContainer.addFile(newFile);
+
+                    // pick the media type
+                    newFile.setMediaType(QuickDialogs.pick(
+                                                 "Import File",
+                                                 null,
+                                                 "Pick a Media Type for the new file:",
+                                                 new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
+                    );
+
+                    TreeItem<InventoryTreeData> newItem = new TreeItem<>(new InventoryTreeData(newFile));
+                    if (target != null)
+                    {
+                        selected.getChildren().removeIf(i -> i.getValue().getName().equals(newName));
+                    }
+                    selected.getChildren().add(newItem);
+                    selected.getChildren().sort((o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+                    selected.setExpanded(true);
+                    Event.fireEvent(selected, new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newItem.getValue()));
+                    tree.getSelectionModel().select(newItem);
+                    requestMetadataSave(String.format("Imported file %s", newFile.getName()));
                 }
 
                 @Override
                 protected void failed()
                 {
-                    super.failed();
+                    QuickDialogs.exception(this.getException());
                 }
             };
 
