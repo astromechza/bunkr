@@ -53,6 +53,7 @@ public abstract class ProgressTask<V> extends Task<V>
     @Override
     protected void updateProgress(double done, double total)
     {
+        if (total < done) total = done;
         if (done > 0)
         {
             long elapsed = System.currentTimeMillis() - this.startTime;

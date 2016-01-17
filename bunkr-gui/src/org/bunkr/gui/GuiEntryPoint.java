@@ -85,7 +85,7 @@ public class GuiEntryPoint
         public void start(Stage primaryStage) throws Exception
         {
             Font.loadFont(Resources.getExternalPath("/resources/fonts/fontawesome.ttf"), 12);
-            new URLRequestBlocker().install();
+            URLRequestBlocker.instance().install();
             new LandingWindow(primaryStage).getStage().show();
         }
     }

@@ -33,13 +33,23 @@ import java.net.*;
  */
 public class URLRequestBlocker
 {
-    final Proxy http_proxy;
-    final Proxy https_proxy;
+    private static URLRequestBlocker instance = null;
+    public static URLRequestBlocker instance()
+    {
+        if (instance == null) instance = new URLRequestBlocker();
+        return instance;
+    }
+
+    private boolean enabled;
 
     public URLRequestBlocker()
     {
-        http_proxy = build_proxy(System.getenv("http_proxy"));
-        https_proxy = build_proxy(System.getenv("https_proxy"));
+        enabled = true;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 
     public void install()
@@ -50,6 +60,7 @@ public class URLRequestBlocker
 
     public URLStreamHandler getStreamHandler(String protocol)
     {
+        if (! enabled) return null;
         if (protocol.equals("jar") || protocol.equals("file")) return null;
         if (protocol.equals("http")) return new HTTPHandler();
         if (protocol.equals("https")) return new HTTPSHandler();
@@ -63,13 +74,6 @@ public class URLRequestBlocker
         };
     }
 
-    private Proxy build_proxy(String input)
-    {
-        if (input == null) return Proxy.NO_PROXY;
-        URI u = URI.create(input);
-        return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(u.getHost(), u.getPort()));
-    }
-
     private class HTTPHandler extends URLStreamHandler
     {
         @Override
@@ -81,7 +85,7 @@ public class URLRequestBlocker
         @Override
         protected URLConnection openConnection(URL url) throws IOException
         {
-            return this.openConnection(url, http_proxy);
+            return this.openConnection(url, null);
         }
 
         @Override
@@ -103,7 +107,7 @@ public class URLRequestBlocker
         @Override
         protected URLConnection openConnection(URL url) throws IOException
         {
-            return this.openConnection(url, https_proxy);
+            return this.openConnection(url, null);
         }
 
         @Override

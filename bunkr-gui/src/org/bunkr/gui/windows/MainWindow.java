@@ -34,7 +34,6 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.BaseBunkrException;
-import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
@@ -43,6 +42,7 @@ import org.bunkr.core.utils.Formatters;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.ProgressTask;
+import org.bunkr.gui.URLRequestBlocker;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.components.tabs.TabLoadError;
 import org.bunkr.gui.components.tabs.html.HtmlTab;
@@ -55,10 +55,13 @@ import org.bunkr.gui.dialogs.ProgressDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * Creator: benmeier
@@ -100,9 +103,11 @@ public class MainWindow extends BaseWindow
         contextMenuController.dirNewFile.setOnAction(event -> this.handleCMNewFile());
         contextMenuController.dirNewSubDir.setOnAction(event -> this.handleCMNewSubDir());
         contextMenuController.dirImportFile.setOnAction(event -> this.handleCMImportFile());
+        contextMenuController.dirImportFile.setOnAction(event -> this.handleCMImportWeb());
         contextMenuController.rootNewSubDir.setOnAction(event -> this.handleCMNewSubDir());
         contextMenuController.rootNewFile.setOnAction(event -> this.handleCMNewFile());
         contextMenuController.rootImportFile.setOnAction(event -> this.handleCMImportFile());
+        contextMenuController.rootImportWeb.setOnAction(event -> this.handleCMImportWeb());
 
         this.tree.refreshAll();
     }
@@ -834,6 +839,98 @@ public class MainWindow extends BaseWindow
         catch (Exception e)
         {
             QuickDialogs.exception(e);
+        }
+    }
+
+    private void handleCMImportWeb()
+    {
+        try
+        {
+            // get input url
+            String url = QuickDialogs.input("Please enter URL:", null);
+            if (url == null) return;
+
+            // unblock requests
+            URLRequestBlocker.instance().setEnabled(false);
+
+            ProgressTask<Void> progressTask = new ProgressTask<Void>()
+            {
+                @Override
+                protected Void innerCall() throws Exception
+                {
+                    URL realUrl = new URL(url);
+                    this.updateMessage("Opening connection..");
+                    HttpURLConnection connection = (HttpURLConnection) realUrl.openConnection();
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+                    int code = connection.getResponseCode();
+                    int redirectCount = 0;
+                    while (code == 301 || code == 302 || code == 303)
+                    {
+                        redirectCount++;
+                        if (redirectCount > 16)
+                        {
+                            throw new Exception("Received too many redirects.");
+                        }
+                        String newUrl = connection.getHeaderField("Location");
+                        String cookies = connection.getHeaderField("Set-Cookie");
+                        Logging.info("Received redirect to %s", newUrl);
+                        this.updateMessage("Following redirect..");
+                        realUrl = new URL(newUrl);
+                        connection = (HttpURLConnection) realUrl.openConnection();
+                        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+                        connection.addRequestProperty("Cookie", cookies);
+                        code = connection.getResponseCode();
+                    }
+                    if (code != 200)
+                    {
+                        throw new Exception("Request returned code " + code);
+                    }
+
+                    this.updateMessage("Reading from stream..");
+                    try(BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("information.html")))
+                    {
+                        try(InputStream connInputStream = connection.getInputStream())
+                        {
+                            long total = 0;
+                            long bytesRead = 0;
+                            if (connection.getContentLengthLong() > -1) total = connection.getContentLengthLong();
+                            byte[] buffer = new byte[1024 * 1024];
+                            int n;
+                            while ((n = connInputStream.read(buffer)) > -1)
+                            {
+                                bos.write(buffer, 0, n);
+                                bytesRead += n;
+                                this.updateProgress(bytesRead, total);
+                            }
+                        }
+                    }
+                    this.updateMessage("Done.");
+
+                    return null;
+                }
+
+                @Override
+                protected void succeeded()
+                {
+                    super.succeeded();
+                }
+
+                @Override
+                protected void failed()
+                {
+                    super.failed();
+                }
+            };
+
+            ProgressDialog pd = new ProgressDialog(progressTask);
+            pd.setContentText(String.format("Reading url: %s", url));
+            new Thread(progressTask).start();
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+            URLRequestBlocker.instance().setEnabled(true);
         }
     }
 }
