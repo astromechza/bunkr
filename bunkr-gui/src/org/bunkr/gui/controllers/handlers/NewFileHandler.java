@@ -27,10 +27,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.IFFContainer;
-import org.bunkr.core.inventory.IFFTraversalTarget;
-import org.bunkr.core.inventory.InventoryPather;
+import org.bunkr.core.inventory.*;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.dialogs.QuickDialogs;
@@ -89,6 +86,7 @@ public class NewFileHandler implements EventHandler<ActionEvent>
             }
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
+            newFile.setMediaType(MediaType.TEXT);
             selectedContainer.addFile(newFile);
 
             // create the new tree item
@@ -102,6 +100,7 @@ public class NewFileHandler implements EventHandler<ActionEvent>
                             new TreeItem.TreeModificationEvent<>(TreeItem.valueChangedEvent(), selected, newValue));
             this.tree.getSelectionModel().select(newItem);
             mainWindow.requestMetadataSave(String.format("Created new file %s", newFile.getName()));
+            mainWindow.requestOpen(newFile);
         }
         catch (Exception e)
         {
