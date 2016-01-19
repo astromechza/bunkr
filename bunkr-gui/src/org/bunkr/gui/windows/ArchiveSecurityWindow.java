@@ -166,7 +166,7 @@ public class ArchiveSecurityWindow extends BaseWindow
         this.getStage().setMinWidth(400);
         this.getStage().setScene(scene);
         this.getStage().initModality(Modality.APPLICATION_MODAL);
-        this.getStage().setResizable(true);
+        this.getStage().setResizable(false);
         return scene;
     }
 
@@ -190,6 +190,7 @@ public class ArchiveSecurityWindow extends BaseWindow
     {
         this.headerLabelValue.setText(this.archive.getDescriptor().getIdentifier().toUpperCase());
         this.centerPane.setCenter(getArchiveDescriptorNode());
+        this.getStage().sizeToScene();
     }
 
     private Node buildPlaintextDescriptorInfoPanel()

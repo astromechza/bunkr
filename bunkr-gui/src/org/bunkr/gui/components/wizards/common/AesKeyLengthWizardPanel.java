@@ -48,6 +48,7 @@ public class AesKeyLengthWizardPanel extends VBox
         keyLengths.getItems().add(256);
         keyLengths.getSelectionModel().select(0);
         Label label = new Label("AES Key Bits:");
+        label.setMaxHeight(Double.MAX_VALUE);
         label.setAlignment(Pos.CENTER_LEFT);
         this.getChildren().add(new HBox(10, label, keyLengths));
     }

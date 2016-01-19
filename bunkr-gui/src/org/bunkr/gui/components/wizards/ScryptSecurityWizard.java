@@ -22,6 +22,7 @@
 
 package org.bunkr.gui.components.wizards;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -71,11 +72,15 @@ public class ScryptSecurityWizard extends WizardWindow
     @SuppressWarnings("unchecked")
     private static class ScryptMemCostWizardPanel extends VBox
     {
+        private static final String DESCRIPTION_TEXT = "Scrypt gets it's strength from the memory required to " +
+                "process. Select a larger value for a larger memory requirement.";
         protected ComboBox<ComboBoxItem<Integer, String>> timeComboBox = new ComboBox<>();
         public ScryptMemCostWizardPanel()
         {
             this.setSpacing(10);
-
+            Label descriptionLabel = new Label(DESCRIPTION_TEXT);
+            descriptionLabel.setWrapText(true);
+            this.getChildren().add(descriptionLabel);
             int n = ScryptDescriptor.MINIMUM_SCRYPT_N;
             for (int i = 0; i < 8; i++)
             {
@@ -84,7 +89,10 @@ public class ScryptSecurityWizard extends WizardWindow
                 n <<= 1;
             }
             timeComboBox.getSelectionModel().select(0);
-            this.getChildren().add(new HBox(10, new Label("Scrypt Memory Usage:"), timeComboBox));
+            Label label = new Label("Scrypt Memory Usage:");
+            label.setMaxHeight(Double.MAX_VALUE);
+            label.setAlignment(Pos.CENTER_LEFT);
+            this.getChildren().add(new HBox(10, label, timeComboBox));
         }
     }
 

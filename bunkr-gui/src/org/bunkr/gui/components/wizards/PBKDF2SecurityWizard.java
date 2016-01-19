@@ -22,6 +22,7 @@
 
 package org.bunkr.gui.components.wizards;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -73,10 +74,16 @@ public class PBKDF2SecurityWizard extends WizardWindow
     @SuppressWarnings("unchecked")
     private static class IterationsWizardPanel extends VBox
     {
+        private static final String DESCRIPTION_TEXT = "PBKDF2 uses many rounds of SHA256 to calculate the final " +
+                "symmetric key. Pick the amount of time you'd like it to take to open the archive using your " +
+                "current hardware.";
         protected ComboBox<ComboBoxItem<Integer, String>> timeComboBox = new ComboBox<>();
         public IterationsWizardPanel()
         {
             this.setSpacing(10);
+            Label descriptionLabel = new Label(DESCRIPTION_TEXT);
+            descriptionLabel.setWrapText(true);
+            this.getChildren().add(descriptionLabel);
             timeComboBox.getItems().addAll(
                     new ComboBoxItem<>(100, "100ms"),
                     new ComboBoxItem<>(500, "0.5s"),
@@ -87,7 +94,10 @@ public class PBKDF2SecurityWizard extends WizardWindow
                     new ComboBoxItem<>(10000, "10s")
             );
             timeComboBox.getSelectionModel().select(2);
-            this.getChildren().add(new HBox(10, new Label("PBKDF2 Calculation Time:"), timeComboBox));
+            Label label = new Label("PBKDF2 Calculation Time:");
+            label.setMaxHeight(Double.MAX_VALUE);
+            label.setAlignment(Pos.CENTER_LEFT);
+            this.getChildren().add(new HBox(10, label, timeComboBox));
         }
     }
 

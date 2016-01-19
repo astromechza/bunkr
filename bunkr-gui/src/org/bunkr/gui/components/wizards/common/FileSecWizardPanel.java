@@ -22,6 +22,7 @@
 
 package org.bunkr.gui.components.wizards.common;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -47,7 +48,10 @@ public class FileSecWizardPanel extends VBox
         this.getChildren().add(descriptionLabel);
         fileSecurityChoices.getItems().add(Algorithms.Encryption.AES256_CTR);
         fileSecurityChoices.getSelectionModel().select(0);
-        this.getChildren().add(new HBox(10, new Label("File Security:"), fileSecurityChoices));
+        Label label = new Label("File Security:");
+        label.setMaxHeight(Double.MAX_VALUE);
+        label.setAlignment(Pos.CENTER_LEFT);
+        this.getChildren().add(new HBox(10, label, fileSecurityChoices));
     }
 
     public Algorithms.Encryption getSelectedValue()
