@@ -47,6 +47,7 @@ public class FileSecWizardPanel extends VBox
         descriptionLabel.setWrapText(true);
         this.getChildren().add(descriptionLabel);
         fileSecurityChoices.getItems().add(Algorithms.Encryption.AES256_CTR);
+        fileSecurityChoices.getItems().add(Algorithms.Encryption.TWOFISH256_CTR);
         fileSecurityChoices.getSelectionModel().select(0);
         Label label = new Label("File Security:");
         label.setMaxHeight(Double.MAX_VALUE);

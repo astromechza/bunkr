@@ -22,6 +22,7 @@
 
 package org.bunkr.core.streams.output;
 
+import org.bouncycastle.crypto.engines.TwofishEngine;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.BlockAllocationManager;
 import org.bunkr.core.inventory.Algorithms;
@@ -78,6 +79,25 @@ public class MultilayeredOutputStream extends OutputStream
             ParametersWithIV keyparams = new ParametersWithIV(new KeyParameter(ekey), eiv);
             fileCipher.init(true, keyparams);
             this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
+        }
+        else if (target.getEncryptionAlgorithm().equals(Algorithms.Encryption.TWOFISH256_CTR))
+        {
+            byte[] edata = target.getEncryptionData();
+            if (edata == null) edata = new byte[2 * 256 / 8];
+            RandomMaker.fill(edata);
+            target.setEncryptionData(edata);
+
+            byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
+            byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
+
+            SICBlockCipher fileCipher = new SICBlockCipher(new TwofishEngine());
+            ParametersWithIV keyparams = new ParametersWithIV(new KeyParameter(ekey), eiv);
+            fileCipher.init(true, keyparams);
+            this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
+        }
+        else
+        {
+            target.setEncryptionData(null);
         }
 
         this.topstream = new DeflaterOutputStream(this.topstream, new Deflater(Deflater.BEST_SPEED));

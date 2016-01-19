@@ -30,6 +30,7 @@ public class Algorithms
 {
     public enum Encryption {
         NONE,
-        AES256_CTR
+        AES256_CTR,
+        TWOFISH256_CTR
     }
 }

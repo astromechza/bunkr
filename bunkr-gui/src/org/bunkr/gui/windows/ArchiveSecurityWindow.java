@@ -93,6 +93,9 @@ public class ArchiveSecurityWindow extends BaseWindow
         rootLayout.setTop(new HBox(this.headerLabel, this.headerLabelValue));
 
         this.centerPane = new BorderPane();
+        this.centerPane.setPrefWidth(600);
+        this.centerPane.setMinWidth(400);
+        this.centerPane.setMinHeight(200);
         this.centerPane.setBottom(changeSecurityButton);
         BorderPane.setAlignment(changeSecurityButton, Pos.BOTTOM_RIGHT);
         rootLayout.setCenter(this.centerPane);
@@ -190,7 +193,6 @@ public class ArchiveSecurityWindow extends BaseWindow
     {
         this.headerLabelValue.setText(this.archive.getDescriptor().getIdentifier().toUpperCase());
         this.centerPane.setCenter(getArchiveDescriptorNode());
-        this.getStage().sizeToScene();
     }
 
     private Node buildPlaintextDescriptorInfoPanel()

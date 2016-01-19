@@ -22,6 +22,7 @@
 
 package org.bunkr.core.streams.input;
 
+import org.bouncycastle.crypto.engines.TwofishEngine;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.inventory.FileInventoryItem;
@@ -63,6 +64,16 @@ public class MultilayeredInputStream extends InputStream
                 byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
 
                 SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
+                fileCipher.init(false, new ParametersWithIV(new KeyParameter(ekey), eiv));
+                this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
+            }
+            else if (target.getEncryptionAlgorithm().equals(Algorithms.Encryption.TWOFISH256_CTR))
+            {
+                byte[] edata = target.getEncryptionData();
+                byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
+                byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
+
+                SICBlockCipher fileCipher = new SICBlockCipher(new TwofishEngine());
                 fileCipher.init(false, new ParametersWithIV(new KeyParameter(ekey), eiv));
                 this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
             }
