@@ -44,6 +44,12 @@ public class ScryptDescriptor implements IDescriptor
 {
     public static final String IDENTIFIER = "scrypt";
 
+    public static final int SALT_LENGTH = 128;
+    public static final int MINIMUM_AES_KEY_LENGTH = 256;
+    public static final int MINIMUM_SCRYPT_N = 2 << 13;
+    public static final int DEFAULT_SCRYPT_R = 8;
+    public static final int DEFAULT_SCRYPT_P = 1;
+
     public final int scryptN;
     public final byte[] scryptSalt;
     public final int scryptR;
@@ -151,6 +157,6 @@ public class ScryptDescriptor implements IDescriptor
 
     public static IDescriptor makeDefaults()
     {
-        return new ScryptDescriptor(256, 2 << 15, RandomMaker.get(128), 8, 1);
+        return new ScryptDescriptor(MINIMUM_AES_KEY_LENGTH, MINIMUM_SCRYPT_N, RandomMaker.get(SALT_LENGTH), DEFAULT_SCRYPT_R, DEFAULT_SCRYPT_P);
     }
 }

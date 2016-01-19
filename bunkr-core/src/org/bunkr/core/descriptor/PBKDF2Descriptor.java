@@ -23,6 +23,7 @@
 package org.bunkr.core.descriptor;
 
 import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
@@ -46,8 +47,9 @@ public class PBKDF2Descriptor implements IDescriptor
 {
     public static final String IDENTIFIER = "pbkdf2";
 
-    private static final int MINIMUM_AES_KEY_LENGTH = 256;
-    private static final int MINIMUM_PBKD2_ITERS = 4096;
+    public static final int MINIMUM_AES_KEY_LENGTH = 256;
+    public static final int MINIMUM_PBKD2_ITERS = 4096;
+    public static final int SALT_LENGTH = 128;
 
     public final int pbkdf2Iterations;
     public final int aesKeyLength;
@@ -69,7 +71,7 @@ public class PBKDF2Descriptor implements IDescriptor
     public PBKDF2Descriptor(JSONObject params)
     {
         aesKeyLength = ((Long) params.get("aeskeylength")).intValue();
-        pbkdf2Iterations = ((Long) params.get("iterations")).intValue();
+        pbkdf2Iterations = ((Long) params.get("timeComboBox")).intValue();
         pbkdf2Salt =  DatatypeConverter.parseBase64Binary((String) params.get("salt"));
 
         if (pbkdf2Iterations < MINIMUM_PBKD2_ITERS)
@@ -91,7 +93,7 @@ public class PBKDF2Descriptor implements IDescriptor
     {
         JSONObject out = new JSONObject();
         out.put("aeskeylength", this.aesKeyLength);
-        out.put("iterations", this.pbkdf2Iterations);
+        out.put("timeComboBox", this.pbkdf2Iterations);
         out.put("salt", DatatypeConverter.printBase64Binary(this.pbkdf2Salt));
         return out;
     }
@@ -101,7 +103,7 @@ public class PBKDF2Descriptor implements IDescriptor
     {
         try
         {
-            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
+            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA256Digest());
             g.init(usp.getHashedPassword(), this.pbkdf2Salt, this.pbkdf2Iterations);
             ParametersWithIV kp = ((ParametersWithIV) g.generateDerivedParameters(
                     this.aesKeyLength,
@@ -132,7 +134,7 @@ public class PBKDF2Descriptor implements IDescriptor
             // first refresh the salt
             RandomMaker.fill(this.pbkdf2Salt);
             
-            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator();
+            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA256Digest());
             g.init(usp.getHashedPassword(), this.pbkdf2Salt, this.pbkdf2Iterations);
             ParametersWithIV kp =
                     ((ParametersWithIV) g.generateDerivedParameters(this.aesKeyLength, this.aesKeyLength));
@@ -155,7 +157,7 @@ public class PBKDF2Descriptor implements IDescriptor
 
     public static IDescriptor makeDefaults()
     {
-        return new PBKDF2Descriptor(256, 10000, RandomMaker.get(128));
+        return new PBKDF2Descriptor(256, 10000, RandomMaker.get(SALT_LENGTH));
     }
 
 }

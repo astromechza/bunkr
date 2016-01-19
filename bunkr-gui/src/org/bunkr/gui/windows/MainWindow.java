@@ -114,7 +114,7 @@ public class MainWindow extends BaseWindow
             try
             {
                 ArchiveSecurityWindow popup = new ArchiveSecurityWindow(this.archive, this.securityProvider);
-                popup.setOnSaveDescriptorRequest(this::requestMetadataSave);
+                popup.setOnSaveMetadataRequest(this::requestMetadataSave);
                 popup.getStage().showAndWait();
             }
             catch (IOException e)

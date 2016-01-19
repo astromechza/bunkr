@@ -62,7 +62,7 @@ define PROJECT_NAME do
         package(:jar, id: 'bunkr-cli').with(manifest: {'Main-Class' => CLI_MAIN_CLASS})
         run.using main: CLI_MAIN_CLASS
 
-        build do
+        run do
             write_version_file_for_project('bunkr-cli')
         end
 
@@ -89,7 +89,7 @@ define PROJECT_NAME do
         package(:jar, id: 'bunkr-gui').with(manifest: {'Main-Class' => GUI_MAIN_CLASS})
         run.using main: [GUI_MAIN_CLASS, '--logging']
 
-        build do
+        run do
             write_version_file_for_project('bunkr-gui')
             write_resources_for_project('bunkr-gui')
         end
