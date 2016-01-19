@@ -38,8 +38,8 @@ import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.descriptor.ScryptDescriptor;
 import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.gui.components.wizards.PBKDF2SecurityWizard;
-import org.bunkr.gui.components.wizards.ScryptSecurityWizard;
+import org.bunkr.gui.wizards.PBKDF2SecurityWizard;
+import org.bunkr.gui.wizards.ScryptSecurityWizard;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;

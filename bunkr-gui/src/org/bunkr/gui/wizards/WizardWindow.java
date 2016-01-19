@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.bunkr.gui.components.wizards;
+package org.bunkr.gui.wizards;
 
 import javafx.geometry.Insets;
 import javafx.scene.Parent;

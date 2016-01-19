@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.bunkr.gui.components.wizards.common;
+package org.bunkr.gui.wizards.common;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;

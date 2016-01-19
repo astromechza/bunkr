@@ -20,76 +20,81 @@
  * SOFTWARE.
  */
 
-package org.bunkr.gui.components.wizards;
+package org.bunkr.gui.wizards;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.macs.HMac;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.descriptor.IDescriptor;
-import org.bunkr.core.descriptor.ScryptDescriptor;
+import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.core.utils.Formatters;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.components.ComboBoxItem;
-import org.bunkr.gui.components.wizards.common.AesKeyLengthWizardPanel;
-import org.bunkr.gui.components.wizards.common.FileSecWizardPanel;
-import org.bunkr.gui.components.wizards.common.PasswordWizardPanel;
+import org.bunkr.gui.wizards.common.AesKeyLengthWizardPanel;
+import org.bunkr.gui.wizards.common.FileSecWizardPanel;
+import org.bunkr.gui.wizards.common.PasswordWizardPanel;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
 
 /**
  * Creator: benmeier
- * Created At: 2016-01-19
+ * Created At: 2016-01-18
  */
-public class ScryptSecurityWizard extends WizardWindow
+public class PBKDF2SecurityWizard extends WizardWindow
 {
     private final ArchiveInfoContext archive;
     private final UserSecurityProvider securityProvider;
     private final AesKeyLengthWizardPanel aesklpanel;
-    private final ScryptMemCostWizardPanel memusepanel;
+    private final IterationsWizardPanel pbkditerpanel;
     private final PasswordWizardPanel pwdpanel;
     private final FileSecWizardPanel filesecpanel;
 
-    public ScryptSecurityWizard(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
+    public PBKDF2SecurityWizard(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
     {
-        super("Configure Scrypt Security");
+        super("Configure PBKDF2 Security");
         this.archive = archive;
         this.securityProvider = securityProvider;
         this.aesklpanel = new AesKeyLengthWizardPanel();
-        this.memusepanel = new ScryptMemCostWizardPanel();
+        this.pbkditerpanel = new IterationsWizardPanel();
         this.pwdpanel = new PasswordWizardPanel();
         this.filesecpanel = new FileSecWizardPanel();
-        this.setPages(aesklpanel, memusepanel, pwdpanel, filesecpanel);
+        this.setPages(aesklpanel, pbkditerpanel, pwdpanel, filesecpanel);
         this.gotoPage(0);
     }
 
     @SuppressWarnings("unchecked")
-    private static class ScryptMemCostWizardPanel extends VBox
+    private static class IterationsWizardPanel extends VBox
     {
-        private static final String DESCRIPTION_TEXT = "Scrypt gets it's strength from the memory required to " +
-                "process. Select a larger value for a larger memory requirement.";
+        private static final String DESCRIPTION_TEXT = "PBKDF2 uses many rounds of SHA256 to calculate the final " +
+                "symmetric key. Pick the amount of time you'd like it to take to open the archive using your " +
+                "current hardware.";
         protected ComboBox<ComboBoxItem<Integer, String>> timeComboBox = new ComboBox<>();
-        public ScryptMemCostWizardPanel()
+        public IterationsWizardPanel()
         {
             this.setSpacing(10);
             Label descriptionLabel = new Label(DESCRIPTION_TEXT);
             descriptionLabel.setWrapText(true);
             this.getChildren().add(descriptionLabel);
-            int n = ScryptDescriptor.MINIMUM_SCRYPT_N;
-            for (int i = 0; i < 8; i++)
-            {
-                long memusage = (128L * (long) ScryptDescriptor.DEFAULT_SCRYPT_R * n) + (128L * (long) ScryptDescriptor.DEFAULT_SCRYPT_R * (long) ScryptDescriptor.DEFAULT_SCRYPT_P);
-                timeComboBox.getItems().add(new ComboBoxItem<>(n, Formatters.formatBytes(memusage) + "B"));
-                n <<= 1;
-            }
-            timeComboBox.getSelectionModel().select(0);
-            Label label = new Label("Scrypt Memory Usage:");
+            timeComboBox.getItems().addAll(
+                    new ComboBoxItem<>(100, "100ms"),
+                    new ComboBoxItem<>(500, "0.5s"),
+                    new ComboBoxItem<>(1000, "1s"),
+                    new ComboBoxItem<>(2000, "2s"),
+                    new ComboBoxItem<>(3000, "3s"),
+                    new ComboBoxItem<>(5000, "5s"),
+                    new ComboBoxItem<>(10000, "10s")
+            );
+            timeComboBox.getSelectionModel().select(2);
+            Label label = new Label("PBKDF2 Calculation Time:");
             label.setMaxHeight(Double.MAX_VALUE);
             label.setAlignment(Pos.CENTER_LEFT);
             this.getChildren().add(new HBox(10, label, timeComboBox));
@@ -113,18 +118,31 @@ public class ScryptSecurityWizard extends WizardWindow
             return false;
         }
 
-        // now the scrypt memusage
-        int scryptN = memusepanel.timeComboBox.getValue().valueValue;
-        scryptN = Math.max(scryptN, ScryptDescriptor.MINIMUM_SCRYPT_N);
+        // now the pbkdf2 iterations
+        int selectedTime = pbkditerpanel.timeComboBox.getSelectionModel().getSelectedItem().valueValue;
+
+        Logging.info("Calculating how many SHA256 rounds we can do in %d millis.", selectedTime);
+        HMac mac = new HMac(new SHA256Digest());
+        byte[] state = new byte[mac.getMacSize()];
+        long startTime = System.currentTimeMillis();
+        int pbkdf2Iterations = 0;
+        while((System.currentTimeMillis() - startTime) < selectedTime)
+        {
+            mac.update(state, 0, state.length);
+            mac.doFinal(state, 0);
+            pbkdf2Iterations++;
+        }
+        pbkdf2Iterations = Math.max(pbkdf2Iterations, PBKDF2Descriptor.MINIMUM_PBKD2_ITERS);
+        Logging.info("Got %d", pbkdf2Iterations);
 
         // now the aes key length
         int aeskeylength = aesklpanel.getSelectedKeyLength();
-        aeskeylength = Math.max(aeskeylength, ScryptDescriptor.MINIMUM_AES_KEY_LENGTH);
+        aeskeylength = Math.max(aeskeylength, PBKDF2Descriptor.MINIMUM_AES_KEY_LENGTH);
 
         try
         {
             // create new Descriptor
-            IDescriptor newDescriptor = new ScryptDescriptor(aeskeylength, scryptN, new byte[ScryptDescriptor.SALT_LENGTH], ScryptDescriptor.DEFAULT_SCRYPT_R, ScryptDescriptor.DEFAULT_SCRYPT_P);
+            IDescriptor newDescriptor = new PBKDF2Descriptor(aeskeylength, pbkdf2Iterations, new byte[PBKDF2Descriptor.SALT_LENGTH]);
 
             // create new security
             securityProvider.getProvider().setArchivePassword(pwdpanel.getPasswordValue().getBytes());
