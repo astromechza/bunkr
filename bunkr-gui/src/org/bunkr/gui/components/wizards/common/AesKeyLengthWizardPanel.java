@@ -36,16 +36,19 @@ public class AesKeyLengthWizardPanel extends VBox
 {
     public final ComboBox<Integer> keyLengths = new ComboBox<>();
 
+    private static final String DESCRIPTION_TEXT = "The AES Strength used for the symmetric encryption that will " +
+            "protect the archive inventory. At this moment in time, only 256 bit AES is allowed.";
+
     public AesKeyLengthWizardPanel()
     {
         this.setSpacing(10);
-        keyLengths.getItems().add(256);
-        keyLengths.getSelectionModel().select(0);
-        Label label = new Label("AES Key Length:");
-        label.setAlignment(Pos.CENTER_LEFT);
-        Label description = new Label("The AES Strength used for the symmetric encryption that will protect the archive.");
+        Label description = new Label(DESCRIPTION_TEXT);
         description.setWrapText(true);
         this.getChildren().add(description);
+        keyLengths.getItems().add(256);
+        keyLengths.getSelectionModel().select(0);
+        Label label = new Label("AES Key Bits:");
+        label.setAlignment(Pos.CENTER_LEFT);
         this.getChildren().add(new HBox(10, label, keyLengths));
     }
 

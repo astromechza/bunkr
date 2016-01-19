@@ -83,8 +83,9 @@ public class WizardWindow extends BaseWindow
         rootPane.setPadding(new Insets(10));
         rootPane.setTop(pageLabel);
         this.centerPanel = new BorderPane();
+        this.centerPanel.setPrefWidth(600);
         this.centerPanel.setMinWidth(400);
-        this.centerPanel.setMinHeight(30);
+        this.centerPanel.setMinHeight(200);
         rootPane.setCenter(this.centerPanel);
         BorderPane.setMargin(this.centerPanel, new Insets(10, 0, 10, 0));
         rootPane.setBottom(

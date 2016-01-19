@@ -41,6 +41,8 @@ public class PasswordWizardPanel extends VBox
     private static final String PW_NOTE_CLASS_OK = "pw-note-success";
     private static final String PW_NOTE_CLASS_NOT_OK = "pw-note-failure";
 
+    private static final String DESCRIPTION_TEXT = "Pick a new password to protect this archive.";
+
     protected final PasswordField passwordBox = new PasswordField();
     protected final PasswordField passwordConfirmBox = new PasswordField();
     private final Label passwordNote = new Label("");
@@ -53,7 +55,9 @@ public class PasswordWizardPanel extends VBox
         this.passwordConfirmBox.setMaxWidth(Double.MAX_VALUE);
         this.passwordConfirmBox.setDisable(true);
         this.passwordNote.setId("pw-note-field");
-        this.getChildren().addAll(passwordBox, passwordConfirmBox, passwordNote);
+        Label descriptionLabel = new Label(DESCRIPTION_TEXT);
+        descriptionLabel.setWrapText(true);
+        this.getChildren().addAll(descriptionLabel, passwordBox, passwordConfirmBox, passwordNote);
         this.setSpacing(10);
         this.setMaxWidth(Double.MAX_VALUE);
 

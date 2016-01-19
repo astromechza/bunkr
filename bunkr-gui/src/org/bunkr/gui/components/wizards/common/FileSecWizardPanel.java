@@ -36,9 +36,15 @@ public class FileSecWizardPanel extends VBox
 {
     protected final ComboBox<Algorithms.Encryption> fileSecurityChoices = new ComboBox<>();
 
+    private static final String DESCRIPTION_TEXT = "The file security algorithm is the algorithm used to encrypt the " +
+            "actual contents of the files stored in this archive.";
+
     public FileSecWizardPanel()
     {
         this.setSpacing(10);
+        Label descriptionLabel = new Label(DESCRIPTION_TEXT);
+        descriptionLabel.setWrapText(true);
+        this.getChildren().add(descriptionLabel);
         fileSecurityChoices.getItems().add(Algorithms.Encryption.AES256_CTR);
         fileSecurityChoices.getSelectionModel().select(0);
         this.getChildren().add(new HBox(10, new Label("File Security:"), fileSecurityChoices));
