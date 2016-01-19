@@ -74,6 +74,8 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     private Mode currentMode = null;
 
     // contents
+    // Plain text content is a cache of the content held by the archive, it should only change its value when it has
+    // been persisted to the archive.
     private String plainTextContent = null;
     private boolean hasChanges = true;
 
@@ -204,7 +206,6 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         // first make sure we can get the absolute path
         if (this.subject.getParent() == null) throw new RuntimeException("Orphaned file tab found");
 
-        // TODO, this part should be done on a separate thread
         StringBuilder content = new StringBuilder();
         try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, this.subject))
         {
@@ -222,9 +223,9 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
             QuickDialogs.exception(e);
             return;
         }
-        // TODO, then return to the UI thread. on failure - show error and close the tab. on success, set the content
 
         this.plainTextContent = content.toString();
+        this.editorArea.setText(this.plainTextContent);
         this.hasChanges = false;
         this.saveButton.setDisable(true);
         this.getStyleClass().remove("has-changes");
@@ -243,7 +244,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         this.currentMode = Mode.EDITTING;
         this.switchModeButton.setText("View");
         this.switchModeButton.setGraphic(Icons.buildIconLabel(Icons.ICON_VIEW));
-        this.editorArea.setText((this.plainTextContent == null) ? "" : this.plainTextContent);
+        if (! this.hasChanges && this.plainTextContent != null) this.editorArea.setText(this.plainTextContent);
         if (this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().remove(this.formattedView);
         if (!this.layout.getChildren().contains(this.editorArea)) this.layout.getChildren().add(this.editorArea);
     }
