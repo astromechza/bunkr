@@ -32,6 +32,8 @@ import java.io.InputStreamReader;
  */
 public final class Version
 {
+    public static final int BYTE = 256;
+
     public static final String versionString;
     public static final byte versionMajor;
     public static final byte versionMinor;
@@ -86,9 +88,9 @@ public final class Version
      */
     public static boolean isCompatible(byte major, byte minor, byte bugfix, boolean strict)
     {
-        int currentVersion = (versionMajor * 256 + versionMinor) * 256 + versionBugfix;
-        int inputVersion = (major * 256 + minor) * 256 + bugfix;
-        int earliestVersion = (compatibleVersionMajor * 256 + compatibleVersionMinor) * 256 + compatibleVersionBugfix;
+        int currentVersion = (versionMajor * BYTE + versionMinor) * BYTE + versionBugfix;
+        int inputVersion = (major * BYTE + minor) * BYTE + bugfix;
+        int earliestVersion = (compatibleVersionMajor * BYTE + compatibleVersionMinor) * BYTE + compatibleVersionBugfix;
         return inputVersion >= earliestVersion && !(strict && inputVersion > currentVersion);
     }
 

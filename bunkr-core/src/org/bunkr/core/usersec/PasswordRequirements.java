@@ -33,6 +33,8 @@ import javax.xml.bind.DatatypeConverter;
 public class PasswordRequirements
 {
     public static final int MINIMUM_PASSWORD_LENGTH = 8;
+    public static final int CHAR_SPACE = 0x20;
+    public static final int CHAR_TILDE = 0x7E;
 
     public static void checkPasses(byte[] input) throws IllegalPasswordException
     {
@@ -43,11 +45,11 @@ public class PasswordRequirements
 
         for (byte b : input)
         {
-            if (b < (byte) 0x20) throw new IllegalPasswordException(
+            if (b < (byte) CHAR_SPACE) throw new IllegalPasswordException(
                     "Password cannot contain byte %s",
                     DatatypeConverter.printByte(b)
             );
-            if (b > (byte) 0x7E) throw new IllegalPasswordException(
+            if (b > (byte) CHAR_TILDE) throw new IllegalPasswordException(
                     "Password cannot contain byte %s",
                     DatatypeConverter.printByte(b)
             );

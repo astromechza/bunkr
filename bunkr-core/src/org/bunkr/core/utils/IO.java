@@ -28,6 +28,7 @@ import java.io.InputStream;
 
 public class IO
 {
+    private static final int MAX_STRING_LENGTH = 0xFFFFFF;
 
     public static byte[] readNBytes(InputStream dis, int n) throws IOException
     {
@@ -39,7 +40,7 @@ public class IO
 
     public static String readNByteString(InputStream dis, int n) throws IOException
     {
-        assert n < 0xFFFFFF;
+        assert n < MAX_STRING_LENGTH;
         byte[] buffer = new byte[n];
         int r = dis.read(buffer);
         return new String(buffer).substring(0, r);

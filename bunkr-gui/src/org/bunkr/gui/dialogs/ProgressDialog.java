@@ -63,7 +63,6 @@ public class ProgressDialog extends Dialog<Void>
 
         createControls();
         createLayout();
-        setStyle();
         bindEvents();
     }
 
@@ -91,10 +90,6 @@ public class ProgressDialog extends Dialog<Void>
         vbox.setMaxHeight(Double.MAX_VALUE);
         VBox.setVgrow(buttonBox, Priority.ALWAYS);
         getDialogPane().setContent(vbox);
-    }
-
-    private void setStyle()
-    {
     }
 
     private void bindEvents()
@@ -126,7 +121,7 @@ public class ProgressDialog extends Dialog<Void>
             getChildren().add(progressBar);
         }
 
-        private ChangeListener<Worker.State> stateListener = (observable, old, value) ->
+        private final ChangeListener<Worker.State> stateListener = (observable, old, value) ->
         {
             switch(value)
             {

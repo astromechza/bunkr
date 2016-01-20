@@ -74,7 +74,7 @@ public class ScryptSecurityWizard extends WizardWindow
     {
         private static final String DESCRIPTION_TEXT = "Scrypt gets it's strength from the memory required to " +
                 "process. Select a larger value for a larger memory requirement.";
-        protected ComboBox<DisplayValuePair<Integer, String>> timeComboBox = new ComboBox<>();
+        protected final ComboBox<DisplayValuePair<Integer, String>> timeComboBox = new ComboBox<>();
         public ScryptMemCostWizardPanel()
         {
             this.setSpacing(10);

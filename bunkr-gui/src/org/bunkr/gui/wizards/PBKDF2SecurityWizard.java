@@ -27,8 +27,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.macs.HMac;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.descriptor.IDescriptor;
@@ -36,7 +34,6 @@ import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.core.utils.Logging;
 import org.bunkr.core.utils.DisplayValuePair;
 import org.bunkr.gui.wizards.common.FileSecWizardPanel;
 import org.bunkr.gui.wizards.common.InventorySecWizardPanel;
@@ -77,7 +74,7 @@ public class PBKDF2SecurityWizard extends WizardWindow
         private static final String DESCRIPTION_TEXT = "PBKDF2 uses many rounds of SHA256 to calculate the final " +
                 "symmetric key. Pick the amount of time you'd like it to take to open the archive using your " +
                 "current hardware.";
-        protected ComboBox<DisplayValuePair<Integer, String>> timeComboBox = new ComboBox<>();
+        protected final ComboBox<DisplayValuePair<Integer, String>> timeComboBox = new ComboBox<>();
         public IterationsWizardPanel()
         {
             this.setSpacing(10);

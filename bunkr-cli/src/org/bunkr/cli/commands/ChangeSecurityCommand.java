@@ -23,7 +23,6 @@
 package org.bunkr.cli.commands;
 
 import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.ArgumentChoice;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
@@ -37,9 +36,7 @@ import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Formatters;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  * Creator: benmeier
@@ -54,8 +51,8 @@ public class ChangeSecurityCommand implements ICLICommand
     public static final String ARG_ITERATIONS_TIME = "pbkdf2iterationstime";
     public static final String ARG_MEMORY_USAGE = "scryptmemoryusage";
 
-    private LinkedHashMap<String, Integer> pbkdf2IterTimeChoices;
-    private LinkedHashMap<String, Integer> scryptNChoices;
+    private final LinkedHashMap<String, Integer> pbkdf2IterTimeChoices;
+    private final LinkedHashMap<String, Integer> scryptNChoices;
 
     public ChangeSecurityCommand()
     {
