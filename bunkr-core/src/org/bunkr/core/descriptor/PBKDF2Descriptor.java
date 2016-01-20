@@ -24,6 +24,7 @@ package org.bunkr.core.descriptor;
 
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -106,7 +107,7 @@ public class PBKDF2Descriptor implements IDescriptor
             if (this.encryptionAlgorithm == Algorithms.Encryption.NONE)
                 throw new IllegalArgumentException("PBKDF2Descriptor requires an active encryption mode");
 
-            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA1Digest());
+            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA256Digest());
             g.init(usp.getHashedPassword(), this.pbkdf2Salt, this.pbkdf2Iterations);
             ParametersWithIV kp = (ParametersWithIV) g.generateDerivedParameters(
                     this.encryptionAlgorithm.keyByteLength * 8,
@@ -140,7 +141,7 @@ public class PBKDF2Descriptor implements IDescriptor
             // first refresh the salt
             RandomMaker.fill(this.pbkdf2Salt);
 
-            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA1Digest());
+            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA256Digest());
             g.init(usp.getHashedPassword(), this.pbkdf2Salt, this.pbkdf2Iterations);
             ParametersWithIV kp = (ParametersWithIV) g.generateDerivedParameters(
                     this.encryptionAlgorithm.keyByteLength * 8,
@@ -176,7 +177,7 @@ public class PBKDF2Descriptor implements IDescriptor
     public static int calculateRounds(int milliseconds)
     {
         Logging.info("Calculating how many SHA1 rounds we can do in %d millis.", milliseconds);
-        HMac mac = new HMac(new SHA1Digest());
+        HMac mac = new HMac(new SHA256Digest());
         byte[] state = new byte[mac.getMacSize()];
         long startTime = System.currentTimeMillis();
         int pbkdf2Iterations = 0;
