@@ -26,6 +26,7 @@ import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.generators.SCrypt;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.inventory.InventoryJSON;
 import org.bunkr.core.usersec.UserSecurityProvider;
@@ -45,20 +46,19 @@ public class ScryptDescriptor implements IDescriptor
     public static final String IDENTIFIER = "scrypt";
 
     public static final int SALT_LENGTH = 128;
-    public static final int MINIMUM_AES_KEY_LENGTH = 256;
     public static final int MINIMUM_SCRYPT_N = 2 << 13;
     public static final int DEFAULT_SCRYPT_R = 8;
     public static final int DEFAULT_SCRYPT_P = 1;
 
+    public final Algorithms.Encryption encryptionAlgorithm;
     public final int scryptN;
     public final byte[] scryptSalt;
     public final int scryptR;
     public final int scryptP;
-    public final int keyLength;
 
-    public ScryptDescriptor(int keyLength, int scryptN, byte[] scryptSalt, int scryptR, int scryptP)
+    public ScryptDescriptor(Algorithms.Encryption encryptionAlgorithm, int scryptN, byte[] scryptSalt, int scryptR, int scryptP)
     {
-        this.keyLength = keyLength;
+        this.encryptionAlgorithm = encryptionAlgorithm;
         this.scryptN = scryptN;
         this.scryptSalt = scryptSalt;
         this.scryptR = scryptR;
@@ -67,7 +67,7 @@ public class ScryptDescriptor implements IDescriptor
 
     public ScryptDescriptor(JSONObject o)
     {
-        this.keyLength = ((Long) o.get("keyLength")).intValue();
+        this.encryptionAlgorithm = Algorithms.Encryption.valueOf((String) o.get("encryptionAlgorithm"));
         this.scryptSalt =  DatatypeConverter.parseBase64Binary((String) o.get("scryptSalt"));
         this.scryptN = ((Long) o.get("scryptN")).intValue();
         this.scryptR = ((Long) o.get("scryptR")).intValue();
@@ -85,7 +85,7 @@ public class ScryptDescriptor implements IDescriptor
     public JSONObject getParams()
     {
         JSONObject out = new JSONObject();
-        out.put("keyLength", this.keyLength);
+        out.put("encryptionAlgorithm", this.encryptionAlgorithm.toString());
         out.put("scryptSalt", DatatypeConverter.printBase64Binary(this.scryptSalt));
         out.put("scryptN", this.scryptN);
         out.put("scryptR", this.scryptR);
@@ -102,14 +102,14 @@ public class ScryptDescriptor implements IDescriptor
             byte[] data = SCrypt.generate(
                     usp.getHashedPassword(),
                     this.scryptSalt, this.scryptN, this.scryptR, this.scryptP,
-                    this.keyLength / 8 + 16
+                    this.encryptionAlgorithm.keyByteLength + this.encryptionAlgorithm.ivByteLength
             );
 
             // pull key and iv out of the data
-            byte[] key = Arrays.copyOfRange(data, 0, this.keyLength / 8);
-            byte[] iv = Arrays.copyOfRange(data, this.keyLength / 8, data.length);
+            byte[] key = Arrays.copyOfRange(data, 0, this.encryptionAlgorithm.keyByteLength);
+            byte[] iv = Arrays.copyOfRange(data, this.encryptionAlgorithm.keyByteLength, data.length);
 
-            byte[] decryptedInv = SimpleAES.decrypt(source, key, iv);
+            byte[] decryptedInv = SimpleAES.decrypt(this.encryptionAlgorithm, source, key, iv);
             Arrays.fill(data, (byte) 0);
             Arrays.fill(key, (byte) 0);
             Arrays.fill(iv, (byte) 0);
@@ -131,18 +131,21 @@ public class ScryptDescriptor implements IDescriptor
             // first refresh the salt
             RandomMaker.fill(this.scryptSalt);
 
+            if (this.encryptionAlgorithm == Algorithms.Encryption.NONE)
+                throw new IllegalArgumentException("ScryptDescriptor requires an active encryption mode");
+
             // generate the encryption key and iv using scrypt
             byte[] data = SCrypt.generate(
                     usp.getHashedPassword(),
                     this.scryptSalt, this.scryptN, this.scryptR, this.scryptP,
-                    this.keyLength / 8 + 16
+                    this.encryptionAlgorithm.keyByteLength + this.encryptionAlgorithm.ivByteLength
             );
 
             // pull key and iv out of the data
-            byte[] key = Arrays.copyOfRange(data, 0, this.keyLength / 8);
-            byte[] iv = Arrays.copyOfRange(data, this.keyLength / 8, data.length);
+            byte[] key = Arrays.copyOfRange(data, 0, this.encryptionAlgorithm.keyByteLength);
+            byte[] iv = Arrays.copyOfRange(data, this.encryptionAlgorithm.keyByteLength, data.length);
 
-            byte[] encryptedInv = SimpleAES.encrypt(inventoryJsonBytes, key, iv);
+            byte[] encryptedInv = SimpleAES.encrypt(this.encryptionAlgorithm, inventoryJsonBytes, key, iv);
             Arrays.fill(inventoryJsonBytes, (byte) 0);
             Arrays.fill(data, (byte) 0);
             Arrays.fill(key, (byte) 0);
@@ -157,6 +160,6 @@ public class ScryptDescriptor implements IDescriptor
 
     public static IDescriptor makeDefaults()
     {
-        return new ScryptDescriptor(MINIMUM_AES_KEY_LENGTH, MINIMUM_SCRYPT_N, RandomMaker.get(SALT_LENGTH), DEFAULT_SCRYPT_R, DEFAULT_SCRYPT_P);
+        return new ScryptDescriptor(Algorithms.Encryption.AES256_CTR, MINIMUM_SCRYPT_N, RandomMaker.get(SALT_LENGTH), DEFAULT_SCRYPT_R, DEFAULT_SCRYPT_P);
     }
 }

@@ -22,20 +22,15 @@
 
 package org.bunkr.core.streams.input;
 
-import org.bouncycastle.crypto.engines.TwofishEngine;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.crypto.CipherBuilder;
 import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
-import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.io.CipherInputStream;
-import org.bouncycastle.crypto.modes.SICBlockCipher;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.zip.InflaterInputStream;
 
 /**
@@ -57,25 +52,11 @@ public class MultilayeredInputStream extends InputStream
             this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
             this.topstream = this.baseStream;
 
-            if (target.getEncryptionAlgorithm().equals(Algorithms.Encryption.AES256_CTR))
+            if (! target.getEncryptionAlgorithm().equals(Algorithms.Encryption.NONE))
             {
-                byte[] edata = target.getEncryptionData();
-                byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
-                byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
-
-                SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
-                fileCipher.init(false, new ParametersWithIV(new KeyParameter(ekey), eiv));
-                this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
-            }
-            else if (target.getEncryptionAlgorithm().equals(Algorithms.Encryption.TWOFISH256_CTR))
-            {
-                byte[] edata = target.getEncryptionData();
-                byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
-                byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
-
-                SICBlockCipher fileCipher = new SICBlockCipher(new TwofishEngine());
-                fileCipher.init(false, new ParametersWithIV(new KeyParameter(ekey), eiv));
-                this.topstream = new CipherInputStream(this.topstream, new BufferedBlockCipher(fileCipher));
+                this.topstream = new CipherInputStream(
+                        this.topstream, new BufferedBlockCipher(CipherBuilder.buildCipherForFile(target, false))
+                );
             }
 
             this.topstream = new InflaterInputStream(this.topstream);

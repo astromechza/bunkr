@@ -23,12 +23,12 @@
 package org.bunkr.core.utils;
 
 import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.paddings.PKCS7Padding;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bunkr.core.crypto.CipherBuilder;
+import org.bunkr.core.inventory.Algorithms;
 
 import java.util.Arrays;
 
@@ -38,11 +38,11 @@ import java.util.Arrays;
  */
 public class SimpleAES
 {
-    private static byte[] runAES(boolean doEncrypt, byte[] subject, byte[] key, byte[] iv) throws CryptoException
+    private static byte[] runAES(Algorithms.Encryption encryptionAlgorithm, boolean doEncrypt, byte[] subject, byte[] key, byte[] iv) throws CryptoException
     {
         // set up padded buffered cipher
         PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(
-                new SICBlockCipher(new AESEngine()), new PKCS7Padding()
+                CipherBuilder.buildCipher(encryptionAlgorithm, doEncrypt, key, iv), new PKCS7Padding()
         );
 
         // init with key and if
@@ -59,14 +59,14 @@ public class SimpleAES
         return output;
     }
 
-    public static byte[] encrypt(byte[] input, byte[] key, byte[] iv) throws CryptoException
+    public static byte[] encrypt(Algorithms.Encryption encryptionAlgorithm, byte[] input, byte[] key, byte[] iv) throws CryptoException
     {
-        return runAES(true, input, key, iv);
+        return runAES(encryptionAlgorithm, true, input, key, iv);
     }
 
-    public static byte[] decrypt(byte[] input, byte[] key, byte[] iv) throws CryptoException
+    public static byte[] decrypt(Algorithms.Encryption encryptionAlgorithm, byte[] input, byte[] key, byte[] iv) throws CryptoException
     {
-        byte[] withPadding = runAES(false, input, key, iv);
+        byte[] withPadding = runAES(encryptionAlgorithm, false, input, key, iv);
         int trueLength = input.length;
         while(trueLength > 0 && withPadding[trueLength - 1] == 0x0) trueLength--;
         byte[] nonPadded = new byte[trueLength];

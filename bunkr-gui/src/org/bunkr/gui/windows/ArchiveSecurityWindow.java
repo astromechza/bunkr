@@ -212,10 +212,11 @@ public class ArchiveSecurityWindow extends BaseWindow
 
         PBKDF2Descriptor descriptor = (PBKDF2Descriptor) archive.getDescriptor();
 
-        gp.add(new Label("AES Strength:"), 0, 0); gp.add(new Label(String.format("%d bits", descriptor.aesKeyLength)), 1, 0);
-        gp.add(new Label("PBKDF2 Iterations:"), 0, 1); gp.add(new Label(String.format("%d", descriptor.pbkdf2Iterations)), 1, 1);
-        gp.add(new Label("PBKDF2 Salt Length:"), 0, 2); gp.add(new Label(String.format("%d bytes", descriptor.pbkdf2Salt.length)), 1, 2);
-        gp.add(new Label("File Encryption:"), 0, 3); gp.add(new Label(archive.getInventory().getDefaultEncryption().toString()), 1, 3);
+        int rowid = 0;
+        gp.add(new Label("PBKDF2 Iterations:"), 0, rowid); gp.add(new Label(String.format("%d", descriptor.pbkdf2Iterations)), 1, rowid++);
+        gp.add(new Label("PBKDF2 Salt Length:"), 0, rowid); gp.add(new Label(String.format("%d bytes", descriptor.pbkdf2Salt.length)), 1, rowid++);
+        gp.add(new Label("Inventory Encryption:"), 0, rowid); gp.add(new Label(String.format("%s", descriptor.encryptionAlgorithm)), 1, rowid++);
+        gp.add(new Label("File Encryption:"), 0, rowid); gp.add(new Label(archive.getInventory().getDefaultEncryption().toString()), 1, rowid);
 
         return gp;
     }
@@ -230,12 +231,13 @@ public class ArchiveSecurityWindow extends BaseWindow
 
         ScryptDescriptor descriptor = (ScryptDescriptor) archive.getDescriptor();
 
-        gp.add(new Label("AES Strength:"), 0, 0); gp.add(new Label(String.format("%d bits", descriptor.keyLength)), 1, 0);
-        gp.add(new Label("Scrypt Cost:"), 0, 1); gp.add(new Label(String.format("%d", descriptor.scryptN)), 1, 1);
-        gp.add(new Label("Scrypt Parallelization:"), 0, 2); gp.add(new Label(String.format("%d", descriptor.scryptP)), 1, 2);
-        gp.add(new Label("Scrypt Block Size:"), 0, 3); gp.add(new Label(String.format("%d", descriptor.scryptR)), 1, 3);
-        gp.add(new Label("Scrypt Salt Length:"), 0, 4); gp.add(new Label(String.format("%d bytes", descriptor.scryptSalt.length)), 1, 4);
-        gp.add(new Label("File Encryption:"), 0, 5); gp.add(new Label(archive.getInventory().getDefaultEncryption().toString()), 1, 5);
+        int rowid = 0;
+        gp.add(new Label("Scrypt Cost:"), 0, rowid); gp.add(new Label(String.format("%d", descriptor.scryptN)), 1, rowid++);
+        gp.add(new Label("Scrypt Parallelization:"), 0, rowid); gp.add(new Label(String.format("%d", descriptor.scryptP)), 1, rowid++);
+        gp.add(new Label("Scrypt Block Size:"), 0, rowid); gp.add(new Label(String.format("%d", descriptor.scryptR)), 1, rowid++);
+        gp.add(new Label("Scrypt Salt Length:"), 0, rowid); gp.add(new Label(String.format("%d bytes", descriptor.scryptSalt.length)), 1, rowid++);
+        gp.add(new Label("Inventory Encryption:"), 0, rowid); gp.add(new Label(String.format("%s", descriptor.encryptionAlgorithm)), 1, rowid++);
+        gp.add(new Label("File Encryption:"), 0, rowid); gp.add(new Label(archive.getInventory().getDefaultEncryption().toString()), 1, rowid);
 
         return gp;
     }

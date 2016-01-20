@@ -22,23 +22,17 @@
 
 package org.bunkr.core.streams.output;
 
-import org.bouncycastle.crypto.engines.TwofishEngine;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.BlockAllocationManager;
+import org.bunkr.core.crypto.CipherBuilder;
 import org.bunkr.core.inventory.Algorithms;
-import org.bunkr.core.utils.RandomMaker;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
-import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.io.CipherOutputStream;
-import org.bouncycastle.crypto.modes.SICBlockCipher;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -65,35 +59,11 @@ public class MultilayeredOutputStream extends OutputStream
 
         target.setEncryptionAlgorithm(context.getInventory().getDefaultEncryption());
 
-        if (target.getEncryptionAlgorithm().equals(Algorithms.Encryption.AES256_CTR))
+        if (! target.getEncryptionAlgorithm().equals(Algorithms.Encryption.NONE))
         {
-            byte[] edata = target.getEncryptionData();
-            if (edata == null) edata = new byte[2 * 256 / 8];
-            RandomMaker.fill(edata);
-            target.setEncryptionData(edata);
-
-            byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
-            byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
-
-            SICBlockCipher fileCipher = new SICBlockCipher(new AESEngine());
-            ParametersWithIV keyparams = new ParametersWithIV(new KeyParameter(ekey), eiv);
-            fileCipher.init(true, keyparams);
-            this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
-        }
-        else if (target.getEncryptionAlgorithm().equals(Algorithms.Encryption.TWOFISH256_CTR))
-        {
-            byte[] edata = target.getEncryptionData();
-            if (edata == null) edata = new byte[2 * 256 / 8];
-            RandomMaker.fill(edata);
-            target.setEncryptionData(edata);
-
-            byte[] ekey = Arrays.copyOfRange(edata, 0, edata.length / 2);
-            byte[] eiv = Arrays.copyOfRange(edata, edata.length / 2, edata.length);
-
-            SICBlockCipher fileCipher = new SICBlockCipher(new TwofishEngine());
-            ParametersWithIV keyparams = new ParametersWithIV(new KeyParameter(ekey), eiv);
-            fileCipher.init(true, keyparams);
-            this.topstream = new CipherOutputStream(this.topstream, new BufferedBlockCipher(fileCipher));
+            this.topstream = new CipherOutputStream(
+                    this.topstream, new BufferedBlockCipher(CipherBuilder.buildCipherForFile(target, true))
+            );
         }
         else
         {

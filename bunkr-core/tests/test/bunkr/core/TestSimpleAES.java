@@ -22,6 +22,7 @@
 
 package test.bunkr.core;
 
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.utils.RandomMaker;
 import org.bunkr.core.utils.SimpleAES;
 import org.bouncycastle.crypto.CryptoException;
@@ -41,14 +42,14 @@ public class TestSimpleAES
     public void testSimple() throws CryptoException
     {
         byte[] k = RandomMaker.get(256);
-        byte[] iv = RandomMaker.get(256);
+        byte[] iv = RandomMaker.get(128);
 
         byte[] p = ("'Ha, Watson! It would appear that our bait, cast though it was over unknown waters, may have " +
                     "brought in a catch!'").getBytes();
 
-        byte[] c = SimpleAES.encrypt(p, k, iv);
+        byte[] c = SimpleAES.encrypt(Algorithms.Encryption.AES256_CTR, p, k, iv);
 
-        byte[] d = SimpleAES.decrypt(c, k, iv);
+        byte[] d = SimpleAES.decrypt(Algorithms.Encryption.AES256_CTR, c, k, iv);
 
         assertThat(p, is(equalTo(d)));
     }
@@ -57,13 +58,13 @@ public class TestSimpleAES
     public void testNoPaddingRequired() throws CryptoException
     {
         byte[] k = RandomMaker.get(256);
-        byte[] iv = RandomMaker.get(256);
+        byte[] iv = RandomMaker.get(128);
 
         byte[] p = ("").getBytes();
 
-        byte[] c = SimpleAES.encrypt(p, k, iv);
+        byte[] c = SimpleAES.encrypt(Algorithms.Encryption.AES256_CTR, p, k, iv);
 
-        byte[] d = SimpleAES.decrypt(c, k, iv);
+        byte[] d = SimpleAES.decrypt(Algorithms.Encryption.AES256_CTR, c, k, iv);
 
         assertThat(p, is(equalTo(d)));
     }

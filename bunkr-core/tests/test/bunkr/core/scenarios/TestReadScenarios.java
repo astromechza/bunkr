@@ -126,7 +126,7 @@ public class TestReadScenarios
     }
 
     @Test
-    public void testReadingWithEncryption() throws Exception
+    public void testReadingWithPBKDF2_AES256_CTR() throws Exception
     {
         File tempfile = folder.newPrefixedFile("withencrypt");
         PasswordProvider prov = new PasswordProvider();
@@ -136,6 +136,51 @@ public class TestReadScenarios
         // first create the demo file
         ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
         context.getInventory().setDefaultEncryption(Algorithms.Encryption.AES256_CTR);
+
+        runThreeFileTestOnContext(context, usp);
+    }
+
+    @Test
+    public void testReadingWithPBKDF2_TWOFISH256_CTR() throws Exception
+    {
+        File tempfile = folder.newPrefixedFile("withencrypt");
+        PasswordProvider prov = new PasswordProvider();
+        prov.setArchivePassword("HunterTwo".getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
+
+        // first create the demo file
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
+        context.getInventory().setDefaultEncryption(Algorithms.Encryption.TWOFISH256_CTR);
+
+        runThreeFileTestOnContext(context, usp);
+    }
+
+    @Test
+    public void testReadingWithPBKDF2_AES128_CTR() throws Exception
+    {
+        File tempfile = folder.newPrefixedFile("withencrypt");
+        PasswordProvider prov = new PasswordProvider();
+        prov.setArchivePassword("HunterTwo".getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
+
+        // first create the demo file
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
+        context.getInventory().setDefaultEncryption(Algorithms.Encryption.AES128_CTR);
+
+        runThreeFileTestOnContext(context, usp);
+    }
+
+    @Test
+    public void testReadingWithPBKDF2_TWOFISH128_CTR() throws Exception
+    {
+        File tempfile = folder.newPrefixedFile("withencrypt");
+        PasswordProvider prov = new PasswordProvider();
+        prov.setArchivePassword("HunterTwo".getBytes());
+        UserSecurityProvider usp = new UserSecurityProvider(prov);
+
+        // first create the demo file
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
+        context.getInventory().setDefaultEncryption(Algorithms.Encryption.TWOFISH128_CTR);
 
         runThreeFileTestOnContext(context, usp);
     }

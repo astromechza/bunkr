@@ -27,34 +27,38 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.bunkr.core.inventory.Algorithms;
 
 /**
  * Creator: benmeier
  * Created At: 2016-01-19
  */
-public class AesKeyLengthWizardPanel extends VBox
+public class InventorySecWizardPanel extends VBox
 {
-    public final ComboBox<Integer> keyLengths = new ComboBox<>();
+    protected final ComboBox<Algorithms.Encryption> inventorySecurityChoices = new ComboBox<>();
 
-    private static final String DESCRIPTION_TEXT = "The AES Strength used for the symmetric encryption that will " +
-            "protect the archive inventory. At this moment in time, only 256 bit AES is allowed.";
+    private static final String DESCRIPTION_TEXT = "The inventory security algorithm is the algorithm used to encrypt the " +
+            "actual file hierarchy and metadata.";
 
-    public AesKeyLengthWizardPanel()
+    public InventorySecWizardPanel()
     {
         this.setSpacing(10);
-        Label description = new Label(DESCRIPTION_TEXT);
-        description.setWrapText(true);
-        this.getChildren().add(description);
-        keyLengths.getItems().add(256);
-        keyLengths.getSelectionModel().select(0);
-        Label label = new Label("AES Key Bits:");
+        Label descriptionLabel = new Label(DESCRIPTION_TEXT);
+        descriptionLabel.setWrapText(true);
+        this.getChildren().add(descriptionLabel);
+        inventorySecurityChoices.getItems().add(Algorithms.Encryption.AES128_CTR);
+        inventorySecurityChoices.getItems().add(Algorithms.Encryption.AES256_CTR);
+        inventorySecurityChoices.getItems().add(Algorithms.Encryption.TWOFISH128_CTR);
+        inventorySecurityChoices.getItems().add(Algorithms.Encryption.TWOFISH256_CTR);
+        inventorySecurityChoices.getSelectionModel().select(0);
+        Label label = new Label("Inventory Security:");
         label.setMaxHeight(Double.MAX_VALUE);
         label.setAlignment(Pos.CENTER_LEFT);
-        this.getChildren().add(new HBox(10, label, keyLengths));
+        this.getChildren().add(new HBox(10, label, inventorySecurityChoices));
     }
 
-    public Integer getSelectedKeyLength()
+    public Algorithms.Encryption getSelectedValue()
     {
-        return keyLengths.getSelectionModel().getSelectedItem();
+        return inventorySecurityChoices.getValue();
     }
 }

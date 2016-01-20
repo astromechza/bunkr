@@ -28,9 +28,28 @@ package org.bunkr.core.inventory;
  */
 public class Algorithms
 {
-    public enum Encryption {
-        NONE,
-        AES256_CTR,
-        TWOFISH256_CTR
+    public enum SYMMETRIC_CIPHER {AES, TWOFISH}
+    public enum SYMMETRIC_MODE {CTR}
+
+    public enum Encryption
+    {
+        NONE(null, 0, 0, null),
+        AES128_CTR(SYMMETRIC_CIPHER.AES, 16, 16, SYMMETRIC_MODE.CTR),
+        AES256_CTR(SYMMETRIC_CIPHER.AES, 32, 16,SYMMETRIC_MODE.CTR),
+        TWOFISH128_CTR(SYMMETRIC_CIPHER.TWOFISH, 16, 16, SYMMETRIC_MODE.CTR),
+        TWOFISH256_CTR(SYMMETRIC_CIPHER.TWOFISH, 32, 16, SYMMETRIC_MODE.CTR);
+
+        public final SYMMETRIC_CIPHER c;
+        public final int keyByteLength;
+        public final int ivByteLength;
+        public final SYMMETRIC_MODE m;
+
+        Encryption(SYMMETRIC_CIPHER c, int keyByteLength, int ivByteLength, SYMMETRIC_MODE m)
+        {
+            this.c = c;
+            this.keyByteLength = keyByteLength;
+            this.ivByteLength = ivByteLength;
+            this.m = m;
+        }
     }
 }

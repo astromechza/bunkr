@@ -23,10 +23,11 @@
 package org.bunkr.core.descriptor;
 
 import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
@@ -47,38 +48,31 @@ public class PBKDF2Descriptor implements IDescriptor
 {
     public static final String IDENTIFIER = "pbkdf2";
 
-    public static final int MINIMUM_AES_KEY_LENGTH = 256;
     public static final int MINIMUM_PBKD2_ITERS = 4096;
     public static final int SALT_LENGTH = 128;
 
+    public final Algorithms.Encryption encryptionAlgorithm;
     public final int pbkdf2Iterations;
-    public final int aesKeyLength;
     public final byte[] pbkdf2Salt;
 
-    public PBKDF2Descriptor(int aesKeyLength, int pbkdf2Iterations, byte[] pbkdf2Salt)
+    public PBKDF2Descriptor(Algorithms.Encryption encryptionAlgorithm, int pbkdf2Iterations, byte[] pbkdf2Salt)
     {
-        this.aesKeyLength = aesKeyLength;
+        this.encryptionAlgorithm = encryptionAlgorithm;
         this.pbkdf2Iterations = pbkdf2Iterations;
         this.pbkdf2Salt = pbkdf2Salt;
 
         if (pbkdf2Iterations < MINIMUM_PBKD2_ITERS)
             throw new IllegalArgumentException(String.format("pbkdf2Iterations must be at least %d", MINIMUM_PBKD2_ITERS));
-
-        if (aesKeyLength != MINIMUM_AES_KEY_LENGTH)
-            throw new IllegalArgumentException(String.format("aesKeyLength must be %d", MINIMUM_AES_KEY_LENGTH));
     }
 
     public PBKDF2Descriptor(JSONObject params)
     {
-        aesKeyLength = ((Long) params.get("aeskeylength")).intValue();
+        encryptionAlgorithm = Algorithms.Encryption.valueOf((String) params.get("encryptionAlgorithm"));
         pbkdf2Iterations = ((Long) params.get("timeComboBox")).intValue();
         pbkdf2Salt =  DatatypeConverter.parseBase64Binary((String) params.get("salt"));
 
         if (pbkdf2Iterations < MINIMUM_PBKD2_ITERS)
             throw new IllegalArgumentException(String.format("pbkdf2Iterations must be at least %d", MINIMUM_PBKD2_ITERS));
-
-        if (aesKeyLength != MINIMUM_AES_KEY_LENGTH)
-            throw new IllegalArgumentException(String.format("aesKeyLength must be %d", MINIMUM_AES_KEY_LENGTH));
     }
 
     @Override
@@ -92,7 +86,7 @@ public class PBKDF2Descriptor implements IDescriptor
     public JSONObject getParams()
     {
         JSONObject out = new JSONObject();
-        out.put("aeskeylength", this.aesKeyLength);
+        out.put("encryptionAlgorithm", this.encryptionAlgorithm.toString());
         out.put("timeComboBox", this.pbkdf2Iterations);
         out.put("salt", DatatypeConverter.printBase64Binary(this.pbkdf2Salt));
         return out;
@@ -103,14 +97,17 @@ public class PBKDF2Descriptor implements IDescriptor
     {
         try
         {
-            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA256Digest());
+            if (this.encryptionAlgorithm == Algorithms.Encryption.NONE)
+                throw new IllegalArgumentException("PBKDF2Descriptor requires an active encryption mode");
+
+            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA1Digest());
             g.init(usp.getHashedPassword(), this.pbkdf2Salt, this.pbkdf2Iterations);
-            ParametersWithIV kp = ((ParametersWithIV) g.generateDerivedParameters(
-                    this.aesKeyLength,
-                    this.aesKeyLength)
-            );
+            ParametersWithIV kp = (ParametersWithIV) g.generateDerivedParameters(
+                    this.encryptionAlgorithm.keyByteLength * 8,
+                    this.encryptionAlgorithm.ivByteLength * 8);
 
             byte[] decryptedInv = SimpleAES.decrypt(
+                    this.encryptionAlgorithm,
                     source,
                     ((KeyParameter) kp.getParameters()).getKey(),
                     kp.getIV()
@@ -131,16 +128,21 @@ public class PBKDF2Descriptor implements IDescriptor
         {
             byte[] inventoryJsonBytes = InventoryJSON.encode(source).getBytes();
 
+            if (this.encryptionAlgorithm == Algorithms.Encryption.NONE)
+                throw new IllegalArgumentException("PBKDF2Descriptor requires an active encryption mode");
+
             // first refresh the salt
             RandomMaker.fill(this.pbkdf2Salt);
-            
-            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA256Digest());
+
+            PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA1Digest());
             g.init(usp.getHashedPassword(), this.pbkdf2Salt, this.pbkdf2Iterations);
-            ParametersWithIV kp =
-                    ((ParametersWithIV) g.generateDerivedParameters(this.aesKeyLength, this.aesKeyLength));
+            ParametersWithIV kp = (ParametersWithIV) g.generateDerivedParameters(
+                    this.encryptionAlgorithm.keyByteLength * 8,
+                    this.encryptionAlgorithm.ivByteLength * 8);
 
             // encrypt the inventory
             byte[] encryptedInv = SimpleAES.encrypt(
+                    this.encryptionAlgorithm,
                     inventoryJsonBytes,
                     ((KeyParameter) kp.getParameters()).getKey(),
                     kp.getIV()
@@ -157,7 +159,7 @@ public class PBKDF2Descriptor implements IDescriptor
 
     public static IDescriptor makeDefaults()
     {
-        return new PBKDF2Descriptor(256, 10000, RandomMaker.get(SALT_LENGTH));
+        return new PBKDF2Descriptor(Algorithms.Encryption.AES256_CTR, 10000, RandomMaker.get(SALT_LENGTH));
     }
 
 }

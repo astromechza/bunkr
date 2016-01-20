@@ -27,7 +27,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
@@ -38,8 +38,8 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.components.ComboBoxItem;
-import org.bunkr.gui.wizards.common.AesKeyLengthWizardPanel;
 import org.bunkr.gui.wizards.common.FileSecWizardPanel;
+import org.bunkr.gui.wizards.common.InventorySecWizardPanel;
 import org.bunkr.gui.wizards.common.PasswordWizardPanel;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
@@ -53,7 +53,7 @@ public class PBKDF2SecurityWizard extends WizardWindow
 {
     private final ArchiveInfoContext archive;
     private final UserSecurityProvider securityProvider;
-    private final AesKeyLengthWizardPanel aesklpanel;
+    private final InventorySecWizardPanel invSecPanel;
     private final IterationsWizardPanel pbkditerpanel;
     private final PasswordWizardPanel pwdpanel;
     private final FileSecWizardPanel filesecpanel;
@@ -63,11 +63,11 @@ public class PBKDF2SecurityWizard extends WizardWindow
         super("Configure PBKDF2 Security");
         this.archive = archive;
         this.securityProvider = securityProvider;
-        this.aesklpanel = new AesKeyLengthWizardPanel();
+        this.invSecPanel = new InventorySecWizardPanel();
         this.pbkditerpanel = new IterationsWizardPanel();
         this.pwdpanel = new PasswordWizardPanel();
         this.filesecpanel = new FileSecWizardPanel();
-        this.setPages(aesklpanel, pbkditerpanel, pwdpanel, filesecpanel);
+        this.setPages(invSecPanel, pbkditerpanel, pwdpanel, filesecpanel);
         this.gotoPage(0);
     }
 
@@ -121,8 +121,8 @@ public class PBKDF2SecurityWizard extends WizardWindow
         // now the pbkdf2 iterations
         int selectedTime = pbkditerpanel.timeComboBox.getSelectionModel().getSelectedItem().valueValue;
 
-        Logging.info("Calculating how many SHA256 rounds we can do in %d millis.", selectedTime);
-        HMac mac = new HMac(new SHA256Digest());
+        Logging.info("Calculating how many SHA1 rounds we can do in %d millis.", selectedTime);
+        HMac mac = new HMac(new SHA1Digest());
         byte[] state = new byte[mac.getMacSize()];
         long startTime = System.currentTimeMillis();
         int pbkdf2Iterations = 0;
@@ -135,14 +135,10 @@ public class PBKDF2SecurityWizard extends WizardWindow
         pbkdf2Iterations = Math.max(pbkdf2Iterations, PBKDF2Descriptor.MINIMUM_PBKD2_ITERS);
         Logging.info("Got %d", pbkdf2Iterations);
 
-        // now the aes key length
-        int aeskeylength = aesklpanel.getSelectedKeyLength();
-        aeskeylength = Math.max(aeskeylength, PBKDF2Descriptor.MINIMUM_AES_KEY_LENGTH);
-
         try
         {
             // create new Descriptor
-            IDescriptor newDescriptor = new PBKDF2Descriptor(aeskeylength, pbkdf2Iterations, new byte[PBKDF2Descriptor.SALT_LENGTH]);
+            IDescriptor newDescriptor = new PBKDF2Descriptor(invSecPanel.getSelectedValue(), pbkdf2Iterations, new byte[PBKDF2Descriptor.SALT_LENGTH]);
 
             // create new security
             securityProvider.getProvider().setArchivePassword(pwdpanel.getPasswordValue().getBytes());

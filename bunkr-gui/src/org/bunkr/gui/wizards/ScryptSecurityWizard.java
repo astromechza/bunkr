@@ -36,8 +36,8 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Formatters;
 import org.bunkr.gui.components.ComboBoxItem;
-import org.bunkr.gui.wizards.common.AesKeyLengthWizardPanel;
 import org.bunkr.gui.wizards.common.FileSecWizardPanel;
+import org.bunkr.gui.wizards.common.InventorySecWizardPanel;
 import org.bunkr.gui.wizards.common.PasswordWizardPanel;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
@@ -51,7 +51,7 @@ public class ScryptSecurityWizard extends WizardWindow
 {
     private final ArchiveInfoContext archive;
     private final UserSecurityProvider securityProvider;
-    private final AesKeyLengthWizardPanel aesklpanel;
+    private final InventorySecWizardPanel invsecpanel;
     private final ScryptMemCostWizardPanel memusepanel;
     private final PasswordWizardPanel pwdpanel;
     private final FileSecWizardPanel filesecpanel;
@@ -61,11 +61,11 @@ public class ScryptSecurityWizard extends WizardWindow
         super("Configure Scrypt Security");
         this.archive = archive;
         this.securityProvider = securityProvider;
-        this.aesklpanel = new AesKeyLengthWizardPanel();
+        this.invsecpanel = new InventorySecWizardPanel();
         this.memusepanel = new ScryptMemCostWizardPanel();
         this.pwdpanel = new PasswordWizardPanel();
         this.filesecpanel = new FileSecWizardPanel();
-        this.setPages(aesklpanel, memusepanel, pwdpanel, filesecpanel);
+        this.setPages(invsecpanel, memusepanel, pwdpanel, filesecpanel);
         this.gotoPage(0);
     }
 
@@ -117,14 +117,10 @@ public class ScryptSecurityWizard extends WizardWindow
         int scryptN = memusepanel.timeComboBox.getValue().valueValue;
         scryptN = Math.max(scryptN, ScryptDescriptor.MINIMUM_SCRYPT_N);
 
-        // now the aes key length
-        int aeskeylength = aesklpanel.getSelectedKeyLength();
-        aeskeylength = Math.max(aeskeylength, ScryptDescriptor.MINIMUM_AES_KEY_LENGTH);
-
         try
         {
             // create new Descriptor
-            IDescriptor newDescriptor = new ScryptDescriptor(aeskeylength, scryptN, new byte[ScryptDescriptor.SALT_LENGTH], ScryptDescriptor.DEFAULT_SCRYPT_R, ScryptDescriptor.DEFAULT_SCRYPT_P);
+            IDescriptor newDescriptor = new ScryptDescriptor(invsecpanel.getSelectedValue(), scryptN, new byte[ScryptDescriptor.SALT_LENGTH], ScryptDescriptor.DEFAULT_SCRYPT_R, ScryptDescriptor.DEFAULT_SCRYPT_P);
 
             // create new security
             securityProvider.getProvider().setArchivePassword(pwdpanel.getPasswordValue().getBytes());
