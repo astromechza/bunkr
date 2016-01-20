@@ -37,7 +37,7 @@ import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Logging;
-import org.bunkr.gui.components.ComboBoxItem;
+import org.bunkr.core.utils.DisplayValuePair;
 import org.bunkr.gui.wizards.common.FileSecWizardPanel;
 import org.bunkr.gui.wizards.common.InventorySecWizardPanel;
 import org.bunkr.gui.wizards.common.PasswordWizardPanel;
@@ -77,23 +77,18 @@ public class PBKDF2SecurityWizard extends WizardWindow
         private static final String DESCRIPTION_TEXT = "PBKDF2 uses many rounds of SHA256 to calculate the final " +
                 "symmetric key. Pick the amount of time you'd like it to take to open the archive using your " +
                 "current hardware.";
-        protected ComboBox<ComboBoxItem<Integer, String>> timeComboBox = new ComboBox<>();
+        protected ComboBox<DisplayValuePair<Integer, String>> timeComboBox = new ComboBox<>();
         public IterationsWizardPanel()
         {
             this.setSpacing(10);
             Label descriptionLabel = new Label(DESCRIPTION_TEXT);
             descriptionLabel.setWrapText(true);
             this.getChildren().add(descriptionLabel);
-            timeComboBox.getItems().addAll(
-                    new ComboBoxItem<>(100, "100ms"),
-                    new ComboBoxItem<>(500, "0.5s"),
-                    new ComboBoxItem<>(1000, "1s"),
-                    new ComboBoxItem<>(2000, "2s"),
-                    new ComboBoxItem<>(3000, "3s"),
-                    new ComboBoxItem<>(5000, "5s"),
-                    new ComboBoxItem<>(10000, "10s")
-            );
-            timeComboBox.getSelectionModel().select(2);
+            for (Integer time : PBKDF2Descriptor.SUGGESTED_ITERATION_TIME_LIST)
+            {
+                timeComboBox.getItems().add(new DisplayValuePair<>(time, String.format("%dms", time)));
+            }
+            timeComboBox.getSelectionModel().select(0);
             Label label = new Label("PBKDF2 Calculation Time:");
             label.setMaxHeight(Double.MAX_VALUE);
             label.setAlignment(Pos.CENTER_LEFT);
@@ -119,21 +114,8 @@ public class PBKDF2SecurityWizard extends WizardWindow
         }
 
         // now the pbkdf2 iterations
-        int selectedTime = pbkditerpanel.timeComboBox.getSelectionModel().getSelectedItem().valueValue;
-
-        Logging.info("Calculating how many SHA1 rounds we can do in %d millis.", selectedTime);
-        HMac mac = new HMac(new SHA1Digest());
-        byte[] state = new byte[mac.getMacSize()];
-        long startTime = System.currentTimeMillis();
-        int pbkdf2Iterations = 0;
-        while((System.currentTimeMillis() - startTime) < selectedTime)
-        {
-            mac.update(state, 0, state.length);
-            mac.doFinal(state, 0);
-            pbkdf2Iterations++;
-        }
-        pbkdf2Iterations = Math.max(pbkdf2Iterations, PBKDF2Descriptor.MINIMUM_PBKD2_ITERS);
-        Logging.info("Got %d", pbkdf2Iterations);
+        int selectedTime = pbkditerpanel.timeComboBox.getSelectionModel().getSelectedItem().value;
+        int pbkdf2Iterations = PBKDF2Descriptor.calculateRounds(selectedTime);
 
         try
         {

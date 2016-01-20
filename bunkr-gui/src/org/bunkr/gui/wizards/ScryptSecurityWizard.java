@@ -35,7 +35,7 @@ import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Formatters;
-import org.bunkr.gui.components.ComboBoxItem;
+import org.bunkr.core.utils.DisplayValuePair;
 import org.bunkr.gui.wizards.common.FileSecWizardPanel;
 import org.bunkr.gui.wizards.common.InventorySecWizardPanel;
 import org.bunkr.gui.wizards.common.PasswordWizardPanel;
@@ -74,19 +74,17 @@ public class ScryptSecurityWizard extends WizardWindow
     {
         private static final String DESCRIPTION_TEXT = "Scrypt gets it's strength from the memory required to " +
                 "process. Select a larger value for a larger memory requirement.";
-        protected ComboBox<ComboBoxItem<Integer, String>> timeComboBox = new ComboBox<>();
+        protected ComboBox<DisplayValuePair<Integer, String>> timeComboBox = new ComboBox<>();
         public ScryptMemCostWizardPanel()
         {
             this.setSpacing(10);
             Label descriptionLabel = new Label(DESCRIPTION_TEXT);
             descriptionLabel.setWrapText(true);
             this.getChildren().add(descriptionLabel);
-            int n = ScryptDescriptor.MINIMUM_SCRYPT_N;
-            for (int i = 0; i < 8; i++)
+            for (Integer n : ScryptDescriptor.SUGGESTED_SCRYPT_N_LIST)
             {
-                long memusage = (128L * (long) ScryptDescriptor.DEFAULT_SCRYPT_R * n) + (128L * (long) ScryptDescriptor.DEFAULT_SCRYPT_R * (long) ScryptDescriptor.DEFAULT_SCRYPT_P);
-                timeComboBox.getItems().add(new ComboBoxItem<>(n, Formatters.formatBytes(memusage) + "B"));
-                n <<= 1;
+                long memusage = ScryptDescriptor.calculateMemoryUsage(n);
+                timeComboBox.getItems().add(new DisplayValuePair<>(n, Formatters.formatBytes(memusage) + "B"));
             }
             timeComboBox.getSelectionModel().select(0);
             Label label = new Label("Scrypt Memory Usage:");
@@ -114,7 +112,7 @@ public class ScryptSecurityWizard extends WizardWindow
         }
 
         // now the scrypt memusage
-        int scryptN = memusepanel.timeComboBox.getValue().valueValue;
+        int scryptN = memusepanel.timeComboBox.getValue().value;
         scryptN = Math.max(scryptN, ScryptDescriptor.MINIMUM_SCRYPT_N);
 
         try

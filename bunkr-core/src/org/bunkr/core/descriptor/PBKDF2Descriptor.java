@@ -25,6 +25,7 @@ package org.bunkr.core.descriptor;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bunkr.core.inventory.Algorithms;
@@ -33,12 +34,15 @@ import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.inventory.InventoryJSON;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.core.utils.RandomMaker;
 import org.bunkr.core.utils.SimpleAES;
 import org.json.simple.JSONObject;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Creator: benmeier
@@ -47,9 +51,11 @@ import java.util.Arrays;
 public class PBKDF2Descriptor implements IDescriptor
 {
     public static final String IDENTIFIER = "pbkdf2";
-
     public static final int MINIMUM_PBKD2_ITERS = 4096;
     public static final int SALT_LENGTH = 128;
+    public static final List<Integer> SUGGESTED_ITERATION_TIME_LIST = Collections.unmodifiableList(Arrays.asList(
+            100, 500, 1000, 2000, 3000, 5000, 10000
+    ));
 
     public final Algorithms.Encryption encryptionAlgorithm;
     public final int pbkdf2Iterations;
@@ -162,4 +168,26 @@ public class PBKDF2Descriptor implements IDescriptor
         return new PBKDF2Descriptor(Algorithms.Encryption.AES256_CTR, 10000, RandomMaker.get(SALT_LENGTH));
     }
 
+    public static IDescriptor make(Algorithms.Encryption algorithm, int iterations)
+    {
+        return new PBKDF2Descriptor(algorithm, iterations, RandomMaker.get(SALT_LENGTH));
+    }
+
+    public static int calculateRounds(int milliseconds)
+    {
+        Logging.info("Calculating how many SHA1 rounds we can do in %d millis.", milliseconds);
+        HMac mac = new HMac(new SHA1Digest());
+        byte[] state = new byte[mac.getMacSize()];
+        long startTime = System.currentTimeMillis();
+        int pbkdf2Iterations = 0;
+        while((System.currentTimeMillis() - startTime) < milliseconds)
+        {
+            mac.update(state, 0, state.length);
+            mac.doFinal(state, 0);
+            pbkdf2Iterations++;
+        }
+        pbkdf2Iterations = Math.max(pbkdf2Iterations, PBKDF2Descriptor.MINIMUM_PBKD2_ITERS);
+        Logging.info("Got %d", pbkdf2Iterations);
+        return pbkdf2Iterations;
+    }
 }

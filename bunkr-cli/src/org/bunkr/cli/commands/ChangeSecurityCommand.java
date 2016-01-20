@@ -23,6 +23,7 @@
 package org.bunkr.cli.commands;
 
 import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.inf.ArgumentChoice;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
@@ -34,6 +35,11 @@ import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.descriptor.ScryptDescriptor;
 import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.usersec.UserSecurityProvider;
+import org.bunkr.core.utils.Formatters;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Creator: benmeier
@@ -44,6 +50,26 @@ public class ChangeSecurityCommand implements ICLICommand
     public static final String ARG_ARCHIVE_SECURITY = "algorithm";
     public static final String ARG_NEW_PASSWORD_FILE = "newpasswordfile";
     public static final String ARG_FILE_SECURITY = "filesecurity";
+    public static final String ARG_INV_SECURITY = "inventorysecurity";
+    public static final String ARG_ITERATIONS_TIME = "pbkdf2iterationstime";
+    public static final String ARG_MEMORY_USAGE = "scryptmemoryusage";
+
+    private LinkedHashMap<String, Integer> pbkdf2IterTimeChoices;
+    private LinkedHashMap<String, Integer> scryptNChoices;
+
+    public ChangeSecurityCommand()
+    {
+        this.pbkdf2IterTimeChoices = new LinkedHashMap<>();
+        for (Integer ms : PBKDF2Descriptor.SUGGESTED_ITERATION_TIME_LIST)
+        {
+            this.pbkdf2IterTimeChoices.put(String.format("%.1fs", (float) ms / 1000), ms);
+        }
+        this.scryptNChoices = new LinkedHashMap<>();
+        for (Integer n : ScryptDescriptor.SUGGESTED_SCRYPT_N_LIST)
+        {
+            this.scryptNChoices.put(Formatters.formatBytes(ScryptDescriptor.calculateMemoryUsage(n)) + "B", n);
+        }
+    }
 
     @Override
     public void buildParser(Subparser target)
@@ -60,9 +86,22 @@ public class ChangeSecurityCommand implements ICLICommand
                 .help("read the new archive password from the given file or '-' for stdin");
         p1.addArgument("--file-security")
                 .dest(ARG_FILE_SECURITY)
-                .setDefault(Algorithms.Encryption.AES256_CTR.toString().toLowerCase())
-                .choices(Algorithms.Encryption.AES256_CTR.toString().toLowerCase())
+                .setDefault(Algorithms.Encryption.AES256_CTR)
+                .choices(Algorithms.Encryption.AES128_CTR, Algorithms.Encryption.AES256_CTR, Algorithms.Encryption.TWOFISH128_CTR, Algorithms.Encryption.TWOFISH256_CTR)
+                .type(Algorithms.Encryption.class)
                 .help("set the encryption used on files");
+        p1.addArgument("--inventory-security")
+                .dest(ARG_INV_SECURITY)
+                .setDefault(Algorithms.Encryption.AES256_CTR)
+                .choices(Algorithms.Encryption.AES128_CTR, Algorithms.Encryption.AES256_CTR,
+                         Algorithms.Encryption.TWOFISH128_CTR, Algorithms.Encryption.TWOFISH256_CTR)
+                .type(Algorithms.Encryption.class)
+                .help("set the encryption used on the hierarchy metadata");
+        p1.addArgument("--iterations-time")
+                .dest(ARG_ITERATIONS_TIME)
+                .setDefault(pbkdf2IterTimeChoices.keySet().iterator().next())
+                .choices(pbkdf2IterTimeChoices.keySet())
+                .help("calculate the number of sha operations based on a time limit");
 
         Subparser p2 = securityType.addParser(ScryptDescriptor.IDENTIFIER.toLowerCase());
         p2.addArgument(ARG_NEW_PASSWORD_FILE)
@@ -70,9 +109,21 @@ public class ChangeSecurityCommand implements ICLICommand
                 .help("read the new archive password from the given file or '-' for stdin");
         p2.addArgument("--file-security")
                 .dest(ARG_FILE_SECURITY)
-                .setDefault(Algorithms.Encryption.AES256_CTR.toString().toLowerCase())
-                .choices(Algorithms.Encryption.AES256_CTR.toString().toLowerCase())
+                .setDefault(Algorithms.Encryption.AES256_CTR)
+                .choices(Algorithms.Encryption.AES128_CTR, Algorithms.Encryption.AES256_CTR, Algorithms.Encryption.TWOFISH128_CTR, Algorithms.Encryption.TWOFISH256_CTR)
+                .type(Algorithms.Encryption.class)
                 .help("set the encryption used on files");
+        p2.addArgument("--inventory-security")
+                .dest(ARG_INV_SECURITY)
+                .setDefault(Algorithms.Encryption.AES256_CTR)
+                .choices(Algorithms.Encryption.AES128_CTR, Algorithms.Encryption.AES256_CTR, Algorithms.Encryption.TWOFISH128_CTR, Algorithms.Encryption.TWOFISH256_CTR)
+                .type(Algorithms.Encryption.class)
+                .help("set the encryption used on the hierarchy metadata");
+        p2.addArgument("--memory-use")
+                .dest(ARG_MEMORY_USAGE)
+                .setDefault(scryptNChoices.keySet().iterator().next())
+                .choices(scryptNChoices.keySet())
+                .help("set the scrypt N parameter");
     }
 
     @Override
@@ -96,26 +147,42 @@ public class ChangeSecurityCommand implements ICLICommand
                 context.getInventory().setDefaultEncryption(Algorithms.Encryption.NONE);
                 break;
             case PBKDF2Descriptor.IDENTIFIER:
-                context.setDescriptor(PBKDF2Descriptor.makeDefaults());
                 usp.setProvider(makeCLIPasswordProvider(args.get(ARG_NEW_PASSWORD_FILE), "Enter new password for pbkdf2:"));
-                context.getInventory().setDefaultEncryption(Algorithms.Encryption.AES256_CTR);
+                applyPBKDF2SecuritySettings(context, args);
                 break;
             case ScryptDescriptor.IDENTIFIER:
-                context.setDescriptor(ScryptDescriptor.makeDefaults());
                 usp.setProvider(makeCLIPasswordProvider(args.get(ARG_NEW_PASSWORD_FILE), "Enter new password for scrypt:"));
-                context.getInventory().setDefaultEncryption(Algorithms.Encryption.AES256_CTR);
+                applyScryptSecuritySettings(context, args);
                 break;
             default:
                 return;
         }
 
         String after = String.format("Archive Security: %s, File Security: %s",
-                                      context.getDescriptor().getIdentifier(),
-                                      context.getInventory().getDefaultEncryption());
+                                     context.getDescriptor().getIdentifier(),
+                                     context.getInventory().getDefaultEncryption());
 
         MetadataWriter.write(context, usp);
         System.out.println("Successfully changed security settings for achive.");
         System.out.println(String.format("Before: %s", before));
         System.out.println(String.format("After: %s", after));
+    }
+
+    public void applyPBKDF2SecuritySettings(ArchiveInfoContext archive, Namespace args)
+    {
+        archive.getInventory().setDefaultEncryption(args.get(ARG_FILE_SECURITY));
+        int ms = pbkdf2IterTimeChoices.get((String) args.get(ARG_ITERATIONS_TIME));
+        System.out.println(String.format("Calculating pbkdf2 rounds for %s milliseconds...", ms));
+        int pbkdf2Rounds = PBKDF2Descriptor.calculateRounds(ms);
+        System.out.println(String.format("Got %d rounds.", pbkdf2Rounds));
+        archive.setDescriptor(PBKDF2Descriptor.make(args.get(ARG_INV_SECURITY), pbkdf2Rounds));
+    }
+
+    public void applyScryptSecuritySettings(ArchiveInfoContext archive, Namespace args)
+    {
+        archive.getInventory().setDefaultEncryption(args.get(ARG_FILE_SECURITY));
+        archive.setDescriptor(ScryptDescriptor.make(
+                args.get(ARG_INV_SECURITY), scryptNChoices.get((String) args.get(ARG_MEMORY_USAGE))
+        ));
     }
 }

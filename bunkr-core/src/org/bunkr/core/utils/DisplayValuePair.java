@@ -20,26 +20,26 @@
  * SOFTWARE.
  */
 
-package org.bunkr.gui.components;
+package org.bunkr.core.utils;
 
 /**
  * Creator: benmeier
  * Created At: 2016-01-19
  */
-public class ComboBoxItem<A, B>
+public class DisplayValuePair<A, B>
 {
-    public final A valueValue;
-    public final B displayValue;
+    public final A value;
+    public final B display;
 
-    public ComboBoxItem(A d, B v)
+    public DisplayValuePair(A d, B v)
     {
-        this.valueValue = d;
-        this.displayValue = v;
+        this.value = d;
+        this.display = v;
     }
 
     @Override
     public String toString()
     {
-        return this.displayValue.toString();
+        return this.display.toString();
     }
 }

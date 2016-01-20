@@ -36,6 +36,8 @@ import org.json.simple.JSONObject;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Creator: benmeier
@@ -44,11 +46,18 @@ import java.util.Arrays;
 public class ScryptDescriptor implements IDescriptor
 {
     public static final String IDENTIFIER = "scrypt";
-
     public static final int SALT_LENGTH = 128;
     public static final int MINIMUM_SCRYPT_N = 2 << 13;
     public static final int DEFAULT_SCRYPT_R = 8;
     public static final int DEFAULT_SCRYPT_P = 1;
+    public static final List<Integer> SUGGESTED_SCRYPT_N_LIST = Collections.unmodifiableList(Arrays.asList(
+            2 << 13, 2 << 14, 2 << 15, 2 << 16, 2 << 17, 2 << 18, 2 << 19, 2 << 20
+    ));
+
+    public static long calculateMemoryUsage(int n)
+    {
+        return (128L * (long) ScryptDescriptor.DEFAULT_SCRYPT_R * n) + (128L * (long) ScryptDescriptor.DEFAULT_SCRYPT_R * (long) ScryptDescriptor.DEFAULT_SCRYPT_P);
+    }
 
     public final Algorithms.Encryption encryptionAlgorithm;
     public final int scryptN;
@@ -156,6 +165,11 @@ public class ScryptDescriptor implements IDescriptor
         {
             throw new BaseBunkrException(e);
         }
+    }
+
+    public static IDescriptor make(Algorithms.Encryption algorithm, int scryptN)
+    {
+        return new ScryptDescriptor(algorithm, scryptN, RandomMaker.get(SALT_LENGTH), DEFAULT_SCRYPT_R, DEFAULT_SCRYPT_P);
     }
 
     public static IDescriptor makeDefaults()
