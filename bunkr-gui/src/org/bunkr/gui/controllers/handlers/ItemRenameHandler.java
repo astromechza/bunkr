@@ -34,7 +34,6 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 import org.bunkr.gui.windows.MainWindow;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-17
  */
 public class ItemRenameHandler implements EventHandler<ActionEvent>

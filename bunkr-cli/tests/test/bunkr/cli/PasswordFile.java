@@ -32,7 +32,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-11
  */
 public class PasswordFile

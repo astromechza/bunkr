@@ -27,7 +27,6 @@ import org.bunkr.core.inventory.Algorithms.Encryption;
 import java.util.List;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-08
  */
 public class Inventory implements IFFContainer, IFFTraversalTarget

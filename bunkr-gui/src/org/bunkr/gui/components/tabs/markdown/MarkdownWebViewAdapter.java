@@ -42,7 +42,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-31
  */
 public class MarkdownWebViewAdapter

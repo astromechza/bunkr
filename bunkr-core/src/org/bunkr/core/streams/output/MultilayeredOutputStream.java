@@ -37,7 +37,6 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-09
  */
 public class MultilayeredOutputStream extends OutputStream

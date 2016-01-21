@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-13
  */
 public final class Version

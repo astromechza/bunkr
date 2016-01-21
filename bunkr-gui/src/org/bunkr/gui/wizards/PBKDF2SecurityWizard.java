@@ -43,7 +43,6 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 import java.io.IOException;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-18
  */
 public class PBKDF2SecurityWizard extends WizardWindow

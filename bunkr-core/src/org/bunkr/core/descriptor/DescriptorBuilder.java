@@ -33,7 +33,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-20
  */
 public class DescriptorBuilder

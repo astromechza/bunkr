@@ -50,7 +50,6 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-31
  */
 public class MarkdownTab extends Tab implements IOpenedFileTab

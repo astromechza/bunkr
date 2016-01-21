@@ -25,7 +25,6 @@ package org.bunkr.core.inventory;
 import java.util.List;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-22
  */
 public class FFContainer implements IFFContainer

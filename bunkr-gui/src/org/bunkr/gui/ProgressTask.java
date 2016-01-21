@@ -26,7 +26,6 @@ import javafx.concurrent.Task;
 import org.bunkr.core.utils.Formatters;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-13
  */
 public abstract class ProgressTask<V> extends Task<V>

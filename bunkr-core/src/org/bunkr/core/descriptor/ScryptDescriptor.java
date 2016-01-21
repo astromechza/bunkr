@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-09
  */
 public class ScryptDescriptor implements IDescriptor

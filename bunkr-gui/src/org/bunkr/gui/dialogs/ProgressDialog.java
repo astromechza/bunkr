@@ -37,7 +37,6 @@ import javafx.scene.layout.VBox;
 /**
  * This progress dialog takes inspiration from the one provided by ControlsFX.
  *
- * Creator: benmeier
  * Created At: 2016-01-13
  */
 public class ProgressDialog extends Dialog<Void>

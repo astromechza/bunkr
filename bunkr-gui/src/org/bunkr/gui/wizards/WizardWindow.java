@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-18
  */
 public class WizardWindow extends BaseWindow

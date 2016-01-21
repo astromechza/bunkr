@@ -23,7 +23,6 @@
 package org.bunkr.core.inventory;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-06
  */
 public interface IFFTraversalTarget

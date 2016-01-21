@@ -34,7 +34,6 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import java.io.File;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-03
  */
 public class CreateCommand implements ICLICommand

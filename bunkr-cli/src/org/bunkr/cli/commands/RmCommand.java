@@ -33,7 +33,6 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bunkr.core.inventory.*;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-06
  */
 public class RmCommand implements ICLICommand

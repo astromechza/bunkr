@@ -27,7 +27,6 @@ import org.bunkr.core.usersec.IPasswordPrompter;
 import java.io.Console;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-02
  */
 public class CLIPasswordPrompt implements IPasswordPrompter

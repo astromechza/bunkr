@@ -25,7 +25,6 @@ package org.bunkr.core.usersec;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-20
  */
 public class UserSecurityProvider

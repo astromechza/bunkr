@@ -46,7 +46,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-09
  */
 public class TestReadScenarios

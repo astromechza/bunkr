@@ -32,7 +32,6 @@ import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-28
  */
 public class ContextMenus

@@ -47,7 +47,6 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-06
  */
 public class ArchiveSecurityWindow extends BaseWindow

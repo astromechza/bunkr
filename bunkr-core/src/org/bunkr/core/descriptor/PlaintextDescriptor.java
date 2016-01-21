@@ -28,7 +28,6 @@ import org.bunkr.core.inventory.InventoryJSON;
 import org.json.simple.JSONObject;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-20
  */
 public class PlaintextDescriptor implements IDescriptor

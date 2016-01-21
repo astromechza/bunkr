@@ -47,7 +47,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.*;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-09
  */
 public class TestWriteScenarios

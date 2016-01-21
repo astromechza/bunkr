@@ -29,7 +29,6 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bunkr.core.usersec.UserSecurityProvider;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-02
  */
 public class CheckPasswordCommand implements ICLICommand

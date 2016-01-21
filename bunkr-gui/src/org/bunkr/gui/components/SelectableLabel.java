@@ -25,7 +25,6 @@ package org.bunkr.gui.components;
 import javafx.scene.control.TextField;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-29
  */
 public class SelectableLabel extends TextField

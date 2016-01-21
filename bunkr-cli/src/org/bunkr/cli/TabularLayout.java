@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-09
  */
 public class TabularLayout

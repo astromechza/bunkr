@@ -47,7 +47,6 @@ import java.util.Map;
 import static junit.framework.TestCase.fail;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-06
  */
 public class TestRmCommand

@@ -50,7 +50,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-12
  */
 public class TestMvCommand

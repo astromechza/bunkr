@@ -26,7 +26,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-08
  */
 public class Icons

@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-06
  */
 public class LsCommand implements ICLICommand

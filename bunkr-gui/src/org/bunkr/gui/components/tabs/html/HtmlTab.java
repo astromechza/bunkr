@@ -46,7 +46,6 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-16
  */
 public class HtmlTab extends Tab implements IOpenedFileTab

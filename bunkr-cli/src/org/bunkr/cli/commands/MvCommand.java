@@ -32,7 +32,6 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bunkr.core.inventory.*;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-11
  *
  * A cli command for moving items.

@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-12
  */
 public class OutputCapture implements AutoCloseable

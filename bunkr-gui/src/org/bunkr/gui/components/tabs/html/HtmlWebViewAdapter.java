@@ -41,7 +41,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-16
  */
 public class HtmlWebViewAdapter

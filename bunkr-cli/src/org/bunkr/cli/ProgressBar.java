@@ -27,7 +27,6 @@ import org.bunkr.core.utils.Formatters;
 import java.util.Arrays;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-09
  */
 public class ProgressBar

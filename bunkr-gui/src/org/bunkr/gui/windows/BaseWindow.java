@@ -30,7 +30,6 @@ import org.bunkr.core.Resources;
 import java.io.IOException;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-24
  */
 public abstract class BaseWindow

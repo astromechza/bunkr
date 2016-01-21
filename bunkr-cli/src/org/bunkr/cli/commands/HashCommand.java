@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-13
  */
 public class HashCommand implements ICLICommand

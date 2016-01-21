@@ -25,7 +25,6 @@ package org.bunkr.core;
 import org.bunkr.core.fragmented_range.FragmentedRange;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-17
  *
  * IBlockAllocationManager is a structure used for managing block allocations in a archive.

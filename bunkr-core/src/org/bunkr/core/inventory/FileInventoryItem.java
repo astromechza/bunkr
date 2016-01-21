@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-08
  */
 public class FileInventoryItem extends InventoryItem implements IFFTraversalTarget

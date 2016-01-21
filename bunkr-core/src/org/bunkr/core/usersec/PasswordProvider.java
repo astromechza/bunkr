@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Set;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-01
  */
 public class PasswordProvider

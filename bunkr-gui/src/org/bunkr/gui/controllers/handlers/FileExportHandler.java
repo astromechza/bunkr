@@ -46,7 +46,6 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-17
  */
 public class FileExportHandler implements EventHandler<ActionEvent>

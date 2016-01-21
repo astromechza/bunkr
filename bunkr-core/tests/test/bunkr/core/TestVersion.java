@@ -31,7 +31,6 @@ import static junit.framework.TestCase.fail;
 import static org.junit.Assert.*;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-14
  */
 public class TestVersion

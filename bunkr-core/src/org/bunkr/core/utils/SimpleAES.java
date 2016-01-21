@@ -33,7 +33,6 @@ import org.bunkr.core.inventory.Algorithms.Encryption;
 import java.util.Arrays;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-27
  */
 public class SimpleAES

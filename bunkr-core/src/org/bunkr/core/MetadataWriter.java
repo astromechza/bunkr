@@ -33,7 +33,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-08
  */
 public class MetadataWriter

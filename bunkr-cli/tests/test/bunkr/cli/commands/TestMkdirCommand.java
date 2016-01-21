@@ -50,7 +50,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-06
  */
 public class TestMkdirCommand

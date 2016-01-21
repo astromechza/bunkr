@@ -39,7 +39,6 @@ import org.bunkr.core.utils.Formatters;
 import java.util.LinkedHashMap;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-10
  */
 public class ChangeSecurityCommand implements ICLICommand

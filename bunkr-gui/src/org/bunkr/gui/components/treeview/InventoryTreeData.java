@@ -33,7 +33,6 @@ import java.util.UUID;
  * Helper datastructure to hold UUID and name. Name is needed *only* for Display purposes. UUID is used for everything
  * else for indexing, lookups, equality, operations.. etc.
  *
- * Creator: benmeier
  * Created At: 2015-12-27
  */
 public class InventoryTreeData implements Comparable<InventoryTreeData>

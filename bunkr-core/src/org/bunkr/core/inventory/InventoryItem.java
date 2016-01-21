@@ -25,7 +25,6 @@ package org.bunkr.core.inventory;
 import java.util.UUID;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-08
  */
 public class InventoryItem implements Comparable<InventoryItem>

@@ -30,7 +30,6 @@ import javafx.scene.layout.VBox;
 import org.bunkr.core.inventory.Algorithms.Encryption;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-19
  */
 public class FileSecWizardPanel extends VBox

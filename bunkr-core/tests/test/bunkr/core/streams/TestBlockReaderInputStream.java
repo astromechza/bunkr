@@ -47,7 +47,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-02
  */
 public class TestBlockReaderInputStream

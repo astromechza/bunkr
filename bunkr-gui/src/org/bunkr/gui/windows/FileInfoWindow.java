@@ -44,7 +44,6 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-29
  */
 public class FileInfoWindow extends BaseWindow

@@ -52,7 +52,6 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-12
  */
 public class TestFindCommand

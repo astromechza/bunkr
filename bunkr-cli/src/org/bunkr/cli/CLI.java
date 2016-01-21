@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-02
  */
 public class CLI

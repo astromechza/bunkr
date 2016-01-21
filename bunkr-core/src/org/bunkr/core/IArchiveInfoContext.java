@@ -30,7 +30,6 @@ import org.bunkr.core.usersec.UserSecurityProvider;
 import java.io.IOException;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-09
  */
 public interface IArchiveInfoContext

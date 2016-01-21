@@ -33,7 +33,6 @@ import javax.xml.bind.DatatypeConverter;
 import java.util.UUID;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-13
  */
 public class FileInventoryItemJSON

@@ -28,7 +28,6 @@ import org.bunkr.core.exceptions.TraversalException;
 import java.util.regex.Pattern;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-06
  */
 public class InventoryPather

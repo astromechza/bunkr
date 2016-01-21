@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-17
  */
 public class ImportWebFileHandler implements EventHandler<ActionEvent>

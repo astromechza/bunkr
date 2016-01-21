@@ -32,7 +32,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-13
  */
 public class FolderInventoryItemJSON

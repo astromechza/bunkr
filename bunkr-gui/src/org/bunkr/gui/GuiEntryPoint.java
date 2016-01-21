@@ -39,7 +39,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-24
  */
 public class GuiEntryPoint

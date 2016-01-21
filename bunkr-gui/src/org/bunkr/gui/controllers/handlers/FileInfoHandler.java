@@ -39,7 +39,6 @@ import org.bunkr.gui.windows.MainWindow;
 import java.io.IOException;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-17
  */
 public class FileInfoHandler implements EventHandler<ActionEvent>

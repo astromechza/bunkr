@@ -31,7 +31,6 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-08
  */
 public class TestFragmentedRange

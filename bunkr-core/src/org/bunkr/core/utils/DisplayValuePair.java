@@ -23,7 +23,6 @@
 package org.bunkr.core.utils;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-19
  */
 public class DisplayValuePair<A, B>

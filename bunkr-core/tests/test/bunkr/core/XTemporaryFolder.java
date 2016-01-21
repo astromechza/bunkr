@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.security.SecureRandom;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-21
  */
 public class XTemporaryFolder extends TemporaryFolder

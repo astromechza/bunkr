@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-27
  */
 public class QuickDialogs

@@ -43,7 +43,6 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-08
  */
 public class ExportFileCommand implements ICLICommand

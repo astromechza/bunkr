@@ -47,7 +47,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-17
  */
 public class DragFileImportHandler implements Consumer<Pair<UUID, File>>

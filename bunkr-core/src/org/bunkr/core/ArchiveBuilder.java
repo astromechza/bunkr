@@ -33,7 +33,6 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-08
  */
 public class ArchiveBuilder

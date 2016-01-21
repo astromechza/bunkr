@@ -23,7 +23,6 @@
 package org.bunkr.core.utils;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-14
  */
 public class AbortableShutdownHook extends Thread

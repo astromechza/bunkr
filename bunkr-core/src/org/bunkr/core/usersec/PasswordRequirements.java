@@ -27,7 +27,6 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import javax.xml.bind.DatatypeConverter;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-25
  */
 public class PasswordRequirements

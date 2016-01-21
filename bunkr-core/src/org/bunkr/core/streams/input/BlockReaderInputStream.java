@@ -35,7 +35,6 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-09
  */
 public class BlockReaderInputStream extends InputStream

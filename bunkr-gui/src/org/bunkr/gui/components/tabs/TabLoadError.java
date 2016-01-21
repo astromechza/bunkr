@@ -25,7 +25,6 @@ package org.bunkr.gui.components.tabs;
 import org.bunkr.core.exceptions.BaseBunkrException;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-06
  */
 public class TabLoadError extends BaseBunkrException

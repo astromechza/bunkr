@@ -38,7 +38,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-27
  */
 public class CellFactoryCallback implements Callback<TreeView<InventoryTreeData>, TreeCell<InventoryTreeData>>

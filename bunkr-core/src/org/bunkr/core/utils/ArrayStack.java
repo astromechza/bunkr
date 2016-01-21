@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-21
  *
  * This is a stack based on an array list.

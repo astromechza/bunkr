@@ -31,7 +31,6 @@ import java.util.Set;
  *
  * These mime types might not be the official recognized ones.
  *
- * Creator: benmeier
  * Created At: 2016-01-02
  */
 public class MediaType

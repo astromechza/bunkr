@@ -53,7 +53,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-12
  */
 public class TestLsCommand

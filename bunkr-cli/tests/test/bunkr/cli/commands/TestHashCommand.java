@@ -51,7 +51,6 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-15
  */
 public class TestHashCommand

@@ -25,7 +25,6 @@ package org.bunkr.core.utils;
 import java.security.SecureRandom;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-22
  */
 public class RandomMaker

@@ -36,7 +36,6 @@ import org.bunkr.core.utils.RandomMaker;
 import java.util.Arrays;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-20
  */
 public class CipherBuilder

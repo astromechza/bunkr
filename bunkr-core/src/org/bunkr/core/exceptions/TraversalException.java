@@ -23,7 +23,6 @@
 package org.bunkr.core.exceptions;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-06
  */
 public class TraversalException extends BaseBunkrException

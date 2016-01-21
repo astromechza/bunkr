@@ -32,7 +32,6 @@ import java.io.StringWriter;
  * Remember that logging informat such as file names, passwords, encryption keys, etc.. classifies as information
  * leakage, so logging should only be enabled when the user is aware of this issue.
  *
- * Creator: benmeier
  * Created At: 2016-01-02
  */
 public class Logging

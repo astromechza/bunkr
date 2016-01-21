@@ -27,7 +27,6 @@ import org.json.simple.JSONAware;
 import org.json.simple.JSONValue;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-13
  */
 public class FragmentedRangeJSON

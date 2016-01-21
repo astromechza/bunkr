@@ -34,7 +34,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-12
  */
 public class FindCommand implements ICLICommand

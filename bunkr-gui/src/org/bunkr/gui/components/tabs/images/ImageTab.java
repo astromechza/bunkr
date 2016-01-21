@@ -42,7 +42,6 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 import java.io.IOException;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-03
  */
 public class ImageTab extends Tab implements IOpenedFileTab

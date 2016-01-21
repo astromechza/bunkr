@@ -51,7 +51,6 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-26
  */
 public class MainWindow extends BaseWindow

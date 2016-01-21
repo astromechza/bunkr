@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-20
  */
 public class PBKDF2Descriptor implements IDescriptor

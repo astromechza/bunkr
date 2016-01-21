@@ -44,7 +44,6 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 import java.io.IOException;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-19
  */
 public class ScryptSecurityWizard extends WizardWindow

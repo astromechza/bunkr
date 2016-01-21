@@ -34,7 +34,6 @@ import java.util.Queue;
 import java.util.UUID;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-27
  */
 public class InventoryTreeView extends TreeView<InventoryTreeData>

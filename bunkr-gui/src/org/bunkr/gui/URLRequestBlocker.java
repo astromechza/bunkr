@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.net.*;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-31
  */
 public class URLRequestBlocker

@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-08
  */
 public class FolderInventoryItem extends InventoryItem implements IFFContainer, IFFTraversalTarget

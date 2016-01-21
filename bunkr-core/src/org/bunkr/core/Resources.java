@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-24
  */
 public class Resources

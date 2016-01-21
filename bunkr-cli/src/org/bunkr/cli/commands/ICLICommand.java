@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Creator: benmeier
  * Created At: 2015-12-02
  */
 public interface ICLICommand

@@ -34,7 +34,6 @@ import java.io.InputStream;
 import java.util.zip.InflaterInputStream;
 
 /**
- * Creator: benmeier
  * Created At: 2015-11-21
  */
 public class MultilayeredInputStream extends InputStream

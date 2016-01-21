@@ -29,7 +29,6 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordRequirements;
 
 /**
- * Creator: benmeier
  * Created At: 2016-01-19
  */
 public class PasswordWizardPanel extends VBox

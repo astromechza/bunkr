@@ -28,7 +28,7 @@ import org.bunkr.core.inventory.Inventory;
 import org.json.simple.JSONObject;
 
 /**
- * Created by benmeier on 15/10/25.
+ * Created At: 2015-10-25
  *
  * This class contains publically readable plaintext information for how to read and decrypt the archive.
  */
