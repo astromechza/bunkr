@@ -24,7 +24,7 @@ package org.bunkr.core.streams.input;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.crypto.CipherBuilder;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.io.CipherInputStream;
@@ -52,7 +52,7 @@ public class MultilayeredInputStream extends InputStream
             this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
             this.topstream = this.baseStream;
 
-            if (! target.getEncryptionAlgorithm().equals(Algorithms.Encryption.NONE))
+            if (! target.getEncryptionAlgorithm().equals(Encryption.NONE))
             {
                 this.topstream = new CipherInputStream(
                         this.topstream, new BufferedBlockCipher(CipherBuilder.buildCipherForFile(target, false))

@@ -23,6 +23,7 @@
 package org.bunkr.core.inventory;
 
 import org.bunkr.core.fragmented_range.FragmentedRange;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 
 import java.util.Date;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class FileInventoryItem extends InventoryItem implements IFFTraversalTarg
     private long sizeOnDisk;
     private long modifiedAt;
     private byte[] encryptionData;
-    private Algorithms.Encryption encryptionAlgorithm;
+    private Encryption encryptionAlgorithm;
     private byte[] integrityHash;
     private FragmentedRange blocks;
     private long actualSize;
@@ -50,7 +51,7 @@ public class FileInventoryItem extends InventoryItem implements IFFTraversalTarg
             long actualSize,
             long modifiedAt,
             byte[] encryptionData,
-            Algorithms.Encryption encryptionAlgorithm,
+            Encryption encryptionAlgorithm,
             byte[] integrityHash,
             String mediaType
     )
@@ -73,7 +74,7 @@ public class FileInventoryItem extends InventoryItem implements IFFTraversalTarg
         this.blocks = new FragmentedRange();
         this.modifiedAt = System.currentTimeMillis();
         this.encryptionData = null;
-        this.encryptionAlgorithm = Algorithms.Encryption.NONE;
+        this.encryptionAlgorithm = Encryption.NONE;
         this.integrityHash = null;
         this.mediaType = MediaType.UNKNOWN;
     }
@@ -98,12 +99,12 @@ public class FileInventoryItem extends InventoryItem implements IFFTraversalTarg
         this.encryptionData = encryptionData;
     }
 
-    public Algorithms.Encryption getEncryptionAlgorithm()
+    public Encryption getEncryptionAlgorithm()
     {
         return encryptionAlgorithm;
     }
 
-    public void setEncryptionAlgorithm(Algorithms.Encryption encryptionAlgorithm)
+    public void setEncryptionAlgorithm(Encryption encryptionAlgorithm)
     {
         this.encryptionAlgorithm = encryptionAlgorithm;
     }

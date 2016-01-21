@@ -28,6 +28,7 @@ import javafx.util.Pair;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
+import org.bunkr.core.utils.Units;
 import org.bunkr.gui.ProgressTask;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
@@ -118,7 +119,7 @@ public class DragFileImportHandler implements Consumer<Pair<UUID, File>>
                         try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(archive, newFile))
                         {
                             this.updateMessage("Importing bytes...");
-                            byte[] buffer = new byte[1024 * 1024];
+                            byte[] buffer = new byte[(int) Units.MEBIBYTE];
                             int n;
                             while ((n = fis.read(buffer)) != -1)
                             {

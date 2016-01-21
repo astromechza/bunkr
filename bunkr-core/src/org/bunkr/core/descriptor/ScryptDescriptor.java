@@ -26,7 +26,7 @@ import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.generators.SCrypt;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.inventory.InventoryJSON;
 import org.bunkr.core.usersec.UserSecurityProvider;
@@ -36,8 +36,9 @@ import org.json.simple.JSONObject;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Creator: benmeier
@@ -47,25 +48,25 @@ public class ScryptDescriptor implements IDescriptor
 {
     public static final String IDENTIFIER = "scrypt";
     public static final int SALT_LENGTH = 128;
-    public static final int MINIMUM_SCRYPT_N = 2 << 13;
     public static final int DEFAULT_SCRYPT_R = 8;
     public static final int DEFAULT_SCRYPT_P = 1;
-    public static final List<Integer> SUGGESTED_SCRYPT_N_LIST = Collections.unmodifiableList(Arrays.asList(
-            2 << 13, 2 << 14, 2 << 15, 2 << 16, 2 << 17, 2 << 18, 2 << 19, 2 << 20
-    ));
+    public static final List<Integer> SUGGESTED_SCRYPT_N_LIST = IntStream.range(13, 20)
+            .map(a -> 2 << a).boxed()
+            .collect(Collectors.toList());
+    public static final int MINIMUM_SCRYPT_N = SUGGESTED_SCRYPT_N_LIST.get(0);
 
-    public static long calculateMemoryUsage(int n)
+    public static long calculateMemoryUsage(long n)
     {
-        return (128L * (long) ScryptDescriptor.DEFAULT_SCRYPT_R * n) + (128L * (long) ScryptDescriptor.DEFAULT_SCRYPT_R * (long) ScryptDescriptor.DEFAULT_SCRYPT_P);
+        return (128L * ((ScryptDescriptor.DEFAULT_SCRYPT_R * n) + (long) (ScryptDescriptor.DEFAULT_SCRYPT_R * ScryptDescriptor.DEFAULT_SCRYPT_P)));
     }
 
-    public final Algorithms.Encryption encryptionAlgorithm;
+    public final Encryption encryptionAlgorithm;
     public final int scryptN;
     public final byte[] scryptSalt;
     public final int scryptR;
     public final int scryptP;
 
-    public ScryptDescriptor(Algorithms.Encryption encryptionAlgorithm, int scryptN, byte[] scryptSalt, int scryptR, int scryptP)
+    public ScryptDescriptor(Encryption encryptionAlgorithm, int scryptN, byte[] scryptSalt, int scryptR, int scryptP)
     {
         this.encryptionAlgorithm = encryptionAlgorithm;
         this.scryptN = scryptN;
@@ -76,7 +77,7 @@ public class ScryptDescriptor implements IDescriptor
 
     public ScryptDescriptor(JSONObject o)
     {
-        this.encryptionAlgorithm = Algorithms.Encryption.valueOf((String) o.get("encryptionAlgorithm"));
+        this.encryptionAlgorithm = Encryption.valueOf((String) o.get("encryptionAlgorithm"));
         this.scryptSalt =  DatatypeConverter.parseBase64Binary((String) o.get("scryptSalt"));
         this.scryptN = ((Long) o.get("scryptN")).intValue();
         this.scryptR = ((Long) o.get("scryptR")).intValue();
@@ -140,7 +141,7 @@ public class ScryptDescriptor implements IDescriptor
             // first refresh the salt
             RandomMaker.fill(this.scryptSalt);
 
-            if (this.encryptionAlgorithm == Algorithms.Encryption.NONE)
+            if (this.encryptionAlgorithm == Encryption.NONE)
                 throw new IllegalArgumentException("ScryptDescriptor requires an active encryption mode");
 
             // generate the encryption key and iv using scrypt
@@ -167,13 +168,8 @@ public class ScryptDescriptor implements IDescriptor
         }
     }
 
-    public static IDescriptor make(Algorithms.Encryption algorithm, int scryptN)
+    public static IDescriptor make(Encryption algorithm, int scryptN)
     {
         return new ScryptDescriptor(algorithm, scryptN, RandomMaker.get(SALT_LENGTH), DEFAULT_SCRYPT_R, DEFAULT_SCRYPT_P);
-    }
-
-    public static IDescriptor makeDefaults()
-    {
-        return new ScryptDescriptor(Algorithms.Encryption.AES256_CTR, MINIMUM_SCRYPT_N, RandomMaker.get(SALT_LENGTH), DEFAULT_SCRYPT_R, DEFAULT_SCRYPT_P);
     }
 }

@@ -22,12 +22,14 @@
 
 package org.bunkr.core.inventory;
 
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Creator: benmeier
@@ -39,18 +41,14 @@ public class InventoryJSON
     public static JSONAware encodeO(Inventory input)
     {
         JSONObject out = new JSONObject();
-        JSONArray files = new JSONArray();
-        for (FileInventoryItem item : input.getFiles())
-        {
-            files.add(FileInventoryItemJSON.encodeO(item));
-        }
+        JSONArray files = input.getFiles().stream()
+                .map(FileInventoryItemJSON::encodeO)
+                .collect(Collectors.toCollection(JSONArray::new));
         out.put("files", files);
 
-        JSONArray folders = new JSONArray();
-        for (FolderInventoryItem item : input.getFolders())
-        {
-            folders.add(FolderInventoryItemJSON.encodeO(item));
-        }
+        JSONArray folders = input.getFolders().stream()
+                .map(FolderInventoryItemJSON::encodeO)
+                .collect(Collectors.toCollection(JSONArray::new));
         out.put("folders", folders);
         out.put("defaultEncryptionAlgorithm", input.getDefaultEncryption().toString());
         return out;
@@ -67,7 +65,7 @@ public class InventoryJSON
         Inventory outputInv = new Inventory(
                 new ArrayList<>(),
                 new ArrayList<>(),
-                Algorithms.Encryption.valueOf((String) input.get("defaultEncryptionAlgorithm"))
+                Encryption.valueOf((String) input.get("defaultEncryptionAlgorithm"))
         );
 
         for (Object item : (JSONArray) input.get("files"))

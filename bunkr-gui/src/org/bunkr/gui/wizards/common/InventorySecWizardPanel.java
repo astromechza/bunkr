@@ -27,7 +27,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 
 /**
  * Creator: benmeier
@@ -35,7 +35,7 @@ import org.bunkr.core.inventory.Algorithms;
  */
 public class InventorySecWizardPanel extends VBox
 {
-    protected final ComboBox<Algorithms.Encryption> inventorySecurityChoices = new ComboBox<>();
+    protected final ComboBox<Encryption> inventorySecurityChoices = new ComboBox<>();
 
     private static final String DESCRIPTION_TEXT = "The inventory security algorithm is the algorithm used to encrypt the " +
             "actual file hierarchy and metadata.";
@@ -46,10 +46,10 @@ public class InventorySecWizardPanel extends VBox
         Label descriptionLabel = new Label(DESCRIPTION_TEXT);
         descriptionLabel.setWrapText(true);
         this.getChildren().add(descriptionLabel);
-        inventorySecurityChoices.getItems().add(Algorithms.Encryption.AES128_CTR);
-        inventorySecurityChoices.getItems().add(Algorithms.Encryption.AES256_CTR);
-        inventorySecurityChoices.getItems().add(Algorithms.Encryption.TWOFISH128_CTR);
-        inventorySecurityChoices.getItems().add(Algorithms.Encryption.TWOFISH256_CTR);
+        inventorySecurityChoices.getItems().add(Encryption.AES128_CTR);
+        inventorySecurityChoices.getItems().add(Encryption.AES256_CTR);
+        inventorySecurityChoices.getItems().add(Encryption.TWOFISH128_CTR);
+        inventorySecurityChoices.getItems().add(Encryption.TWOFISH256_CTR);
         inventorySecurityChoices.getSelectionModel().select(0);
         Label label = new Label("Inventory Security:");
         label.setMaxHeight(Double.MAX_VALUE);
@@ -57,7 +57,7 @@ public class InventorySecWizardPanel extends VBox
         this.getChildren().add(new HBox(10, label, inventorySecurityChoices));
     }
 
-    public Algorithms.Encryption getSelectedValue()
+    public Encryption getSelectedValue()
     {
         return inventorySecurityChoices.getValue();
     }

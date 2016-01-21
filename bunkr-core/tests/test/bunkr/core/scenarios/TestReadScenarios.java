@@ -25,6 +25,7 @@ package test.bunkr.core.scenarios;
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
@@ -134,8 +135,9 @@ public class TestReadScenarios
         UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
-        context.getInventory().setDefaultEncryption(Algorithms.Encryption.AES256_CTR);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.make(
+                Encryption.AES128_CTR, 10000), usp);
+        context.getInventory().setDefaultEncryption(Encryption.AES256_CTR);
 
         runThreeFileTestOnContext(context, usp);
     }
@@ -149,8 +151,9 @@ public class TestReadScenarios
         UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
-        context.getInventory().setDefaultEncryption(Algorithms.Encryption.TWOFISH256_CTR);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.make(
+                Encryption.AES128_CTR, 10000), usp);
+        context.getInventory().setDefaultEncryption(Encryption.TWOFISH256_CTR);
 
         runThreeFileTestOnContext(context, usp);
     }
@@ -164,8 +167,9 @@ public class TestReadScenarios
         UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
-        context.getInventory().setDefaultEncryption(Algorithms.Encryption.AES128_CTR);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.make(
+                Encryption.AES128_CTR, 10000), usp);
+        context.getInventory().setDefaultEncryption(Encryption.AES128_CTR);
 
         runThreeFileTestOnContext(context, usp);
     }
@@ -179,8 +183,9 @@ public class TestReadScenarios
         UserSecurityProvider usp = new UserSecurityProvider(prov);
 
         // first create the demo file
-        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.makeDefaults(), usp);
-        context.getInventory().setDefaultEncryption(Algorithms.Encryption.TWOFISH128_CTR);
+        ArchiveInfoContext context = ArchiveBuilder.createNewEmptyArchive(tempfile, PBKDF2Descriptor.make(
+                Encryption.AES128_CTR, 10000), usp);
+        context.getInventory().setDefaultEncryption(Encryption.TWOFISH128_CTR);
 
         runThreeFileTestOnContext(context, usp);
     }

@@ -24,6 +24,7 @@ package test.bunkr.core.inventory;
 
 import org.bunkr.core.exceptions.TraversalException;
 import org.bunkr.core.inventory.*;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -115,7 +116,7 @@ public class TestInventoryPather
         Inventory i = new Inventory(
                 new ArrayList<>(),
                 new ArrayList<>(),
-                Algorithms.Encryption.NONE
+                Encryption.NONE
         );
         FolderInventoryItem d1 = new FolderInventoryItem("d1");
         i.addFolder(d1);

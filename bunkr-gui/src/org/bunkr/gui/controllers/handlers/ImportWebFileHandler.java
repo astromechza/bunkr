@@ -32,6 +32,7 @@ import okhttp3.Response;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
+import org.bunkr.core.utils.Units;
 import org.bunkr.gui.ProgressTask;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
@@ -184,7 +185,7 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
                 task.updateMessage("Reading from stream..");
                 long total = response.body().contentLength();
                 long bytesRead = 0;
-                byte[] buffer = new byte[1024 * 32];
+                byte[] buffer = new byte[(int)(32 * Units.KIBIBYTE)];
                 int n;
                 while ((n = connInputStream.read(buffer)) > -1)
                 {

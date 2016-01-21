@@ -35,6 +35,7 @@ import org.bunkr.core.streams.input.MultilayeredInputStream;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import org.bouncycastle.crypto.digests.*;
+import org.bunkr.core.utils.Units;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -94,7 +95,7 @@ public class HashCommand implements ICLICommand
         digest.reset();
         try (MultilayeredInputStream ms = new MultilayeredInputStream(context, target))
         {
-            byte[] buffer = new byte[1024 * 1024];
+            byte[] buffer = new byte[(int) Units.MEBIBYTE];
             int n;
             while ((n = ms.read(buffer)) != -1)
             {

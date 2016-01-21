@@ -28,7 +28,7 @@ import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bunkr.core.crypto.CipherBuilder;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 
 import java.util.Arrays;
 
@@ -38,7 +38,7 @@ import java.util.Arrays;
  */
 public class SimpleAES
 {
-    private static byte[] runAES(Algorithms.Encryption encryptionAlgorithm, boolean doEncrypt, byte[] subject, byte[] key, byte[] iv) throws CryptoException
+    private static byte[] runAES(Encryption encryptionAlgorithm, boolean doEncrypt, byte[] subject, byte[] key, byte[] iv) throws CryptoException
     {
         // set up padded buffered cipher
         PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(
@@ -59,12 +59,12 @@ public class SimpleAES
         return output;
     }
 
-    public static byte[] encrypt(Algorithms.Encryption encryptionAlgorithm, byte[] input, byte[] key, byte[] iv) throws CryptoException
+    public static byte[] encrypt(Encryption encryptionAlgorithm, byte[] input, byte[] key, byte[] iv) throws CryptoException
     {
         return runAES(encryptionAlgorithm, true, input, key, iv);
     }
 
-    public static byte[] decrypt(Algorithms.Encryption encryptionAlgorithm, byte[] input, byte[] key, byte[] iv) throws CryptoException
+    public static byte[] decrypt(Encryption encryptionAlgorithm, byte[] input, byte[] key, byte[] iv) throws CryptoException
     {
         byte[] withPadding = runAES(encryptionAlgorithm, false, input, key, iv);
         int trueLength = input.length;

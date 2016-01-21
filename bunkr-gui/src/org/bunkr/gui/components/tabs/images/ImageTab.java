@@ -94,8 +94,8 @@ public class ImageTab extends Tab implements IOpenedFileTab
             double Fy2 = Iy * newValue.doubleValue();
             this.imageView.setFitWidth(Fx2);
             this.imageView.setFitHeight(Fy2);
-            double Hx2 = (Cx * Fx2 - 0.5 * Sx) / (Fx2 - Sx);
-            double Hy2 = (Cy * Fy2 - 0.5 * Sy) / (Fy2 - Sy);
+            double Hx2 = (Cx * Fx2 - Sx / 2) / (Fx2 - Sx);
+            double Hy2 = (Cy * Fy2 - Sy / 2) / (Fy2 - Sy);
             this.scrollPane.setHvalue(Hx2);
             this.scrollPane.setVvalue(Hy2);
 

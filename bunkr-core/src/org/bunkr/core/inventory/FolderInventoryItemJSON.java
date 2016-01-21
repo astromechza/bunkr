@@ -29,6 +29,7 @@ import org.json.simple.JSONValue;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Creator: benmeier
@@ -44,18 +45,14 @@ public class FolderInventoryItemJSON
         out.put("name", input.getName());
         out.put("uuid", input.getUuid().toString());
 
-        JSONArray files = new JSONArray();
-        for (FileInventoryItem item : input.getFiles())
-        {
-            files.add(FileInventoryItemJSON.encodeO(item));
-        }
+        JSONArray files = input.getFiles().stream()
+                .map(FileInventoryItemJSON::encodeO)
+                .collect(Collectors.toCollection(JSONArray::new));
         out.put("files", files);
 
-        JSONArray folders = new JSONArray();
-        for (FolderInventoryItem item : input.getFolders())
-        {
-            folders.add(FolderInventoryItemJSON.encodeO(item));
-        }
+        JSONArray folders = input.getFolders().stream()
+                .map(FolderInventoryItemJSON::encodeO)
+                .collect(Collectors.toCollection(JSONArray::new));
         out.put("folders", folders);
         return out;
     }

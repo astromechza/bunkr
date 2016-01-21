@@ -25,7 +25,7 @@ package org.bunkr.core.streams.output;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.BlockAllocationManager;
 import org.bunkr.core.crypto.CipherBuilder;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.io.CipherOutputStream;
@@ -59,7 +59,7 @@ public class MultilayeredOutputStream extends OutputStream
 
         target.setEncryptionAlgorithm(context.getInventory().getDefaultEncryption());
 
-        if (! target.getEncryptionAlgorithm().equals(Algorithms.Encryption.NONE))
+        if (! target.getEncryptionAlgorithm().equals(Encryption.NONE))
         {
             this.topstream = new CipherOutputStream(
                     this.topstream, new BufferedBlockCipher(CipherBuilder.buildCipherForFile(target, true))

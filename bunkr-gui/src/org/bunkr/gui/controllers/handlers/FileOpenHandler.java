@@ -32,6 +32,7 @@ import org.bunkr.core.inventory.IFFTraversalTarget;
 import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.inventory.MediaType;
 import org.bunkr.core.utils.Formatters;
+import org.bunkr.core.utils.Units;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.dialogs.QuickDialogs;
@@ -83,7 +84,7 @@ public class FileOpenHandler implements EventHandler<ActionEvent>
             {
                 QuickDialogs.error("Cannot open file of unknown type. Use Context Menu > Info to change the type.");
             }
-            else if (selectedFile.getActualSize() < (1024 * 1024) || QuickDialogs.confirm(
+            else if (selectedFile.getActualSize() < (Units.MEBIBYTE) || QuickDialogs.confirm(
                     "Please Confirm", "This is a large file!", "File %s is %s in size. Are you sure you want to open it?",
                     selectedFile.getName(), Formatters.formatBytes(selectedFile.getActualSize())))
             {

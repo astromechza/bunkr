@@ -29,6 +29,7 @@ import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.utils.RandomMaker;
 
@@ -52,7 +53,7 @@ public class CipherBuilder
      */
     public static BlockCipher buildCipherForFile(FileInventoryItem file, boolean encrypting)
     {
-        Algorithms.Encryption alg = file.getEncryptionAlgorithm();
+        Encryption alg = file.getEncryptionAlgorithm();
 
         if (alg.c.equals(Algorithms.SYMMETRIC_CIPHER.AES))
         {
@@ -103,7 +104,7 @@ public class CipherBuilder
      * @param iv initialization vector data bytes
      * @return a BlockCipher
      */
-    public static BlockCipher buildCipher(Algorithms.Encryption alg, boolean encrypting, byte[] key, byte[] iv)
+    public static BlockCipher buildCipher(Encryption alg, boolean encrypting, byte[] key, byte[] iv)
     {
         if (key.length != alg.keyByteLength) throw new IllegalArgumentException(
                 String.format("Supplied key length %s != required key length %s", key.length, alg.keyByteLength)

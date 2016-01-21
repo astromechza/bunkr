@@ -31,6 +31,7 @@ import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.inventory.IFFTraversalTarget;
 import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
+import org.bunkr.core.utils.Units;
 import org.bunkr.gui.ProgressTask;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
@@ -113,7 +114,7 @@ public class FileExportHandler implements EventHandler<ActionEvent>
                         try (MultilayeredInputStream ms = new MultilayeredInputStream(archive, selectedFile))
                         {
                             this.updateMessage("Exporting bytes...");
-                            byte[] buffer = new byte[1024 * 1024];
+                            byte[] buffer = new byte[(int) Units.MEBIBYTE];
                             int n;
                             while ((n = ms.read(buffer)) != -1)
                             {

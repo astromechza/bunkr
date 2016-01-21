@@ -28,6 +28,7 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.commands.RmCommand;
 import org.bunkr.core.inventory.*;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
@@ -59,7 +60,7 @@ public class TestRmCommand
         Inventory i = new Inventory(
                 new ArrayList<>(),
                 new ArrayList<>(),
-                Algorithms.Encryption.NONE
+                Encryption.NONE
         );
         FolderInventoryItem d1 = new FolderInventoryItem("t1");
         i.addFolder(d1);

@@ -24,7 +24,7 @@ package org.bunkr.core;
 
 import org.bunkr.core.descriptor.IDescriptor;
 import org.bunkr.core.exceptions.BaseBunkrException;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.inventory.Inventory;
 import org.bouncycastle.crypto.CryptoException;
 import org.bunkr.core.usersec.UserSecurityProvider;
@@ -47,7 +47,7 @@ public class ArchiveBuilder
         Inventory blankInventory = new Inventory(
                 new ArrayList<>(),
                 new ArrayList<>(),
-                Algorithms.Encryption.NONE
+                Encryption.NONE
         );
 
         try(FileOutputStream fos = new FileOutputStream(path))

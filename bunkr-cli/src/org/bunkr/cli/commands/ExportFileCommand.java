@@ -35,6 +35,7 @@ import org.bunkr.core.streams.input.MultilayeredInputStream;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import org.bunkr.core.utils.Units;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -122,7 +123,7 @@ public class ExportFileCommand implements ICLICommand
         try (MultilayeredInputStream ms = new MultilayeredInputStream(ctxt, targetFile))
         {
             ms.setCheckHashOnFinish(checkHash);
-            byte[] buffer = new byte[1024 * 1024];
+            byte[] buffer = new byte[(int) Units.MEBIBYTE];
             int n;
             while ((n = ms.read(buffer)) != -1)
             {

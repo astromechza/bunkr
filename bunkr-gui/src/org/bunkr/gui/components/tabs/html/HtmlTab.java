@@ -34,6 +34,7 @@ import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Logging;
+import org.bunkr.core.utils.Units;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.dialogs.QuickDialogs;
@@ -138,7 +139,7 @@ public class HtmlTab extends Tab implements IOpenedFileTab
                         MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, this.subject);
                         InputStream is = new ByteArrayInputStream(this.editorArea.getText().getBytes()))
                 {
-                    byte[] buffer = new byte[1024 * 1024];
+                    byte[] buffer = new byte[(int) Units.MEBIBYTE];
                     int n;
                     while ((n = is.read(buffer)) != -1)
                     {
@@ -188,7 +189,7 @@ public class HtmlTab extends Tab implements IOpenedFileTab
         try (MultilayeredInputStream ms = new MultilayeredInputStream(this.archive, this.subject))
         {
             ms.setCheckHashOnFinish(true);
-            byte[] buffer = new byte[1024 * 1024];
+            byte[] buffer = new byte[(int) Units.MEBIBYTE];
             int n;
             while ((n = ms.read(buffer)) != -1)
             {

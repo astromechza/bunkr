@@ -36,7 +36,7 @@ import org.bunkr.core.Resources;
 import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.descriptor.ScryptDescriptor;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.gui.wizards.PBKDF2SecurityWizard;
 import org.bunkr.gui.wizards.ScryptSecurityWizard;
@@ -129,7 +129,7 @@ public class ArchiveSecurityWindow extends BaseWindow
                         if (QuickDialogs.confirm("Set security model to %s?", PlaintextDescriptor.IDENTIFIER))
                         {
                             this.archive.setDescriptor(new PlaintextDescriptor());
-                            this.archive.getInventory().setDefaultEncryption(Algorithms.Encryption.NONE);
+                            this.archive.getInventory().setDefaultEncryption(Encryption.NONE);
                             this.onSaveMetadataRequest.accept("Updated Security Model");
                         }
                         return;

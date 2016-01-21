@@ -27,7 +27,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 
 /**
  * Creator: benmeier
@@ -35,7 +35,7 @@ import org.bunkr.core.inventory.Algorithms;
  */
 public class FileSecWizardPanel extends VBox
 {
-    protected final ComboBox<Algorithms.Encryption> fileSecurityChoices = new ComboBox<>();
+    protected final ComboBox<Encryption> fileSecurityChoices = new ComboBox<>();
 
     private static final String DESCRIPTION_TEXT = "The file security algorithm is the algorithm used to encrypt the " +
             "actual contents of the files stored in this archive.";
@@ -46,10 +46,10 @@ public class FileSecWizardPanel extends VBox
         Label descriptionLabel = new Label(DESCRIPTION_TEXT);
         descriptionLabel.setWrapText(true);
         this.getChildren().add(descriptionLabel);
-        fileSecurityChoices.getItems().add(Algorithms.Encryption.AES128_CTR);
-        fileSecurityChoices.getItems().add(Algorithms.Encryption.AES256_CTR);
-        fileSecurityChoices.getItems().add(Algorithms.Encryption.TWOFISH128_CTR);
-        fileSecurityChoices.getItems().add(Algorithms.Encryption.TWOFISH256_CTR);
+        fileSecurityChoices.getItems().add(Encryption.AES128_CTR);
+        fileSecurityChoices.getItems().add(Encryption.AES256_CTR);
+        fileSecurityChoices.getItems().add(Encryption.TWOFISH128_CTR);
+        fileSecurityChoices.getItems().add(Encryption.TWOFISH256_CTR);
         fileSecurityChoices.getSelectionModel().select(0);
         Label label = new Label("File Security:");
         label.setMaxHeight(Double.MAX_VALUE);
@@ -57,7 +57,7 @@ public class FileSecWizardPanel extends VBox
         this.getChildren().add(new HBox(10, label, fileSecurityChoices));
     }
 
-    public Algorithms.Encryption getSelectedValue()
+    public Encryption getSelectedValue()
     {
         return fileSecurityChoices.getValue();
     }

@@ -31,6 +31,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bunkr.core.inventory.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Creator: benmeier
@@ -101,13 +102,9 @@ public class FindCommand implements ICLICommand
         List<InventoryItem> itemsToSort = new ArrayList<>();
         if (type == null || type.equals(ARG_TYPE_FILE))
         {
-            for (FileInventoryItem item : root.getFiles())
-            {
-                if ((prefix == null || item.getName().startsWith(prefix)) && (suffix == null || item.getName().endsWith(suffix)))
-                {
-                    itemsToSort.add(item);
-                }
-            }
+            itemsToSort.addAll(root.getFiles().stream()
+               .filter(item -> (prefix == null || item.getName().startsWith(prefix)) && (suffix == null || item.getName().endsWith(suffix)))
+               .collect(Collectors.toList()));
         }
         itemsToSort.addAll(root.getFolders());
         Collections.sort(itemsToSort);

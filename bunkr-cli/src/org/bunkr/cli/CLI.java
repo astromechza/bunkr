@@ -54,6 +54,7 @@ public class CLI
     public static final Map<String, ICLICommand> commands = new HashMap<>();
     static
     {
+        commands.put("show-security", new ShowSecurityCommand());
         commands.put("check-password", new CheckPasswordCommand());
         commands.put("change-security", new ChangeSecurityCommand());
         commands.put("create", new CreateCommand());

@@ -35,6 +35,7 @@ import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
+import org.bunkr.core.utils.Units;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -151,7 +152,7 @@ public class ImportFileCommand implements ICLICommand
 
         try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))
         {
-            byte[] buffer = new byte[1024 * 1024];
+            byte[] buffer = new byte[(int) Units.MEBIBYTE];
             int n;
             while ((n = is.read(buffer)) != -1)
             {

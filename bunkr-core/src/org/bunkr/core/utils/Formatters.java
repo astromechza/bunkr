@@ -32,67 +32,52 @@ import java.util.Date;
  */
 public class Formatters
 {
-    public static final long KIBIBYTE = 1024;
-    public static final long MEBIBYTE = KIBIBYTE * KIBIBYTE;
-    public static final long GIBIBYTE = KIBIBYTE * MEBIBYTE;
-    public static final long TEBIBYTE = KIBIBYTE * GIBIBYTE;
-
-    public static final long KILO = 1000;
-    public static final long MEGA = KILO * KILO;
-    public static final long GIGA = KILO * MEGA;
-    public static final long TERA = KILO * GIGA;
-
-    public static final long MILLISECOND = 1;
-    public static final long SECOND = 1000 * MILLISECOND;
-    public static final long MINUTE = 60 * SECOND;
-    public static final long HOUR = 60 * MINUTE;
-    public static final long DAY = 24 * HOUR;
 
     public static String formatBytes(long numBytes)
     {
-        if (numBytes < KIBIBYTE)
+        if (numBytes < Units.KIBIBYTE)
         {
             return String.format("%dB", numBytes);
         }
-        else if (numBytes < MEBIBYTE)
+        else if (numBytes < Units.MEBIBYTE)
         {
-            return String.format("%.1fKi", numBytes / (float) KIBIBYTE);
+            return String.format("%.1fKi", numBytes / (float) Units.KIBIBYTE);
         }
-        else if (numBytes < GIBIBYTE)
+        else if (numBytes < Units.GIBIBYTE)
         {
-            return String.format("%.1fMi", numBytes / (float) MEBIBYTE);
+            return String.format("%.1fMi", numBytes / (float) Units.MEBIBYTE);
         }
-        else if (numBytes < TEBIBYTE)
+        else if (numBytes < Units.TEBIBYTE)
         {
-            return String.format("%.1fGi", numBytes / (float) GIBIBYTE);
+            return String.format("%.1fGi", numBytes / (float) Units.GIBIBYTE);
         }
         else
         {
-            return String.format("%.1fTi", numBytes / (float) TEBIBYTE);
+            return String.format("%.1fTi", numBytes / (float) Units.TEBIBYTE);
         }
     }
 
     public static String formatPrettyInt(long n)
     {
-        if (n < KILO)
+        if (n < Units.KILO)
         {
             return String.format("%dB", n);
         }
-        else if (n < MEGA)
+        else if (n < Units.MEGA)
         {
-            return String.format("%.1fK", n / (double) KILO);
+            return String.format("%.1fK", n / (double) Units.KILO);
         }
-        else if (n < GIGA)
+        else if (n < Units.GIGA)
         {
-            return String.format("%.1fM", n / (double) MEGA);
+            return String.format("%.1fM", n / (double) Units.MEGA);
         }
-        else if (n < TERA)
+        else if (n < Units.TERA)
         {
-            return String.format("%.1fG", n / (double) GIGA);
+            return String.format("%.1fG", n / (double) Units.GIGA);
         }
         else
         {
-            return String.format("%.1fT", n / (double) TERA);
+            return String.format("%.1fT", n / (double) Units.TERA);
         }
     }
 
@@ -116,10 +101,10 @@ public class Formatters
     {
         if (milliseconds == 0) return "0";
         if (milliseconds < 0) return "Unknown";
-        if (milliseconds > DAY) return String.format("%.1f Days", milliseconds / (double) DAY);
-        if (milliseconds > HOUR) return String.format("%.1f Hours", milliseconds / (double) HOUR);
-        if (milliseconds > MINUTE) return String.format("%.1f Minutes", milliseconds / (double) MINUTE);
-        if (milliseconds > SECOND) return String.format("%.1f Seconds", milliseconds / (double) SECOND);
+        if (milliseconds > Units.DAY) return String.format("%.1f Days", milliseconds / (double) Units.DAY);
+        if (milliseconds > Units.HOUR) return String.format("%.1f Hours", milliseconds / (double) Units.HOUR);
+        if (milliseconds > Units.MINUTE) return String.format("%.1f Minutes", milliseconds / (double) Units.MINUTE);
+        if (milliseconds > Units.SECOND) return String.format("%.1f Seconds", milliseconds / (double) Units.SECOND);
         return String.format("%d Milliseconds", (long) milliseconds);
     }
 

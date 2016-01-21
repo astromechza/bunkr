@@ -201,8 +201,8 @@ public class ProgressDialog extends Dialog<Void>
             double h = getHeight() - insets.getTop() - insets.getBottom();
 
             double prefH = progressBar.prefHeight(-1);
-            double x = insets.getLeft() + (w - w) / 2.0;
-            double y = insets.getTop() + (h - prefH) / 2.0;
+            double x = insets.getLeft() + (w - w) / 2;
+            double y = insets.getTop() + (h - prefH) / 2;
 
             progressBar.resizeRelocate(x, y, w, prefH);
         }

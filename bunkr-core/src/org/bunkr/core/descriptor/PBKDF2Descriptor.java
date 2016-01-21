@@ -23,13 +23,12 @@
 package org.bunkr.core.descriptor;
 
 import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.IllegalPasswordException;
@@ -38,6 +37,7 @@ import org.bunkr.core.inventory.InventoryJSON;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.core.utils.RandomMaker;
 import org.bunkr.core.utils.SimpleAES;
+import org.bunkr.core.utils.Units;
 import org.json.simple.JSONObject;
 
 import javax.xml.bind.DatatypeConverter;
@@ -55,14 +55,15 @@ public class PBKDF2Descriptor implements IDescriptor
     public static final int MINIMUM_PBKD2_ITERS = 4096;
     public static final int SALT_LENGTH = 128;
     public static final List<Integer> SUGGESTED_ITERATION_TIME_LIST = Collections.unmodifiableList(Arrays.asList(
-            100, 500, 1000, 2000, 3000, 5000, 10000
+            100 * Units.MILLISECOND, Units.SECOND / 2, Units.SECOND,
+            2 * Units.SECOND, 3 * Units.SECOND, 5 * Units.SECOND, 10 * Units.SECOND
     ));
 
-    public final Algorithms.Encryption encryptionAlgorithm;
+    public final Encryption encryptionAlgorithm;
     public final int pbkdf2Iterations;
     public final byte[] pbkdf2Salt;
 
-    public PBKDF2Descriptor(Algorithms.Encryption encryptionAlgorithm, int pbkdf2Iterations, byte[] pbkdf2Salt)
+    public PBKDF2Descriptor(Encryption encryptionAlgorithm, int pbkdf2Iterations, byte[] pbkdf2Salt)
     {
         this.encryptionAlgorithm = encryptionAlgorithm;
         this.pbkdf2Iterations = pbkdf2Iterations;
@@ -74,7 +75,7 @@ public class PBKDF2Descriptor implements IDescriptor
 
     public PBKDF2Descriptor(JSONObject params)
     {
-        encryptionAlgorithm = Algorithms.Encryption.valueOf((String) params.get("encryptionAlgorithm"));
+        encryptionAlgorithm = Encryption.valueOf((String) params.get("encryptionAlgorithm"));
         pbkdf2Iterations = ((Long) params.get("timeComboBox")).intValue();
         pbkdf2Salt =  DatatypeConverter.parseBase64Binary((String) params.get("salt"));
 
@@ -104,7 +105,7 @@ public class PBKDF2Descriptor implements IDescriptor
     {
         try
         {
-            if (this.encryptionAlgorithm == Algorithms.Encryption.NONE)
+            if (this.encryptionAlgorithm == Encryption.NONE)
                 throw new IllegalArgumentException("PBKDF2Descriptor requires an active encryption mode");
 
             PKCS5S2ParametersGenerator g = new PKCS5S2ParametersGenerator(new SHA256Digest());
@@ -135,7 +136,7 @@ public class PBKDF2Descriptor implements IDescriptor
         {
             byte[] inventoryJsonBytes = InventoryJSON.encode(source).getBytes();
 
-            if (this.encryptionAlgorithm == Algorithms.Encryption.NONE)
+            if (this.encryptionAlgorithm == Encryption.NONE)
                 throw new IllegalArgumentException("PBKDF2Descriptor requires an active encryption mode");
 
             // first refresh the salt
@@ -164,12 +165,7 @@ public class PBKDF2Descriptor implements IDescriptor
         }
     }
 
-    public static IDescriptor makeDefaults()
-    {
-        return new PBKDF2Descriptor(Algorithms.Encryption.AES256_CTR, 10000, RandomMaker.get(SALT_LENGTH));
-    }
-
-    public static IDescriptor make(Algorithms.Encryption algorithm, int iterations)
+    public static IDescriptor make(Encryption algorithm, int iterations)
     {
         return new PBKDF2Descriptor(algorithm, iterations, RandomMaker.get(SALT_LENGTH));
     }

@@ -22,6 +22,8 @@
 
 package org.bunkr.core.inventory;
 
+import org.bunkr.core.inventory.Algorithms.Encryption;
+
 import java.util.List;
 
 /**
@@ -30,10 +32,10 @@ import java.util.List;
  */
 public class Inventory implements IFFContainer, IFFTraversalTarget
 {
-    private Algorithms.Encryption defaultEncryption;
+    private Encryption defaultEncryption;
     private final FFContainer ffcontainer;
 
-    public Inventory(List<FileInventoryItem> files, List<FolderInventoryItem> folders, Algorithms.Encryption encrypted)
+    public Inventory(List<FileInventoryItem> files, List<FolderInventoryItem> folders, Encryption encrypted)
     {
         this.ffcontainer = new FFContainer(files, folders);
         this.defaultEncryption = encrypted;
@@ -63,15 +65,15 @@ public class Inventory implements IFFContainer, IFFTraversalTarget
 
     public boolean areFilesEncrypted()
     {
-        return defaultEncryption != null && defaultEncryption != Algorithms.Encryption.NONE;
+        return defaultEncryption != null && defaultEncryption != Encryption.NONE;
     }
 
-    public Algorithms.Encryption getDefaultEncryption()
+    public Encryption getDefaultEncryption()
     {
         return defaultEncryption;
     }
 
-    public void setDefaultEncryption(Algorithms.Encryption defaultEncryption)
+    public void setDefaultEncryption(Encryption defaultEncryption)
     {
         this.defaultEncryption = defaultEncryption;
     }

@@ -32,7 +32,7 @@ import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.descriptor.ScryptDescriptor;
-import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Formatters;
 
@@ -83,16 +83,16 @@ public class ChangeSecurityCommand implements ICLICommand
                 .help("read the new archive password from the given file or '-' for stdin");
         p1.addArgument("--file-security")
                 .dest(ARG_FILE_SECURITY)
-                .setDefault(Algorithms.Encryption.AES256_CTR)
-                .choices(Algorithms.Encryption.AES128_CTR, Algorithms.Encryption.AES256_CTR, Algorithms.Encryption.TWOFISH128_CTR, Algorithms.Encryption.TWOFISH256_CTR)
-                .type(Algorithms.Encryption.class)
+                .setDefault(Encryption.AES256_CTR)
+                .choices(Encryption.AES128_CTR, Encryption.AES256_CTR, Encryption.TWOFISH128_CTR, Encryption.TWOFISH256_CTR)
+                .type(Encryption.class)
                 .help("set the encryption used on files");
         p1.addArgument("--inventory-security")
                 .dest(ARG_INV_SECURITY)
-                .setDefault(Algorithms.Encryption.AES256_CTR)
-                .choices(Algorithms.Encryption.AES128_CTR, Algorithms.Encryption.AES256_CTR,
-                         Algorithms.Encryption.TWOFISH128_CTR, Algorithms.Encryption.TWOFISH256_CTR)
-                .type(Algorithms.Encryption.class)
+                .setDefault(Encryption.AES256_CTR)
+                .choices(Encryption.AES128_CTR, Encryption.AES256_CTR,
+                         Encryption.TWOFISH128_CTR, Encryption.TWOFISH256_CTR)
+                .type(Encryption.class)
                 .help("set the encryption used on the hierarchy metadata");
         p1.addArgument("--iterations-time")
                 .dest(ARG_ITERATIONS_TIME)
@@ -106,15 +106,15 @@ public class ChangeSecurityCommand implements ICLICommand
                 .help("read the new archive password from the given file or '-' for stdin");
         p2.addArgument("--file-security")
                 .dest(ARG_FILE_SECURITY)
-                .setDefault(Algorithms.Encryption.AES256_CTR)
-                .choices(Algorithms.Encryption.AES128_CTR, Algorithms.Encryption.AES256_CTR, Algorithms.Encryption.TWOFISH128_CTR, Algorithms.Encryption.TWOFISH256_CTR)
-                .type(Algorithms.Encryption.class)
+                .setDefault(Encryption.AES256_CTR)
+                .choices(Encryption.AES128_CTR, Encryption.AES256_CTR, Encryption.TWOFISH128_CTR, Encryption.TWOFISH256_CTR)
+                .type(Encryption.class)
                 .help("set the encryption used on files");
         p2.addArgument("--inventory-security")
                 .dest(ARG_INV_SECURITY)
-                .setDefault(Algorithms.Encryption.AES256_CTR)
-                .choices(Algorithms.Encryption.AES128_CTR, Algorithms.Encryption.AES256_CTR, Algorithms.Encryption.TWOFISH128_CTR, Algorithms.Encryption.TWOFISH256_CTR)
-                .type(Algorithms.Encryption.class)
+                .setDefault(Encryption.AES256_CTR)
+                .choices(Encryption.AES128_CTR, Encryption.AES256_CTR, Encryption.TWOFISH128_CTR, Encryption.TWOFISH256_CTR)
+                .type(Encryption.class)
                 .help("set the encryption used on the hierarchy metadata");
         p2.addArgument("--memory-use")
                 .dest(ARG_MEMORY_USAGE)
@@ -141,7 +141,7 @@ public class ChangeSecurityCommand implements ICLICommand
         {
             case PlaintextDescriptor.IDENTIFIER:
                 context.setDescriptor(new PlaintextDescriptor());
-                context.getInventory().setDefaultEncryption(Algorithms.Encryption.NONE);
+                context.getInventory().setDefaultEncryption(Encryption.NONE);
                 break;
             case PBKDF2Descriptor.IDENTIFIER:
                 usp.setProvider(makeCLIPasswordProvider(args.get(ARG_NEW_PASSWORD_FILE), "Enter new password for pbkdf2:"));
