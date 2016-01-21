@@ -22,11 +22,23 @@
 
 package org.bunkr.gui.wizards.common;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.PasswordRequirements;
+import org.bunkr.gui.Icons;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Created At: 2016-01-19
@@ -42,8 +54,9 @@ public class PasswordWizardPanel extends VBox
 
     private static final String DESCRIPTION_TEXT = "Pick a new password to protect this archive.";
 
-    protected final PasswordField passwordBox = new PasswordField();
-    protected final PasswordField passwordConfirmBox = new PasswordField();
+    private final PasswordField passwordBox = new PasswordField();
+    private final PasswordField passwordConfirmBox = new PasswordField();
+    private final TextField passwordFilePathBox = new TextField();
     private final Label passwordNote = new Label("");
 
     public PasswordWizardPanel()
@@ -53,10 +66,18 @@ public class PasswordWizardPanel extends VBox
         this.passwordConfirmBox.setPromptText("Enter the password again");
         this.passwordConfirmBox.setMaxWidth(Double.MAX_VALUE);
         this.passwordConfirmBox.setDisable(true);
+        this.passwordFilePathBox.setEditable(false);
+        this.passwordFilePathBox.setFocusTraversable(false);
+        this.passwordFilePathBox.getStyleClass().add("no-focus-style");
         this.passwordNote.setId("pw-note-field");
         Label descriptionLabel = new Label(DESCRIPTION_TEXT);
         descriptionLabel.setWrapText(true);
-        this.getChildren().addAll(descriptionLabel, passwordBox, passwordConfirmBox, passwordNote);
+        Button pickPasswordFileButton = Icons.buildIconButton("Select", Icons.ICON_ELLIPSIS);
+        this.getChildren().addAll(descriptionLabel,
+                                  new Label("Password:"), passwordBox, passwordConfirmBox, passwordNote,
+                                  new Label("Password File:"),
+                                  new HBox(10, passwordFilePathBox, pickPasswordFileButton));
+        HBox.setHgrow(this.passwordFilePathBox, Priority.ALWAYS);
         this.setSpacing(10);
         this.setMaxWidth(Double.MAX_VALUE);
 
@@ -64,6 +85,7 @@ public class PasswordWizardPanel extends VBox
             this.passwordConfirmBox.setText("");
             this.passwordConfirmBox.setDisable(true);
             this.passwordNote.getStyleClass().clear();
+            this.passwordFilePathBox.clear();
 
             if (this.passwordBox.getText().equals(""))
             {
@@ -87,6 +109,7 @@ public class PasswordWizardPanel extends VBox
 
         this.passwordConfirmBox.textProperty().addListener((observable, oldValue, newValue) -> {
             this.passwordNote.getStyleClass().clear();
+            this.passwordFilePathBox.clear();
             if (this.passwordConfirmBox.getText().equals(this.passwordBox.getText()))
             {
                 this.passwordNote.setText(PW_NOTE_MATCH);
@@ -102,13 +125,42 @@ public class PasswordWizardPanel extends VBox
                 this.passwordNote.getStyleClass().add(PW_NOTE_CLASS_NOT_OK);
             }
         });
+
+        pickPasswordFileButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Pick password file");
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"));
+            File selectedPath = fileChooser.showOpenDialog(this.getScene().getWindow());
+            if (selectedPath != null)
+            {
+                this.passwordBox.clear();
+                this.passwordConfirmBox.clear();
+                this.passwordConfirmBox.setDisable(true);
+                this.passwordFilePathBox.setText(selectedPath.getAbsolutePath());
+            }
+        });
     }
 
     public String getPasswordValue() throws IllegalPasswordException
     {
-        PasswordRequirements.checkPasses(passwordBox.getText().getBytes());
-        if (! passwordBox.getText().equals(passwordConfirmBox.getText()))
-            throw new IllegalPasswordException("Password confirmation does not match");
-        return passwordBox.getText();
+        if (passwordBox.getText() != null && passwordBox.getText().length() > 0)
+        {
+            if (! passwordBox.getText().equals(passwordConfirmBox.getText()))
+                throw new IllegalPasswordException("Password confirmation does not match");
+            return passwordBox.getText();
+        }
+        if (passwordFilePathBox.getText() != null && passwordFilePathBox.getText().length() > 0)
+        {
+            try(BufferedReader br = Files.newBufferedReader(Paths.get(passwordFilePathBox.getText())))
+            {
+                return br.readLine();
+            }
+            catch (IOException e)
+            {
+                throw new IllegalPasswordException("Cannot read password from %s", passwordFilePathBox.getText());
+            }
+        }
+
+        return "";
     }
 }

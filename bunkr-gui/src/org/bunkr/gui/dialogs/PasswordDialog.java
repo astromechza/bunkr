@@ -70,7 +70,9 @@ public class PasswordDialog extends BaseWindow
         this.passwordFileLabel = new Label("Password File:");
         this.passwordField = new PasswordField();
         this.passwordFilePathBox = new TextField();
+        this.passwordFilePathBox.setEditable(false);
         this.pickPasswordFileButton = Icons.buildIconButton("Select", Icons.ICON_ELLIPSIS);
+        this.passwordFilePathBox.setFocusTraversable(false);
         this.cancelButton = Icons.buildIconButton("Cancel", Icons.ICON_CROSS);
         this.continueButton = Icons.buildIconButton("Continue", Icons.ICON_TICK);
         this.continueButton.setDisable(true);
@@ -170,6 +172,7 @@ public class PasswordDialog extends BaseWindow
         this.passwordLabel.getStyleClass().add("small-label");
         this.passwordFileLabel.getStyleClass().add("small-label");
         this.getRootLayout().getStyleClass().add("background");
+        this.passwordFilePathBox.getStyleClass().add("no-focus-style");
     }
 
     @Override

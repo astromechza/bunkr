@@ -97,18 +97,6 @@ public class PBKDF2SecurityWizard extends WizardWindow
     {
         // Validation of choices here
 
-        // first the password
-        try
-        {
-            pwdpanel.getPasswordValue();
-        }
-        catch (IllegalPasswordException e)
-        {
-            gotoPage(2);
-            QuickDialogs.error("Password does not meet requirements: %s", e.getMessage());
-            return false;
-        }
-
         // now the pbkdf2 iterations
         int selectedTime = pbkditerpanel.timeComboBox.getSelectionModel().getSelectedItem().value;
         int pbkdf2Iterations = PBKDF2Descriptor.calculateRounds(selectedTime);
@@ -127,6 +115,12 @@ public class PBKDF2SecurityWizard extends WizardWindow
 
             // save!
             MetadataWriter.write(archive, securityProvider);
+        }
+        catch (IllegalPasswordException e)
+        {
+            gotoPage(2);
+            QuickDialogs.error("Password does not meet requirements: %s", e.getMessage());
+            return false;
         }
         catch (BaseBunkrException | IOException e)
         {

@@ -98,18 +98,6 @@ public class ScryptSecurityWizard extends WizardWindow
     {
         // Validation of choices here
 
-        // first the password
-        try
-        {
-            pwdpanel.getPasswordValue();
-        }
-        catch (IllegalPasswordException e)
-        {
-            gotoPage(2);
-            QuickDialogs.error("Password does not meet requirements: %s", e.getMessage());
-            return false;
-        }
-
         // now the scrypt memusage
         int scryptN = memusepanel.timeComboBox.getValue().value;
         scryptN = Math.max(scryptN, ScryptDescriptor.MINIMUM_SCRYPT_N);
@@ -128,6 +116,12 @@ public class ScryptSecurityWizard extends WizardWindow
 
             // save!
             MetadataWriter.write(archive, securityProvider);
+        }
+        catch (IllegalPasswordException e)
+        {
+            gotoPage(2);
+            QuickDialogs.error("Password does not meet requirements: %s", e.getMessage());
+            return false;
         }
         catch (BaseBunkrException | IOException e)
         {
