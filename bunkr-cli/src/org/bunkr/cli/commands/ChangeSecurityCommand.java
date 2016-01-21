@@ -35,6 +35,7 @@ import org.bunkr.core.descriptor.ScryptDescriptor;
 import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Formatters;
+import org.bunkr.core.utils.Units;
 
 import java.util.LinkedHashMap;
 
@@ -58,12 +59,12 @@ public class ChangeSecurityCommand implements ICLICommand
         this.pbkdf2IterTimeChoices = new LinkedHashMap<>();
         for (Integer ms : PBKDF2Descriptor.SUGGESTED_ITERATION_TIME_LIST)
         {
-            this.pbkdf2IterTimeChoices.put(String.format("%.1fs", (float) ms / 1000), ms);
+            this.pbkdf2IterTimeChoices.put(String.format("%.1fs", (float) ms / Units.SECOND), ms);
         }
         this.scryptNChoices = new LinkedHashMap<>();
         for (Integer n : ScryptDescriptor.SUGGESTED_SCRYPT_N_LIST)
         {
-            this.scryptNChoices.put(Formatters.formatBytes(ScryptDescriptor.calculateMemoryUsage(n)) + "B", n);
+            this.scryptNChoices.put(Formatters.formatBytes(ScryptDescriptor.calculateMemoryUsage(n)), n);
         }
     }
 

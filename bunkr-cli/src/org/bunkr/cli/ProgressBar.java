@@ -23,6 +23,7 @@
 package org.bunkr.cli;
 
 import org.bunkr.core.utils.Formatters;
+import org.bunkr.core.utils.Units;
 
 import java.util.Arrays;
 
@@ -145,7 +146,7 @@ public class ProgressBar
 
             if (elapsedMs > 0 && ncols >= 12)
             {
-                String rateBar = Formatters.formatPrettyInt(1000 * n / elapsedMs);
+                String rateBar = Formatters.formatPrettyInt(Units.SECOND * n / elapsedMs);
                 int rateBarL = rateBar.length();
                 int startOfRateSection = ncols / 2 - rateBarL / 2;
                 bar[startOfRateSection - 1] = '[';

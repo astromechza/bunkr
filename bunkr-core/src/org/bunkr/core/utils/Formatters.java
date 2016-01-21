@@ -40,19 +40,19 @@ public class Formatters
         }
         else if (numBytes < Units.MEBIBYTE)
         {
-            return String.format("%.1fKi", numBytes / (float) Units.KIBIBYTE);
+            return String.format("%.1fKiB", numBytes / (float) Units.KIBIBYTE);
         }
         else if (numBytes < Units.GIBIBYTE)
         {
-            return String.format("%.1fMi", numBytes / (float) Units.MEBIBYTE);
+            return String.format("%.1fMiB", numBytes / (float) Units.MEBIBYTE);
         }
         else if (numBytes < Units.TEBIBYTE)
         {
-            return String.format("%.1fGi", numBytes / (float) Units.GIBIBYTE);
+            return String.format("%.1fGiB", numBytes / (float) Units.GIBIBYTE);
         }
         else
         {
-            return String.format("%.1fTi", numBytes / (float) Units.TEBIBYTE);
+            return String.format("%.1fTiB", numBytes / (float) Units.TEBIBYTE);
         }
     }
 
@@ -64,19 +64,19 @@ public class Formatters
         }
         else if (n < Units.MEGA)
         {
-            return String.format("%.1fK", n / (double) Units.KILO);
+            return String.format("%.1fKB", n / (double) Units.KILO);
         }
         else if (n < Units.GIGA)
         {
-            return String.format("%.1fM", n / (double) Units.MEGA);
+            return String.format("%.1fMB", n / (double) Units.MEGA);
         }
         else if (n < Units.TERA)
         {
-            return String.format("%.1fG", n / (double) Units.GIGA);
+            return String.format("%.1fGB", n / (double) Units.GIGA);
         }
         else
         {
-            return String.format("%.1fT", n / (double) Units.TERA);
+            return String.format("%.1fTB", n / (double) Units.TERA);
         }
     }
 

@@ -24,6 +24,7 @@ package org.bunkr.gui;
 
 import javafx.concurrent.Task;
 import org.bunkr.core.utils.Formatters;
+import org.bunkr.core.utils.Units;
 
 /**
  * Created At: 2016-01-13
@@ -59,7 +60,7 @@ public abstract class ProgressTask<V> extends Task<V>
             super.updateMessage(String.format(
                                        "%s (%s/s ETA: %s)",
                                        currentStateMessage,
-                                       Formatters.formatPrettyInt((long) (1000 * done / elapsed)),
+                                       Formatters.formatPrettyInt((long) (Units.SECOND * done / elapsed)),
                                        Formatters.formatPrettyElapsed(eta)
                                )
             );
