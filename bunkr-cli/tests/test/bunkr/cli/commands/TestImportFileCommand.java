@@ -45,8 +45,6 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +53,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created At: 2015-12-11
@@ -89,6 +86,7 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/a.txt");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, fileToImport);
+        args.put(ImportFileCommand.ARG_NO_PROGRESS, true);
 
         try (OutputCapture ignored = new OutputCapture())
         {
@@ -115,6 +113,7 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/sub/b.txt");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
+        args.put(ImportFileCommand.ARG_NO_PROGRESS, false);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(
                 "01234567890123456789012345678901234567890123456789012345678901234567890123456789".getBytes());
@@ -123,7 +122,6 @@ public class TestImportFileCommand
         try (OutputCapture ignored = new OutputCapture())
         {
             new ImportFileCommand().handle(new Namespace(args));
-            assertTrue(ignored.getContent().contains("==================="));
         }
         System.setIn(null);
 
@@ -177,6 +175,7 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
+        args.put(ImportFileCommand.ARG_NO_PROGRESS, true);
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try
@@ -214,6 +213,7 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/a.txt/something");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
+        args.put(ImportFileCommand.ARG_NO_PROGRESS, true);
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try
@@ -251,6 +251,7 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/a.txt");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
+        args.put(ImportFileCommand.ARG_NO_PROGRESS, true);
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try (OutputCapture ignored = new OutputCapture())
@@ -286,6 +287,7 @@ public class TestImportFileCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archiveFile);
         args.put(ImportFileCommand.ARG_PATH, "/folder");
         args.put(ImportFileCommand.ARG_SOURCE_FILE, new File("-"));
+        args.put(ImportFileCommand.ARG_NO_PROGRESS, true);
 
         System.setIn(new ByteArrayInputStream("0123456789012345678901234567890123456789".getBytes()));
         try (OutputCapture ignored = new OutputCapture())

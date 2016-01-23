@@ -29,7 +29,6 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.ProgressBar;
-import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.exceptions.CLIException;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -111,19 +110,18 @@ public class ImportFileCommand implements ICLICommand
         AbortableShutdownHook emergencyShutdownThread = new MetadataWriter.EnsuredMetadataWriter(aic, usp);
         Runtime.getRuntime().addShutdownHook(emergencyShutdownThread);
 
-        boolean noProgress = (Boolean) getOrDefault(args.get(ARG_NO_PROGRESS), false);
         try
         {
             if (inputFile.getPath().equals("-"))
             {
-                importFileFromStream(aic, targetFile, System.in, !noProgress);
+                importFileFromStream(aic, targetFile, System.in);
             }
             else
             {
                 FileChannel fc = new RandomAccessFile(inputFile, "r").getChannel();
                 try (InputStream fis = Channels.newInputStream(fc))
                 {
-                    importFileFromStream(aic, targetFile, fis, inputFile.length(), !noProgress);
+                    importFileFromStream(aic, targetFile, fis, inputFile.length(), !args.getBoolean(ARG_NO_PROGRESS));
                 }
             }
         }
@@ -137,10 +135,18 @@ public class ImportFileCommand implements ICLICommand
         }
     }
 
-    private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target,
-                                      InputStream is, boolean showProgress) throws IOException
+    private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target, InputStream is) throws IOException
     {
-        importFileFromStream(context, target, is, is.available(), showProgress);
+        try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))
+        {
+            byte[] buffer = new byte[(int) Units.MEBIBYTE];
+            int n;
+            while ((n = is.read(buffer)) != -1)
+            {
+                bwos.write(buffer, 0, n);
+            }
+            Arrays.fill(buffer, (byte) 0);
+        }
     }
 
     private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target,
@@ -163,11 +169,5 @@ public class ImportFileCommand implements ICLICommand
         }
 
         pb.finish();
-    }
-
-    private Object getOrDefault(Object v, Object d)
-    {
-        if (v == null) return d;
-        return v;
     }
 }

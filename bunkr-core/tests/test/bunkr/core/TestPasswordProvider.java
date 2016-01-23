@@ -83,13 +83,7 @@ public class TestPasswordProvider
     @Test
     public void testWithPrompt() throws Exception
     {
-        PasswordProvider uic = new PasswordProvider(new IPasswordPrompter() {
-            @Override
-            public byte[] getPassword()
-            {
-                return "AdventureTime".getBytes();
-            }
-        });
+        PasswordProvider uic = new PasswordProvider("AdventureTime"::getBytes);
 
         uic.clearArchivePassword();
         assertThat(uic.getHashedArchivePassword(), is(not(equalTo("AdventureTime".getBytes()))));
@@ -107,13 +101,7 @@ public class TestPasswordProvider
     @Test
     public void testShortLength() throws Exception
     {
-        PasswordProvider uic = new PasswordProvider(new IPasswordPrompter() {
-            @Override
-            public byte[] getPassword()
-            {
-                return "bad".getBytes();
-            }
-        });
+        PasswordProvider uic = new PasswordProvider("bad"::getBytes);
 
         try
         {
@@ -126,13 +114,7 @@ public class TestPasswordProvider
     @Test
     public void testBadCharacters() throws Exception
     {
-        PasswordProvider uic = new PasswordProvider(new IPasswordPrompter() {
-            @Override
-            public byte[] getPassword()
-            {
-                return "badaw\tdoiahwda".getBytes();
-            }
-        });
+        PasswordProvider uic = new PasswordProvider("badaw\tdoiahwda"::getBytes);
 
         try
         {
@@ -145,13 +127,7 @@ public class TestPasswordProvider
     @Test
     public void testBadCharacters2() throws Exception
     {
-        PasswordProvider uic = new PasswordProvider(new IPasswordPrompter() {
-            @Override
-            public byte[] getPassword()
-            {
-                return ("badaw" + ((char) 0x7F) + "doiahwda").getBytes();
-            }
-        });
+        PasswordProvider uic = new PasswordProvider(("badaw" + ((char) 0x7F) + "doiahwda")::getBytes);
 
         try
         {

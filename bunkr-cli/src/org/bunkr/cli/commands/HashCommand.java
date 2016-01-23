@@ -81,8 +81,8 @@ public class HashCommand implements ICLICommand
         if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
 
         FileInventoryItem targetFile = (FileInventoryItem) target;
-        boolean noProgress = (Boolean) getOrDefault(args.get(ARG_NO_PROGRESS), false);
-        System.out.println(DatatypeConverter.printHexBinary(calculateHash(aic, targetFile, args.getString(ARG_ALGORITHM), !noProgress)).toLowerCase());
+        byte[] digest = calculateHash(aic, targetFile, args.getString(ARG_ALGORITHM), !args.getBoolean(ARG_NO_PROGRESS));
+        System.out.println(DatatypeConverter.printHexBinary(digest).toLowerCase());
     }
 
     private byte[] calculateHash(ArchiveInfoContext context, FileInventoryItem target, String algorithm, boolean showProgress)
@@ -120,11 +120,5 @@ public class HashCommand implements ICLICommand
         if (algorithm.equals("sha224")) return new SHA224Digest();
         if (algorithm.equals("sha256")) return new SHA256Digest();
         throw new CLIException("unsupported algorithm: " + algorithm);
-    }
-
-    private Object getOrDefault(Object v, Object d)
-    {
-        if (v == null) return d;
-        return v;
     }
 }

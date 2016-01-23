@@ -168,7 +168,7 @@ public class ChangeSecurityCommand implements ICLICommand
     public void applyPBKDF2SecuritySettings(ArchiveInfoContext archive, Namespace args)
     {
         archive.getInventory().setDefaultEncryption(args.get(ARG_FILE_SECURITY));
-        int ms = pbkdf2IterTimeChoices.get((String) args.get(ARG_ITERATIONS_TIME));
+        int ms = pbkdf2IterTimeChoices.get(args.getString(ARG_ITERATIONS_TIME));
         System.out.println(String.format("Calculating pbkdf2 rounds for %s milliseconds...", ms));
         int pbkdf2Rounds = PBKDF2Descriptor.calculateRounds(ms);
         System.out.println(String.format("Got %d rounds.", pbkdf2Rounds));
@@ -179,7 +179,7 @@ public class ChangeSecurityCommand implements ICLICommand
     {
         archive.getInventory().setDefaultEncryption(args.get(ARG_FILE_SECURITY));
         archive.setDescriptor(ScryptDescriptor.make(
-                args.get(ARG_INV_SECURITY), scryptNChoices.get((String) args.get(ARG_MEMORY_USAGE))
+                args.get(ARG_INV_SECURITY), scryptNChoices.get(args.getString(ARG_MEMORY_USAGE))
         ));
     }
 }

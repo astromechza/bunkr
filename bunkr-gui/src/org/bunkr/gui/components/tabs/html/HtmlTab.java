@@ -33,7 +33,6 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
-import org.bunkr.core.utils.Logging;
 import org.bunkr.core.utils.Units;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
@@ -81,15 +80,8 @@ public class HtmlTab extends Tab implements IOpenedFileTab
         this.initControls();
         this.reloadContent();
 
-        try
-        {
-            HtmlWebViewAdapter hwva = new HtmlWebViewAdapter();
-            hwva.adapt(this.formattedView);
-        }
-        catch (IOException e)
-        {
-            Logging.exception(e);
-        }
+        HtmlWebViewAdapter hwva = new HtmlWebViewAdapter();
+        hwva.adapt(this.formattedView);
 
         this.bindEvents();
         this.goToViewMode();

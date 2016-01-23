@@ -22,7 +22,6 @@
 
 package test.bunkr.core;
 
-import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.utils.RandomMaker;
 import org.bunkr.core.utils.SimpleAES;

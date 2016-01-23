@@ -92,7 +92,6 @@ public class ExportFileCommand implements ICLICommand
 
             File inputFile = args.get(ARG_DESTINATION_FILE);
             boolean checkHash = (!args.getBoolean(ARG_IGNORE_INTEGRITY_CHECK));
-            boolean noProgress = (Boolean) getOrDefault(args.get(ARG_NO_PROGRESS), false);
             if (inputFile.getPath().equals("-"))
             {
                 writeBlockFileToStream(aic, targetFile, System.out, checkHash, false);
@@ -103,7 +102,7 @@ public class ExportFileCommand implements ICLICommand
                 FileChannel fc = new RandomAccessFile(inputFile, "rw").getChannel();
                 try (OutputStream contentOutputStream = Channels.newOutputStream(fc))
                 {
-                    writeBlockFileToStream(aic, targetFile, contentOutputStream, checkHash, !noProgress);
+                    writeBlockFileToStream(aic, targetFile, contentOutputStream, checkHash, !args.getBoolean(ARG_NO_PROGRESS));
                 }
             }
         }
@@ -134,11 +133,5 @@ public class ExportFileCommand implements ICLICommand
         }
 
         pb.finish();
-    }
-
-    private Object getOrDefault(Object v, Object d)
-    {
-        if (v == null) return d;
-        return v;
     }
 }

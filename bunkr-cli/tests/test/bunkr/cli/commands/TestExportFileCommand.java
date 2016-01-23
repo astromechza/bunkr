@@ -125,6 +125,7 @@ public class TestExportFileCommand
         args.put(ExportFileCommand.ARG_PATH, "/folder/b.txt");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, outputFile);
         args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
+        args.put(ExportFileCommand.ARG_NO_PROGRESS, true);
 
         new ExportFileCommand().handle(new Namespace(args));
         assertThat(outputFile.length(), is(equalTo(50L)));
@@ -141,6 +142,7 @@ public class TestExportFileCommand
         args.put(ExportFileCommand.ARG_PATH, "/folder");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, outputFile);
         args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
+        args.put(ExportFileCommand.ARG_NO_PROGRESS, true);
 
         try
         {
@@ -161,6 +163,7 @@ public class TestExportFileCommand
         args.put(ExportFileCommand.ARG_PATH, "/");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, outputFile);
         args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
+        args.put(ExportFileCommand.ARG_NO_PROGRESS, true);
 
         try
         {
@@ -183,6 +186,7 @@ public class TestExportFileCommand
         args.put(ExportFileCommand.ARG_PATH, "/a.txt");
         args.put(ExportFileCommand.ARG_DESTINATION_FILE, outputFile);
         args.put(ExportFileCommand.ARG_IGNORE_INTEGRITY_CHECK, false);
+        args.put(ExportFileCommand.ARG_NO_PROGRESS, true);
 
         try
         {

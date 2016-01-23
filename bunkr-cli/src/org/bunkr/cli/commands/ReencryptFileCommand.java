@@ -1,3 +1,25 @@
+/**
+ * Copyright (c) 2016 Bunkr
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.bunkr.cli.commands;
 
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -15,7 +37,6 @@ import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.AbortableShutdownHook;
-import org.bunkr.core.utils.Logging;
 import org.bunkr.core.utils.Units;
 
 import java.util.Arrays;
@@ -52,7 +73,6 @@ public class ReencryptFileCommand implements ICLICommand
         IFFTraversalTarget target = InventoryPather.traverse(archive.getInventory(), args.getString(ARG_PATH));
         if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
 
-
         AbortableShutdownHook emergencyShutdownThread = new MetadataWriter.EnsuredMetadataWriter(archive, usp);
         Runtime.getRuntime().addShutdownHook(emergencyShutdownThread);
 
@@ -71,12 +91,10 @@ public class ReencryptFileCommand implements ICLICommand
                     int n;
                     while ((n = mis.read(buffer)) != -1)
                     {
-                        Logging.debug("Read %d bytes", n);
                         mos.write(buffer, 0, n);
                         pb.inc(n);
                     }
                     Arrays.fill(buffer, (byte) 0);
-                    Logging.debug("Finished reading");
                 }
             }
             pb.finish();

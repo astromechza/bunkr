@@ -41,7 +41,7 @@ public class ArchiveBuilder
     public static final int DEFAULT_BLOCK_SIZE = 1024;
 
     public static ArchiveInfoContext createNewEmptyArchive(File path, IDescriptor descriptor, UserSecurityProvider uic)
-            throws IOException, CryptoException, BaseBunkrException
+            throws IOException, BaseBunkrException
     {
         Inventory blankInventory = new Inventory(
                 new ArrayList<>(),

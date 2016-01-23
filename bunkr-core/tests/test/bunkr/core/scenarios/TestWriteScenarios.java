@@ -25,7 +25,6 @@ package test.bunkr.core.scenarios;
 import org.bunkr.core.usersec.PasswordProvider;
 import org.bunkr.core.*;
 import org.bunkr.core.descriptor.DescriptorBuilder;
-import org.bunkr.core.descriptor.IDescriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.fragmented_range.FragmentedRange;
 import org.bunkr.core.inventory.FileInventoryItem;
@@ -76,7 +75,7 @@ public class TestWriteScenarios
             assertEquals(dis.readLong(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            IDescriptor descriptor = DescriptorBuilder.fromJSON(desJSON);
+            DescriptorBuilder.fromJSON(desJSON);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);
@@ -121,7 +120,7 @@ public class TestWriteScenarios
             FragmentedRange expected = new FragmentedRange(0, 1);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            IDescriptor descriptor = DescriptorBuilder.fromJSON(desJSON);
+            DescriptorBuilder.fromJSON(desJSON);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);
@@ -186,7 +185,7 @@ public class TestWriteScenarios
             assertEquals(dis.read(data), data.length);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            IDescriptor descriptor = DescriptorBuilder.fromJSON(desJSON);
+            DescriptorBuilder.fromJSON(desJSON);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);
@@ -241,7 +240,7 @@ public class TestWriteScenarios
             assertEquals(dis.readLong(), 0);
 
             String desJSON = IO.readNByteString(dis, dis.readInt());
-            IDescriptor descriptor = DescriptorBuilder.fromJSON(desJSON);
+            DescriptorBuilder.fromJSON(desJSON);
 
             String invJSON = IO.readNByteString(dis, dis.readInt());
             Inventory inventory = InventoryJSON.decode(invJSON);

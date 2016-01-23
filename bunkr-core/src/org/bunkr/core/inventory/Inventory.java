@@ -62,11 +62,6 @@ public class Inventory implements IFFContainer, IFFTraversalTarget
         return true;
     }
 
-    public boolean areFilesEncrypted()
-    {
-        return defaultEncryption != null && defaultEncryption != Encryption.NONE;
-    }
-
     public Encryption getDefaultEncryption()
     {
         return defaultEncryption;

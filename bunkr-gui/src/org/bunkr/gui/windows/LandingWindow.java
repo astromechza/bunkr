@@ -34,7 +34,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.bouncycastle.crypto.CryptoException;
 import org.bunkr.core.ArchiveBuilder;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
@@ -150,9 +149,8 @@ public class LandingWindow extends BaseWindow
                 new MainWindow(archive, usp).getStage().show();
                 this.getStage().close();
             }
-            catch (CryptoException | BaseBunkrException | IOException e)
+            catch (BaseBunkrException | IOException e)
             {
-                // TODO probably some exceptions we can display with a better message instead of defaulting to ExceptionDialog
                 QuickDialogs.exception(e);
             }
             finally

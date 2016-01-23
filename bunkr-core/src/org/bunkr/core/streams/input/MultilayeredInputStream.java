@@ -51,13 +51,12 @@ public class MultilayeredInputStream extends InputStream
             this.baseStream = new BlockReaderInputStream(context.filePath, context.getBlockSize(), target);
             this.topstream = this.baseStream;
 
-            if (! target.getEncryptionAlgorithm().equals(Encryption.NONE))
+            if (target.isEncrypted())
             {
                 this.topstream = new CipherInputStream(
                         this.topstream, new BufferedBlockCipher(CipherBuilder.buildCipherForFile(target, false))
                 );
             }
-
             this.topstream = new InflaterInputStream(this.topstream);
         }
     }

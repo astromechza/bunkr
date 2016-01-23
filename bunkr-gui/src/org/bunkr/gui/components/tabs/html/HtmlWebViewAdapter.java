@@ -49,7 +49,7 @@ public class HtmlWebViewAdapter
             "http", "https", "ftp", ""
     ));
 
-    public void adapt(WebView subject) throws IOException
+    public void adapt(WebView subject)
     {
         // disable existing context menu
         subject.setContextMenuEnabled(false);

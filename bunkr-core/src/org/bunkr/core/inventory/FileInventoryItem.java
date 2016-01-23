@@ -171,4 +171,9 @@ public class FileInventoryItem extends InventoryItem implements IFFTraversalTarg
     {
         return true;
     }
+
+    public boolean isEncrypted()
+    {
+        return encryptionAlgorithm != null && ! encryptionAlgorithm.equals(Encryption.NONE);
+    }
 }

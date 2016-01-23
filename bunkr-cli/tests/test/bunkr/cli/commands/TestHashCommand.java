@@ -103,6 +103,7 @@ public class TestHashCommand
         args.put(CLI.ARG_ARCHIVE_PATH, archive);
         args.put(HashCommand.ARG_PATH, "/a.txt");
         args.put(HashCommand.ARG_ALGORITHM, algorithm);
+        args.put(HashCommand.ARG_NO_PROGRESS, false);
 
         try(OutputCapture c = new OutputCapture())
         {

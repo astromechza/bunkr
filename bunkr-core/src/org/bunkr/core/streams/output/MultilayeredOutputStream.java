@@ -58,7 +58,7 @@ public class MultilayeredOutputStream extends OutputStream
 
         target.setEncryptionAlgorithm(context.getInventory().getDefaultEncryption());
 
-        if (! target.getEncryptionAlgorithm().equals(Encryption.NONE))
+        if (target.isEncrypted())
         {
             this.topstream = new CipherOutputStream(
                     this.topstream, new BufferedBlockCipher(CipherBuilder.buildCipherForFile(target, true))
