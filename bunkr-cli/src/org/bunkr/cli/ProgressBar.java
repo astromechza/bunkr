@@ -35,11 +35,11 @@ public class ProgressBar
     private final String title;
     private final long total;
     private final long minIters;
+    private final long startTime;
     private final int width;
     private boolean enabled;
     private long n;
     private long lastPrintN;
-    private long startTime;
 
     public ProgressBar(int width, long total, String title, long minIters)
     {

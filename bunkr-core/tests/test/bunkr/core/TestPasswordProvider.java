@@ -23,7 +23,6 @@
 package test.bunkr.core;
 
 import org.bunkr.core.usersec.PasswordProvider;
-import org.bunkr.core.usersec.IPasswordPrompter;
 import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.junit.Rule;
 import org.junit.Test;

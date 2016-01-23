@@ -157,7 +157,7 @@ public class FileSecAuditWindow extends BaseWindow
     {
         public final FileInventoryItem file;
         public final String text;
-        public SimpleBooleanProperty selected = new SimpleBooleanProperty();
+        public final SimpleBooleanProperty selected = new SimpleBooleanProperty();
 
         public PathBoxItem(FileInventoryItem file)
         {

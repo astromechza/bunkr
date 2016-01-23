@@ -24,7 +24,6 @@ package org.bunkr.core.streams.input;
 
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.crypto.CipherBuilder;
-import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.io.CipherInputStream;
