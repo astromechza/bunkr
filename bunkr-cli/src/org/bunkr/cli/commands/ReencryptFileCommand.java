@@ -99,6 +99,5 @@ public class ReencryptFileCommand implements ICLICommand
                     targetFile.getName(), targetFile.getEncryptionAlgorithm(), algorithmBefore
             ));
         }
-
     }
 }

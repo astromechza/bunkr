@@ -30,6 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import org.bunkr.core.Resources;
+import org.bunkr.gui.components.HExpander;
 import org.bunkr.gui.windows.BaseWindow;
 
 import java.io.IOException;
@@ -88,7 +89,7 @@ public class WizardWindow extends BaseWindow
         rootPane.setCenter(this.centerPanel);
         BorderPane.setMargin(this.centerPanel, new Insets(10, 0, 10, 0));
         rootPane.setBottom(
-                new HBox(5, hExpander(), previousPageButton, nextPageButton, cancelWizardButton, finishWizardButton));
+                new HBox(5, new HExpander(), previousPageButton, nextPageButton, cancelWizardButton, finishWizardButton));
         return rootPane;
     }
 
@@ -153,14 +154,6 @@ public class WizardWindow extends BaseWindow
     public void previousPage()
     {
         gotoPage(currentPage - 1);
-    }
-
-
-    private Region hExpander()
-    {
-        Region e = new Region();
-        HBox.setHgrow(e, Priority.ALWAYS);
-        return e;
     }
 
     public boolean cancel()

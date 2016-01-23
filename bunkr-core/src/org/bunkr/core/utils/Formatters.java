@@ -80,6 +80,11 @@ public class Formatters
         }
     }
 
+    public static String formatThousands(long n)
+    {
+        return String.format("%,d", n);
+    }
+
     public static String formateDate(long milliseconds, String format)
     {
         DateFormat formatter = new SimpleDateFormat(format);

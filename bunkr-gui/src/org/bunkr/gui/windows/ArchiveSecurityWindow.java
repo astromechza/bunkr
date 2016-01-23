@@ -38,6 +38,8 @@ import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.descriptor.ScryptDescriptor;
 import org.bunkr.core.inventory.Algorithms.Encryption;
 import org.bunkr.core.usersec.UserSecurityProvider;
+import org.bunkr.core.utils.Formatters;
+import org.bunkr.gui.components.HExpander;
 import org.bunkr.gui.wizards.PBKDF2SecurityWizard;
 import org.bunkr.gui.wizards.ScryptSecurityWizard;
 import org.bunkr.gui.dialogs.QuickDialogs;
@@ -89,14 +91,12 @@ public class ArchiveSecurityWindow extends BaseWindow
         BorderPane rootLayout = new BorderPane();
         rootLayout.setPadding(new Insets(10));
 
-        rootLayout.setTop(new HBox(this.headerLabel, this.headerLabelValue));
+        rootLayout.setTop(new HBox(this.headerLabel, this.headerLabelValue, new HExpander(), changeSecurityButton));
 
         this.centerPane = new BorderPane();
         this.centerPane.setPrefWidth(600);
         this.centerPane.setMinWidth(400);
         this.centerPane.setMinHeight(200);
-        this.centerPane.setBottom(changeSecurityButton);
-        BorderPane.setAlignment(changeSecurityButton, Pos.BOTTOM_RIGHT);
         rootLayout.setCenter(this.centerPane);
         BorderPane.setMargin(this.centerPane, new Insets(10, 0, 10, 0));
 
@@ -191,7 +191,7 @@ public class ArchiveSecurityWindow extends BaseWindow
     private void reloadArchiveSecurityDisplay()
     {
         this.headerLabelValue.setText(this.archive.getDescriptor().getIdentifier().toUpperCase());
-        this.centerPane.setCenter(getArchiveDescriptorNode());
+        this.centerPane.setTop(getArchiveDescriptorNode());
     }
 
     private Node buildPlaintextDescriptorInfoPanel()
@@ -212,7 +212,7 @@ public class ArchiveSecurityWindow extends BaseWindow
         PBKDF2Descriptor descriptor = (PBKDF2Descriptor) archive.getDescriptor();
 
         int rowid = 0;
-        gp.add(new Label("PBKDF2 Iterations:"), 0, rowid); gp.add(new Label(String.format("%d", descriptor.pbkdf2Iterations)), 1, rowid++);
+        gp.add(new Label("PBKDF2 Iterations:"), 0, rowid); gp.add(new Label(Formatters.formatThousands(descriptor.pbkdf2Iterations)), 1, rowid++);
         gp.add(new Label("PBKDF2 Salt Length:"), 0, rowid); gp.add(new Label(String.format("%d bytes", descriptor.pbkdf2Salt.length)), 1, rowid++);
         gp.add(new Label("Inventory Encryption:"), 0, rowid); gp.add(new Label(String.format("%s", descriptor.encryptionAlgorithm)), 1, rowid++);
         gp.add(new Label("File Encryption:"), 0, rowid); gp.add(new Label(archive.getInventory().getDefaultEncryption().toString()), 1, rowid);

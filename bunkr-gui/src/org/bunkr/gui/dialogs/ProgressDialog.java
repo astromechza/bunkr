@@ -33,6 +33,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 
 /**
  * This progress dialog takes inspiration from the one provided by ControlsFX.
@@ -59,6 +60,8 @@ public class ProgressDialog extends Dialog<Void>
 
         setTitle("Progress");
         getDialogPane().setHeaderText("Operation in Progress");
+
+        initModality(Modality.APPLICATION_MODAL);
 
         createControls();
         createLayout();

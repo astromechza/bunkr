@@ -67,8 +67,9 @@ public class FileInfoHandler implements EventHandler<ActionEvent>
             if (selectedFile.isAFile() && selectedFile instanceof FileInventoryItem)
             {
                 FileInventoryItem fileItem = (FileInventoryItem) selectedFile;
-                FileInfoWindow popup = new FileInfoWindow(fileItem);
+                FileInfoWindow popup = new FileInfoWindow(archive, fileItem);
                 popup.setOnRefreshTreeItem(e -> selected.setValue(new InventoryTreeData(fileItem)));
+                popup.getStage().initOwner(this.mainWindow.getStage());
                 popup.setOnSaveInventoryRequest(mainWindow::requestMetadataSave);
                 popup.getStage().showAndWait();
             }

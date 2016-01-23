@@ -31,12 +31,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
+import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.inventory.MediaType;
+import org.bunkr.core.streams.input.MultilayeredInputStream;
+import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Formatters;
+import org.bunkr.core.utils.Units;
 import org.bunkr.gui.Icons;
+import org.bunkr.gui.ProgressTask;
 import org.bunkr.gui.components.SelectableLabel;
+import org.bunkr.gui.dialogs.ProgressDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
@@ -53,6 +59,7 @@ public class FileInfoWindow extends BaseWindow
     private final String cssPath;
     private final FileInventoryItem item;
     private final String filePath;
+    private final ArchiveInfoContext archive;
 
     // components
     private Label lblFilePath; SelectableLabel lblFilePathValue;
@@ -61,14 +68,16 @@ public class FileInfoWindow extends BaseWindow
     private Label lblSizeOnDisk; SelectableLabel lblSizeOnDiskValue;
     private Label lblUUID; SelectableLabel lblUUIDValue;
     private Label lblMediaType, lblMediaTypeValue;
-    private Button closeButton, applyButton, changeMediaTypeButton;
+    private Label lblFileEnc, lblFileEncValue;
+    private Button closeButton, applyButton, changeMediaTypeButton, fileEncChangeButton;
 
     private Consumer<String> onSaveInventoryRequest;
     private Consumer<FileInventoryItem> onRefreshTreeItem;
 
-    public FileInfoWindow(FileInventoryItem item) throws IOException
+    public FileInfoWindow(ArchiveInfoContext archive, FileInventoryItem item) throws IOException
     {
         super();
+        this.archive = archive;
         this.filePath = item.getAbsolutePath();
         this.item = item;
         this.cssPath = Resources.getExternalPath("/resources/css/fileinfo_dialog.css");
@@ -102,6 +111,10 @@ public class FileInfoWindow extends BaseWindow
         this.lblMediaType = new Label("Media Type:");
         this.lblMediaTypeValue = new Label(this.item.getMediaType());
         this.changeMediaTypeButton = new Button("Change..");
+
+        this.lblFileEnc = new Label("File Encryption:");
+        this.lblFileEncValue = new Label("" + this.item.getEncryptionAlgorithm());
+        this.fileEncChangeButton = Icons.buildIconButton("Re-encrypt", Icons.ICON_RELOAD);
 
         this.applyButton = Icons.buildIconButton("Save Changes", Icons.ICON_SAVE);
         this.applyButton.setDisable(true);
@@ -145,6 +158,12 @@ public class FileInfoWindow extends BaseWindow
         this.changeMediaTypeButton.setAlignment(Pos.CENTER_RIGHT);
         rootLayout.add(mediaTypeRow, 1, rowid); rowid++;
 
+        rootLayout.add(this.lblFileEnc, 0, rowid);
+        HBox fileEncRow = new HBox(10, this.lblFileEncValue, this.fileEncChangeButton);
+        mediaTypeRow.setMaxWidth(Double.MAX_VALUE);
+        this.changeMediaTypeButton.setAlignment(Pos.CENTER_RIGHT);
+        rootLayout.add(fileEncRow, 1, rowid); rowid++;
+
         HBox buttonbox = new HBox(10, this.closeButton, this.applyButton);
         buttonbox.setAlignment(Pos.BOTTOM_RIGHT);
         rootLayout.add(buttonbox, 0, rowid);
@@ -177,6 +196,62 @@ public class FileInfoWindow extends BaseWindow
             }
         });
 
+        this.fileEncChangeButton.setOnAction(e -> {
+            if (! QuickDialogs.confirm("Are you sure you want to re-encrypt this file? This may take some time..")) return;
+
+            ProgressTask<Void> progressTask = new ProgressTask<Void>()
+            {
+                @Override
+                protected Void innerCall() throws Exception
+                {
+                    try (MultilayeredInputStream mis = new MultilayeredInputStream(archive, item))
+                    {
+                        try (MultilayeredOutputStream mos = new MultilayeredOutputStream(archive, item))
+                        {
+                            this.updateMessage("Re-encrypting file bytes..");
+                            long bytesTotal = item.getActualSize();
+                            long bytesDone = 0;
+                            byte[] buffer = new byte[(int) Units.MEBIBYTE];
+                            int n;
+                            while ((n = mis.read(buffer)) != -1)
+                            {
+                                mos.write(buffer, 0, n);
+                                bytesDone += n;
+                                this.updateProgress(bytesDone, bytesTotal);
+                            }
+                        }
+                    }
+
+                    this.updateMessage("Finished.");
+
+                    return null;
+                }
+
+                @Override
+                protected void succeeded()
+                {
+                    onSaveInventoryRequest.accept(String.format("Imported file %s", item.getName()));
+                }
+
+                @Override
+                protected void cancelled()
+                {
+                    onSaveInventoryRequest.accept("Cancelled file import");
+                }
+
+                @Override
+                protected void failed()
+                {
+                    onSaveInventoryRequest.accept("Failed file import");
+                    QuickDialogs.exception(this.getException());
+                }
+            };
+
+            ProgressDialog pd = new ProgressDialog(progressTask);
+            pd.setHeaderText(String.format("Re-encrypting file %s ...", item.getName()));
+            new Thread(progressTask).start();
+        });
+
         this.applyButton.setOnAction(event -> {
             this.item.setMediaType(this.lblMediaTypeValue.getText());
             this.onRefreshTreeItem.accept(this.item);
@@ -189,6 +264,7 @@ public class FileInfoWindow extends BaseWindow
     public void applyStyling()
     {
         this.changeMediaTypeButton.getStyleClass().add("small-button");
+        this.fileEncChangeButton.getStyleClass().add("small-button");
     }
 
     @Override
