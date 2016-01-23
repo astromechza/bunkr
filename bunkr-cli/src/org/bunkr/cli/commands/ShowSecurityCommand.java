@@ -22,6 +22,7 @@
 
 package org.bunkr.cli.commands;
 
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import org.bunkr.cli.CLI;
@@ -29,17 +30,30 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.descriptor.PBKDF2Descriptor;
 import org.bunkr.core.descriptor.PlaintextDescriptor;
 import org.bunkr.core.descriptor.ScryptDescriptor;
+import org.bunkr.core.inventory.Algorithms;
+import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.usersec.UserSecurityProvider;
+
+import java.util.Iterator;
 
 /**
  * Created At: 2016-01-21
  */
 public class ShowSecurityCommand implements ICLICommand
 {
+    private static final String ARG_AUDIT = "audit";
+
     @Override
     public void buildParser(Subparser target)
     {
         target.help("show the security settings of the archive");
+
+        target.addArgument("--audit")
+                .dest(ARG_AUDIT)
+                .action(Arguments.storeTrue())
+                .setDefault(false)
+                .type(Boolean.class)
+                .help("Scan the archive for files with out of date security settings");
     }
 
     @Override
@@ -77,5 +91,38 @@ public class ShowSecurityCommand implements ICLICommand
         }
 
         System.out.println(String.format("File Encryption: %s", archive.getInventory().getDefaultEncryption()));
+
+        if (args.getBoolean(ARG_AUDIT))
+        {
+            scanForOutOfDateEncryption(archive);
+        }
+    }
+
+    public static void scanForOutOfDateEncryption(ArchiveInfoContext archive)
+    {
+        System.out.println("Scanning archive for files with out of date encryption settings...");
+
+        int badCount = 0;
+        Iterator<FileInventoryItem> fileit = archive.getInventory().getIterator();
+        while(fileit.hasNext())
+        {
+            FileInventoryItem current = fileit.next();
+            if (current.getEncryptionAlgorithm() != archive.getInventory().getDefaultEncryption())
+            {
+                String absolutePath = current.getAbsolutePath();
+                Algorithms.Encryption alg = current.getEncryptionAlgorithm();
+                System.out.println(String.format("%s has incorrect encryption %s", absolutePath, alg));
+                badCount++;
+            }
+        }
+        if (badCount > 0)
+        {
+            System.out.println(String.format("%d files in the archive have out of date encryption settings. " +
+                                                     "Use the 're-encrypt' CLI command to fix these.", badCount));
+        }
+        else
+        {
+            System.out.println("All files have up to date encryption settings.");
+        }
     }
 }

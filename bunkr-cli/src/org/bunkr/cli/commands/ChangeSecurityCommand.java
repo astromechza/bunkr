@@ -163,6 +163,8 @@ public class ChangeSecurityCommand implements ICLICommand
         System.out.println("Successfully changed security settings for achive.");
         System.out.println(String.format("Before: %s", before));
         System.out.println(String.format("After: %s", after));
+
+        ShowSecurityCommand.scanForOutOfDateEncryption(context);
     }
 
     public void applyPBKDF2SecuritySettings(ArchiveInfoContext archive, Namespace args)
