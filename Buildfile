@@ -5,6 +5,7 @@ require_relative './build_scripts/utils'
 require_relative './build_scripts/licenser'
 require_relative './build_scripts/build_cli_demo'
 require_relative './build_scripts/examplebuilder'
+require_relative './build_scripts/mac_app'
 
 PROJECT_NAME = 'bunkr'
 PROJECT_GROUP = "org.#{PROJECT_NAME}"
@@ -98,6 +99,31 @@ define PROJECT_NAME do
             # first clean target folder
             system("rm -rf '#{project('bunkr-gui').path_to('target', 'main')}'")
             proguard_wrap('bunkr-gui')
+        end
+
+        # ant-based task to generate Mac OSX app
+        task :build_mac_app do
+
+            appbundler_jar = project.path_to('..', 'lib', 'appbundler-1.0.jar')
+            unless File.exists?(appbundler_jar)
+                puts "Error #{appbundler_jar} does not exist"
+                exit! 1
+            end
+
+            output_dir = project.path_to('target', 'app')
+            system("rm -rfv #{output_dir}")
+            system("mkdir #{output_dir}")
+
+            File.open("#{output_dir}/build.xml", 'w') do |f|
+                f.puts make_mac_app_xml(output_dir)
+            end
+
+            if system("cd #{output_dir}; ant")
+                puts "Build #{output_dir}/bunkr-#{project.version}.app"
+            else
+                puts "Error while building app!"
+                exit! 1
+            end
         end
     end
 
