@@ -32,18 +32,18 @@ import java.util.Arrays;
  */
 public class ProgressBar
 {
-    private final boolean enabled;
     private final String title;
     private final long total;
     private final long minIters;
     private final int width;
+    private boolean enabled;
     private long n;
     private long lastPrintN;
     private long startTime;
 
-    public ProgressBar(int width, long total, String title, boolean enabled, long minIters)
+    public ProgressBar(int width, long total, String title, long minIters)
     {
-        this.enabled = enabled;
+        this.enabled = true;
         this.title = title;
         this.total = total;
         this.minIters = minIters;
@@ -53,9 +53,9 @@ public class ProgressBar
         this.startTime = System.currentTimeMillis();
     }
 
-    public ProgressBar(int width, long total, String title, boolean enabled)
+    public ProgressBar(int width, long total, String title)
     {
-        this(width, total, title, enabled, total / 100);
+        this(width, total, title, total / 100);
     }
 
     public void startFresh()
@@ -96,6 +96,11 @@ public class ProgressBar
                 System.out.println(formatStateWithRate(n, total, width, title, elapsed));
             }
         }
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 
     private static String formatState(long n, long total, int ncols, String prefix)

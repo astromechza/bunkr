@@ -27,6 +27,7 @@ import org.bunkr.core.descriptor.IDescriptor;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.usersec.UserSecurityProvider;
+import org.bunkr.core.utils.AbortableShutdownHook;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -84,6 +85,32 @@ public class MetadataWriter
 
                 // truncate file if required
                 raf.setLength(DBL_DATA_POS + Long.BYTES + dataBlocksLength + metaLength);
+            }
+        }
+    }
+
+    public static class EnsuredMetadataWriter extends AbortableShutdownHook
+    {
+        private final ArchiveInfoContext context;
+        private final UserSecurityProvider prov;
+
+        public EnsuredMetadataWriter(ArchiveInfoContext context, UserSecurityProvider prov)
+        {
+            this.context = context;
+            this.prov = prov;
+        }
+
+        @Override
+        public void innerRun()
+        {
+            try
+            {
+                System.err.println("Performing emergency metadata write for recovery");
+                MetadataWriter.write(this.context, this.prov);
+            }
+            catch (IOException | BaseBunkrException e)
+            {
+                e.printStackTrace();
             }
         }
     }

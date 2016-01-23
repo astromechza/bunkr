@@ -108,7 +108,7 @@ public class ImportFileCommand implements ICLICommand
 
         File inputFile = args.get(ARG_SOURCE_FILE);
 
-        AbortableShutdownHook emergencyShutdownThread = new EnsuredMetadataWriter(aic, usp);
+        AbortableShutdownHook emergencyShutdownThread = new MetadataWriter.EnsuredMetadataWriter(aic, usp);
         Runtime.getRuntime().addShutdownHook(emergencyShutdownThread);
 
         boolean noProgress = (Boolean) getOrDefault(args.get(ARG_NO_PROGRESS), false);
@@ -146,7 +146,8 @@ public class ImportFileCommand implements ICLICommand
     private void importFileFromStream(ArchiveInfoContext context, FileInventoryItem target,
                                       InputStream is, long expectedBytes, boolean showProgress) throws IOException
     {
-        ProgressBar pb = new ProgressBar(120, expectedBytes, "Importing file: ", showProgress);
+        ProgressBar pb = new ProgressBar(120, expectedBytes, "Importing file: ");
+        pb.setEnabled(showProgress);
         pb.startFresh();
 
         try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))
@@ -162,32 +163,6 @@ public class ImportFileCommand implements ICLICommand
         }
 
         pb.finish();
-    }
-
-    private static class EnsuredMetadataWriter extends AbortableShutdownHook
-    {
-        private final ArchiveInfoContext context;
-        private final UserSecurityProvider prov;
-
-        public EnsuredMetadataWriter(ArchiveInfoContext context, UserSecurityProvider prov)
-        {
-            this.context = context;
-            this.prov = prov;
-        }
-
-        @Override
-        public void innerRun()
-        {
-            try
-            {
-                System.err.println("Performing emergency metadata write for recovery");
-                MetadataWriter.write(this.context, this.prov);
-            }
-            catch (IOException | BaseBunkrException e)
-            {
-                e.printStackTrace();
-            }
-        }
     }
 
     private Object getOrDefault(Object v, Object d)

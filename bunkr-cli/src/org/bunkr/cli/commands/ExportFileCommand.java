@@ -116,7 +116,8 @@ public class ExportFileCommand implements ICLICommand
     private void writeBlockFileToStream(ArchiveInfoContext ctxt, FileInventoryItem targetFile, OutputStream os, boolean checkHash, boolean showProgress)
             throws IOException
     {
-        ProgressBar pb = new ProgressBar(120, targetFile.getActualSize(), "Exporting file: ", showProgress);
+        ProgressBar pb = new ProgressBar(120, targetFile.getActualSize(), "Exporting file: ");
+        pb.setEnabled(showProgress);
         pb.startFresh();
 
         try (MultilayeredInputStream ms = new MultilayeredInputStream(ctxt, targetFile))
