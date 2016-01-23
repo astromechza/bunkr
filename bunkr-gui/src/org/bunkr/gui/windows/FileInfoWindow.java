@@ -47,6 +47,7 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
@@ -249,7 +250,9 @@ public class FileInfoWindow extends BaseWindow
 
             ProgressDialog pd = new ProgressDialog(progressTask);
             pd.setHeaderText(String.format("Re-encrypting file %s ...", item.getName()));
-            new Thread(progressTask).start();
+            Thread task = new Thread(progressTask);
+            task.setDaemon(true);
+            task.start();
         });
 
         this.applyButton.setOnAction(event -> {

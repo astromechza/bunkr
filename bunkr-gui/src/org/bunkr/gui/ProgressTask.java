@@ -31,13 +31,17 @@ import org.bunkr.core.utils.Units;
  */
 public abstract class ProgressTask<V> extends Task<V>
 {
+    private static final long PROGRESS_UPDATE_INTERVAL = 500;
+
     private long startTime;
+    private long lastProgressUpdateTime;
     private String currentStateMessage;
 
     @Override
     protected final V call() throws Exception
     {
         this.startTime = System.currentTimeMillis();
+        this.lastProgressUpdateTime = 0;
         return this.innerCall();
     }
 
@@ -53,9 +57,11 @@ public abstract class ProgressTask<V> extends Task<V>
     @Override
     public void updateProgress(double done, double total)
     {
-        if (done > 0)
+        long now = System.currentTimeMillis();
+        if (done > 0 && (now - lastProgressUpdateTime) > PROGRESS_UPDATE_INTERVAL)
         {
-            long elapsed = System.currentTimeMillis() - this.startTime;
+            lastProgressUpdateTime = now;
+            long elapsed = now - this.startTime;
             double eta = elapsed * (total - done) / done;
             super.updateMessage(String.format(
                                        "%s (%s/s ETA: %s)",

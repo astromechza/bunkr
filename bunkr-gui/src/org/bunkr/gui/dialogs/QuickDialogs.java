@@ -23,6 +23,7 @@
 package org.bunkr.gui.dialogs;
 
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import org.bunkr.core.utils.Formatters;
 import org.bunkr.core.utils.Logging;
 
@@ -43,6 +44,7 @@ public class QuickDialogs
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(String.format(format, args));
+        alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
     }
 
@@ -60,6 +62,7 @@ public class QuickDialogs
         ButtonType positiveButton = new ButtonType("Yes");
         ButtonType negativeButton = new ButtonType("No");
         alert.getButtonTypes().setAll(positiveButton, negativeButton);
+        alert.initModality(Modality.APPLICATION_MODAL);
         Optional<ButtonType> result = alert.showAndWait();
         return result.get() == positiveButton;
     }
@@ -88,6 +91,7 @@ public class QuickDialogs
         textArea.setEditable(false);
         textArea.setWrapText(true);
         alert.getDialogPane().setExpandableContent(textArea);
+        alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
     }
 
@@ -97,6 +101,7 @@ public class QuickDialogs
         dialog.setTitle("Input Required");
         dialog.setHeaderText(null);
         dialog.setContentText(content);
+        dialog.initModality(Modality.APPLICATION_MODAL);
 
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent())
@@ -113,6 +118,7 @@ public class QuickDialogs
         alert.setTitle(title);
         alert.setHeaderText(heading);
         alert.setContentText(String.format(message, args));
+        alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
     }
 
@@ -130,6 +136,7 @@ public class QuickDialogs
         dialog.setTitle(title);
         dialog.setHeaderText(heading);
         dialog.setContentText(content);
+        dialog.initModality(Modality.APPLICATION_MODAL);
         Optional<T> result = dialog.showAndWait();
         if (result.isPresent())
         {

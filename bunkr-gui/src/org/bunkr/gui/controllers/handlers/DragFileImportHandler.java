@@ -178,7 +178,9 @@ public class DragFileImportHandler implements Consumer<Pair<UUID, File>>
 
             ProgressDialog pd = new ProgressDialog(progressTask);
             pd.setHeaderText(String.format("Importing file %s ...", newFile.getName()));
-            new Thread(progressTask).start();
+            Thread task = new Thread(progressTask);
+            task.setDaemon(true);
+            task.start();
         }
         catch (Exception e)
         {

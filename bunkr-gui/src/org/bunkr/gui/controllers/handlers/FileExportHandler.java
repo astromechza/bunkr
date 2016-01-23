@@ -143,7 +143,9 @@ public class FileExportHandler implements EventHandler<ActionEvent>
 
             ProgressDialog pd = new ProgressDialog(progressTask);
             pd.setHeaderText(String.format("Exporting file %s ...", exportedFile.getName()));
-            new Thread(progressTask).start();
+            Thread task = new Thread(progressTask);
+            task.setDaemon(true);
+            task.start();
         }
         catch (Exception e)
         {
