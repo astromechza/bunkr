@@ -28,6 +28,7 @@ import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.AbortableShutdownHook;
+import org.bunkr.core.utils.Logging;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -52,6 +53,7 @@ public class MetadataWriter
     public static void write(File filePath, Inventory inventory, IDescriptor descriptor, UserSecurityProvider uic, int blockSize)
             throws IOException, BaseBunkrException
     {
+        Logging.debug("Saving Archive Metadata..");
         try(RandomAccessFile raf = new RandomAccessFile(filePath, "rw"))
         {
             try(FileChannel fc = raf.getChannel())
@@ -87,9 +89,10 @@ public class MetadataWriter
                 raf.setLength(DBL_DATA_POS + Long.BYTES + dataBlocksLength + metaLength);
             }
         }
+        Logging.info("Saved Archive Metadata.");
     }
 
-    public static class EnsuredMetadataWriter extends AbortableShutdownHook
+    private static class EnsuredMetadataWriter extends AbortableShutdownHook
     {
         private final ArchiveInfoContext context;
         private final UserSecurityProvider prov;
@@ -105,13 +108,38 @@ public class MetadataWriter
         {
             try
             {
-                System.err.println("Performing emergency metadata write for recovery");
+                System.err.println("Performing emergency metadata write for future recovery.");
                 MetadataWriter.write(this.context, this.prov);
             }
             catch (IOException | BaseBunkrException e)
             {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static class ProtectedMetadataWrite implements AutoCloseable
+    {
+        private final ArchiveInfoContext context;
+        private final UserSecurityProvider prov;
+        private final EnsuredMetadataWriter shutdownHook;
+
+        public ProtectedMetadataWrite(ArchiveInfoContext context, UserSecurityProvider prov)
+        {
+            this.context = context;
+            this.prov = prov;
+            this.shutdownHook = new MetadataWriter.EnsuredMetadataWriter(this.context, this.prov);
+            Runtime.getRuntime().addShutdownHook(this.shutdownHook);
+        }
+
+        @Override
+        public void close() throws Exception
+        {
+            // This finally block is a basic attempt at handling bad problems like corrupted writes when saving a file.
+            // if an exception was raised due to some IO issue, then we still want to write a hopefully correct
+            // metadata section so that the file can be correctly read in future.
+            MetadataWriter.write(this.context, this.prov);
+            Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
         }
     }
 }

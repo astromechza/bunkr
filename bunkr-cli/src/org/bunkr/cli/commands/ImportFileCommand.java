@@ -24,9 +24,8 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.core.utils.AbortableShutdownHook;
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.MetadataWriter;
+import org.bunkr.core.MetadataWriter.ProtectedMetadataWrite;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.ProgressBar;
 import org.bunkr.core.exceptions.CLIException;
@@ -107,10 +106,8 @@ public class ImportFileCommand implements ICLICommand
 
         File inputFile = args.get(ARG_SOURCE_FILE);
 
-        AbortableShutdownHook emergencyShutdownThread = new MetadataWriter.EnsuredMetadataWriter(aic, usp);
-        Runtime.getRuntime().addShutdownHook(emergencyShutdownThread);
 
-        try
+        try(ProtectedMetadataWrite ignored = new ProtectedMetadataWrite(aic, usp))
         {
             if (inputFile.getPath().equals("-"))
             {
@@ -124,14 +121,6 @@ public class ImportFileCommand implements ICLICommand
                     importFileFromStream(aic, targetFile, fis, inputFile.length(), !args.getBoolean(ARG_NO_PROGRESS));
                 }
             }
-        }
-        finally
-        {
-            // This finally block is a basic attempt at handling bad problems like corrupted writes when saving a file.
-            // if an exception was raised due to some IO issue, then we still want to write a hopefully correct
-            // metadata section so that the file can be correctly read in future.
-            MetadataWriter.write(aic, usp);
-            Runtime.getRuntime().removeShutdownHook(emergencyShutdownThread);
         }
     }
 

@@ -28,18 +28,16 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import org.bunkr.cli.CLI;
 import org.bunkr.cli.ProgressBar;
 import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.MetadataWriter;
+import org.bunkr.core.MetadataWriter.ProtectedMetadataWrite;
 import org.bunkr.core.exceptions.CLIException;
+import org.bunkr.core.inventory.Algorithms;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.inventory.IFFTraversalTarget;
 import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.usersec.UserSecurityProvider;
-import org.bunkr.core.utils.AbortableShutdownHook;
 import org.bunkr.core.utils.Units;
-
-import java.util.Arrays;
 
 /**
  * Created At: 2016-01-23
@@ -73,17 +71,16 @@ public class ReencryptFileCommand implements ICLICommand
         IFFTraversalTarget target = InventoryPather.traverse(archive.getInventory(), args.getString(ARG_PATH));
         if (!target.isAFile()) throw new CLIException("'%s' is not a file.", args.getString(ARG_PATH));
 
-        AbortableShutdownHook emergencyShutdownThread = new MetadataWriter.EnsuredMetadataWriter(archive, usp);
-        Runtime.getRuntime().addShutdownHook(emergencyShutdownThread);
-
         FileInventoryItem targetFile = (FileInventoryItem) target;
         ProgressBar pb = new ProgressBar(120, targetFile.getActualSize(), "Exporting file: ");
         pb.setEnabled(!(Boolean) args.get(ARG_NO_PROGRESS));
         pb.startFresh();
 
-        try
+        Algorithms.Encryption algorithmBefore = targetFile.getEncryptionAlgorithm();
+
+        try (MultilayeredInputStream mis = new MultilayeredInputStream(archive, targetFile))
         {
-            try (MultilayeredInputStream mis = new MultilayeredInputStream(archive, targetFile))
+            try(ProtectedMetadataWrite ignored = new ProtectedMetadataWrite(archive, usp))
             {
                 try (MultilayeredOutputStream mos = new MultilayeredOutputStream(archive, targetFile))
                 {
@@ -94,18 +91,14 @@ public class ReencryptFileCommand implements ICLICommand
                         mos.write(buffer, 0, n);
                         pb.inc(n);
                     }
-                    Arrays.fill(buffer, (byte) 0);
                 }
             }
             pb.finish();
+            System.out.println(String.format(
+                    "Re-encrypted file %s with %s (was %s).",
+                    targetFile.getName(), targetFile.getEncryptionAlgorithm(), algorithmBefore
+            ));
         }
-        finally
-        {
-            // This finally block is a basic attempt at handling bad problems like corrupted writes when saving a file.
-            // if an exception was raised due to some IO issue, then we still want to write a hopefully correct
-            // metadata section so that the file can be correctly read in future.
-            MetadataWriter.write(archive, usp);
-            Runtime.getRuntime().removeShutdownHook(emergencyShutdownThread);
-        }
+
     }
 }

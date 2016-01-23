@@ -65,7 +65,7 @@ public class CLI
         commands.put("mv", new MvCommand());
         commands.put("find", new FindCommand());
         commands.put("hash", new HashCommand());
-        commands.put("reencrypt-file", new ReencryptFileCommand());
+        commands.put("re-encrypt-file", new ReencryptFileCommand());
     }
 
     public static void main(String[] args) throws IOException
