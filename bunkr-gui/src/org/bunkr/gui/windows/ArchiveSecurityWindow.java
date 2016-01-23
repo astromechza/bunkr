@@ -60,7 +60,7 @@ public class ArchiveSecurityWindow extends BaseWindow
     private Label headerLabel;
     private Label headerLabelValue;
     private BorderPane centerPane;
-    private Button changeSecurityButton, backButton;
+    private Button changeSecurityButton, backButton, auditFileSecButton;
 
     private Consumer<String> onSaveMetadataRequest;
 
@@ -79,10 +79,11 @@ public class ArchiveSecurityWindow extends BaseWindow
     {
         this.headerLabel = new Label("Archive Security: ");
         this.headerLabelValue = new Label("Unknown");
-        this.changeSecurityButton = new Button("Change..");
+        this.changeSecurityButton = new Button("Change Archive Security");
         this.changeSecurityButton.setFocusTraversable(false);
         this.backButton = new Button("Back");
         this.backButton.setFocusTraversable(false);
+        this.auditFileSecButton = new Button("Audit File Security");
     }
 
     @Override
@@ -100,8 +101,7 @@ public class ArchiveSecurityWindow extends BaseWindow
         rootLayout.setCenter(this.centerPane);
         BorderPane.setMargin(this.centerPane, new Insets(10, 0, 10, 0));
 
-        rootLayout.setBottom(backButton);
-        BorderPane.setAlignment(backButton, Pos.BOTTOM_RIGHT);
+        rootLayout.setBottom(new HBox(10, this.auditFileSecButton, new HExpander(), this.backButton));
 
         return rootLayout;
     }
@@ -141,8 +141,22 @@ public class ArchiveSecurityWindow extends BaseWindow
                         this.reloadArchiveSecurityDisplay();
                         break;
                     default:
-                        QuickDialogs.error("Descriptor type %s is unknown.", this.archive.getDescriptor().getIdentifier());
+                        QuickDialogs.error("Descriptor type %s is unknown.",
+                                           this.archive.getDescriptor().getIdentifier());
                 }
+            }
+            catch (IOException exc)
+            {
+                QuickDialogs.exception(exc);
+            }
+        });
+
+        this.auditFileSecButton.setOnAction(e -> {
+            try
+            {
+                FileSecAuditWindow fsaw = new FileSecAuditWindow(this.archive);
+                fsaw.setOnSaveMetadataRequest(this.onSaveMetadataRequest);
+                fsaw.getStage().showAndWait();
             }
             catch (IOException exc)
             {

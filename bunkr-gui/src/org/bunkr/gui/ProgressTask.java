@@ -54,6 +54,11 @@ public abstract class ProgressTask<V> extends Task<V>
         super.updateMessage(message);
     }
 
+    public void updateMessage(String format, Object... args)
+    {
+        this.updateMessage(String.format(format, args));
+    }
+
     @Override
     public void updateProgress(double done, double total)
     {
