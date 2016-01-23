@@ -8,8 +8,8 @@ require_relative './build_scripts/examplebuilder'
 
 PROJECT_NAME = 'bunkr'
 PROJECT_GROUP = "org.#{PROJECT_NAME}"
-PROJECT_VERSION = '0.9.0'
-COMPATIBLE_PROJECT_VERSION = '0.9.0'
+PROJECT_VERSION = '0.10.0'
+COMPATIBLE_PROJECT_VERSION = '0.10.0'
 
 # where to pull maven dependencies from
 repositories.remote << 'https://repo.maven.apache.org/maven2'
