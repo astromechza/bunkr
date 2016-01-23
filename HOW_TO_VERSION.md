@@ -32,5 +32,5 @@
 7. Push commits and tags. Also upload new Github release.
 
     ```
-    git push --tags
+    git push --all
     ```
