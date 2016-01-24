@@ -26,6 +26,12 @@ JAR_PROGUARD = 'net.sf.proguard:proguard-base:jar:5.2.1'
 JAR_OKIO = 'com.squareup.okio:okio:jar:1.6.0'
 JAR_OKHTTP = 'com.squareup.okhttp3:okhttp:jar:3.0.1'
 
+JAR_RICHTEXT = 'org.fxmisc.richtext:richtextfx:jar:0.6.10'
+JAR_REACTFX = 'org.reactfx:reactfx:jar:2.0-M4u1'
+JAR_UNDOFX = 'org.fxmisc.undo:undofx:jar:1.2'
+JAR_FLOWLESS = 'org.fxmisc.flowless:flowless:jar:0.4.5'
+JAR_WELLBEHAVED = 'org.fxmisc.wellbehaved:wellbehavedfx:jar:0.1.1'
+
 layout = Layout.new
 layout[:source, :main, :java] = 'src'
 layout[:source, :test, :java] = 'tests'
@@ -84,7 +90,8 @@ define PROJECT_NAME do
     define 'bunkr-gui', layout: layout do
         test.with JAR_JUNIT, project('bunkr-core').test.compile.target
         jacoco.generate_html = true
-        compile.with JAR_BC, JAR_ARGPARSE, JAR_MARKDOWN, JAR_JSON_SIMPLE, JAR_OKIO, JAR_OKHTTP, project('bunkr-core')
+        compile.with JAR_BC, JAR_ARGPARSE, JAR_MARKDOWN, JAR_JSON_SIMPLE, JAR_OKIO, JAR_OKHTTP,
+                     JAR_UNDOFX, JAR_FLOWLESS, JAR_REACTFX, JAR_RICHTEXT, JAR_WELLBEHAVED, project('bunkr-core')
         compile.using(source: '1.8', target: '1.8', lint: 'all')
         package(:jar, id: 'bunkr-gui').merge(compile.dependencies).exclude('META-INF/BCKEY.*')
         package(:jar, id: 'bunkr-gui').with(manifest: {'Main-Class' => GUI_MAIN_CLASS})

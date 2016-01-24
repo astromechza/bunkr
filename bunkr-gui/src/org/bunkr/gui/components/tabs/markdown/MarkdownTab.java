@@ -24,8 +24,8 @@ package org.bunkr.gui.components.tabs.markdown;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
@@ -41,6 +41,10 @@ import org.bunkr.core.utils.Units;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.dialogs.QuickDialogs;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.wellbehaved.event.EventHandlerHelper;
+import org.fxmisc.wellbehaved.event.EventPattern;
 import org.markdown4j.Markdown4jProcessor;
 
 import java.io.ByteArrayInputStream;
@@ -66,7 +70,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     private Button saveButton;
     private Button switchModeButton;
     private Button resetButton;
-    private TextArea editorArea;
+    private CodeArea editorArea;
     private WebView formattedView;
 
     // mode
@@ -130,7 +134,8 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         actionBar.getItems().addAll(this.saveButton, this.resetButton, this.switchModeButton);
         VBox.setVgrow(actionBar, Priority.NEVER);
 
-        this.editorArea = new TextArea();
+        this.editorArea = new CodeArea();
+        this.editorArea.setParagraphGraphicFactory(LineNumberFactory.get(this.editorArea));
         this.editorArea.getStyleClass().add("editor-area-monospaced");
         VBox.setVgrow(this.editorArea, Priority.ALWAYS);
 
@@ -193,6 +198,8 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
                 }
             }
         });
+
+        this.editorArea.setWrapText(true);
     }
 
     @Override
@@ -225,7 +232,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         }
 
         this.plainTextContent = content.toString();
-        this.editorArea.setText(this.plainTextContent);
+        this.editorArea.replaceText(0, 0, this.plainTextContent);
         this.hasChanges = false;
         this.saveButton.setDisable(true);
         this.getStyleClass().remove("has-changes");
@@ -244,7 +251,8 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         this.currentMode = Mode.EDITTING;
         this.switchModeButton.setText("View");
         this.switchModeButton.setGraphic(Icons.buildIconLabel(Icons.ICON_VIEW));
-        if (! this.hasChanges && this.plainTextContent != null) this.editorArea.setText(this.plainTextContent);
+        if (! this.hasChanges && this.plainTextContent != null) this.editorArea.replaceText(0, 0, this
+                .plainTextContent);
         if (this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().remove(this.formattedView);
         if (!this.layout.getChildren().contains(this.editorArea)) this.layout.getChildren().add(this.editorArea);
     }
