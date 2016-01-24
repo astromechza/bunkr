@@ -1,6 +1,12 @@
 # Bunkr
 
-See [CLI_DEMO.md](CLI_DEMO.md) for usage examples.
+There are 2 ways of working with Bunkr archives: using the GUI, and through the CLI. Both interfaces attempt to expose
+the same functionality but the GUI is more usable from a user standpoint and the CLI allows other programs to easily
+manipulate and read from archives.
+
+See [CLI_DEMO.md](CLI_DEMO.md) for usage examples of the CLI.
+
+See [/screenshots](/screenshots) for images of the GUI.
 
 ## Development
 
