@@ -263,8 +263,11 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         this.currentMode = Mode.EDITTING;
         this.switchModeButton.setText("View");
         this.switchModeButton.setGraphic(Icons.buildIconLabel(Icons.ICON_VIEW));
-        if (! this.hasChanges && this.plainTextContent != null) this.editorArea.replaceText(0, 0, this
-                .plainTextContent);
+        if (! this.hasChanges && this.plainTextContent != null)
+        {
+            this.editorArea.clear();
+            this.editorArea.replaceText(0, 0, this.plainTextContent);
+        }
         if (this.layout.getChildren().contains(this.formattedView)) this.layout.getChildren().remove(this.formattedView);
         if (!this.layout.getChildren().contains(this.editorArea)) this.layout.getChildren().add(this.editorArea);
     }
