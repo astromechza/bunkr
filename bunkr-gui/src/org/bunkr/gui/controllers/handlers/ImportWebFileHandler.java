@@ -26,11 +26,10 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.*;
+import org.bunkr.core.inventory.MediaType;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Units;
 import org.bunkr.gui.ProgressTask;
@@ -116,7 +115,27 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
                 @Override
                 protected Void innerCall() throws Exception
                 {
-                    downloadContent(url, newFile, this);
+                    Response r = downloadContent(url, newFile, this);
+                    okhttp3.MediaType mt = r.body().contentType();
+                    if (mt.type().equals("text"))
+                    {
+                        if (mt.subtype().equals("html"))
+                        {
+                            newFile.setMediaType(MediaType.HTML);
+                        }
+                        else
+                        {
+                            newFile.setMediaType(MediaType.TEXT);
+                        }
+                    }
+                    else if (mt.type().equals("image"))
+                    {
+                        newFile.setMediaType(MediaType.IMAGE);
+                    }
+                    else
+                    {
+                        newFile.setMediaType(MediaType.UNKNOWN);
+                    }
                     return null;
                 }
 
@@ -125,14 +144,6 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
                 {
                     // add to the container if this is a new item
                     if (target == null) selectedContainer.addFile(newFile);
-
-                    // pick the media type
-                    newFile.setMediaType(QuickDialogs.pick(
-                                                 "Import File",
-                                                 null,
-                                                 "Pick a Media Type for the new file:",
-                                                 new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
-                    );
 
                     TreeItem<InventoryTreeData> newItem = new TreeItem<>(new InventoryTreeData(newFile));
                     if (target != null) selected.getChildren().removeIf(i -> i.getValue().getName().equals(newName));
@@ -170,7 +181,7 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
         }
     }
 
-    private void downloadContent(String url, FileInventoryItem destination, ProgressTask<Void> task) throws IOException
+    private Response downloadContent(String url, FileInventoryItem destination, ProgressTask<Void> task) throws IOException
     {
         OkHttpClient client = new OkHttpClient.Builder().build();
         Request request = new Request.Builder().url(url).build();
@@ -193,7 +204,8 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
                     task.updateProgress(bytesRead, total);
                 }
                 Arrays.fill(buffer, (byte) 0);
-                task.updateMessage("Finished.");
+                task.updateMessage("Finished Downloading.");
+                return response;
             }
         }
     }
