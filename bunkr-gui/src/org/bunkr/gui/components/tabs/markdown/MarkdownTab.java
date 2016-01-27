@@ -293,7 +293,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         {
             IFFTraversalTarget t = InventoryPather.traverse(this.archive.getInventory(), absolutePath);
             if (t instanceof FileInventoryItem) this.onRequestOpen.accept((FileInventoryItem) t);
-            QuickDialogs.error("Item %s is not a file.", absolutePath);
+            else QuickDialogs.error("Item %s is not a file.", absolutePath);
         }
         catch (TraversalException e)
         {
