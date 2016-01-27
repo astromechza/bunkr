@@ -23,6 +23,7 @@
 package org.bunkr.gui.components.tabs.markdown;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
@@ -39,6 +40,7 @@ import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.core.utils.Units;
 import org.bunkr.gui.Icons;
+import org.bunkr.gui.components.HExpander;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.fxmisc.richtext.CodeArea;
@@ -72,6 +74,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
     private Button resetButton;
     private CodeArea editorArea;
     private WebView formattedView;
+    private CheckBox wordWrapCheckBox;
 
     // mode
     private enum Mode {EDITTING, VIEWING}
@@ -131,7 +134,9 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         this.switchModeButton.getStyleClass().add("small-button");
         this.resetButton = Icons.buildIconButton("Reload", Icons.ICON_RELOAD);
         this.resetButton.getStyleClass().add("small-button");
-        actionBar.getItems().addAll(this.saveButton, this.resetButton, this.switchModeButton);
+        this.wordWrapCheckBox = new CheckBox("Word Wrap");
+        this.wordWrapCheckBox.getStyleClass().add("small-button");
+        actionBar.getItems().addAll(this.saveButton, this.resetButton, this.switchModeButton, new HExpander(), this.wordWrapCheckBox);
         VBox.setVgrow(actionBar, Priority.NEVER);
 
         this.editorArea = new CodeArea();
@@ -199,7 +204,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
             }
         });
 
-        this.editorArea.setWrapText(true);
+        this.wordWrapCheckBox.setOnAction(e -> this.editorArea.setWrapText(this.wordWrapCheckBox.isSelected()));
     }
 
     @Override
@@ -232,6 +237,7 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         }
 
         this.plainTextContent = content.toString();
+        this.editorArea.clear();
         this.editorArea.replaceText(0, 0, this.plainTextContent);
         this.hasChanges = false;
         this.saveButton.setDisable(true);
