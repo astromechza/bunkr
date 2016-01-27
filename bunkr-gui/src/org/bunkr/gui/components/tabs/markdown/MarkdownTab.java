@@ -26,7 +26,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.ToolBar;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
@@ -45,8 +44,6 @@ import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.wellbehaved.event.EventHandlerHelper;
-import org.fxmisc.wellbehaved.event.EventPattern;
 import org.markdown4j.Markdown4jProcessor;
 
 import java.io.ByteArrayInputStream;

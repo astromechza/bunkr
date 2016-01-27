@@ -168,52 +168,58 @@ public class LandingWindow extends BaseWindow
             File selectedPath = fileChooser.showOpenDialog(LandingWindow.this.getStage());
             if (selectedPath != null)
             {
-                try
-                {
-                    IDescriptor descriptor = DescriptorBuilder.fromFile(selectedPath);
-                    UserSecurityProvider usp;
-
-                    if (descriptor instanceof PlaintextDescriptor)
-                    {
-                        usp = new UserSecurityProvider();
-                    }
-                    else if (descriptor instanceof PBKDF2Descriptor || descriptor instanceof ScryptDescriptor)
-                    {
-                        PasswordProvider passProv = new PasswordProvider();
-                        PasswordDialog dialog = new PasswordDialog();
-                        dialog.getStage().showAndWait();
-                        if (dialog.hasFile())
-                        {
-                            passProv.setArchivePassword(dialog.getFile());
-                        }
-                        else if (dialog.hasPassword())
-                        {
-                            passProv.setArchivePassword(dialog.getPassword());
-                        }
-                        else
-                        {
-                            return;
-                        }
-
-                        usp = new UserSecurityProvider(passProv);
-                    }
-                    else
-                    {
-                        throw new BaseBunkrException("Archive Open is not implemented for Descriptor type %s", descriptor.getIdentifier());
-                    }
-
-                    ArchiveInfoContext archive = new ArchiveInfoContext(selectedPath, usp);
-                    new MainWindow(archive, usp).getStage().show();
-                    this.getStage().close();
-                }
-                catch (Exception e)
-                {
-                    QuickDialogs.exception(e);
-                    this.getStage().show();
-                }
+                tryOpen(selectedPath);
             }
         });
     }
+
+    public void tryOpen(File path)
+    {
+        try
+        {
+            IDescriptor descriptor = DescriptorBuilder.fromFile(path);
+            UserSecurityProvider usp;
+
+            if (descriptor instanceof PlaintextDescriptor)
+            {
+                usp = new UserSecurityProvider();
+            }
+            else if (descriptor instanceof PBKDF2Descriptor || descriptor instanceof ScryptDescriptor)
+            {
+                PasswordProvider passProv = new PasswordProvider();
+                PasswordDialog dialog = new PasswordDialog();
+                dialog.getStage().showAndWait();
+                if (dialog.hasFile())
+                {
+                    passProv.setArchivePassword(dialog.getFile());
+                }
+                else if (dialog.hasPassword())
+                {
+                    passProv.setArchivePassword(dialog.getPassword());
+                }
+                else
+                {
+                    return;
+                }
+
+                usp = new UserSecurityProvider(passProv);
+            }
+            else
+            {
+                throw new BaseBunkrException("Archive Open is not implemented for Descriptor type %s", descriptor.getIdentifier());
+            }
+
+            ArchiveInfoContext archive = new ArchiveInfoContext(path, usp);
+            new MainWindow(archive, usp).getStage().show();
+            this.getStage().close();
+        }
+        catch (Exception e)
+        {
+            QuickDialogs.exception(e);
+            this.getStage().show();
+        }
+    }
+
 
     @Override
     public void applyStyling()

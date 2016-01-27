@@ -37,6 +37,7 @@ import org.bunkr.gui.windows.LandingWindow;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * Created At: 2015-12-24
@@ -67,6 +68,9 @@ public class GuiEntryPoint
                 .type(Boolean.class)
                 .setDefault(false)
                 .help("Enable debug logging. This may be a security issue due to information leakage.");
+        parser.addArgument("--file")
+                .type(String.class)
+                .help("Open a particular archive by file path");
 
         Namespace namespace = parser.parseArgs(args);
         if (namespace.getBoolean("logging"))
@@ -75,7 +79,8 @@ public class GuiEntryPoint
             Logging.info("Logging is now enabled");
         }
 
-        MainApplication.launch(MainApplication.class);
+        String[] guiParams = new String[]{namespace.get("file")};
+        MainApplication.launch(MainApplication.class, guiParams);
     }
 
     public static class MainApplication extends Application
@@ -83,9 +88,17 @@ public class GuiEntryPoint
         @Override
         public void start(Stage primaryStage) throws Exception
         {
+            List<String> args = getParameters().getRaw();
+
             Font.loadFont(Resources.getExternalPath("/resources/fonts/fontawesome.ttf"), 12);
             URLRequestBlocker.instance().install();
-            new LandingWindow(primaryStage).getStage().show();
+
+            LandingWindow window = new LandingWindow(primaryStage);
+            window.getStage().show();
+            if (args.size() > 0 && args.get(0) != null)
+            {
+                window.tryOpen(new File(args.get(0)));
+            }
         }
     }
 }
