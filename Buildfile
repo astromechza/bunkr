@@ -69,7 +69,7 @@ define PROJECT_NAME do
         package(:jar, id: 'bunkr-cli').with(manifest: {'Main-Class' => CLI_MAIN_CLASS})
         run.using main: CLI_MAIN_CLASS
 
-        run do
+        build do
             write_version_file_for_project('bunkr-cli')
         end
 
@@ -81,8 +81,8 @@ define PROJECT_NAME do
         end
 
         task build_release: [:package] do
-            # first clean target folder
-            system("rm -rf '#{project('bunkr-cli').path_to('target', 'main')}'")
+            puts "Cleaning old classes folder.."
+            system("rm -rfv '#{project('bunkr-cli').path_to('target', 'main')}'")
             proguard_wrap('bunkr-cli')
         end
     end
@@ -97,14 +97,14 @@ define PROJECT_NAME do
         package(:jar, id: 'bunkr-gui').with(manifest: {'Main-Class' => GUI_MAIN_CLASS})
         run.using main: [GUI_MAIN_CLASS, '--logging']
 
-        run do
+        build do
             write_version_file_for_project('bunkr-gui')
             write_resources_for_project('bunkr-gui')
         end
 
         task build_release: [:package] do
-            # first clean target folder
-            system("rm -rf '#{project('bunkr-gui').path_to('target', 'main')}'")
+            puts "Cleaning old classes folder.."
+            system("rm -rfv '#{project('bunkr-gui').path_to('target', 'main')}'")
             proguard_wrap('bunkr-gui')
         end
 
