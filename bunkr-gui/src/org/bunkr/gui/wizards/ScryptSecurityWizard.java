@@ -36,6 +36,7 @@ import org.bunkr.core.exceptions.IllegalPasswordException;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Formatters;
 import org.bunkr.core.utils.DisplayValuePair;
+import org.bunkr.core.utils.Logging;
 import org.bunkr.gui.wizards.common.FileSecWizardPanel;
 import org.bunkr.gui.wizards.common.InventorySecWizardPanel;
 import org.bunkr.gui.wizards.common.PasswordWizardPanel;

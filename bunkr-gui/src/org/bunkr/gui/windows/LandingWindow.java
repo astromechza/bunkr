@@ -178,15 +178,15 @@ public class LandingWindow extends BaseWindow
         try
         {
             IDescriptor descriptor = DescriptorBuilder.fromFile(path);
-            UserSecurityProvider usp;
+            PasswordProvider passProv = new PasswordProvider();
+            UserSecurityProvider usp = new UserSecurityProvider(passProv);
 
             if (descriptor instanceof PlaintextDescriptor)
             {
-                usp = new UserSecurityProvider();
+                passProv.clearArchivePassword();
             }
             else if (descriptor instanceof PBKDF2Descriptor || descriptor instanceof ScryptDescriptor)
             {
-                PasswordProvider passProv = new PasswordProvider();
                 PasswordDialog dialog = new PasswordDialog();
                 dialog.getStage().showAndWait();
                 if (dialog.hasFile())
@@ -201,8 +201,6 @@ public class LandingWindow extends BaseWindow
                 {
                     return;
                 }
-
-                usp = new UserSecurityProvider(passProv);
             }
             else
             {
