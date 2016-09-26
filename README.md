@@ -23,10 +23,13 @@ This project uses Apache Buildr for managing compilation and packaging. Each par
 ```
 # build
 $ bundle exec buildr bunkr:bunkr-core:compile
+
 # test
 $ bundle exec buildr bunkr:bunkr-core:test
+
 # run unit tests with coverage analyser
 $ bundle exec buildr bunkr:bunkr-core:test jacoco:report
+
 # package into a jar
 $ bundle exec buildr bunkr:bunkr-core:package
 ```
@@ -36,4 +39,10 @@ $ bundle exec buildr bunkr:bunkr-core:package
 ```
 $ bundle exec buildr idea
 $ bundle exec buildr bunkr:pull_libs
+```
+
+If you get a 'No java install found' error, make sure you have `$JAVA_HOME` set.
+
+```
+export JAVA_HOME=$(/usr/libexec/java_home)
 ```

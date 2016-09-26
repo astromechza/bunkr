@@ -28,6 +28,10 @@ end
 
 def lib_copy(project_name)
     project(project_name).compile.dependencies.each do |t|
+        if t.to_s.include? 'bunkr-core-'
+            puts "Ignoring #{t}"
+            next
+        end
         if t.to_s.match(/\.jar$/)
             unless File.exists? File.join(project.path_to('lib'), File.basename(t.to_s))
                 puts "Copying #{t} to 'lib' directory"
@@ -36,6 +40,10 @@ def lib_copy(project_name)
         end
     end
     project(project_name).test.dependencies.each do |t|
+        if t.to_s.include? 'bunkr-core-'
+            puts "Ignoring #{t}"
+            next
+        end
         if t.to_s.match(/\.jar$/)
             unless File.exists? File.join(project.path_to('lib'), File.basename(t.to_s))
                 puts "Copying #{t} to 'lib' directory"
