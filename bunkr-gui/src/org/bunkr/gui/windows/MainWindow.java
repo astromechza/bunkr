@@ -22,10 +22,12 @@
 
 package org.bunkr.gui.windows;
 
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -47,6 +49,8 @@ import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.*;
 import org.bunkr.gui.controllers.handlers.*;
 import org.bunkr.gui.dialogs.QuickDialogs;
+import org.fxmisc.wellbehaved.event.EventHandlerHelper;
+import org.fxmisc.wellbehaved.event.EventPattern;
 
 import java.io.*;
 import java.util.*;
@@ -160,7 +164,10 @@ public class MainWindow extends BaseWindow
     @Override
     public void bindEvents()
     {
-
+        EventHandlerHelper.install(this.getRootLayout().onKeyPressedProperty(), EventHandlerHelper
+            .on(EventPattern.keyPressed(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN))).act(event -> {
+                    requestSaveActiveFile();
+            }).create());
     }
 
     @Override
@@ -255,6 +262,18 @@ public class MainWindow extends BaseWindow
         {
             this.tabPane.getTabs().remove((Tab) openTabs.get(file.getUuid()));
             this.openTabs.remove(file.getUuid());
+        }
+    }
+
+    public void requestSaveActiveFile()
+    {
+        if (!this.tabPane.getSelectionModel().isEmpty())
+        {
+            Tab selectedTab = this.tabPane.getSelectionModel().getSelectedItem();
+            if (selectedTab instanceof MarkdownTab) {
+                MarkdownTab targetTab = (MarkdownTab) selectedTab;
+                targetTab.saveContent();
+            }
         }
     }
 }

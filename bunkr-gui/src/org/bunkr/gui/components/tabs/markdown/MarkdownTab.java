@@ -154,38 +154,8 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
 
     private void bindEvents()
     {
-        this.switchModeButton.setOnAction(e -> {
-            if (this.currentMode == Mode.VIEWING)
-                this.goToEditMode();
-            else
-                this.goToViewMode();
-        });
-
-        this.saveButton.setOnAction(e -> {
-            try
-            {
-                try (
-                        MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, this.subject);
-                        InputStream is = new ByteArrayInputStream(this.editorArea.getText().getBytes()))
-                {
-                    byte[] buffer = new byte[(int) Units.MEBIBYTE];
-                    int n;
-                    while ((n = is.read(buffer)) != -1)
-                    {
-                        bwos.write(buffer, 0, n);
-                    }
-                    Arrays.fill(buffer, (byte) 0);
-                }
-                this.plainTextContent = this.editorArea.getText();
-                this.checkChanges();
-                this.onSaveInventoryRequest.accept("Wrote content to file " + this.getText());
-            }
-            catch (IOException exc)
-            {
-                QuickDialogs.exception(exc);
-            }
-        });
-
+        this.switchModeButton.setOnAction(e -> this.toggleMode());
+        this.saveButton.setOnAction(e -> this.saveContent());
         this.resetButton.setOnAction(e -> this.reloadContent());
 
         this.editorArea.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -250,12 +220,46 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         this.getStyleClass().remove("has-changes");
     }
 
+    public void saveContent()
+    {
+        try
+        {
+            try (
+                    MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, this.subject);
+                    InputStream is = new ByteArrayInputStream(this.editorArea.getText().getBytes()))
+            {
+                byte[] buffer = new byte[(int) Units.MEBIBYTE];
+                int n;
+                while ((n = is.read(buffer)) != -1)
+                {
+                    bwos.write(buffer, 0, n);
+                }
+                Arrays.fill(buffer, (byte) 0);
+            }
+            this.plainTextContent = this.editorArea.getText();
+            this.checkChanges();
+            this.onSaveInventoryRequest.accept("Wrote content to file " + this.getText());
+        }
+        catch (IOException exc)
+        {
+            QuickDialogs.exception(exc);
+        }
+    }
+
     public void checkChanges()
     {
         this.hasChanges = ! this.editorArea.getText().equals(this.plainTextContent);
         this.saveButton.setDisable(!this.hasChanges);
         this.getStyleClass().remove("has-changes");
         if (this.hasChanges)  this.getStyleClass().add("has-changes");
+    }
+
+    public void toggleMode()
+    {
+        if (this.currentMode == Mode.VIEWING)
+            this.goToEditMode();
+        else
+            this.goToViewMode();
     }
 
     public void goToEditMode()
