@@ -26,6 +26,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.bunkr.core.ArchiveInfoContext;
@@ -61,10 +62,11 @@ public class MainWindow extends BaseWindow
     private final String cssPath;
     private final UserSecurityProvider securityProvider;
 
-    private Label lblHierarchy;
     private TabPane tabPane;
     private InventoryTreeView tree;
     private Button encryptionSettingsButton;
+    private Button newFileButton;
+    private Button newFolderButton;
 
     private final Map<UUID, IOpenedFileTab> openTabs;
 
@@ -105,7 +107,6 @@ public class MainWindow extends BaseWindow
     @Override
     public void initControls()
     {
-        this.lblHierarchy = new Label("File Structure");
         this.tree = new InventoryTreeView(this.archive);
         this.tabPane = new TabPane();
         this.encryptionSettingsButton = Icons.buildIconButton("Security Settings", Icons.ICON_SETTINGS);
@@ -121,6 +122,17 @@ public class MainWindow extends BaseWindow
                 QuickDialogs.exception(e);
             }
         });
+        this.encryptionSettingsButton.setTooltip(new Tooltip("Change the encryption settings on this archive"));
+        this.newFileButton = Icons.buildIconButton("New File", Icons.ICON_FILE);
+        this.newFileButton.setTooltip(new Tooltip("Add new file"));
+        this.newFileButton.setOnAction(event -> {
+            new NewFileHandler(archive, tree, this).handle(event);
+        });
+        this.newFolderButton = Icons.buildIconButton("New Folder", Icons.ICON_FOLDER);
+        this.newFolderButton.setTooltip(new Tooltip("Add new folder"));
+        this.newFolderButton.setOnAction(event -> {
+            new NewSubDirHandler(archive, tree, this).handle(event);
+        });
     }
 
     @Override
@@ -129,9 +141,13 @@ public class MainWindow extends BaseWindow
         SplitPane sp = new SplitPane();
         sp.setDividerPosition(0, 0.3);
 
-        VBox leftBox = new VBox(0, this.lblHierarchy, this.tree, this.encryptionSettingsButton);
-        VBox.setVgrow(this.lblHierarchy, Priority.NEVER);
-        this.lblHierarchy.setAlignment(Pos.CENTER);
+        HBox buttonBox = new HBox(0, this.newFileButton, this.newFolderButton);
+        HBox.setHgrow(this.newFileButton, Priority.ALWAYS);
+        HBox.setHgrow(this.newFolderButton, Priority.ALWAYS);
+        newFileButton.setMaxWidth(Double.MAX_VALUE);
+        newFolderButton.setMaxWidth(Double.MAX_VALUE);
+
+        VBox leftBox = new VBox(0, buttonBox, this.tree, this.encryptionSettingsButton);
         VBox.setVgrow(this.tree, Priority.ALWAYS);
         VBox.setVgrow(this.encryptionSettingsButton, Priority.NEVER);
         this.encryptionSettingsButton.setMaxWidth(Double.MAX_VALUE);
@@ -150,8 +166,7 @@ public class MainWindow extends BaseWindow
     @Override
     public void applyStyling()
     {
-        this.lblHierarchy.getStyleClass().add("hierarchy-label");
-        this.lblHierarchy.setAlignment(Pos.CENTER);
+
     }
 
     @Override

@@ -59,7 +59,7 @@ public class NewFileHandler implements EventHandler<ActionEvent>
             if (newName == null) return;
             if (! InventoryPather.isValidName(newName))
             {
-                QuickDialogs.error("Create Error", "'%s' is an invalid file name.", newName);
+                QuickDialogs.error("Create Error", "New File Error", "'%s' is an invalid file name.", newName);
                 return;
             }
 
@@ -69,7 +69,7 @@ public class NewFileHandler implements EventHandler<ActionEvent>
             IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
             if (selectedItem.isAFile())
             {
-                QuickDialogs.error("Create Error", "'%s' is a file.", selectedPath);
+                QuickDialogs.error("Create Error", "New File Error", "Parent '%s' is a file.", selectedPath);
                 return;
             }
 
@@ -80,7 +80,8 @@ public class NewFileHandler implements EventHandler<ActionEvent>
             IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
             if (target != null)
             {
-                QuickDialogs.error("Create Error", "There is already an item named '%s' in the parent folder.", newName);
+                QuickDialogs.error("Create Error", "New File Error",
+                                   "There is already an item named '%s' in the parent folder.", newName);
                 return;
             }
 
