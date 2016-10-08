@@ -129,14 +129,10 @@ public class MainWindow extends BaseWindow
         this.encryptionSettingsButton.setTooltip(new Tooltip("Change the encryption settings on this archive"));
         this.newFileButton = Icons.buildIconButton("New File", Icons.ICON_FILE);
         this.newFileButton.setTooltip(new Tooltip("Add new file"));
-        this.newFileButton.setOnAction(event -> {
-            new NewFileHandler(archive, tree, this).handle(event);
-        });
+        this.newFileButton.setOnAction(event -> new NewFileHandler(archive, tree, this).handle(event));
         this.newFolderButton = Icons.buildIconButton("New Folder", Icons.ICON_FOLDER);
         this.newFolderButton.setTooltip(new Tooltip("Add new folder"));
-        this.newFolderButton.setOnAction(event -> {
-            new NewSubDirHandler(archive, tree, this).handle(event);
-        });
+        this.newFolderButton.setOnAction(event -> new NewSubDirHandler(archive, tree, this).handle(event));
     }
 
     @Override

@@ -57,6 +57,21 @@ public class NewSubDirHandler implements EventHandler<ActionEvent>
     {
         try
         {
+            // get item for which the context menu was called from
+            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItem();
+            String selectedPath = this.tree.getPathForTreeItem(selected);
+            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+            if (selectedItem.isAFile())
+            {
+                // if parent is a file, go up a level
+                selected = selected.getParent();
+                selectedPath = this.tree.getPathForTreeItem(selected);
+                selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
+            }
+
+            // find subject FolderInventoryItem
+            IFFContainer selectedContainer = (IFFContainer) selectedItem;
+
             // get new file name
             String newName = QuickDialogs.input("Enter a new directory name:", "");
             if (newName == null) return;
@@ -65,19 +80,6 @@ public class NewSubDirHandler implements EventHandler<ActionEvent>
                 QuickDialogs.error("Create Error", "New Folder Error", "'%s' is an invalid file name.", newName);
                 return;
             }
-
-            // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItem();
-            String selectedPath = this.tree.getPathForTreeItem(selected);
-            IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
-            if (selectedItem.isAFile())
-            {
-                QuickDialogs.error("Create Error", "New Folder Error", "'%s' is a file.", selectedPath);
-                return;
-            }
-
-            // find subject FolderInventoryItem
-            IFFContainer selectedContainer = (IFFContainer) selectedItem;
 
             // check parent for the same name
             IFFTraversalTarget target = selectedContainer.findFileOrFolder(newName);
