@@ -149,6 +149,7 @@ public class FileSecAuditWindow extends BaseWindow
 
     public void reloadFixablePaths()
     {
+        this.pathsBox.getItems().clear();
         Iterator<FileInventoryItem> fileit = archive.getInventory().getIterator();
         while(fileit.hasNext())
         {

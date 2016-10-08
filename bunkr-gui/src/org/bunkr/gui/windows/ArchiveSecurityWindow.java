@@ -123,16 +123,18 @@ public class ArchiveSecurityWindow extends BaseWindow
                 // if cancel selected, stop
                 if (type == null) return;
 
+                if (!QuickDialogs.confirm(
+                        "Change security model from %s to %s? This may require re-encrypting all files.",
+                        beforeType, type
+                )) return;
+
                 // spawn the correct wizard
                 switch (type)
                 {
                     case PlaintextDescriptor.IDENTIFIER:
-                        if (QuickDialogs.confirm("Set security model to %s?", PlaintextDescriptor.IDENTIFIER))
-                        {
-                            this.archive.setDescriptor(new PlaintextDescriptor());
-                            this.archive.getInventory().setDefaultEncryption(Encryption.NONE);
-                            this.onSaveMetadataRequest.accept("Updated Security Model");
-                        }
+                        this.archive.setDescriptor(new PlaintextDescriptor());
+                        this.archive.getInventory().setDefaultEncryption(Encryption.NONE);
+                        this.onSaveMetadataRequest.accept("Updated Security Model");
                         break;
                     case PBKDF2Descriptor.IDENTIFIER:
                         new PBKDF2SecurityWizard(archive, securityProvider).getStage().showAndWait();
