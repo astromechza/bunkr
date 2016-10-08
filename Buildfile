@@ -118,15 +118,19 @@ define PROJECT_NAME do
             end
 
             output_dir = project.path_to('target', 'app')
+            puts "Removing #{output_dir}"
             system("rm -rfv #{output_dir}")
+            puts "Creating #{output_dir}"
             system("mkdir #{output_dir}")
 
+            puts "Writing build.xml"
             File.open("#{output_dir}/build.xml", 'w') do |f|
                 f.puts make_mac_app_xml(output_dir)
             end
 
             if system("cd #{output_dir}; ant")
-                puts "Build #{output_dir}/bunkr-#{project.version}.app"
+                puts "Built #{output_dir}/bunkr-#{project.version}.app"
+                puts "Size #{system("ls -lh #{output_dir}")}"
             else
                 puts "Error while building app!"
                 exit! 1
