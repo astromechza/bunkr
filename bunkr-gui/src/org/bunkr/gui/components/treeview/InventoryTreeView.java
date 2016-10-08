@@ -148,4 +148,10 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
         if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
         return null;
     }
+
+    public TreeItem<InventoryTreeData> getSelectedTreeItemOrRoot()
+    {
+        if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
+        return this.getRoot();
+    }
 }

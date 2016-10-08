@@ -139,12 +139,15 @@ public class DragFileImportHandler implements Consumer<Pair<UUID, File>>
                     // add to the container
                     if (target == null) selectedContainer.addFile(newFile);
 
+                    // guess type
+                    String guessedType = MediaType.guess(newFile.getName());
+
                     // pick the media type
                     newFile.setMediaType(QuickDialogs.pick(
                                                  "Import File",
                                                  null,
                                                  "Pick a Media Type for the new file:",
-                                                 new ArrayList<>(MediaType.ALL_TYPES), MediaType.UNKNOWN)
+                                                 new ArrayList<>(MediaType.ALL_TYPES), guessedType)
                     );
 
                     TreeItem<InventoryTreeData> newItem = new TreeItem<>(new InventoryTreeData(newFile));

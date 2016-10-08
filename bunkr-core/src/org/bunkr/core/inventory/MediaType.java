@@ -40,6 +40,25 @@ public class MediaType
     public static final String IMAGE = "image";
     public static final String HTML = "html";
 
+    public static final String[] TEXT_EXT = {
+            "md", "markdown", "mdown",
+            "txt", "text", "log",
+            "ini", "cfg"
+    };
+
+    public static final String[] IMAGE_EXT = {
+            "jpg", "jpeg",
+            "png",
+            "ico",
+            "bmp",
+    };
+
+    public static final String[] HTML_EXT = {
+            "html",
+            "xhtml",
+            "htm"
+    };
+
     public static final Set<String> ALL_TYPES = new HashSet<>();
     static {
         ALL_TYPES.add(UNKNOWN);
@@ -53,5 +72,27 @@ public class MediaType
         OPENABLE_TYPES.add(TEXT);
         OPENABLE_TYPES.add(IMAGE);
         OPENABLE_TYPES.add(HTML);
+    }
+
+    public static String guess(String filename)
+    {
+        int i = filename.lastIndexOf('.');
+        if (i > 0)
+        {
+            String ext = filename.substring(i + 1);
+            for (String s : TEXT_EXT)
+            {
+                if (ext.equals(s)) return MediaType.TEXT;
+            }
+            for (String s : IMAGE_EXT)
+            {
+                if (ext.equals(s)) return MediaType.IMAGE;
+            }
+            for (String s : HTML_EXT)
+            {
+                if (ext.equals(s)) return MediaType.HTML;
+            }
+        }
+        return MediaType.UNKNOWN;
     }
 }
