@@ -234,7 +234,7 @@ public class LandingWindow extends BaseWindow
         scene.getStylesheets().add(this.cssPath);
         this.getStage().setTitle("Bunkr");
         this.getStage().setScene(scene);
-        this.getStage().setResizable(true);
+        this.getStage().setResizable(false);
         return scene;
     }
 }

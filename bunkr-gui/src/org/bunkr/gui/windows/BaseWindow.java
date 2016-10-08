@@ -24,6 +24,7 @@ package org.bunkr.gui.windows;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.bunkr.core.Resources;
 
@@ -35,8 +36,10 @@ import java.io.IOException;
 public abstract class BaseWindow
 {
     protected final String cssCommon;
+    protected final String windowIconPath;
 
     private final Stage stage;
+
     private Scene scene;
     private Parent rootLayout;
 
@@ -44,6 +47,7 @@ public abstract class BaseWindow
     {
         this.stage = container;
         this.cssCommon = Resources.getExternalPath("/resources/css/common.css");
+        this.windowIconPath = Resources.getExternalPath("/resources/images/bunkr-icon.png");
     }
 
     public BaseWindow() throws IOException
@@ -58,6 +62,7 @@ public abstract class BaseWindow
         this.bindEvents();
         this.applyStyling();
         this.scene = this.initScene();
+        this.setIcon();
     }
 
     public abstract void initControls();
@@ -79,5 +84,9 @@ public abstract class BaseWindow
     public Parent getRootLayout()
     {
         return rootLayout;
+    }
+
+    public void setIcon() {
+        this.getStage().getIcons().add(new Image(this.windowIconPath));
     }
 }
