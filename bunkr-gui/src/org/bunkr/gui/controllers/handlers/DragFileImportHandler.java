@@ -93,7 +93,7 @@ public class DragFileImportHandler implements Consumer<Pair<UUID, File>>
             FileInventoryItem newFile;
             if (target != null)
             {
-                if (! QuickDialogs.confirm("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
+                if (! QuickDialogs.confirmFull("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
                 {
                     return;
                 }

@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -99,7 +98,7 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
             FileInventoryItem newFile;
             if (target != null)
             {
-                if (! QuickDialogs.confirm("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
+                if (! QuickDialogs.confirmFull("Import Error", null, "There is already an item named '%s' in the parent folder. Do you want to replace it?", newName))
                 {
                     return;
                 }

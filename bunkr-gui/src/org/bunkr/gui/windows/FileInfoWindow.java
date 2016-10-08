@@ -47,7 +47,6 @@ import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
@@ -232,6 +231,7 @@ public class FileInfoWindow extends BaseWindow
                 protected void succeeded()
                 {
                     onSaveInventoryRequest.accept(String.format("Imported file %s", item.getName()));
+                    lblFileEncValue.setText("" + item.getEncryptionAlgorithm());
                 }
 
                 @Override

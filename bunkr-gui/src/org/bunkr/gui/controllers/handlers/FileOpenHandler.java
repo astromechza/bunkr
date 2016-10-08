@@ -83,7 +83,7 @@ public class FileOpenHandler implements EventHandler<ActionEvent>
             {
                 QuickDialogs.error("Cannot open file of unknown type. Use Context Menu > Info to change the type.");
             }
-            else if (selectedFile.getActualSize() < (Units.MEBIBYTE) || QuickDialogs.confirm(
+            else if (selectedFile.getActualSize() < (Units.MEBIBYTE) || QuickDialogs.confirmFull(
                     "Please Confirm", "This is a large file!", "File %s is %s in size. Are you sure you want to open it?",
                     selectedFile.getName(), Formatters.formatBytes(selectedFile.getActualSize())))
             {

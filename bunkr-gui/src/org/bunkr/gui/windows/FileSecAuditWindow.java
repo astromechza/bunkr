@@ -33,7 +33,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.InventoryPather;
 import org.bunkr.core.streams.input.MultilayeredInputStream;
 import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Units;
@@ -47,7 +46,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**

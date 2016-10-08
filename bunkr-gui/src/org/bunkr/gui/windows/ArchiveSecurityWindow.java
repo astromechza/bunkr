@@ -23,7 +23,6 @@
 package org.bunkr.gui.windows;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;

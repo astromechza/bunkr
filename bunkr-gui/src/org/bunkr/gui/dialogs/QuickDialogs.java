@@ -53,7 +53,7 @@ public class QuickDialogs
         info("Info", null, format, args);
     }
 
-    public static boolean confirm(String title, String header, String format, Object... args)
+    public static boolean confirmFull(String title, String header, String format, Object... args)
     {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
@@ -69,7 +69,7 @@ public class QuickDialogs
 
     public static boolean confirm(String format, Object... args)
     {
-        return confirm("Input Required", null, format, args);
+        return confirmFull("Input Required", null, format, args);
     }
 
     public static void exception(Throwable e)
