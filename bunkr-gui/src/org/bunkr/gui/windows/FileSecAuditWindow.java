@@ -26,9 +26,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -60,7 +58,7 @@ public class FileSecAuditWindow extends BaseWindow
     private final ArchiveInfoContext archive;
 
     private Label topLabel;
-    private Button backButton, fixButton;
+    private Button backButton, fixButton, fixAllButton;
     private ListView<PathBoxItem> pathsBox;
     private Consumer<String> onSaveMetadataRequest;
 
@@ -79,8 +77,10 @@ public class FileSecAuditWindow extends BaseWindow
         this.topLabel.setWrapText(true);
         this.pathsBox = new ListView<>();
         this.pathsBox.setCellFactory(CheckBoxListCell.forListView(param -> param.selected));
+        this.pathsBox.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.backButton = new Button("Back");
-        this.fixButton = Icons.buildIconButton("Re-encrypt Files", Icons.ICON_RELOAD);
+        this.fixButton = Icons.buildIconButton("Re-encrypt Selected Files", Icons.ICON_RELOAD);
+        this.fixAllButton = Icons.buildIconButton("Re-encrypt All Files", Icons.ICON_RELOAD);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class FileSecAuditWindow extends BaseWindow
         root.setCenter(this.pathsBox);
         BorderPane.setMargin(this.pathsBox, new Insets(10, 0, 10, 0));
 
-        root.setBottom(new HBox(10, this.fixButton, new HExpander(), this.backButton));
+        root.setBottom(new HBox(10, this.fixButton, this.fixAllButton, new HExpander(), this.backButton));
         return root;
     }
 
@@ -109,9 +109,16 @@ public class FileSecAuditWindow extends BaseWindow
                     .map(pathBoxItem -> pathBoxItem.file)
                     .collect(Collectors.toList());
 
+            if (selected.size() == 0)  return;
+
             if (!QuickDialogs.confirm("Are you sure you want to re-encrypt %d files? This may take some time.", selected.size())) return;
 
             this.reencryptFiles(selected);
+        });
+
+        this.fixAllButton.setOnAction(e -> {
+            this.pathsBox.getItems().stream().forEach(i -> i.selected.set(true));
+            this.fixButton.fire();
         });
     }
 
@@ -151,6 +158,11 @@ public class FileSecAuditWindow extends BaseWindow
                 this.pathsBox.getItems().add(new PathBoxItem(current));
             }
         }
+    }
+
+    public boolean hasOutstandingItems()
+    {
+        return this.pathsBox.getItems().size() > 0;
     }
 
     private class PathBoxItem
@@ -214,13 +226,14 @@ public class FileSecAuditWindow extends BaseWindow
             protected void succeeded()
             {
                 onSaveMetadataRequest.accept("Reencrypted files");
+                FileSecAuditWindow.this.reloadFixablePaths();
                 QuickDialogs.info("Finished Re-encrypting all files.");
             }
 
             @Override
             protected void cancelled()
             {
-                onSaveMetadataRequest.accept("Cancelled file import");
+                onSaveMetadataRequest.accept("Cancelled file re-encrypt");
             }
 
             @Override

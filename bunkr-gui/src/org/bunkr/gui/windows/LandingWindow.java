@@ -34,10 +34,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.bunkr.core.ArchiveBuilder;
-import org.bunkr.core.ArchiveInfoContext;
-import org.bunkr.core.Resources;
-import org.bunkr.core.Version;
+import org.bunkr.core.*;
 import org.bunkr.core.descriptor.*;
 import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.usersec.PasswordProvider;
@@ -145,6 +142,26 @@ public class LandingWindow extends BaseWindow
                         new PlaintextDescriptor(),
                         usp
                 );
+
+                try
+                {
+                    ArchiveSecurityWindow popup = new ArchiveSecurityWindow(archive, usp);
+                    popup.setOnSaveMetadataRequest(r -> {
+                        try
+                        {
+                            MetadataWriter.write(archive, usp);
+                        }
+                        catch (IOException | BaseBunkrException e)
+                        {
+                            QuickDialogs.exception(e);
+                        }
+                    });
+                    popup.getStage().showAndWait();
+                }
+                catch (IOException e)
+                {
+                    QuickDialogs.exception(e);
+                }
 
                 new MainWindow(archive, usp).getStage().show();
                 this.getStage().close();

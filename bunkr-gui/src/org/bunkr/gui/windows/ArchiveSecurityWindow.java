@@ -113,10 +113,12 @@ public class ArchiveSecurityWindow extends BaseWindow
         changeSecurityButton.setOnAction(e -> {
             try
             {
+                String beforeType = this.archive.getDescriptor().getIdentifier();
+
                 // ask user for new security model
                 String type = QuickDialogs.pick("Pick a new Security Model", Arrays.asList(
                         PlaintextDescriptor.IDENTIFIER, PBKDF2Descriptor.IDENTIFIER, ScryptDescriptor.IDENTIFIER
-                ), null);
+                ), beforeType);
 
                 // if cancel selected, stop
                 if (type == null) return;
@@ -131,18 +133,22 @@ public class ArchiveSecurityWindow extends BaseWindow
                             this.archive.getInventory().setDefaultEncryption(Encryption.NONE);
                             this.onSaveMetadataRequest.accept("Updated Security Model");
                         }
-                        return;
+                        break;
                     case PBKDF2Descriptor.IDENTIFIER:
                         new PBKDF2SecurityWizard(archive, securityProvider).getStage().showAndWait();
-                        this.reloadArchiveSecurityDisplay();
                         break;
                     case ScryptDescriptor.IDENTIFIER:
                         new ScryptSecurityWizard(archive, securityProvider).getStage().showAndWait();
-                        this.reloadArchiveSecurityDisplay();
                         break;
                     default:
                         QuickDialogs.error("Descriptor type %s is unknown.",
                                            this.archive.getDescriptor().getIdentifier());
+                }
+
+                String afterType = this.archive.getDescriptor().getIdentifier();
+                if (!afterType.equals(beforeType)) {
+                    this.reloadArchiveSecurityDisplay();
+                    this.auditFileSecButton.fire();
                 }
             }
             catch (IOException exc)
@@ -155,6 +161,11 @@ public class ArchiveSecurityWindow extends BaseWindow
             try
             {
                 FileSecAuditWindow fsaw = new FileSecAuditWindow(this.archive);
+                if (!fsaw.hasOutstandingItems())
+                {
+                    QuickDialogs.info("Great, no files require re-encryption!");
+                    return;
+                }
                 fsaw.setOnSaveMetadataRequest(this.onSaveMetadataRequest);
                 fsaw.getStage().showAndWait();
             }
