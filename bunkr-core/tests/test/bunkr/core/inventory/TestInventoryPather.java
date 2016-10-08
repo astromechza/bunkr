@@ -51,6 +51,7 @@ public class TestInventoryPather
         assertTrue(InventoryPather.isValidPath("/something/fn.jpg"));
         assertTrue(InventoryPather.isValidPath("/something/fn-one.jpg"));
         assertTrue(InventoryPather.isValidPath("/something____funny.tuff"));
+        assertTrue(InventoryPather.isValidPath("/something[]"));
     }
 
     @Test
@@ -62,7 +63,6 @@ public class TestInventoryPather
         assertFalse(InventoryPather.isValidPath("/something/what\r\n"));
         assertFalse(InventoryPather.isValidPath("/something/\ttab"));
         assertFalse(InventoryPather.isValidPath("/something/!@#(*!@&"));
-        assertFalse(InventoryPather.isValidPath("/something[]"));
     }
 
     @Test

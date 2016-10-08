@@ -32,9 +32,9 @@ import java.util.regex.Pattern;
  */
 public class InventoryPather
 {
-    public static final Pattern namePattern = Pattern.compile("[0-9a-zA-Z\\-_\\.,; ]+");
+    public static final Pattern namePattern = Pattern.compile("[^/:*?\"<>\\x00-\\x1F\\x7F]+");
     public static final Pattern pathPattern = Pattern.compile("^(?:/" + namePattern.pattern() + ")+|/$");
-    public static final Pattern relpathPattern = Pattern.compile("^(?:\\.\\.\\/)*(?:" + namePattern.pattern() + "(?:\\/" + namePattern.pattern() + ")*)?");
+    public static final Pattern relpathPattern = Pattern.compile("^(?:\\.\\./)*(?:" + namePattern.pattern() + "(?:/" + namePattern.pattern() + ")*)?");
 
     public static boolean isValidPath(String path)
     {
