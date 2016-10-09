@@ -63,6 +63,8 @@ public class ImportFileHandler implements EventHandler<ActionEvent>
 
             // get item for which the context menu was called from
             TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItemOrRoot();
+            if (selected.getValue().getType() == InventoryTreeData.Type.FILE) selected = selected.getParent();
+
             subHandler.accept(new Pair<>(selected.getValue().getUuid(), importedFile));
         }
         catch (Exception e)
