@@ -4,9 +4,11 @@ There are 2 ways of working with Bunkr archives: using the GUI, and through the 
 the same functionality but the GUI is more usable from a user standpoint and the CLI allows other programs to easily
 manipulate and read from archives.
 
-See [CLI_DEMO.md](CLI_DEMO.md) for usage examples of the CLI.
+See [Cli Demo](CLI_DEMO.md) for usage examples of the CLI.
 
-See [/screenshots](/screenshots) for images of the GUI.
+See [Screenshots](/screenshots) for images of the GUI.
+
+See [Overview](/docs/00_overview.md) for documentation of the file format and security.
 
 ## Development
 
