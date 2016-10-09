@@ -51,7 +51,7 @@ inventory section. It specifies the active encryption mode, settings, and any in
 
 The basic structure is:
 
-```json
+```
 {
     "security": "<string>",
     "params": {
@@ -71,7 +71,7 @@ on this.
 
 The basic plaintext structure is:
 
-```json
+```
 {
     "files": [
         {

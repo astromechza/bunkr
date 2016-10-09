@@ -84,7 +84,7 @@ public class ScryptSecurityWizard extends WizardWindow
             for (Integer n : ScryptDescriptor.SUGGESTED_SCRYPT_N_LIST)
             {
                 long memusage = ScryptDescriptor.calculateMemoryUsage(n);
-                timeComboBox.getItems().add(new DisplayValuePair<>(n, Formatters.formatBytes(memusage) + "B"));
+                timeComboBox.getItems().add(new DisplayValuePair<>(n, Formatters.formatBytes(memusage)));
             }
             timeComboBox.getSelectionModel().select(0);
             Label label = new Label("Scrypt Memory Usage:");
