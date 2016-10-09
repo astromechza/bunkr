@@ -72,7 +72,6 @@ public class MainWindow extends BaseWindow
     private MenuItem importFileFromURLMI;
     private MenuItem importFileMI;
     private MenuItem newFolderMI;
-    private MenuItem closeArchiveMI;
     private Menu optionsMenu;
     private MenuItem securitySettingsMI;
     private Menu helpMenu;
@@ -125,7 +124,6 @@ public class MainWindow extends BaseWindow
         this.importFileMI = new MenuItem("Import File..", Icons.buildIconLabel(Icons.ICON_IMPORT));
         this.importFileFromURLMI = new MenuItem("Import From URL..", Icons.buildIconLabel(Icons.ICON_WEB_IMPORT));
         this.newFolderMI = new MenuItem("New Folder..", Icons.buildIconLabel(Icons.ICON_FOLDER));
-        this.closeArchiveMI = new MenuItem("Close");
         this.optionsMenu = new Menu("Options");
         this.securitySettingsMI = new MenuItem("Security Settings..", Icons.buildIconLabel(Icons.ICON_SETTINGS));
         this.helpMenu = new Menu("Help");
@@ -144,9 +142,7 @@ public class MainWindow extends BaseWindow
         this.fileMenu.getItems().addAll(this.newFileMI,
                                         this.importFileMI,
                                         this.importFileFromURLMI,
-                                        this.newFolderMI,
-                                        new SeparatorMenuItem(),
-                                        this.closeArchiveMI);
+                                        this.newFolderMI);
         this.optionsMenu.getItems().addAll(this.securitySettingsMI);
         this.helpMenu.getItems().addAll(this.aboutMI);
 
@@ -178,7 +174,6 @@ public class MainWindow extends BaseWindow
         this.importFileMI.setOnAction(event -> new ImportFileHandler(archive, tree, this).handle(event));
         this.importFileFromURLMI.setOnAction(event -> new ImportWebFileHandler(archive, tree, this).handle(event));
         this.newFolderMI.setOnAction(event -> new NewSubDirHandler(archive, tree, this).handle(event));
-        this.closeArchiveMI.setOnAction(event -> this.getStage().close());
 
         this.bindHotKey(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), event -> requestSaveActiveFile());
     }
