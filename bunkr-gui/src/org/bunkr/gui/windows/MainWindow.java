@@ -29,9 +29,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
@@ -69,12 +66,11 @@ public class MainWindow extends BaseWindow
 
     private TabPane tabPane;
     private InventoryTreeView tree;
-    private Button encryptionSettingsButton;
-    private Button newFileButton;
-    private Button newFolderButton;
 
     private Menu fileMenu;
     private MenuItem newFileMI;
+    private MenuItem importFileFromURLMI;
+    private MenuItem importFileMI;
     private MenuItem newFolderMI;
     private MenuItem closeArchiveMI;
     private Menu optionsMenu;
@@ -123,16 +119,11 @@ public class MainWindow extends BaseWindow
     {
         this.tree = new InventoryTreeView(this.archive);
         this.tabPane = new TabPane();
-        this.encryptionSettingsButton = Icons.buildIconButton("Security Settings", Icons.ICON_SETTINGS);
-
-        this.encryptionSettingsButton.setTooltip(new Tooltip("Change the encryption settings on this archive"));
-        this.newFileButton = Icons.buildIconButton("New File", Icons.ICON_FILE);
-        this.newFileButton.setTooltip(new Tooltip("Add new file"));
-        this.newFolderButton = Icons.buildIconButton("New Folder", Icons.ICON_FOLDER);
-        this.newFolderButton.setTooltip(new Tooltip("Add new folder"));
 
         this.fileMenu = new Menu("File");
         this.newFileMI = new MenuItem("New File..", Icons.buildIconLabel(Icons.ICON_FILE));
+        this.importFileMI = new MenuItem("Import File..", Icons.buildIconLabel(Icons.ICON_IMPORT));
+        this.importFileFromURLMI = new MenuItem("Import From URL..", Icons.buildIconLabel(Icons.ICON_WEB_IMPORT));
         this.newFolderMI = new MenuItem("New Folder..", Icons.buildIconLabel(Icons.ICON_FOLDER));
         this.closeArchiveMI = new MenuItem("Close");
         this.optionsMenu = new Menu("Options");
@@ -150,22 +141,16 @@ public class MainWindow extends BaseWindow
         sp.setDividerPosition(0, 0.3);
 
         MenuBar menu = new MenuBar(this.fileMenu, this.optionsMenu, this.helpMenu);
-        this.fileMenu.getItems().addAll(this.newFileMI, this.newFolderMI, new SeparatorMenuItem(), this.closeArchiveMI);
+        this.fileMenu.getItems().addAll(this.newFileMI,
+                                        this.importFileMI,
+                                        this.importFileFromURLMI,
+                                        this.newFolderMI,
+                                        new SeparatorMenuItem(),
+                                        this.closeArchiveMI);
         this.optionsMenu.getItems().addAll(this.securitySettingsMI);
         this.helpMenu.getItems().addAll(this.aboutMI);
 
-        HBox buttonBox = new HBox(0, this.newFileButton, this.newFolderButton);
-        HBox.setHgrow(this.newFileButton, Priority.ALWAYS);
-        HBox.setHgrow(this.newFolderButton, Priority.ALWAYS);
-        newFileButton.setMaxWidth(Double.MAX_VALUE);
-        newFolderButton.setMaxWidth(Double.MAX_VALUE);
-
-        VBox leftBox = new VBox(0, buttonBox, this.tree, this.encryptionSettingsButton);
-        VBox.setVgrow(this.tree, Priority.ALWAYS);
-        VBox.setVgrow(this.encryptionSettingsButton, Priority.NEVER);
-        this.encryptionSettingsButton.setMaxWidth(Double.MAX_VALUE);
-
-        sp.getItems().add(leftBox);
+        sp.getItems().add(this.tree);
         sp.getItems().add(this.tabPane);
 
         bp.setTop(menu);
@@ -189,13 +174,13 @@ public class MainWindow extends BaseWindow
                 QuickDialogs.exception(e);
             }
         });
-        this.newFolderMI.setOnAction(event -> new NewSubDirHandler(archive, tree, this).handle(event));
         this.newFileMI.setOnAction(event -> new NewFileHandler(archive, tree, this).handle(event));
+        this.importFileMI.setOnAction(event -> new ImportFileHandler(archive, tree, this).handle(event));
+        this.importFileFromURLMI.setOnAction(event -> new ImportWebFileHandler(archive, tree, this).handle(event));
+        this.newFolderMI.setOnAction(event -> new NewSubDirHandler(archive, tree, this).handle(event));
+        this.closeArchiveMI.setOnAction(event -> this.getStage().close());
 
-        EventHandlerHelper.install(this.getRootLayout().onKeyPressedProperty(), EventHandlerHelper
-            .on(EventPattern.keyPressed(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN))).act(event -> {
-                    requestSaveActiveFile();
-            }).create());
+        this.bindHotKey(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), event -> requestSaveActiveFile());
     }
 
     @Override

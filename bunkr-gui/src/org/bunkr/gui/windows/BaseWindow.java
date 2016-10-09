@@ -25,10 +25,17 @@ package org.bunkr.gui.windows;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.bunkr.core.Resources;
+import org.fxmisc.wellbehaved.event.EventHandlerHelper;
+import org.fxmisc.wellbehaved.event.EventPattern;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * Created At: 2015-12-24
@@ -88,5 +95,11 @@ public abstract class BaseWindow
 
     public void setIcon() {
         this.getStage().getIcons().add(new Image(this.windowIconPath));
+    }
+
+    public void bindHotKey(KeyCodeCombination combo, Consumer<? super KeyEvent> action)
+    {
+        EventHandlerHelper.install(this.getRootLayout().onKeyPressedProperty(), EventHandlerHelper
+                .on(EventPattern.keyPressed(combo)).act(action).create());
     }
 }

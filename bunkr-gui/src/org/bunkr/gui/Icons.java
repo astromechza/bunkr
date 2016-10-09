@@ -27,6 +27,18 @@ import javafx.scene.control.Label;
 
 /**
  * Created At: 2016-01-08
+ *
+ * These icons use font-awesome unicode points to display icons.
+ *
+ * The font awesome font is linked to the 'icons' fx css class and displays the correct icons based on the values
+ * below.
+ *
+ * To add a new icon:
+ * - Go to http://fontawesome.io/icons/
+ * - Find the icon you want
+ * - Click on it
+ * - Copy the Unicode value seen on the page to a String below.
+ *
  */
 public class Icons
 {
@@ -49,6 +61,9 @@ public class Icons
     public static final String ICON_OPEN = "\uf07c";
     public static final String ICON_NEW = "\uf187";
     public static final String ICON_SAVE = "\uf0c7";
+
+    public static final String ICON_IMPORT = "\uf090";
+    public static final String ICON_WEB_IMPORT = "\uf0ed";
 
     public static final String ICON_FOLDER = "\uf114";
     public static final String ICON_FILE = "\uf016";
