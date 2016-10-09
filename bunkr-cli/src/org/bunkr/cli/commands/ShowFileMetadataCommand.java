@@ -58,7 +58,8 @@ public class ShowFileMetadataCommand implements ICLICommand
             System.out.printf("Media type:            %s\n", file.getMediaType());
             System.out.printf("Integrity hash:        %s\n", DatatypeConverter.printHexBinary(file.getIntegrityHash()));
             System.out.printf("Encryption algorithm:  %s\n", file.getEncryptionAlgorithm());
-            System.out.printf("Encryption data:       %s\n", DatatypeConverter.printHexBinary(file.getEncryptionData()));
+            if (file.getEncryptionData() != null)
+                System.out.printf("Encryption data:       %s\n", DatatypeConverter.printHexBinary(file.getEncryptionData()));
             System.out.printf("Block count:           %d\n", file.getBlocks().size());
             System.out.printf("Block ranges:          ");
             BooleanProperty first = new SimpleBooleanProperty(true);
