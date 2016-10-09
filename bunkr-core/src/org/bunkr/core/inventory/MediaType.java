@@ -39,11 +39,16 @@ public class MediaType
     public static final String TEXT = "text";
     public static final String IMAGE = "image";
     public static final String HTML = "html";
+    public static final String MARKDOWN = "markdown";
+
+    public static final String[] MARKDOWN_EXT = {
+            "md", "markdown", "mdown",
+    };
 
     public static final String[] TEXT_EXT = {
-            "md", "markdown", "mdown",
             "txt", "text", "log",
-            "ini", "cfg"
+            "ini", "cfg",
+            "yaml", "json",
     };
 
     public static final String[] IMAGE_EXT = {
@@ -56,13 +61,14 @@ public class MediaType
     public static final String[] HTML_EXT = {
             "html",
             "xhtml",
-            "htm"
+            "htm",
     };
 
     public static final Set<String> ALL_TYPES = new HashSet<>();
     static {
         ALL_TYPES.add(UNKNOWN);
         ALL_TYPES.add(IMAGE);
+        ALL_TYPES.add(MARKDOWN);
         ALL_TYPES.add(TEXT);
         ALL_TYPES.add(HTML);
     }
@@ -70,6 +76,7 @@ public class MediaType
     public static final Set<String> OPENABLE_TYPES = new HashSet<>();
     static {
         OPENABLE_TYPES.add(TEXT);
+        OPENABLE_TYPES.add(MARKDOWN);
         OPENABLE_TYPES.add(IMAGE);
         OPENABLE_TYPES.add(HTML);
     }
@@ -80,6 +87,10 @@ public class MediaType
         if (i > 0)
         {
             String ext = filename.substring(i + 1);
+            for (String s : MARKDOWN_EXT)
+            {
+                if (ext.equals(s)) return MediaType.MARKDOWN;
+            }
             for (String s : TEXT_EXT)
             {
                 if (ext.equals(s)) return MediaType.TEXT;

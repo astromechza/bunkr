@@ -42,6 +42,7 @@ import org.bunkr.gui.components.tabs.TabLoadError;
 import org.bunkr.gui.components.tabs.html.HtmlTab;
 import org.bunkr.gui.components.tabs.images.ImageTab;
 import org.bunkr.gui.components.tabs.markdown.MarkdownTab;
+import org.bunkr.gui.components.tabs.text.TextTab;
 import org.bunkr.gui.components.treeview.CellFactoryCallback;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.*;
@@ -226,10 +227,14 @@ public class MainWindow extends BaseWindow
                 IOpenedFileTab tab;
                 switch (file.getMediaType())
                 {
-                    case MediaType.TEXT:
+                    case MediaType.MARKDOWN:
                         tab = new MarkdownTab(file, this.archive);
                         ((MarkdownTab) tab).setOnSaveInventoryRequest(this::requestMetadataSave);
                         ((MarkdownTab) tab).setOnRequestOpen(this::requestOpen);
+                        break;
+                    case MediaType.TEXT:
+                        tab = new TextTab(file, this.archive);
+                        ((TextTab) tab).setOnSaveInventoryRequest(this::requestMetadataSave);
                         break;
                     case MediaType.HTML:
                         tab = new HtmlTab(file, this.archive);
