@@ -70,10 +70,12 @@ public class TextTab extends Tab implements IOpenedFileTab
         this.resetButton.getStyleClass().add("small-button");
         this.wordWrapCheckBox = new CheckBox("Word Wrap");
         this.wordWrapCheckBox.getStyleClass().add("small-button");
+        this.wordWrapCheckBox.selectedProperty().set(true);
         actionBar.getItems().addAll(this.saveButton, this.resetButton, new HExpander(), this.wordWrapCheckBox);
         VBox.setVgrow(actionBar, Priority.NEVER);
 
         this.editorArea = new CodeArea();
+        this.editorArea.setWrapText(true);
         this.editorArea.setParagraphGraphicFactory(LineNumberFactory.get(this.editorArea));
         this.editorArea.getStyleClass().add("editor-area-monospaced");
         VBox.setVgrow(this.editorArea, Priority.ALWAYS);
