@@ -154,4 +154,11 @@ public class InventoryTreeView extends TreeView<InventoryTreeData>
         if (! this.getSelectionModel().isEmpty()) return this.getSelectionModel().getSelectedItem();
         return this.getRoot();
     }
+
+    public TreeItem<InventoryTreeData> getSelectedTreeFolder()
+    {
+        TreeItem<InventoryTreeData> s = getSelectedTreeItemOrRoot();
+        if (s.getValue().getType() == InventoryTreeData.Type.FILE) s = s.getParent();
+        return s;
+    }
 }

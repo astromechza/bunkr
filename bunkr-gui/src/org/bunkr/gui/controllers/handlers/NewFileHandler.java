@@ -55,16 +55,9 @@ public class NewFileHandler implements EventHandler<ActionEvent>
         try
         {
             // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItemOrRoot();
+            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeFolder();
             String selectedPath = this.tree.getPathForTreeItem(selected);
             IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
-            if (selectedItem.isAFile())
-            {
-                // if parent is a file, go up a level
-                selected = selected.getParent();
-                selectedPath = this.tree.getPathForTreeItem(selected);
-                selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
-            }
 
             // find subject FolderInventoryItem
             IFFContainer selectedContainer = (IFFContainer) selectedItem;

@@ -81,9 +81,8 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
             }
 
             // get item for which the context menu was called from
-            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeItemOrRoot();
-            if (selected.getValue().getType() == InventoryTreeData.Type.FILE) selected = selected.getParent();
-            
+            TreeItem<InventoryTreeData> selected = this.tree.getSelectedTreeFolder();
+
             String selectedPath = this.tree.getPathForTreeItem(selected);
             IFFTraversalTarget selectedItem = InventoryPather.traverse(this.archive.getInventory(), selectedPath);
             if (selectedItem.isAFile())
