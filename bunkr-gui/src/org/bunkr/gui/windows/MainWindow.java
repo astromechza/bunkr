@@ -28,6 +28,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -72,6 +73,15 @@ public class MainWindow extends BaseWindow
     private Button newFileButton;
     private Button newFolderButton;
 
+    private Menu fileMenu;
+    private MenuItem newFileMI;
+    private MenuItem newFolderMI;
+    private MenuItem closeArchiveMI;
+    private Menu optionsMenu;
+    private MenuItem securitySettingsMI;
+    private Menu helpMenu;
+    private MenuItem aboutMI;
+
     private final Map<UUID, IOpenedFileTab> openTabs;
 
     public MainWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
@@ -114,32 +124,35 @@ public class MainWindow extends BaseWindow
         this.tree = new InventoryTreeView(this.archive);
         this.tabPane = new TabPane();
         this.encryptionSettingsButton = Icons.buildIconButton("Security Settings", Icons.ICON_SETTINGS);
-        this.encryptionSettingsButton.setOnAction(event -> {
-            try
-            {
-                ArchiveSecurityWindow popup = new ArchiveSecurityWindow(this.archive, this.securityProvider);
-                popup.setOnSaveMetadataRequest(this::requestMetadataSave);
-                popup.getStage().showAndWait();
-            }
-            catch (IOException e)
-            {
-                QuickDialogs.exception(e);
-            }
-        });
+
         this.encryptionSettingsButton.setTooltip(new Tooltip("Change the encryption settings on this archive"));
         this.newFileButton = Icons.buildIconButton("New File", Icons.ICON_FILE);
         this.newFileButton.setTooltip(new Tooltip("Add new file"));
-        this.newFileButton.setOnAction(event -> new NewFileHandler(archive, tree, this).handle(event));
         this.newFolderButton = Icons.buildIconButton("New Folder", Icons.ICON_FOLDER);
         this.newFolderButton.setTooltip(new Tooltip("Add new folder"));
-        this.newFolderButton.setOnAction(event -> new NewSubDirHandler(archive, tree, this).handle(event));
+
+        this.fileMenu = new Menu("File");
+        this.newFileMI = new MenuItem("New File..", Icons.buildIconLabel(Icons.ICON_FILE));
+        this.newFolderMI = new MenuItem("New Folder..", Icons.buildIconLabel(Icons.ICON_FOLDER));
+        this.closeArchiveMI = new MenuItem("Close");
+        this.optionsMenu = new Menu("Options");
+        this.securitySettingsMI = new MenuItem("Security Settings..", Icons.buildIconLabel(Icons.ICON_SETTINGS));
+        this.helpMenu = new Menu("Help");
+        this.aboutMI = new MenuItem("About");
     }
 
     @Override
     public Parent initLayout()
     {
+        BorderPane bp = new BorderPane();
+
         SplitPane sp = new SplitPane();
         sp.setDividerPosition(0, 0.3);
+
+        MenuBar menu = new MenuBar(this.fileMenu, this.optionsMenu, this.helpMenu);
+        this.fileMenu.getItems().addAll(this.newFileMI, this.newFolderMI, new SeparatorMenuItem(), this.closeArchiveMI);
+        this.optionsMenu.getItems().addAll(this.securitySettingsMI);
+        this.helpMenu.getItems().addAll(this.aboutMI);
 
         HBox buttonBox = new HBox(0, this.newFileButton, this.newFolderButton);
         HBox.setHgrow(this.newFileButton, Priority.ALWAYS);
@@ -154,12 +167,31 @@ public class MainWindow extends BaseWindow
 
         sp.getItems().add(leftBox);
         sp.getItems().add(this.tabPane);
-        return sp;
+
+        bp.setTop(menu);
+        bp.setCenter(sp);
+
+        return bp;
     }
 
     @Override
     public void bindEvents()
     {
+        this.securitySettingsMI.setOnAction(event -> {
+            try
+            {
+                ArchiveSecurityWindow popup = new ArchiveSecurityWindow(this.archive, this.securityProvider);
+                popup.setOnSaveMetadataRequest(this::requestMetadataSave);
+                popup.getStage().showAndWait();
+            }
+            catch (IOException e)
+            {
+                QuickDialogs.exception(e);
+            }
+        });
+        this.newFolderMI.setOnAction(event -> new NewSubDirHandler(archive, tree, this).handle(event));
+        this.newFileMI.setOnAction(event -> new NewFileHandler(archive, tree, this).handle(event));
+
         EventHandlerHelper.install(this.getRootLayout().onKeyPressedProperty(), EventHandlerHelper
             .on(EventPattern.keyPressed(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN))).act(event -> {
                     requestSaveActiveFile();
