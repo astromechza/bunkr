@@ -74,6 +74,7 @@ public class ReencryptFileCommand implements ICLICommand
         FileInventoryItem targetFile = (FileInventoryItem) target;
         ProgressBar pb = new ProgressBar(120, targetFile.getActualSize(), "Exporting file: ");
         pb.setEnabled(!(Boolean) args.get(ARG_NO_PROGRESS));
+        pb.setUnitIsBytes(true);
         pb.startFresh();
 
         Algorithms.Encryption algorithmBefore = targetFile.getEncryptionAlgorithm();

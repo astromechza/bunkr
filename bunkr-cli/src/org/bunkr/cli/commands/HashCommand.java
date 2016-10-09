@@ -90,6 +90,7 @@ public class HashCommand implements ICLICommand
     {
         ProgressBar pb = new ProgressBar(120, target.getActualSize(), "Calculating hash: ");
         pb.setEnabled(showProgress);
+        pb.setUnitIsBytes(true);
         pb.startFresh();
         GeneralDigest digest = getDigest(algorithm);
         digest.reset();

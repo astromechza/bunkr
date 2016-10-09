@@ -40,6 +40,7 @@ public class ProgressBar
     private boolean enabled;
     private long n;
     private long lastPrintN;
+    private boolean unitIsBytes;
 
     public ProgressBar(int width, long total, String title, long minIters)
     {
@@ -51,6 +52,7 @@ public class ProgressBar
         this.n = 0;
         this.lastPrintN = 0;
         this.startTime = System.currentTimeMillis();
+        this.unitIsBytes = false;
     }
 
     public ProgressBar(int width, long total, String title)
@@ -80,7 +82,7 @@ public class ProgressBar
         {
             long elapsed = System.currentTimeMillis() - this.startTime;
             System.out.print('\r');
-            System.out.print(formatStateWithRate(n, total, width, title, elapsed));
+            System.out.print(formatStateWithRate(n, total, width, title, elapsed, this.unitIsBytes));
             lastPrintN = n;
         }
     }
@@ -93,7 +95,7 @@ public class ProgressBar
             {
                 long elapsed = System.currentTimeMillis() - this.startTime;
                 System.out.print('\r');
-                System.out.println(formatStateWithRate(n, total, width, title, elapsed));
+                System.out.println(formatStateWithRate(n, total, width, title, elapsed, this.unitIsBytes));
             }
         }
     }
@@ -101,6 +103,11 @@ public class ProgressBar
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public void setUnitIsBytes(boolean unitIsBytes)
+    {
+        this.unitIsBytes = unitIsBytes;
     }
 
     private static String formatState(long n, long total, int ncols, String prefix)
@@ -127,7 +134,7 @@ public class ProgressBar
         }
     }
 
-    private static String formatStateWithRate(long n, long total, int ncols, String prefix, long elapsedMs)
+    private static String formatStateWithRate(long n, long total, int ncols, String prefix, long elapsedMs, boolean unitIsBytes)
     {
         double frac = n / (double) total;
         double percentage = frac * 100;
@@ -151,7 +158,11 @@ public class ProgressBar
 
             if (elapsedMs > 0 && ncols >= 12)
             {
-                String rateBar = Formatters.formatPrettyInt(Units.SECOND * n / elapsedMs);
+                final String rateBar;
+                if (unitIsBytes)
+                    rateBar = Formatters.formatBytes(Units.SECOND * n / elapsedMs);
+                else
+                    rateBar = Formatters.formatPrettyInt(Units.SECOND * n / elapsedMs);
                 int rateBarL = rateBar.length();
                 int startOfRateSection = ncols / 2 - rateBarL / 2;
                 bar[startOfRateSection - 1] = '[';

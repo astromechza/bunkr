@@ -117,6 +117,7 @@ public class ExportFileCommand implements ICLICommand
     {
         ProgressBar pb = new ProgressBar(120, targetFile.getActualSize(), "Exporting file: ");
         pb.setEnabled(showProgress);
+        pb.setUnitIsBytes(true);
         pb.startFresh();
 
         try (MultilayeredInputStream ms = new MultilayeredInputStream(ctxt, targetFile))

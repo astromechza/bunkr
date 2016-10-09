@@ -43,6 +43,7 @@ public class DescriptorBuilder
     public static IDescriptor fromJSON(String s)
     {
         JSONObject jo = (JSONObject) JSONValue.parse(s);
+        if (jo == null) throw new IllegalArgumentException("Security descriptor is corrupt");
         if (!jo.containsKey(KEY_NAME)) throw new IllegalArgumentException("Missing required key: " + KEY_NAME);
         if (!jo.containsKey(KEY_PARAMS)) throw new IllegalArgumentException("Missing required key: " + KEY_NAME);
         String name = (String) jo.get(KEY_NAME);

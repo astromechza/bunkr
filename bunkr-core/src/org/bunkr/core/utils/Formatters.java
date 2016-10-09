@@ -64,19 +64,19 @@ public class Formatters
         }
         else if (n < Units.MEGA)
         {
-            return String.format("%.1fKB", n / (double) Units.KILO);
+            return String.format("%.1fK", n / (double) Units.KILO);
         }
         else if (n < Units.GIGA)
         {
-            return String.format("%.1fMB", n / (double) Units.MEGA);
+            return String.format("%.1fM", n / (double) Units.MEGA);
         }
         else if (n < Units.TERA)
         {
-            return String.format("%.1fGB", n / (double) Units.GIGA);
+            return String.format("%.1fG", n / (double) Units.GIGA);
         }
         else
         {
-            return String.format("%.1fTB", n / (double) Units.TERA);
+            return String.format("%.1fT", n / (double) Units.TERA);
         }
     }
 

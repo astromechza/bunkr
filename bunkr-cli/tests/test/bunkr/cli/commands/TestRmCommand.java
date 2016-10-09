@@ -137,6 +137,8 @@ public class TestRmCommand
         args.put(CLI.ARG_ARCHIVE_PATH, context.filePath);
         args.put(RmCommand.ARG_PATH, "/t1");
         args.put(RmCommand.ARG_RECURSIVE, false);
+        args.put(RmCommand.ARG_NOPROGRESS, false);
+        args.put(RmCommand.ARG_NOWIPE, false);
         new RmCommand().handle(new Namespace(args));
 
         context.refresh(new UserSecurityProvider(new PasswordProvider()));

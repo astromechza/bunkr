@@ -143,6 +143,7 @@ public class ImportFileCommand implements ICLICommand
     {
         ProgressBar pb = new ProgressBar(120, expectedBytes, "Importing file: ");
         pb.setEnabled(showProgress);
+        pb.setUnitIsBytes(true);
         pb.startFresh();
 
         try (MultilayeredOutputStream bwos = new MultilayeredOutputStream(context, target))

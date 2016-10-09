@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -310,4 +311,28 @@ public class TestFragmentedRange
         }
     }
 
+    @Test
+    public void testIterate()
+    {
+        FragmentedRange fr = new FragmentedRange(10, 20);
+        fr.add(31, 10);
+        fr.add(8, 6);
+
+        List<Integer> blocks = new ArrayList<>();
+        fr.iterate().forEachRemaining(blocks::add);
+        assertEquals(blocks, Arrays.asList(
+                8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+                29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+        ));
+    }
+
+    @Test
+    public void testIterateEmpty()
+    {
+        FragmentedRange fr = new FragmentedRange();
+
+        List<Integer> blocks = new ArrayList<>();
+        fr.iterate().forEachRemaining(blocks::add);
+        assertEquals(blocks.size(), 0);
+    }
 }

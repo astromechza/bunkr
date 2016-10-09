@@ -66,6 +66,7 @@ public class CLI
         commands.put("find", new FindCommand());
         commands.put("hash", new HashCommand());
         commands.put("re-encrypt-file", new ReencryptFileCommand());
+        commands.put("file-metadata", new ShowFileMetadataCommand());
     }
 
     public static void main(String[] args) throws IOException

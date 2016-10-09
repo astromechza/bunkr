@@ -22,8 +22,11 @@
 
 package org.bunkr.core.fragmented_range;
 
+import javafx.util.Pair;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -293,7 +296,7 @@ public class FragmentedRange
 
     /**
      * @return a new ArrayList object containing all of the items in this range.
-     * Warning: this could be very big if its a large span.
+     * Warning: this could be very big if its a large span. Use .iterate() if possible.
      */
     public List<Integer> toList()
     {
@@ -309,12 +312,17 @@ public class FragmentedRange
         return l;
     }
 
+    /**
+     * To string method. Contains each item - could be HUGE.
+     * @return a string
+     */
     @Override
     public String toString()
     {
-        String o = "FragmentedRange{";
-        for (Integer j : this.toList()) o += (j.toString() + ",");
-        return o + '}';
+        StringBuilder sb = new StringBuilder("FragmentedRange{");
+        this.iterate().forEachRemaining(i -> sb.append(i.toString()).append(","));
+        sb.append('}');
+        return sb.toString();
     }
 
     public int[] toRepr()
@@ -327,6 +335,60 @@ public class FragmentedRange
     public boolean equals(FragmentedRange other)
     {
         return Arrays.equals(this.data, other.data);
+    }
+
+    /**
+     * @return an iterator over the items of the fragmented range.
+     */
+    public Iterator<Integer> iterate()
+    {
+        return new Iterator<Integer>() {
+            int cursor = 0;
+            int cpos = 0;
+            int counter = 0;
+
+            @Override
+            public boolean hasNext()
+            {
+                return cursor < usedDataLength || counter > 0;
+            }
+
+            @Override
+            public Integer next()
+            {
+                if (counter <= 0)
+                {
+                    cpos = data[cursor];
+                    counter = data[cursor + 1];
+                    cursor += 2;
+                }
+                counter--;
+                return cpos++;
+            }
+        };
+    }
+
+    /**
+     * @return an iterator over the ranges of the fragmented range. Each pair contains a position and length.
+     */
+    public Iterator<Pair<Integer, Integer>> iteratePairs()
+    {
+        return new Iterator<Pair<Integer, Integer>>() {
+            int cursor = 0;
+
+            @Override
+            public boolean hasNext()
+            {
+                return cursor < usedDataLength;
+            }
+
+            @Override
+            public Pair<Integer, Integer> next()
+            {
+                cursor += 2;
+                return new Pair<>(data[cursor-2], data[cursor-1]);
+            }
+        };
     }
 
     // ======= PRIVATE PARTS ========
@@ -424,6 +486,4 @@ public class FragmentedRange
         // otherwise drop into right range
         return search((mi + 1), ei, value);
     }
-
-
 }
