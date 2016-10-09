@@ -10,6 +10,7 @@ the way it does. All efforts are taken to keep this project as secure as possibl
 
 ### TL;DR:
 
+- All encryption is performed via the Bouncy Castle 1.53 library
 - Files are encrypted by a file-unique random symmetric key that changes each time the file is written
     - can pick between AES 128, AES 256, Twofish 128, or Twofish 256. All use CTR mode.
 - File encryption key is stored in the `inventory` section
