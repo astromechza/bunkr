@@ -28,7 +28,7 @@ import org.bunkr.core.BlockAllocationManager;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.core.fragmented_range.FragmentedRange;
-import org.bunkr.core.operations.WipeFileOp;
+import org.bunkr.core.operations.WipeBlocksOp;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.exceptions.TraversalException;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -91,7 +91,7 @@ public class RmCommand implements ICLICommand
         // now attempt wipe of those blocks if required
         if (!args.getBoolean(ARG_NOWIPE) && !wipeblocks.isEmpty())
         {
-            WipeFileOp op = new WipeFileOp(aic.filePath, aic.getBlockSize(), wipeblocks, true);
+            WipeBlocksOp op = new WipeBlocksOp(aic.filePath, aic.getBlockSize(), wipeblocks, true);
             ProgressBar pb = new ProgressBar(120, op.getTotalBlocks(), "Wiping file blocks: ");
             pb.setEnabled(!args.getBoolean(ARG_NOPROGRESS));
             pb.startFresh();

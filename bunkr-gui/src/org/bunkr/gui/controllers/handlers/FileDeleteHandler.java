@@ -26,13 +26,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.BlockAllocationManager;
 import org.bunkr.core.exceptions.BaseBunkrException;
-import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.inventory.IFFContainer;
-import org.bunkr.core.inventory.IFFTraversalTarget;
-import org.bunkr.core.inventory.InventoryPather;
+import org.bunkr.core.fragmented_range.FragmentedRange;
+import org.bunkr.core.inventory.*;
+import org.bunkr.core.operations.WipeBlocksOp;
+import org.bunkr.gui.ProgressTask;
 import org.bunkr.gui.components.treeview.InventoryTreeData;
 import org.bunkr.gui.components.treeview.InventoryTreeView;
+import org.bunkr.gui.dialogs.ProgressDialog;
 import org.bunkr.gui.dialogs.QuickDialogs;
 import org.bunkr.gui.windows.MainWindow;
 
@@ -75,13 +77,51 @@ public class FileDeleteHandler implements EventHandler<ActionEvent>
             IFFTraversalTarget target = parentContainer.findFileOrFolder(selected.getValue().getName());
             if (target instanceof FileInventoryItem)
             {
-                FileInventoryItem targetFile = (FileInventoryItem) target;
-                parentContainer.removeFile(targetFile);
                 parent.getChildren().remove(selected);
 
+                FileInventoryItem targetFile = (FileInventoryItem) target;
+                FragmentedRange wipeblocks = targetFile.getBlocks();
+                parentContainer.removeFile(targetFile);
+
+                mainWindow.requestClose(targetFile);
                 mainWindow.requestMetadataSave(
                         String.format("Deleted file %s from %s", selected.getValue().getName(), parentPath));
-                mainWindow.requestClose(targetFile);
+
+                // now calculate which blocks we can still safely wipe (the descriptor and inventory may have landed over some)
+                long usedBlocks = BlockAllocationManager.calculateUsedBlocks(this.archive.getInventory());
+                wipeblocks.subtract(new FragmentedRange((int) usedBlocks, Integer.MAX_VALUE));
+
+                // now attempt wipe of those blocks if required
+                if (!wipeblocks.isEmpty())
+                {
+                    if (QuickDialogs.confirm("Do you want to securely wipe the data blocks used by the file you deleted?"))
+                    {
+                        WipeBlocksOp op = new WipeBlocksOp(this.archive.filePath, this.archive.getBlockSize(), wipeblocks, true);
+                        ProgressTask<Void> progressTask = new ProgressTask<Void>()
+                        {
+                            @Override
+                            protected Void innerCall() throws Exception
+                            {
+                                this.updateMessage("Wiping blocks");
+                                op.setProgressUpdate(o -> this.updateProgress(o.getBlocksWiped(), o.getTotalBlocks()));
+                                op.run();
+                                return null;
+                            }
+
+                            @Override
+                            protected void failed()
+                            {
+                                QuickDialogs.exception(this.getException());
+                            }
+                        };
+
+                        ProgressDialog pd = new ProgressDialog(progressTask);
+                        pd.setHeaderText(String.format("Wiping %d data blocks ...", wipeblocks.size()));
+                        Thread task = new Thread(progressTask);
+                        task.setDaemon(true);
+                        task.start();
+                    }
+                }
             }
             else
             {

@@ -202,7 +202,6 @@ public class MainWindow extends BaseWindow
         {
             Logging.info("Saving Archive Metadata due to %s", reason);
             MetadataWriter.write(this.archive, this.securityProvider);
-            Logging.info("Saved Archive Metadata");
         }
         catch (IOException | BaseBunkrException e)
         {

@@ -14,14 +14,14 @@ import java.util.function.Consumer;
 /**
  * Created At: 2016-10-09
  */
-public class WipeFileOp
+public class WipeBlocksOp
 {
     private final File path;
     private final int blockSize;
     private final FragmentedRange blockRange;
     private final boolean fillRandom;
     private boolean cancelled = false;
-    private Consumer<WipeFileOp> progressUpdate = null;
+    private Consumer<WipeBlocksOp> progressUpdate = null;
     private final int totalBlocks;
     private int blocksWiped = 0;
 
@@ -33,7 +33,7 @@ public class WipeFileOp
      * @param blockRange the range of blocks to wipe
      * @param fillRandom whether or not to fill the blocks with random, otherwise it will be wiped with zeroes
      */
-    public WipeFileOp(File path, int blockSize, FragmentedRange blockRange, boolean fillRandom)
+    public WipeBlocksOp(File path, int blockSize, FragmentedRange blockRange, boolean fillRandom)
     {
         this.path = path;
         this.blockSize = blockSize;
@@ -50,7 +50,7 @@ public class WipeFileOp
      *
      * @param update a consumer
      */
-    public void setProgressUpdate(Consumer<WipeFileOp> update)
+    public void setProgressUpdate(Consumer<WipeBlocksOp> update)
     {
         this.progressUpdate = update;
     }
@@ -117,6 +117,6 @@ public class WipeFileOp
      */
     public static boolean wipe(File path, int blockSize, FragmentedRange blockRange, boolean fillRandom) throws IOException
     {
-        return new WipeFileOp(path, blockSize, blockRange, fillRandom).run();
+        return new WipeBlocksOp(path, blockSize, blockRange, fillRandom).run();
     }
 }
