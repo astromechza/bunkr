@@ -31,7 +31,7 @@ import org.bunkr.core.utils.Units;
  */
 public abstract class ProgressTask<V> extends Task<V>
 {
-    private static final long PROGRESS_UPDATE_INTERVAL = 500;
+    private static final long PROGRESS_UPDATE_INTERVAL = 200;
 
     private long startTime;
     private long lastProgressUpdateTime;
