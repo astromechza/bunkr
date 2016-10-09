@@ -24,6 +24,7 @@ package org.bunkr.cli.commands;
 
 import org.bunkr.cli.ProgressBar;
 import org.bunkr.core.ArchiveInfoContext;
+import org.bunkr.core.BlockAllocationManager;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.cli.CLI;
 import org.bunkr.core.fragmented_range.FragmentedRange;
@@ -78,9 +79,14 @@ public class RmCommand implements ICLICommand
 
         // first delete the correct items and collect blocks to wipe
         FragmentedRange wipeblocks = deleteItem(aic.getInventory(), args.getString(ARG_PATH), args.getBoolean(ARG_RECURSIVE));
+
         // save metadata as soon as possible
         MetadataWriter.write(aic, usp);
         System.out.println(String.format("Deleted %s from archive.", args.getString(ARG_PATH)));
+
+        // now calculate which blocks we can still safely wipe (the descriptor and inventory may have landed over some)
+        long usedBlocks = BlockAllocationManager.calculateUsedBlocks(aic.getInventory());
+        wipeblocks.subtract(new FragmentedRange((int) usedBlocks, Integer.MAX_VALUE));
 
         // now attempt wipe of those blocks if required
         if (!args.getBoolean(ARG_NOWIPE) && !wipeblocks.isEmpty())
@@ -94,7 +100,6 @@ public class RmCommand implements ICLICommand
             pb.finish();
             System.out.println(String.format("Wiped %d blocked clean.", op.getBlocksWiped()));
         }
-
     }
 
     public FragmentedRange deleteItem(Inventory inv, String targetPath, boolean recursive) throws TraversalException
