@@ -36,7 +36,7 @@ import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.inventory.InventoryJSON;
 import org.bunkr.core.utils.Logging;
 import org.bunkr.core.utils.RandomMaker;
-import org.bunkr.core.utils.SimpleAES;
+import org.bunkr.core.utils.SimpleBlockCipher;
 import org.bunkr.core.utils.Units;
 import org.json.simple.JSONObject;
 
@@ -113,7 +113,7 @@ public class PBKDF2Descriptor implements IDescriptor
                     this.encryptionAlgorithm.keyByteLength * 8,
                     this.encryptionAlgorithm.ivByteLength * 8);
 
-            byte[] decryptedInv = SimpleAES.decrypt(
+            byte[] decryptedInv = SimpleBlockCipher.decrypt(
                     this.encryptionAlgorithm,
                     source,
                     ((KeyParameter) kp.getParameters()).getKey(),
@@ -148,7 +148,7 @@ public class PBKDF2Descriptor implements IDescriptor
                     this.encryptionAlgorithm.ivByteLength * 8);
 
             // encrypt the inventory
-            byte[] encryptedInv = SimpleAES.encrypt(
+            byte[] encryptedInv = SimpleBlockCipher.encrypt(
                     this.encryptionAlgorithm,
                     inventoryJsonBytes,
                     ((KeyParameter) kp.getParameters()).getKey(),

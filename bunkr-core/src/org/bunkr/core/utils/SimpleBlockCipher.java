@@ -35,9 +35,9 @@ import java.util.Arrays;
 /**
  * Created At: 2015-11-27
  */
-public class SimpleAES
+public class SimpleBlockCipher
 {
-    private static byte[] runAES(Encryption encryptionAlgorithm, boolean doEncrypt, byte[] subject, byte[] key, byte[] iv) throws CryptoException
+    private static byte[] operate(Encryption encryptionAlgorithm, boolean doEncrypt, byte[] subject, byte[] key, byte[] iv) throws CryptoException
     {
         // set up padded buffered cipher
         PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(
@@ -60,12 +60,12 @@ public class SimpleAES
 
     public static byte[] encrypt(Encryption encryptionAlgorithm, byte[] input, byte[] key, byte[] iv) throws CryptoException
     {
-        return runAES(encryptionAlgorithm, true, input, key, iv);
+        return operate(encryptionAlgorithm, true, input, key, iv);
     }
 
     public static byte[] decrypt(Encryption encryptionAlgorithm, byte[] input, byte[] key, byte[] iv) throws CryptoException
     {
-        byte[] withPadding = runAES(encryptionAlgorithm, false, input, key, iv);
+        byte[] withPadding = operate(encryptionAlgorithm, false, input, key, iv);
         int trueLength = input.length;
         while(trueLength > 0 && withPadding[trueLength - 1] == 0x0) trueLength--;
         byte[] nonPadded = new byte[trueLength];

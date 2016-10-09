@@ -31,7 +31,7 @@ import org.bunkr.core.inventory.Inventory;
 import org.bunkr.core.inventory.InventoryJSON;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.RandomMaker;
-import org.bunkr.core.utils.SimpleAES;
+import org.bunkr.core.utils.SimpleBlockCipher;
 import org.json.simple.JSONObject;
 
 import javax.xml.bind.DatatypeConverter;
@@ -118,7 +118,7 @@ public class ScryptDescriptor implements IDescriptor
             byte[] key = Arrays.copyOfRange(data, 0, this.encryptionAlgorithm.keyByteLength);
             byte[] iv = Arrays.copyOfRange(data, this.encryptionAlgorithm.keyByteLength, data.length);
 
-            byte[] decryptedInv = SimpleAES.decrypt(this.encryptionAlgorithm, source, key, iv);
+            byte[] decryptedInv = SimpleBlockCipher.decrypt(this.encryptionAlgorithm, source, key, iv);
             Arrays.fill(data, (byte) 0);
             Arrays.fill(key, (byte) 0);
             Arrays.fill(iv, (byte) 0);
@@ -154,7 +154,7 @@ public class ScryptDescriptor implements IDescriptor
             byte[] key = Arrays.copyOfRange(data, 0, this.encryptionAlgorithm.keyByteLength);
             byte[] iv = Arrays.copyOfRange(data, this.encryptionAlgorithm.keyByteLength, data.length);
 
-            byte[] encryptedInv = SimpleAES.encrypt(this.encryptionAlgorithm, inventoryJsonBytes, key, iv);
+            byte[] encryptedInv = SimpleBlockCipher.encrypt(this.encryptionAlgorithm, inventoryJsonBytes, key, iv);
             Arrays.fill(inventoryJsonBytes, (byte) 0);
             Arrays.fill(data, (byte) 0);
             Arrays.fill(key, (byte) 0);
