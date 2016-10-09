@@ -29,12 +29,12 @@ which are much slower and can only securely encrypt small amounts of data.
 
 The cipher suites supported are:
 
-1. AES (either 128bit or 256bit key length)
+#### 1. AES (either 128bit or 256bit key length)
     See [wikipedia](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) for more info. AES is a secure
     symmetric block cipher approved by NIST and other encryption comittees. We support both 128 and 256
     bit key lengths although even 128bit keys provide sufficient security for the forseable future.
 
-2. Twofish (either 128bit or 256bit key length)
+#### 2. Twofish (either 128bit or 256bit key length)
     See [wikipedia](https://en.wikipedia.org/wiki/Twofish) for more info. Twofish is another symmetric block
     cipher that was proposed as an alternative during the AES selection process. The Twofish algorithm is not
     patented or restricted in any way. We hope it is sufficiently different to AES in order to provide an alternative
@@ -62,7 +62,7 @@ PKCS7 padding.
 
 The key and iv for the chosen cipher are calculated using a key derivation algorithm. We support the following algorithms:
 
-1. PBKDF2
+#### 1. PBKDF2
     See [wikipedia](https://en.wikipedia.org/wiki/PBKDF2) for more info. pbkdf2 is a time-intensive algorithm that takes
     the input password and combines it
     with a salt before peforming many many iterations of a SHA256 hash in order to consume time. The user can pick how
@@ -70,7 +70,7 @@ The key and iv for the chosen cipher are calculated using a key derivation algor
     of iterations. We store the unique salt and number of iterations in the `descriptor` section. At the moment the user
     can choose anything from 100ms to 10 seconds. This impact is hit whenever the inventory section is written or read.
 
-2. Scrypt
+#### 2. Scrypt
     See [wikipedia](https://en.wikipedia.org/wiki/Scrypt) for more info. Scrypt is a memory-intensive algorithm that takes
     that can be configured to require an amount of RAM required to calculate the result. Again, the user can pick this
     memory requirement. At the moment the user can choose anything from 16 MiB to 1 GiB.
