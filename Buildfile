@@ -111,17 +111,12 @@ define PROJECT_NAME do
         # ant-based task to generate Mac OSX app
         task :build_mac_app do
 
-            appbundler_jar = project.path_to('..', 'lib', 'appbundler-1.0.jar')
-            unless File.exists?(appbundler_jar)
-                puts "Error #{appbundler_jar} does not exist"
-                exit! 1
-            end
-
             output_dir = project.path_to('target', 'app')
             puts "Removing #{output_dir}"
             system("rm -rfv #{output_dir}")
             puts "Creating #{output_dir}"
             system("mkdir #{output_dir}")
+            system("mkdir #{output_dir}/dist")
 
             puts "Writing build.xml"
             File.open("#{output_dir}/build.xml", 'w') do |f|

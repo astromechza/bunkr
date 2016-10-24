@@ -10,23 +10,30 @@ def make_mac_app_xml(working_dir)
         exit! 1
     end
 
-    xml_template = <<-EOF
-<project name="Bunkr" default="bundleapp" basedir=".">
-    <taskdef name="bundleapp"
-             classname="com.oracle.appbundler.AppBundlerTask"
-             classpath="#{project.path_to('..', 'lib', 'appbundler-1.0.jar')}" />
-    <target name="bundleapp">
-        <bundleapp outputdirectory="#{working_dir}"
-                   name="Bunkr"
-                   shortversion="#{project.version}"
-                   icon="../../resources/images/bunkr-icon.icns"
-                   displayname="Bunkr"
-                   identifier="#{main_class}"
-                   mainclassname="#{main_class}">
+    system("cp #{release_jar} #{working_dir}/dist")
 
-            <classpath file="#{release_jar}" />
-        </bundleapp>
-    </target>
+    java_home = ENV['JAVA_HOME']
+
+    xml_template = <<-EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Bunkr"
+         default="default"
+         basedir="."
+         xmlns:fx="javafx:com.sun.javafx.tools.ant">
+<target name="default">
+    <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                uri="javafx:com.sun.javafx.tools.ant"
+                classpath="#{File.join(java_home, "lib", "ant-javafx.jar")}"/>
+    <fx:deploy nativeBundles="dmg" outdir="dist" outfile="thing" verbose="true">
+            <fx:info title="Bunkr"
+                  vendor="AstromechZA"/>
+            <fx:application name="Bunkr" mainClass="#{main_class}"/>
+            <fx:resources>
+               <fx:fileset dir="dist" includes="#{project_name}-#{project.version}-release.jar">
+               </fx:fileset>
+            </fx:resources>
+      </fx:deploy>
+</target>
 </project>
 EOF
     xml_template
