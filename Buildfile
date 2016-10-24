@@ -114,9 +114,8 @@ define PROJECT_NAME do
             output_dir = project.path_to('target', 'app')
             puts "Removing #{output_dir}"
             system("rm -rfv #{output_dir}")
-            puts "Creating #{output_dir}"
-            system("mkdir #{output_dir}")
-            system("mkdir #{output_dir}/dist")
+            puts "Creating #{output_dir}/dist"
+            system("mkdir -pv #{output_dir}/dist")
 
             puts "Writing build.xml"
             File.open("#{output_dir}/build.xml", 'w') do |f|
