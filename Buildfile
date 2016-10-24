@@ -114,8 +114,8 @@ define PROJECT_NAME do
             output_dir = project.path_to('target', 'app')
             puts "Removing #{output_dir}"
             system("rm -rfv #{output_dir}")
-            puts "Creating #{output_dir}/dist"
-            system("mkdir -pv #{output_dir}/dist")
+            puts "Creating #{output_dir}"
+            system("mkdir -pv #{output_dir}")
 
             puts "Writing build.xml"
             File.open("#{output_dir}/build.xml", 'w') do |f|
@@ -123,8 +123,9 @@ define PROJECT_NAME do
             end
 
             if system("cd #{output_dir}; ant")
-                puts "Built #{output_dir}/bunkr-#{project.version}.app"
-                puts "Size #{system("ls -lh #{output_dir}")}"
+                bundle_dir = File.join(output_dir, 'bundles')
+                puts "Built #{bundle_dir}/Bunkr-#{project.version}.dmg"
+                puts "Size #{system("ls -lh #{bundle_dir}")}"
             else
                 puts "Error while building app!"
                 exit! 1
