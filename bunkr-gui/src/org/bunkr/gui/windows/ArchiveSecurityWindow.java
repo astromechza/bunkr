@@ -78,7 +78,7 @@ public class ArchiveSecurityWindow extends BaseWindow
     {
         this.headerLabel = new Label("Archive Security: ");
         this.headerLabelValue = new Label("Unknown");
-        this.changeSecurityButton = new Button("Change Archive Security");
+        this.changeSecurityButton = new Button("Change Archive Security..");
         this.changeSecurityButton.setFocusTraversable(false);
         this.backButton = new Button("Back");
         this.backButton.setFocusTraversable(false);
@@ -91,7 +91,7 @@ public class ArchiveSecurityWindow extends BaseWindow
         BorderPane rootLayout = new BorderPane();
         rootLayout.setPadding(new Insets(10));
 
-        rootLayout.setTop(new HBox(this.headerLabel, this.headerLabelValue, new HExpander(), changeSecurityButton));
+        rootLayout.setTop(new HBox(this.headerLabel, this.headerLabelValue));
 
         this.centerPane = new BorderPane();
         this.centerPane.setPrefWidth(600);
@@ -100,7 +100,7 @@ public class ArchiveSecurityWindow extends BaseWindow
         rootLayout.setCenter(this.centerPane);
         BorderPane.setMargin(this.centerPane, new Insets(10, 0, 10, 0));
 
-        rootLayout.setBottom(new HBox(10, this.auditFileSecButton, new HExpander(), this.backButton));
+        rootLayout.setBottom(new HBox(10, this.auditFileSecButton, new HExpander(), changeSecurityButton, this.backButton));
 
         return rootLayout;
     }
@@ -181,7 +181,6 @@ public class ArchiveSecurityWindow extends BaseWindow
     public void applyStyling()
     {
         this.centerPane.getStyleClass().add("center-pane");
-        this.changeSecurityButton.getStyleClass().add("small-button");
     }
 
     @Override
