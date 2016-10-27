@@ -164,6 +164,8 @@ public class PasswordDialog extends BaseWindow
             this.passwordField.clear();
             this.passwordFilePathBox.clear();
         });
+
+        this.continueButton.defaultButtonProperty().set(true);
     }
 
     @Override
