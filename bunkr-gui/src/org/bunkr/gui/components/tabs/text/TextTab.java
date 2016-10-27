@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 /**
  * Created At: 2016-10-09
@@ -124,6 +125,15 @@ public class TextTab extends Tab implements IOpenedFileTab
         this.setText(this.subject.getAbsolutePath());
     }
 
+    public String cleanContent(String input) {
+        input = input.replaceAll("\t", "    ");
+        Pattern fileTrailingWhitespace = Pattern.compile("\\s+$");
+        input = fileTrailingWhitespace.matcher(input).replaceAll("\n");
+        Pattern lineTrailingWhitespace = Pattern.compile("[ \t]+\n");
+        input = lineTrailingWhitespace.matcher(input).replaceAll("\n");
+        return input;
+    }
+
     public void reloadContent()
     {
         // first make sure we can get the absolute path
@@ -157,6 +167,10 @@ public class TextTab extends Tab implements IOpenedFileTab
 
     public void saveContent()
     {
+        String cleanedContent = this.cleanContent(this.editorArea.getText());
+        this.editorArea.clear();
+        this.editorArea.replaceText(0, 0, cleanedContent);
+
         try
         {
             try (

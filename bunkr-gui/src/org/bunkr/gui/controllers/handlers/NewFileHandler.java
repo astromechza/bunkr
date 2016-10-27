@@ -81,7 +81,7 @@ public class NewFileHandler implements EventHandler<ActionEvent>
             }
 
             FileInventoryItem newFile = new FileInventoryItem(newName);
-            newFile.setMediaType(MediaType.TEXT);
+            newFile.setMediaType(MediaType.guess(newName));
             selectedContainer.addFile(newFile);
 
             // create the new tree item

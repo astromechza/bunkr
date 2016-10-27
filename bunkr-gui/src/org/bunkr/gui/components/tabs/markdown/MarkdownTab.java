@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 /**
  * Created At: 2015-12-31
@@ -189,6 +190,15 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
         this.setText(this.subject.getAbsolutePath());
     }
 
+    public String cleanContent(String input) {
+        input = input.replaceAll("\t", "    ");
+        Pattern fileTrailingWhitespace = Pattern.compile("\\s+$");
+        input = fileTrailingWhitespace.matcher(input).replaceAll("\n");
+        Pattern lineTrailingWhitespace = Pattern.compile("[ \t]+\n");
+        input = lineTrailingWhitespace.matcher(input).replaceAll("\n");
+        return input;
+    }
+
     public void reloadContent()
     {
         // first make sure we can get the absolute path
@@ -222,11 +232,15 @@ public class MarkdownTab extends Tab implements IOpenedFileTab
 
     public void saveContent()
     {
+        String cleanedContent = this.cleanContent(this.editorArea.getText());
+        this.editorArea.clear();
+        this.editorArea.replaceText(0, 0, cleanedContent);
+
         try
         {
             try (
                     MultilayeredOutputStream bwos = new MultilayeredOutputStream(this.archive, this.subject);
-                    InputStream is = new ByteArrayInputStream(this.editorArea.getText().getBytes()))
+                    InputStream is = new ByteArrayInputStream(cleanedContent.getBytes()))
             {
                 byte[] buffer = new byte[(int) Units.MEBIBYTE];
                 int n;

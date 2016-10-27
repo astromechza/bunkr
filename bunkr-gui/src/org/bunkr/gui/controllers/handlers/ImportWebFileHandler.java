@@ -134,7 +134,7 @@ public class ImportWebFileHandler implements EventHandler<ActionEvent>
                     }
                     else
                     {
-                        newFile.setMediaType(MediaType.UNKNOWN);
+                        newFile.setMediaType(MediaType.guess(newFile.getName()));
                     }
                     return null;
                 }
