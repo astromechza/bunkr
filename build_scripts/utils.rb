@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'date'
 
 def to_filesize(value)
     {
@@ -13,11 +14,13 @@ def write_version_file_for_project(project_name)
     puts 'Writing ' + version_dat_file
     git_hash = `git rev-parse HEAD`
     git_date = `git --no-pager log -n 1 --date=iso-strict --format="%cd"`
+    current_date = Time.now.strftime("%Y-%m-%dT%H:%M:%S%:z")
     File.open(version_dat_file, 'w') do |f|
         f.puts PROJECT_VERSION
         f.puts COMPATIBLE_PROJECT_VERSION
         f.puts git_date
         f.puts git_hash
+        f.puts current_date
     end
 end
 

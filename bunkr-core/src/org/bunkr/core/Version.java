@@ -43,6 +43,7 @@ public final class Version
     private static final byte compatibleVersionBugfix;
     public static final String gitDate;
     public static final String gitHash;
+    public static final String builtDate;
 
     static
     {
@@ -50,6 +51,7 @@ public final class Version
         String tcompatVersionNumber = "0.0.0";
         String tgitDate = "1970-01-01T00:00:00+00:00";
         String tgitHash = "????????????????????????????????????????";
+        String tbuiltDate = "1970-01-01T00:00:00+00:00";
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(Resources.getStream("/version.dat"))))
         {
@@ -57,6 +59,7 @@ public final class Version
             tcompatVersionNumber = br.readLine();
             tgitDate = br.readLine();
             tgitHash = br.readLine();
+            tbuiltDate = br.readLine();
         }
         catch (IOException | NullPointerException ignored) { }
 
@@ -64,6 +67,7 @@ public final class Version
         compatibleVersionString = tcompatVersionNumber;
         gitDate = tgitDate;
         gitHash = tgitHash;
+        builtDate = tbuiltDate;
 
         String[] parts = versionString.split("\\.", -1);
         versionMajor = Byte.parseByte(parts[0]);

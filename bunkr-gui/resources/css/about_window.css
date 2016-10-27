@@ -1,0 +1,11 @@
+.row-label {
+    -fx-font-weight: bold;
+}
+
+.row-value {
+    -fx-text-fill: #555555;
+}
+
+.row-hyperlink {
+    -fx-focus-color: transparent;
+}

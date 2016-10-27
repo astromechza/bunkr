@@ -48,8 +48,6 @@ import org.bunkr.gui.components.treeview.InventoryTreeView;
 import org.bunkr.gui.controllers.*;
 import org.bunkr.gui.controllers.handlers.*;
 import org.bunkr.gui.dialogs.QuickDialogs;
-import org.fxmisc.wellbehaved.event.EventHandlerHelper;
-import org.fxmisc.wellbehaved.event.EventPattern;
 
 import java.io.*;
 import java.util.*;
@@ -175,6 +173,16 @@ public class MainWindow extends BaseWindow
         this.importFileMI.setOnAction(event -> new ImportFileHandler(archive, tree, this).handle(event));
         this.importFileFromURLMI.setOnAction(event -> new ImportWebFileHandler(archive, tree, this).handle(event));
         this.newFolderMI.setOnAction(event -> new NewSubDirHandler(archive, tree, this).handle(event));
+        this.aboutMI.setOnAction(event -> {
+            try
+            {
+                new AboutWindow().getStage().showAndWait();
+            }
+            catch (IOException e)
+            {
+                QuickDialogs.exception(e);
+            }
+        });
 
         this.bindHotKey(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), event -> requestSaveActiveFile());
     }
