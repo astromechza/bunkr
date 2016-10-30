@@ -98,7 +98,14 @@ public class ProgressDialog extends Dialog<Void>
     {
         progressMessage.textProperty().bind(worker.messageProperty());
         contentText.textProperty().bind(getDialogPane().contentTextProperty());
-        cancelButton.setOnAction(event -> worker.cancel());
+
+        cancelButton.setOnAction(event -> {
+
+            if (QuickDialogs.confirm("Are you sure you want to cancel this operation? It may cause corruption of the " +
+                                     "file or metadata if you cancel at this point.")) {
+                worker.cancel();
+            }
+        });
 
         contentText.textProperty().addListener((observable, oldValue, newValue) -> {
             contentText.setManaged(true);
