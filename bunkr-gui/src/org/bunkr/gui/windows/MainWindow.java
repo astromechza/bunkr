@@ -36,6 +36,7 @@ import org.bunkr.core.exceptions.BaseBunkrException;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Logging;
+import org.bunkr.gui.BlockImageGenerator;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.components.tabs.TabLoadError;
@@ -190,7 +191,7 @@ public class MainWindow extends BaseWindow
         this.blockDistribMI.setOnAction(event -> {
             try
             {
-                new BlockDistributionWindow().getStage().showAndWait();
+                new BlockDistributionWindow(this.archive).getStage().showAndWait();
             }
             catch (IOException e)
             {

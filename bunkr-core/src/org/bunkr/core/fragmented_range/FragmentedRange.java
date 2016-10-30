@@ -313,14 +313,16 @@ public class FragmentedRange
     }
 
     /**
-     * To string method. Contains each item - could be HUGE.
+     * To string method. Contains each pair - could be HUGE.
      * @return a string
      */
     @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder("FragmentedRange{");
-        this.iterate().forEachRemaining(i -> sb.append(i.toString()).append(","));
+        this.iteratePairs().forEachRemaining(
+                p -> sb.append(String.format("%s->%s", p.getKey(), p.getKey() + p.getValue())).append(",")
+        );
         sb.append('}');
         return sb.toString();
     }

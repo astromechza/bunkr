@@ -6,7 +6,9 @@ import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
+import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
+import org.bunkr.gui.BlockImageGenerator;
 
 import java.io.IOException;
 
@@ -16,12 +18,14 @@ import java.io.IOException;
 public class BlockDistributionWindow extends BaseWindow
 {
     private final String cssPath;
+    private final ArchiveInfoContext archive;
     private ImageView imageView;
     private BorderPane imagePanel;
 
-    public BlockDistributionWindow() throws IOException
+    public BlockDistributionWindow(ArchiveInfoContext archive) throws IOException
     {
         super();
+        this.archive = archive;
         this.cssPath = Resources.getExternalPath("/resources/css/block_distrib.css");
         this.initialise();
     }
@@ -43,6 +47,8 @@ public class BlockDistributionWindow extends BaseWindow
         root.setPadding(new Insets(10));
 
         imagePanel.setCenter(imageView);
+
+        imageView.setImage(BlockImageGenerator.buildImageFromArchiveInfo(this.archive, 400, 400));
 
         root.setCenter(imagePanel);
 

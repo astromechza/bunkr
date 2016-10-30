@@ -33,10 +33,15 @@ import java.io.*;
 
 public class ArchiveInfoContext implements IArchiveInfoContext
 {
+    // the path to the archive on disk
     public final File filePath;
+    // the inventory object read from the metadata
     private Inventory inventory;
+    // the discriptor object read from the metadata
     private IDescriptor descriptor;
+    // the size of each block in bytes
     private int blockSize;
+    // the length of the block data section in bytes
     private long blockDataLength;
 
     public ArchiveInfoContext(File filePath, UserSecurityProvider uic) throws IOException, BaseBunkrException
@@ -71,6 +76,12 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     }
 
     @Override
+    public long getBlockDataLength()
+    {
+        return blockDataLength;
+    }
+
+    @Override
     public IDescriptor getDescriptor()
     {
         return descriptor;
@@ -86,11 +97,5 @@ public class ArchiveInfoContext implements IArchiveInfoContext
     public Inventory getInventory()
     {
         return inventory;
-    }
-
-    @Override
-    public long getBlockDataLength()
-    {
-        return blockDataLength;
     }
 }
