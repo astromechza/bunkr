@@ -5,7 +5,6 @@ import javafx.scene.image.Image;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.fragmented_range.FragmentedRange;
 import org.bunkr.core.inventory.FileInventoryItem;
-import org.bunkr.core.utils.Logging;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -17,7 +16,9 @@ import java.util.Iterator;
  */
 public class BlockImageGenerator
 {
-    public static Image buildImageFromArchiveInfo(ArchiveInfoContext aic, int width, int height)
+
+
+    public static Image buildImageFromArchiveInfo(ArchiveInfoContext aic, int width)
     {
         FragmentedRange frange = new FragmentedRange();
         Iterator<FileInventoryItem> fit = aic.getInventory().getIterator();
@@ -26,35 +27,41 @@ public class BlockImageGenerator
             frange.union(fit.next().getBlocks());
         }
 
-        return buildImageFromFragRange(frange, width, height);
+        return buildImageFromFragRange(frange, width);
     }
     
-    public static Image buildImageFromFragRange(FragmentedRange frange, int width, int height)
+    public static Image buildImageFromFragRange(FragmentedRange frange, int width)
     {
         // block length is in bytes so we have to downshift
-        int numberOfBlocks = frange.getMax() + 1;
-        int numberOfPixels = width * height;
+        int numberOfBlocks = frange.getMax();
+        int numberOfPixels = Math.max(width, numberOfBlocks);
         float blocksPerPixel = numberOfBlocks / (float) numberOfPixels;
         float pixelsPerBlock = numberOfPixels / (float) numberOfBlocks;
 
         // new image
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage img = new BufferedImage(numberOfPixels, 1, BufferedImage.TYPE_INT_RGB);
         int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
         Arrays.fill(pixels, 0xFFFFFF);
-        
+
+        int lastPixelPainted = -1;
         Iterator<Integer> bit = frange.iterate();
         while(bit.hasNext())
         {
             int bid = bit.next();
             float pixelBucket = bid / blocksPerPixel;
-            int lowBucket = (int)Math.floor(pixelBucket);
-            if (lowBucket >= numberOfPixels) lowBucket = numberOfPixels - 1;
-            Logging.info("%s", lowBucket);
+            int lowBucket = Math.min(numberOfPixels - 1, (int)Math.floor(pixelBucket));
 
-            pixels[lowBucket] = 0xFF0000;
-            for (int i = 0; i < pixelsPerBlock; i++)
+            if (lowBucket > lastPixelPainted)
             {
-                pixels[lowBucket + i] = 0xFF0000;
+                pixels[lowBucket] = 0xFF0000;
+                for (int i = 0, j = lowBucket; i < pixelsPerBlock; i++, j++)
+                {
+                    if (j < numberOfPixels)
+                    {
+                        pixels[j] = 0xFF0000;
+                        lastPixelPainted = j - 1;
+                    }
+                }
             }
         }
 

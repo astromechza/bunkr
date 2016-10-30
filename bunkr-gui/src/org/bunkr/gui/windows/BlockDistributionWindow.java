@@ -48,7 +48,10 @@ public class BlockDistributionWindow extends BaseWindow
 
         imagePanel.setCenter(imageView);
 
-        imageView.setImage(BlockImageGenerator.buildImageFromArchiveInfo(this.archive, 400, 400));
+        imageView.setImage(BlockImageGenerator.buildImageFromArchiveInfo(this.archive, 400));
+        imageView.setSmooth(false);
+        imageView.fitWidthProperty().bind(imagePanel.widthProperty().subtract(10));
+        imageView.fitHeightProperty().bind(imagePanel.heightProperty().subtract(10));
 
         root.setCenter(imagePanel);
 
