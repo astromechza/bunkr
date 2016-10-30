@@ -73,6 +73,7 @@ public class MainWindow extends BaseWindow
     private MenuItem newFolderMI;
     private Menu optionsMenu;
     private MenuItem securitySettingsMI;
+    private MenuItem blockDistribMI;
     private Menu helpMenu;
     private MenuItem aboutMI;
 
@@ -125,6 +126,7 @@ public class MainWindow extends BaseWindow
         this.newFolderMI = new MenuItem("New Folder..", Icons.buildIconLabel(Icons.ICON_FOLDER));
         this.optionsMenu = new Menu("Options");
         this.securitySettingsMI = new MenuItem("Security Settings..", Icons.buildIconLabel(Icons.ICON_SETTINGS));
+        this.blockDistribMI = new MenuItem("Block Distribution..", Icons.buildIconLabel(Icons.ICON_BLOCKS));
         this.helpMenu = new Menu("Help");
         this.aboutMI = new MenuItem("About");
     }
@@ -142,7 +144,8 @@ public class MainWindow extends BaseWindow
                                         this.importFileMI,
                                         this.importFileFromURLMI,
                                         this.newFolderMI);
-        this.optionsMenu.getItems().addAll(this.securitySettingsMI);
+        this.optionsMenu.getItems().addAll(this.securitySettingsMI,
+                                           this.blockDistribMI);
         this.helpMenu.getItems().addAll(this.aboutMI);
 
         sp.getItems().add(this.tree);
@@ -177,6 +180,17 @@ public class MainWindow extends BaseWindow
             try
             {
                 new AboutWindow().getStage().showAndWait();
+            }
+            catch (IOException e)
+            {
+                QuickDialogs.exception(e);
+            }
+        });
+
+        this.blockDistribMI.setOnAction(event -> {
+            try
+            {
+                new BlockDistributionWindow().getStage().showAndWait();
             }
             catch (IOException e)
             {

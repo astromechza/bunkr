@@ -72,6 +72,8 @@ public class Icons
     public static final String ICON_FILE_RICH = "\uf1c2";
     public static final String ICON_FILE_HTML = "\uf0ac";
 
+    public static final String ICON_BLOCKS = "\uf02a";
+
     public static Button buildIconButton(String text, String icon, int size)
     {
         Button b = new Button(text);

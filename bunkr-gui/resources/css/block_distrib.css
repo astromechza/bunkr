@@ -1,0 +1,10 @@
+.block-image {
+    -fx-padding: 10px 10px 10px 10px;
+    -fx-border-radius: 3px;
+    -fx-border-insets: 0;
+    -fx-border-width: 2px;
+    -fx-border-style: solid;
+    -fx-border-color: darkgray lightgray lightgray darkgray;
+    -fx-margin: 10px 10px 10px 10px;
+    -fx-background-color: #FEFEFE;
+}
