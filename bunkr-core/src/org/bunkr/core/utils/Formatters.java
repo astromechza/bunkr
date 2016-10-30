@@ -112,6 +112,17 @@ public class Formatters
         return String.format("%d Milliseconds", (long) milliseconds);
     }
 
+    public static String formatPrettyElapsedShort(double milliseconds)
+    {
+        if (milliseconds == 0) return "0";
+        if (milliseconds < 0) return "Unknown";
+        if (milliseconds > Units.DAY) return String.format("%.1f Day", milliseconds / (double) Units.DAY);
+        if (milliseconds > Units.HOUR) return String.format("%.1f Hrs", milliseconds / (double) Units.HOUR);
+        if (milliseconds > Units.MINUTE) return String.format("%.1f Min", milliseconds / (double) Units.MINUTE);
+        if (milliseconds > Units.SECOND) return String.format("%.1f Sec", milliseconds / (double) Units.SECOND);
+        return String.format("%d Milliseconds", (long) milliseconds);
+    }
+
     public static String wrap(String input, int linewidth)
     {
         if (input == null) return null;

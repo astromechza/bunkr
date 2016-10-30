@@ -86,7 +86,7 @@ public class InventoryPather
     public static String dirname(String path)
     {
         path = path.trim();
-        if (path.equals("/")) return "/";
+        if (path.equals("/") || ! path.contains("/")) return "/";
         String s = path.substring(0, path.lastIndexOf("/"));
         if (s.equals("")) return "/";
         return s;

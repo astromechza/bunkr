@@ -65,7 +65,7 @@ public class ProgressBar
         if (enabled)
         {
             System.out.print('\r');
-            System.out.print(formatState(n, total, width, title));
+            System.out.print(formatStateWithRate(n, total, width, title, 0, this.unitIsBytes));
         }
     }
 
@@ -89,14 +89,11 @@ public class ProgressBar
 
     public void finish()
     {
-        if (enabled)
+        if (enabled && n >= lastPrintN)
         {
-            if (n >= lastPrintN)
-            {
-                long elapsed = System.currentTimeMillis() - this.startTime;
-                System.out.print('\r');
-                System.out.println(formatStateWithRate(n, total, width, title, elapsed, this.unitIsBytes));
-            }
+            long elapsed = System.currentTimeMillis() - this.startTime;
+            System.out.print('\r');
+            System.out.println(formatStateWithRate(n, total, width, title, elapsed, this.unitIsBytes));
         }
     }
 
@@ -110,68 +107,71 @@ public class ProgressBar
         this.unitIsBytes = unitIsBytes;
     }
 
-    private static String formatState(long n, long total, int ncols, String prefix)
+    private static String buildBarMiddle(long n, long total, int ncols, long elapsedMs, boolean unitIsBytes)
     {
-        double frac = n / (double) total;
-        double percentage = frac * 100;
-        String left = (prefix != null) ? prefix : "";
-        String right = String.format("%3.0f%%", percentage);
-        ncols -= left.length();
-        ncols -= right.length();
-        if (ncols < 4)
-        {
-            return left + right;
-        }
+        String middle = "";
+        int characterBudget = ncols;
+        characterBudget -= 4;
+
+        String rateBar;
+        if (unitIsBytes)
+            rateBar = Formatters.formatBytes(Units.SECOND * n / elapsedMs);
         else
+            rateBar = Formatters.formatPrettyInt(Units.SECOND * n / elapsedMs);
+        rateBar += "/s";
+
+        // do we have space to draw the proposed text
+        if (characterBudget >= rateBar.length())
         {
-            ncols -= 2;
-            int barWidth = (int) (frac * ncols);
-            char[] bar = new char[barWidth];
-            char[] space = new char[ncols - barWidth];
-            Arrays.fill(bar, '=');
-            Arrays.fill(space, ' ');
-            return String.format("%s|%s%s|%s", left, new String(bar), new String(space), right);
+            middle += rateBar;
+            characterBudget -= rateBar.length();
+
+            double remainingMilliseconds = (elapsedMs / (double)(n)) * (total - n);
+            if (remainingMilliseconds > 0)
+            {
+                String remText = Formatters.formatPrettyElapsedShort(remainingMilliseconds);
+                if (characterBudget >= remText.length() + 1) middle += " " + remText;
+            }
+            else
+            {
+                String elapText = Formatters.formatPrettyElapsed(elapsedMs);
+                if (characterBudget >= elapText.length() + 1) middle += " " + elapText;
+            }
         }
+        return "[" + middle + "]";
     }
+
 
     private static String formatStateWithRate(long n, long total, int ncols, String prefix, long elapsedMs, boolean unitIsBytes)
     {
+        // calculate percentage
         double frac = n / (double) total;
         double percentage = frac * 100;
+
+        // create elements at the ends of the progress bar
         String left = (prefix != null) ? prefix : "";
         String right = String.format("%3.0f%%", percentage);
+
+        // if we have used up all the characters we have to work with, return
         ncols -= left.length();
         ncols -= right.length();
-        if (ncols < 4)
+        if (ncols < 4) return left + right;
+
+        // account for | at end of bar
+        ncols -= 2;
+
+        // create array of bar characters
+        int barWidth = (int) (frac * ncols);
+        char[] bar = new char[ncols];
+        Arrays.fill(bar, 0, barWidth, '=');
+        Arrays.fill(bar, barWidth, bar.length, ' ');
+
+        if (elapsedMs > 0 && n > 0)
         {
-            return left + right;
+            String middle = buildBarMiddle(n, total, ncols, elapsedMs, unitIsBytes);
+            int startOfRateSection = ncols / 2 - middle.length() / 2;
+            System.arraycopy(middle.toCharArray(), 0, bar, startOfRateSection, middle.length());
         }
-        else
-        {
-            ncols -= 2;
-
-            int barWidth = (int) (frac * ncols);
-
-            char[] bar = new char[ncols];
-            Arrays.fill(bar, 0, barWidth, '=');
-            Arrays.fill(bar, barWidth, bar.length, ' ');
-
-            if (elapsedMs > 0 && ncols >= 12)
-            {
-                final String rateBar;
-                if (unitIsBytes)
-                    rateBar = Formatters.formatBytes(Units.SECOND * n / elapsedMs);
-                else
-                    rateBar = Formatters.formatPrettyInt(Units.SECOND * n / elapsedMs);
-                int rateBarL = rateBar.length();
-                int startOfRateSection = ncols / 2 - rateBarL / 2;
-                bar[startOfRateSection - 1] = '[';
-                System.arraycopy(rateBar.toCharArray(), 0, bar, startOfRateSection, rateBarL);
-                bar[startOfRateSection + rateBarL] = '/';
-                bar[startOfRateSection + rateBarL + 1] = 's';
-                bar[startOfRateSection + rateBarL + 2] = ']';
-            }
-            return String.format("%s|%s|%s", left, new String(bar), right);
-        }
+        return String.format("%s|%s|%s", left, new String(bar), right);
     }
 }
