@@ -17,7 +17,6 @@ import java.util.Iterator;
 public class BlockImageGenerator
 {
 
-
     public static Image buildImageFromArchiveInfo(ArchiveInfoContext aic, int width)
     {
         FragmentedRange frange = new FragmentedRange();

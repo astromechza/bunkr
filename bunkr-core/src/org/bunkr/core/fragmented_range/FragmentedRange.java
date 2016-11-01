@@ -393,6 +393,25 @@ public class FragmentedRange
         };
     }
 
+    /**
+     * Inverts the fragmented range so that all missing elements between the min and max become the new items.
+     * @return a new FragmentedRange object
+     */
+    public FragmentedRange invert()
+    {
+        FragmentedRange output = new FragmentedRange();
+        if (this.isEmpty()) return output;
+
+        output.add(this.getMin(), this.getMax() - this.getMin());
+        Iterator<Pair<Integer, Integer>> it = this.iteratePairs();
+        while (it.hasNext())
+        {
+            Pair<Integer, Integer> p = it.next();
+            output.remove(p.getKey(), p.getValue());
+        }
+        return output;
+    }
+
     // ======= PRIVATE PARTS ========
 
     //    private void rangeCheck(int index)
