@@ -33,10 +33,10 @@ import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.MetadataWriter;
 import org.bunkr.core.Resources;
 import org.bunkr.core.exceptions.BaseBunkrException;
+import org.bunkr.core.fragmented_range.FragmentedRange;
 import org.bunkr.core.inventory.*;
 import org.bunkr.core.usersec.UserSecurityProvider;
 import org.bunkr.core.utils.Logging;
-import org.bunkr.gui.BlockImageGenerator;
 import org.bunkr.gui.Icons;
 import org.bunkr.gui.components.tabs.IOpenedFileTab;
 import org.bunkr.gui.components.tabs.TabLoadError;
@@ -78,6 +78,10 @@ public class MainWindow extends BaseWindow
     private Menu helpMenu;
     private MenuItem aboutMI;
 
+    private BorderPane flashPane;
+    private Label flashLabel;
+    private Button hideFlashButton;
+
     private final Map<UUID, IOpenedFileTab> openTabs;
 
     public MainWindow(ArchiveInfoContext archive, UserSecurityProvider securityProvider) throws IOException
@@ -112,6 +116,7 @@ public class MainWindow extends BaseWindow
         this.tree.setCellFactory(cellFactory);
 
         this.tree.refreshAll();
+        this.flashWarningsIfNeeded();
     }
 
     @Override
@@ -130,6 +135,8 @@ public class MainWindow extends BaseWindow
         this.blockDistribMI = new MenuItem("Block Distribution..", Icons.buildIconLabel(Icons.ICON_BLOCKS));
         this.helpMenu = new Menu("Help");
         this.aboutMI = new MenuItem("About");
+        this.flashLabel = new Label("Test content");
+        this.hideFlashButton = new Button("", Icons.buildIconLabel(Icons.ICON_CROSS));
     }
 
     @Override
@@ -153,7 +160,15 @@ public class MainWindow extends BaseWindow
         sp.getItems().add(this.tabPane);
 
         bp.setTop(menu);
-        bp.setCenter(sp);
+
+        BorderPane innerbp = new BorderPane();
+        flashPane = new BorderPane();
+        flashPane.setCenter(this.flashLabel);
+        flashPane.setRight(hideFlashButton);
+        innerbp.setTop(flashPane);
+        innerbp.setCenter(sp);
+
+        bp.setCenter(innerbp);
 
         return bp;
     }
@@ -201,13 +216,15 @@ public class MainWindow extends BaseWindow
             }
         });
 
+        this.hideFlashButton.setOnAction(e -> this.hideFlashMessage());
+
         this.bindHotKey(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), event -> requestSaveActiveFile());
     }
 
     @Override
     public void applyStyling()
     {
-
+        flashPane.getStyleClass().add("flash-warning");
     }
 
     @Override
@@ -228,6 +245,7 @@ public class MainWindow extends BaseWindow
         {
             Logging.info("Saving Archive Metadata due to %s", reason);
             MetadataWriter.write(this.archive, this.securityProvider);
+            this.flashWarningsIfNeeded();
         }
         catch (IOException | BaseBunkrException e)
         {
@@ -310,6 +328,51 @@ public class MainWindow extends BaseWindow
             if (selectedTab instanceof MarkdownTab) {
                 MarkdownTab targetTab = (MarkdownTab) selectedTab;
                 targetTab.saveContent();
+            }
+        }
+    }
+
+    public void showFlashMessage(String text)
+    {
+        Logging.info("Setting flash message to '%s'", text);
+        this.flashLabel.setText(text);
+        this.flashPane.setVisible(true);
+        this.flashPane.setManaged(true);
+    }
+
+    public void hideFlashMessage()
+    {
+        this.flashPane.setVisible(false);
+        this.flashPane.setManaged(false);
+    }
+
+    public void flashWarningsIfNeeded()
+    {
+        this.hideFlashMessage();
+
+        // scan for files that need re-encryption
+        Iterator<FileInventoryItem> fileit = archive.getInventory().getIterator();
+        FragmentedRange usedBlocks = new FragmentedRange();
+        while(fileit.hasNext())
+        {
+            FileInventoryItem current = fileit.next();
+            if (current.getEncryptionAlgorithm() != archive.getInventory().getDefaultEncryption())
+            {
+                this.showFlashMessage("WARNING: Some files need to be re-encrypted. Go to Options > Security Settings.");
+                return;
+            }
+            usedBlocks.union(current.getBlocks());
+        }
+
+        // scan for lots of empty space
+        long allocatedBytes = usedBlocks.size() * archive.getBlockSize();
+        long unallocatedBytes = archive.getBlockDataLength() - allocatedBytes;
+        if (archive.getBlockDataLength() > 0)
+        {
+            float percent = unallocatedBytes / (float)(allocatedBytes + unallocatedBytes);
+            if (percent > 0.10 && unallocatedBytes > (1024 * 1024))
+            {
+                this.showFlashMessage(String.format("WARNING: %.2f%% of space is being wasted! Go to Options > Block Distribution", percent * 100));
             }
         }
     }

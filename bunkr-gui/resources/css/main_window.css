@@ -47,3 +47,11 @@
     -fx-text-alignment: center;
 }
 
+.flash-warning {
+    -fx-background-color: linear-gradient(to bottom, #ffd65e, #febf04);
+    -fx-padding: 2px 2px 2px 2px;
+    -fx-border-insets: 0;
+    -fx-border-width: 0px 1px 0px 1px;
+    -fx-border-style: solid;
+    -fx-border-color: darkgray;
+}

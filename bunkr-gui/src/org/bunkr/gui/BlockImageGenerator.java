@@ -17,6 +17,8 @@ import java.util.Iterator;
  */
 public class BlockImageGenerator
 {
+    public static final int BACKGROUND_COLOUR = 0xFFFFFF;
+    public static final int FOREGROUND_COLOUR = 0xFF0000;
 
     public static Image buildImageFromArchiveInfo(ArchiveInfoContext aic, int width)
     {
@@ -42,7 +44,7 @@ public class BlockImageGenerator
         // new image
         BufferedImage img = new BufferedImage(numberOfPixels, 1, BufferedImage.TYPE_INT_RGB);
         int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
-        Arrays.fill(pixels, 0xFFFFFF);
+        Arrays.fill(pixels, BACKGROUND_COLOUR);
 
         int lastPixelPainted = -1;
         Iterator<Integer> bit = frange.iterate();
@@ -54,7 +56,7 @@ public class BlockImageGenerator
 
             if (lowBucket > lastPixelPainted)
             {
-                pixels[lowBucket] = 0xFF0000;
+                pixels[lowBucket] = FOREGROUND_COLOUR;
                 for (int i = 0, j = lowBucket; i < pixelsPerBlock; i++, j++)
                 {
                     if (j < numberOfPixels)
