@@ -76,6 +76,15 @@ public class FragmentedRange
     }
 
     /**
+     * Construct a FragmentedRage object which contains the given items.
+     * @param items a number of items to add to the range
+     */
+    public FragmentedRange(int... items)
+    {
+        this.addAll(items);
+    }
+
+    /**
      * Merge all ranges from the other object into the current object.
      * @param other another range object
      */
@@ -187,6 +196,15 @@ public class FragmentedRange
             }
         }
         addElementPair(start, length);
+    }
+
+    /**
+     * Add a number of items.
+     * @param items the items to add
+     */
+    public void addAll(int... items)
+    {
+        for (int i : items) this.add(i);
     }
 
     /**
@@ -410,6 +428,22 @@ public class FragmentedRange
             output.remove(p.getKey(), p.getValue());
         }
         return output;
+    }
+
+    /**
+     * @return a boolean indicating whether the range is not fragmented
+     */
+    public boolean isContinuous()
+    {
+        return this.usedDataLength <= 2;
+    }
+
+    /**
+     * @return a boolean indicating whether the range is fragmented
+     */
+    public boolean isFragmented()
+    {
+        return ! this.isContinuous();
     }
 
     // ======= PRIVATE PARTS ========

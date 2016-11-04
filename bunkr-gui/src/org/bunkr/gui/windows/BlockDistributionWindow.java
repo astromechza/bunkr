@@ -1,17 +1,22 @@
 package org.bunkr.gui.windows;
 
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.Resources;
 import org.bunkr.core.fragmented_range.FragmentedRange;
 import org.bunkr.core.inventory.FileInventoryItem;
+import org.bunkr.core.operations.BlockDefragmentation;
 import org.bunkr.core.utils.Formatters;
 import org.bunkr.gui.BlockImageGenerator;
 
@@ -28,12 +33,15 @@ public class BlockDistributionWindow extends BaseWindow
     private ImageView imageView;
     private BorderPane imagePanel;
     private GridPane statsPanel;
+    private GridPane actionPanel;
     private Label blocksLabel;
     private Label blocksValue;
     private Label bytesLabel;
     private Label bytesValue;
     private Label percentLabel;
     private Label percentValue;
+    private Label workValue;
+    private Button defragButton;
 
     public BlockDistributionWindow(ArchiveInfoContext archive) throws IOException
     {
@@ -71,6 +79,13 @@ public class BlockDistributionWindow extends BaseWindow
 
         imageView.setImage(BlockImageGenerator.buildImageFromArchiveInfo(this.archive, 400));
 
+        int moveBlocksCount = BlockDefragmentation.calculateFilesThatRequireAMove(
+                archive.getInventory()).stream().mapToInt(f -> f.getBlocks().size()).sum();
+        workValue.setText(String.format("%d blocks (%s) need to be written to defrag the archive and save %s.",
+                                        moveBlocksCount,
+                                        Formatters.formatBytes(moveBlocksCount * blockSize),
+                                        Formatters.formatBytes(unallocatedBlocksCount * blockSize)
+        ));
     }
 
     @Override
@@ -78,6 +93,8 @@ public class BlockDistributionWindow extends BaseWindow
     {
         this.statsPanel = new GridPane();
         this.imagePanel = new BorderPane();
+        this.actionPanel = new GridPane();
+
         this.imageView = new ImageView();
 
         this.blocksLabel = new Label("Blocks:");
@@ -86,6 +103,9 @@ public class BlockDistributionWindow extends BaseWindow
         this.bytesValue = new Label();
         this.percentLabel = new Label("Percentage:");
         this.percentValue = new Label();
+
+        this.workValue = new Label();
+        this.defragButton = new Button("Defrag");
     }
 
     @Override
@@ -116,6 +136,25 @@ public class BlockDistributionWindow extends BaseWindow
 
         root.setCenter(imagePanel);
 
+        actionPanel.setHgap(10);
+        actionPanel.setHgap(10);
+        actionPanel.setPadding(new Insets(10, 0, 0, 10));
+
+        actionPanel.add(this.workValue, 0, 0); actionPanel.add(this.defragButton, 1, 0);
+
+        ColumnConstraints c1 = new ColumnConstraints();
+        c1.setHalignment(HPos.LEFT);
+        c1.setHgrow(Priority.ALWAYS);
+        ColumnConstraints c2 = new ColumnConstraints();
+        c2.setHalignment(HPos.RIGHT);
+
+        actionPanel.getColumnConstraints().addAll(c1, c2);
+        actionPanel.setMaxWidth(Double.MAX_VALUE);
+
+        root.setBottom(actionPanel);
+
+        BorderPane.setMargin(imagePanel, new Insets(10, 0, 0, 0));
+
         return root;
     }
 
@@ -145,7 +184,7 @@ public class BlockDistributionWindow extends BaseWindow
         scene.getStylesheets().add(this.cssCommon);
         scene.getStylesheets().add(this.cssPath);
         this.getStage().setTitle("Bunkr - Block Distribution");
-        this.getStage().setMinWidth(800);
+        this.getStage().setMinWidth(750);
         this.getStage().setMinHeight(300);
         this.getStage().setScene(scene);
         this.getStage().initModality(Modality.APPLICATION_MODAL);
