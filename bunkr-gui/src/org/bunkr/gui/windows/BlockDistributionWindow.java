@@ -17,11 +17,19 @@ import org.bunkr.core.Resources;
 import org.bunkr.core.fragmented_range.FragmentedRange;
 import org.bunkr.core.inventory.FileInventoryItem;
 import org.bunkr.core.operations.BlockDefragmentation;
+import org.bunkr.core.streams.input.MultilayeredInputStream;
+import org.bunkr.core.streams.output.MultilayeredOutputStream;
 import org.bunkr.core.utils.Formatters;
+import org.bunkr.core.utils.Units;
 import org.bunkr.gui.BlockImageGenerator;
+import org.bunkr.gui.ProgressTask;
+import org.bunkr.gui.dialogs.ProgressDialog;
+import org.bunkr.gui.dialogs.QuickDialogs;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created At: 2016-10-30
@@ -42,6 +50,8 @@ public class BlockDistributionWindow extends BaseWindow
     private Label percentValue;
     private Label workValue;
     private Button defragButton;
+
+    private Consumer<String> onSaveInventoryRequest;
 
     public BlockDistributionWindow(ArchiveInfoContext archive) throws IOException
     {
@@ -81,6 +91,7 @@ public class BlockDistributionWindow extends BaseWindow
 
         int moveBlocksCount = BlockDefragmentation.calculateFilesThatRequireAMove(
                 archive.getInventory()).stream().mapToInt(f -> f.getBlocks().size()).sum();
+        defragButton.setDisable(moveBlocksCount == 0);
         workValue.setText(String.format("%d blocks (%s) need to be written to defrag the archive and save %s.",
                                         moveBlocksCount,
                                         Formatters.formatBytes(moveBlocksCount * blockSize),
@@ -161,7 +172,7 @@ public class BlockDistributionWindow extends BaseWindow
     @Override
     public void bindEvents()
     {
-
+        this.defragButton.setOnAction(event -> this.work());
     }
 
     @Override
@@ -190,5 +201,76 @@ public class BlockDistributionWindow extends BaseWindow
         this.getStage().initModality(Modality.APPLICATION_MODAL);
         this.getStage().setResizable(true);
         return scene;
+    }
+
+    private void work()
+    {
+        List<FileInventoryItem> files = BlockDefragmentation.calculateFilesThatRequireAMove(archive.getInventory());
+        if (files.size() > 0)
+        {
+            FileInventoryItem firstFile = files.get(0);
+
+            ProgressTask<Void> progressTask = new ProgressTask<Void>()
+            {
+                FileInventoryItem subject = firstFile;
+
+                @Override
+                protected Void innerCall() throws Exception
+                {
+                    try (MultilayeredInputStream mis = new MultilayeredInputStream(archive, subject))
+                    {
+                        try (MultilayeredOutputStream mos = new MultilayeredOutputStream(archive, subject))
+                        {
+                            this.updateMessage("Re-encrypting file bytes..");
+                            long bytesTotal = subject.getActualSize();
+                            long bytesDone = 0;
+                            byte[] buffer = new byte[(int) Units.MEBIBYTE];
+                            int n;
+                            while ((n = mis.read(buffer)) != -1)
+                            {
+                                mos.write(buffer, 0, n);
+                                bytesDone += n;
+                                this.updateProgress(bytesDone, bytesTotal);
+                            }
+                        }
+                    }
+
+                    this.updateMessage("Finished.");
+
+                    return null;
+                }
+
+                @Override
+                protected void succeeded()
+                {
+                    onSaveInventoryRequest.accept(String.format("Rewrote file %s", subject.getName()));
+                    BlockDistributionWindow.this.refresh();
+                }
+
+                @Override
+                protected void cancelled()
+                {
+                    onSaveInventoryRequest.accept("Cancelled file import");
+                }
+
+                @Override
+                protected void failed()
+                {
+                    onSaveInventoryRequest.accept("Failed file import");
+                    QuickDialogs.exception(this.getException());
+                }
+            };
+
+            ProgressDialog pd = new ProgressDialog(progressTask);
+            pd.setHeaderText(String.format("Re-encrypting file %s ...", firstFile.getName()));
+            Thread task = new Thread(progressTask);
+            task.setDaemon(true);
+            task.start();
+        }
+    }
+
+    public void setOnSaveInventoryRequest(Consumer<String> onSaveInventoryRequest)
+    {
+        this.onSaveInventoryRequest = onSaveInventoryRequest;
     }
 }

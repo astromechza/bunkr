@@ -191,7 +191,9 @@ public class MainWindow extends BaseWindow
         this.blockDistribMI.setOnAction(event -> {
             try
             {
-                new BlockDistributionWindow(this.archive).getStage().showAndWait();
+                BlockDistributionWindow w = new BlockDistributionWindow(this.archive);
+                w.setOnSaveInventoryRequest(this::requestMetadataSave);
+                w.getStage().showAndWait();
             }
             catch (IOException e)
             {

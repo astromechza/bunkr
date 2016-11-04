@@ -31,6 +31,8 @@ public class BlockImageGenerator
     
     public static Image buildImageFromFragRange(FragmentedRange frange, int width)
     {
+        if (frange.isEmpty()) return null;
+
         // block length is in bytes so we have to downshift
         int numberOfBlocks = frange.getMax();
         int numberOfPixels = Math.max(width, numberOfBlocks);
