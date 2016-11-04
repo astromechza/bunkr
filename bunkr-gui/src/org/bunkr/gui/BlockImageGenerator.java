@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import org.bunkr.core.ArchiveInfoContext;
 import org.bunkr.core.fragmented_range.FragmentedRange;
 import org.bunkr.core.inventory.FileInventoryItem;
+import org.bunkr.core.utils.Logging;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -25,7 +26,6 @@ public class BlockImageGenerator
         {
             frange.union(fit.next().getBlocks());
         }
-
         return buildImageFromFragRange(frange, width);
     }
     
@@ -34,7 +34,7 @@ public class BlockImageGenerator
         if (frange.isEmpty()) return null;
 
         // block length is in bytes so we have to downshift
-        int numberOfBlocks = frange.getMax();
+        int numberOfBlocks = frange.getMax() + 1;
         int numberOfPixels = Math.max(width, numberOfBlocks);
         float blocksPerPixel = numberOfBlocks / (float) numberOfPixels;
         float pixelsPerBlock = numberOfPixels / (float) numberOfBlocks;

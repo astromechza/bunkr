@@ -116,7 +116,7 @@ public class BlockDistributionWindow extends BaseWindow
         this.percentValue = new Label();
 
         this.workValue = new Label();
-        this.defragButton = new Button("Defrag");
+        this.defragButton = new Button("Defrag Once");
     }
 
     @Override
